@@ -111,7 +111,7 @@
         "../node_modules/@nuxt/ui/dist/runtime/*"
       ],
       "#ui-colors": [
-        "./ui.colors"
+        "./ui.colors.mjs"
       ],
       "#color-mode-options": [
         "./color-mode-options.mjs"
@@ -124,9 +124,6 @@
       ],
       "#tailwind-config": [
         "./tailwind/expose"
-      ],
-      "#tailwind-config/*": [
-        "./tailwind/expose/*"
       ],
       "vue-i18n": [
         "../node_modules/vue-i18n/dist/vue-i18n"
@@ -156,10 +153,10 @@
         "../node_modules/@nuxtjs/i18n/dist/types"
       ],
       "#nuxt-i18n/logger": [
-        "./nuxt-i18n-logger"
+        "./nuxt-i18n-logger.mjs"
       ],
       "#app-manifest": [
-        "./manifest/meta/dev.json"
+        "./manifest/meta/9fc17df1-8df6-4070-98c4-d31e28b70db9.json"
       ],
       "#components": [
         "./components"
@@ -247,6 +244,6 @@
     "../node_modules/@nuxt/devtools/dist/runtime/server",
     "../node_modules/@nuxt/telemetry/runtime/server",
     "../node_modules/@nuxt/telemetry/dist/runtime/server",
-    "dev"
+    "../.output"
   ]
 }

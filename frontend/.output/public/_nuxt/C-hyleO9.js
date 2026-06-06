@@ -1,1 +1,0 @@
-import{u as n}from"./DkIonGR_.js";function u(){function a(o,t,r){const s=URL.createObjectURL(o),e=document.createElement("a");e.href=s,e.download=t,e.click(),URL.revokeObjectURL(s),n().add({title:r,color:"success"})}function c(o){const t=o.response?.data?.error||o.message||"Unknown error";n().add({title:t,color:"error"})}return{downloadBlob:a,showError:c}}export{u};

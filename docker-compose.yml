@@ -9,12 +9,9 @@ services:
       - log_data:/var/log/docstamp
     environment:
       - TZ=Asia/Shanghai
+      - DOCSTAMP_STATIC=/opt/docstamp/frontend/.output/public
+      - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
 volumes:
   output_data:
