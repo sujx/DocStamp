@@ -20,6 +20,15 @@ npm-debug.log*
 .pids/
 backend/output/*
 !backend/output/.gitkeep
+backend/tasks.db*
+.plan/
+.codegraph/
+.claude/
+SPEC.md
+
+# Nuxt build artifacts
+frontend/.nuxt/
+frontend/.output/
 
 # Poetry
 poetry.lock

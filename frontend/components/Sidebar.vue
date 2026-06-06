@@ -95,7 +95,7 @@
     </nav>
 
     <!-- Bottom: language + collapse -->
-    <div class="p-2 border-t space-y-1 shrink-0" :style="{ borderColor: 'var(--color-border-subtle)' }">
+    <div class="px-1.5 py-2 border-t space-y-1 shrink-0 overflow-hidden" :style="{ borderColor: 'var(--color-border-subtle)' }">
       <LanguageSwitcher :collapsed="collapsed" />
       <UButton
         size="sm" variant="ghost" color="neutral"

@@ -33,7 +33,6 @@ export default defineNuxtConfig({
     },
   },
 
-  // @nuxtjs/i18n v8 config (Nuxt 3 compatible)
   i18n: {
     strategy: "no_prefix",
     defaultLocale: "zh-CN",
@@ -41,7 +40,7 @@ export default defineNuxtConfig({
       { code: "zh-CN", name: "中文", file: "zh-CN.json" },
       { code: "en", name: "English", file: "en.json" },
     ],
-    lazy: true,
+    lazy: false,
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: "docstamp_lang",

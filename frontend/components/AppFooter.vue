@@ -5,3 +5,7 @@
     <a href="mailto:sujx@live.cn" class="hover:underline">sujx@live.cn</a>
   </footer>
 </template>
+
+<style scoped>
+footer { border-color: var(--color-border-default); color: var(--color-text-tertiary); }
+</style>

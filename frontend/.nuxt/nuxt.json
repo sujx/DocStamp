@@ -1,9 +1,9 @@
 {
-  "_hash": "7EgtOmolS3QfJkov1k4eVBrnNhUQEcJLYuZktCiZtKM",
+  "_hash": "EEWwiIiJyvZCQkDCv3oHeA7VcYQkEU-W9jWdNISs0Ng",
   "project": {
     "rootDir": "/root/Project/docStamp/frontend"
   },
   "versions": {
-    "nuxt": "3.21.7"
+    "nuxt": "3.15.4"
   }
 }

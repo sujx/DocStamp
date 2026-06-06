@@ -41,7 +41,9 @@
     "taskFailure": "Failed",
     "taskNotFound": "Task not found",
     "taskRetrying": "Retrying",
-    "uploadArea": "File upload area, click or drag files here"
+    "uploadArea": "File upload area, click or drag files here",
+    "langZh": "Switch to Chinese",
+    "langEn": "Switch to English"
   },
   "properties": {
     "title": "Office Document Properties",

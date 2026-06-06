@@ -2,36 +2,67 @@
 
 ## 项目概述
 
-docStamp 是一站式文档处理工具箱，9 大功能模块。Nuxt 4 + Nuxt UI v4 + Tailwind CSS v4 前端，Flask REST API 后端。绿鹃品牌色系（`#008A3D` + `#F9F7E8`），仪表盘 + 侧边导航 + 多页面路由，中英文双语。
+docStamp 是一站式文档处理工具箱，8 大功能模块。Nuxt 3 + Nuxt UI v2 + Tailwind CSS v3 前端，Flask REST API 后端。绿鹃品牌色系（`#008A3D` + `#F9F7E8`），仪表盘 + 侧边导航 + 多页面路由，中英文双语。
+
+**单体工具定位**：无用户系统、无认证、无 AI — 即开即用，随用随走。
 
 ## 项目结构
 
 ```
 docStamp/
-├── backend/                    # Flask API（9 模块 + 24 端点）
-│   ├── app.py                  # 工厂模式 create_app() + _register_routes()
-│   ├── converter.py            # Pandoc/LibreOffice/Calibre 文档转换
-│   ├── formatter.py            # GB/T 9704-2012 DOCX 格式化
-│   ├── properties.py           # Office 属性读写
-│   ├── img2pdf_handler.py      # 图片 → PDF
-│   ├── pdf_to_images.py        # PDF → 图片（pdftoppm）
-│   ├── print_split.py          # PDF 打印分组
-│   ├── watermark.py            # 水印添加 + 去除
-│   ├── pdf_editor.py           # PDF 页面编辑
-│   ├── excel_merger.py         # Excel/CSV 合并
-│   ├── gunicorn.conf.py        # Gunicorn 配置
-│   └── tests/                  # 27 tests
-├── frontend/                   # Nuxt 4 SPA
-│   ├── nuxt.config.ts          # 模块、代理、i18n、图标
-│   ├── app.config.ts           # Nuxt UI brand 主题
-│   ├── assets/css/main.css     # Tailwind @theme + CSS 变量
-│   ├── plugins/axios.client.ts # 开发模式 API 直连 :5000
-│   ├── composables/useDownload.ts
-│   ├── layouts/default.vue     # 侧边导航 + 内容区
-│   ├── pages/                  # 10 个路由页面（仪表盘 + 9 工具）
-│   ├── components/             # 15+ 组件
-│   └── i18n/locales/           # zh-CN / en
-├── manage.sh                   # 开发管理
+├── backend/
+│   ├── app.py                  # Flask 工厂 (<70 行，仅蓝图注册 + SPA fallback)
+│   ├── config.py               # 集中配置
+│   ├── errors.py               # ErrorCode 枚举 + ServiceResult[T] + ServiceError
+│   ├── schemas.py              # Pydantic v2 请求 DTO (15+ Schema)
+│   ├── error_handler.py        # 全局异常拦截 + @validate_request + requestId
+│   ├── json_logging.py         # JSON 结构化日志 + TimedRotatingFileHandler (30天)
+│   ├── models.py               # TaskRecord + OperationLog + BaseCRUD (原始 SQL)
+│   ├── cache.py                # Flask-Caching SimpleCache
+│   ├── cel.py                  # Celery (memory:// broker, 3 队列: convert/pdf/office)
+│   ├── config_validators.py    # 配置校验 (URL/端口/CORS)
+│   ├── gunicorn.conf.py        # 生产: bind 0.0.0.0:5000, workers=4
+│   ├── blueprints/             # HTTP 路由层 (只做请求/响应)
+│   │   ├── convert.py          # /api/convert, /api/preview, /api/stats
+│   │   ├── files.py            # /api/properties, /api/watermark, /api/pdf-editor, ...
+│   │   └── download.py         # /api/download, /api/health, /api/tasks/*
+│   ├── services/               # 业务逻辑层 (纯函数，零 Flask 依赖)
+│   │   ├── converter.py        # MD → DOCX (Pandoc)
+│   │   ├── formatter.py        # GB/T 9704-2012 格式化
+│   │   ├── watermark.py        # 水印添加/去除
+│   │   ├── pdf_editor.py       # PDF 删除/插入/重排
+│   │   ├── excel_merger.py     # Excel/CSV 合并
+│   │   ├── img2pdf_handler.py  # 图片 → PDF
+│   │   ├── pdf_to_images.py    # PDF → 图片 (pdftoppm)
+│   │   ├── print_split.py      # PDF 打印分组
+│   │   └── properties.py       # Office 属性读写
+│   ├── tasks/                  # Celery 异步任务
+│   │   ├── convert.py          # convert_queue
+│   │   ├── pdf.py              # pdf_queue (8 tasks)
+│   │   ├── office.py           # office_queue (3 tasks)
+│   │   └── maintenance.py      # Beat: 定时清理临时文件
+│   ├── utils/                  # 通用工具
+│   │   ├── base/               # file_helpers / validators
+│   │   ├── file_security.py    # 魔数校验 + 大小限制 + 扩展名白名单
+│   │   ├── file_cleanup.py     # 7 天定时清理
+│   │   ├── retry.py            # @retry_on_failure (2 次重试 → 降级)
+│   │   └── crypto.py           # AES-256 Fernet 字段加密
+│   └── tests/
+├── frontend/                   # Nuxt 3 SPA
+│   ├── nuxt.config.ts          # splitChunks:true, @nuxtjs/i18n v9, ssr:false
+│   ├── tailwind.config.ts      # Tailwind v3 品牌色阶
+│   ├── app.config.ts           # Nuxt UI v2: primary:green, gray:cool
+│   ├── assets/css/main.css     # CSS 变量 (品牌 token)
+│   ├── composables/            # useValidation / useTaskStream / useApi / useDownload
+│   ├── components/ui/          # 原子组件 (ButtonPrimary / CardBase / ProgressBar)
+│   ├── layouts/default.vue     # 侧边导航壳
+│   ├── pages/                  # 9 页面 (仪表盘 + 8 工具)
+│   ├── components/             # 15+ 业务组件
+│   └── locales/                # zh-CN / en
+├── docs/
+│   └── vireolens-ui-spec.css   # VireoLens 通用 UI 设计参考
+├── manage.sh                   # dev/prod 管理 (start/stop/restart/prod/test)
+├── prod-start.sh               # 生产一键启动
 ├── Dockerfile
 └── SPEC.md
 ```
@@ -41,58 +72,95 @@ docStamp/
 ### 启动
 
 ```bash
-# 启动后端
-cd backend && python3 app.py                    # :5000
-
-# 启动前端
-cd frontend && npm run dev                      # :8080
-
-# 一键启动
+# 开发模式 (Flask :5000 + Nuxt :8080)
 ./manage.sh start
+
+# 生产模式 (Gunicorn :5000 单端口，含前端静态)
+./manage.sh prod
+
+# 停止
+./manage.sh stop
 ```
-
-### 代理
-
-`plugins/axios.client.ts` 在开发模式下将 API 请求直连 `localhost:5000`。生产环境通过 Flask 服务 Nuxt 静态输出。
 
 ### 测试
 
 ```bash
-./manage.sh test                # 27 tests, <0.5s
-cd frontend && npm run build    # 构建验证
+./manage.sh test              # 后端 pytest
+cd frontend && npm run build  # 前端构建验证
 ```
 
-## 设计规范
+## 核心规范
 
-### 颜色 Token（Tailwind @theme）
+### Service 层规范
+
+所有 Service 函数必须返回 `ServiceResult[T]`，禁止裸 raise：
+
+```python
+from errors import ServiceResult, ErrorCode
+
+def my_service(path: str) -> ServiceResult[dict]:
+    try:
+        data = do_work(path)
+        return ServiceResult.ok(data)
+    except ValueError as e:
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, str(e))
+```
+
+**错误码**: 使用 `ErrorCode` 枚举（20+ 预定义错误码），不硬编码字符串。
+**异常**: 需要中断流程时 raise `ServiceError(code, msg, status)`，由全局 handler 自动捕获。
+
+### API 层规范
+
+- Blueprint 函数不超过 15 行，只做参数提取 → 调用 service → 返回响应
+- 所有请求参数通过 Pydantic Schema 校验：`@validate_request(body=MdConvertSchema)`
+- 全局异常拦截器自动处理所有异常 → 标准化 JSON: `{code, msg, requestId}`
+- 每个请求自动分配 `requestId`（12 位 hex），通过 `X-Request-Id` 响应头返回
+
+### 前端规范
+
+- UI 组件：Nuxt UI v2 (`UFormGroup`, `UButton`, `UInput`, `USelect`, `UTabs`)
+- 图标：Heroicons (`i-heroicons-*`)，本地模式
+- 所有 UI 文本用 `$t()`，禁止硬编码
+- 颜色统一通过 CSS 变量（`var(--color-*)`），禁止 inline hex
+- 禁止 `transition: all`，仅对 opacity/transform/border-color 过渡
+- 表单校验：Vuelidate (`useFormValidation` composable)
+- 异步进度：SSE (`useTaskStream` composable)
+- 数字时钟：rem/vw/clamp 响应式，`role="timer"` + `aria-label`
+
+### 设计 Token
 
 | Token | 值 | 用途 |
 |-------|-----|------|
-| `--color-brand-700` | `#008a3d` | 主色 |
-| `--color-page` | `#f9f7e8` | 页面底 |
-| `--color-surface` | `#ffffff` | 卡片白 |
+| `--color-brand-700` | `#008a3d` | 品牌主色 |
+| `--color-page` | `#f9f7e8` | 页面底色 |
+| `--color-surface` | `#ffffff` | 卡片白色 |
 | `--color-text-primary` | `#1a1a1a` | 正文 |
 | `--color-text-secondary` | `#5c5c5c` | 辅助 |
-| `--color-text-tertiary` | `#8c8a7a` | 提示 |
-| `--color-border-default` | `#e8e6d8` | 边框 |
+| `--color-border-default` | `#e8e6d8` | 默认边框 |
 
-### 组件规范
+### 命名规范
 
-- UI 组件库：Nuxt UI v4（UButton, UInput, USelect, UTabs, UFormField, UAlert, UProgress, UIcon）
-- 图标：Heroicons（`i-heroicons-*`）
-- 禁用 `transition: all`，仅对 opacity/transform/border-color 过渡
-- 所有 UI 文本用 `$t()`，禁止硬编码
-- 颜色统一通过 CSS 变量，禁止 inline style 硬编码色值
+| 层级 | 规范 | 示例 |
+|------|------|------|
+| 后端 Blueprint | 复数/功能名 | `convert.py`, `files.py` |
+| 后端 Service | 单数 + `_service` (或原名) | `converter.py`, `watermark.py` |
+| 后端 Model | 小写 | `models.py` |
+| 前端组件 | PascalCase | `DigitalClock.vue`, `ProgressBar.vue` |
+| 前端 composables | `useXxx.ts` | `useValidation.ts`, `useTaskStream.ts` |
+| 前端 pages | kebab-case 路由 | `md-to-docx.vue`, `file-assembly.vue` |
 
-### 布局模式
+## 版本信息
 
-- 工具页面：`<PageHeader />` + 功能组件
-- 子功能（文件组装/水印管理）：卡片式模式切换（grid 2 列）
-- 新增工具：pages/ 创建路由 + Sidebar 添加导航 + Dashboard 添加卡片 + i18n 添加键
-
-## 参考文档
-
-- [前端框架迁移指南](docs/nuxt-migration-guide.md) — Buefy → Nuxt UI 迁移方法、步骤、注意事项
+| 组件 | 版本 | 备注 |
+|------|------|------|
+| Nuxt | 3.15.4 | 锁死版本 |
+| @nuxt/ui | ^2.21 | Nuxt UI v2 |
+| @nuxtjs/i18n | ^9.5 | i18n v9 |
+| @nuxt/icon | ^1.10 | Icon v1 |
+| Tailwind CSS | v3 | tailwind.config.ts |
+| Flask | ^3.1 | — |
+| Pydantic | ^2.13 | 参数校验 |
+| Celery | ^5.6 | 异步任务 (dev: memory://) |
 
 ## 常见命令
 
@@ -101,10 +169,12 @@ cd frontend && npm run build    # 构建验证
 find . -name "__pycache__" -exec rm -rf {} +
 rm -rf frontend/.nuxt frontend/.output
 
-# 安装前端依赖
-cd frontend && npm install
-
-# 安装后端依赖
+# 依赖安装
 cd backend && pip3 install --break-system-packages flask flask-cors flask-babel \
-    python-docx openpyxl python-pptx markdown bleach img2pdf pypdf Pillow reportlab gunicorn
+    python-docx openpyxl python-pptx markdown bleach img2pdf pypdf Pillow \
+    reportlab gunicorn pydantic celery flask-caching cryptography
+cd ../frontend && npm install
+
+# 前端 lint
+cd frontend && npm run lint && npm run format
 ```

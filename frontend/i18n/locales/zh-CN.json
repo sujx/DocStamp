@@ -41,7 +41,9 @@
     "taskFailure": "处理失败",
     "taskNotFound": "任务未找到",
     "taskRetrying": "正在重试",
-    "uploadArea": "文件上传区域，点击或拖拽文件到此处"
+    "uploadArea": "文件上传区域，点击或拖拽文件到此处",
+    "langZh": "切换到中文",
+    "langEn": "切换到英文"
   },
   "properties": {
     "title": "Office 文档属性修改",

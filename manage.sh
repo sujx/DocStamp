@@ -11,7 +11,7 @@
 #   ./manage.sh frontend  仅启动前端
 #   ./manage.sh test      运行后端测试
 #   ./manage.sh test-cov  运行测试 + 覆盖率
-#   ./manage.sh clean-output  清理临时输出文件
+#   ./manage.sh prod      生产模式（单端口 :5000）
 # ───────────────────────────────────────────────────────────────────
 
 set -euo pipefail
@@ -208,6 +208,9 @@ case "${1:-}" in
     frontend)
         _start_frontend
         ;;
+    prod)
+        bash "$PROJECT_DIR/prod-start.sh"
+        ;;
     test)
         log_info "运行后端测试..."
         cd "$BACKEND_DIR"
@@ -232,12 +235,13 @@ case "${1:-}" in
         echo "用法: $0 <command>"
         echo ""
         echo "命令:"
-        echo "  start         启动后端 + 前端"
+        echo "  start         启动后端 + 前端（开发模式）"
         echo "  stop          停止所有服务"
         echo "  restart       重启所有服务"
         echo "  status        查看运行状态"
         echo "  backend       仅启动后端"
         echo "  frontend      仅启动前端"
+        echo "  prod          生产模式（Gunicorn :5000 + 前端静态文件）"
         echo "  test          运行后端 pytest 测试"
         echo "  test-cov      运行后端测试（含覆盖率）"
         echo "  clean-output  清理 output 目录文件"

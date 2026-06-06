@@ -1,6 +1,7 @@
 
 // @ts-nocheck
-
+import locale_zh_45CN_46json_1f0c5420 from "#nuxt-i18n/1f0c5420";
+import locale_en_46json_9b0da3fe from "#nuxt-i18n/9b0da3fe";
 
 export const localeCodes =  [
   "zh-CN",
@@ -11,14 +12,14 @@ export const localeLoaders = {
   "zh-CN": [
     {
       key: "locale_zh_45CN_46json_1f0c5420",
-      load: () => import("#nuxt-i18n/1f0c5420" /* webpackChunkName: "locale_zh_45CN_46json_1f0c5420" */),
+      load: () => Promise.resolve(locale_zh_45CN_46json_1f0c5420),
       cache: true
     }
   ],
   en: [
     {
       key: "locale_en_46json_9b0da3fe",
-      load: () => import("#nuxt-i18n/9b0da3fe" /* webpackChunkName: "locale_en_46json_9b0da3fe" */),
+      load: () => Promise.resolve(locale_en_46json_9b0da3fe),
       cache: true
     }
   ]
@@ -81,7 +82,7 @@ export const nuxtI18nOptions = {
   trailingSlash: false,
   defaultLocaleRouteNameSuffix: "default",
   strategy: "no_prefix",
-  lazy: true,
+  lazy: false,
   langDir: "locales",
   rootRedirect: undefined,
   detectBrowserLanguage: {
