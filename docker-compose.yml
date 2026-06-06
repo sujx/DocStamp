@@ -1,0 +1,21 @@
+services:
+  docstamp:
+    build: .
+    container_name: docstamp
+    ports:
+      - "8050:5000"
+    volumes:
+      - output_data:/opt/docstamp/output
+      - log_data:/var/log/docstamp
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  output_data:
+  log_data:

@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.venv/
+venv/
+*.egg
+
+# Node
+node_modules/
+frontend/dist/
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+
+# Project
+.pids/
+backend/output/*
+!backend/output/.gitkeep
+
+# Poetry
+poetry.lock
+
+# Docker
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*

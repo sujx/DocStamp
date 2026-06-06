@@ -1,0 +1,53 @@
+<h2>Split-Screen Login — Detail Design</h2>
+<p class="subtitle">Left: brand panel. Right: form. Below: 3 variations of the brand panel content.</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Variation 1: Logo + Title Only</div>
+    <div class="mockup-body" style="display:flex;min-height:360px;">
+      <div style="flex:1;background:#008a3d;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 32px;color:#fff;text-align:center;">
+        <div style="width:64px;height:64px;background:rgba(255,255,255,0.15);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:28px;">📄</div>
+        <div style="font-size:24px;font-weight:700;margin-bottom:8px;">docStamp</div>
+        <div style="font-size:14px;opacity:0.8;">文档处理工具箱</div>
+      </div>
+      <div style="flex:1;background:#fff;padding:48px 40px;display:flex;flex-direction:column;justify-content:center;">
+        <div style="font-size:20px;font-weight:600;color:#1a1a1a;margin-bottom:24px;">登录</div>
+        <div style="height:40px;background:#f4f2e4;border-radius:6px;margin-bottom:12px;"></div>
+        <div style="height:40px;background:#f4f2e4;border-radius:6px;margin-bottom:24px;"></div>
+        <div style="height:44px;background:#008a3d;border-radius:8px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="mockup-header">Variation 2: Smaller Brand Panel</div>
+    <div class="mockup-body" style="display:flex;min-height:360px;">
+      <div style="flex:0.8;background:#008a3d;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;color:#fff;text-align:center;">
+        <div style="width:48px;height:48px;background:rgba(255,255,255,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:22px;">📄</div>
+        <div style="font-size:20px;font-weight:700;">docStamp</div>
+      </div>
+      <div style="flex:1.2;background:#fff;padding:48px 40px;display:flex;flex-direction:column;justify-content:center;">
+        <div style="font-size:20px;font-weight:600;color:#1a1a1a;margin-bottom:24px;">登录</div>
+        <div style="height:40px;background:#f4f2e4;border-radius:6px;margin-bottom:12px;"></div>
+        <div style="height:40px;background:#f4f2e4;border-radius:6px;margin-bottom:24px;"></div>
+        <div style="height:44px;background:#008a3d;border-radius:8px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="options" style="margin-top:24px;">
+  <div class="option" data-choice="v1-balanced" onclick="toggleSelect(this)">
+    <div class="letter">V1</div>
+    <div class="content">
+      <h3>50/50 Balanced</h3>
+      <p>Equal-width columns. More brand presence.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="v2-compact" onclick="toggleSelect(this)">
+    <div class="letter">V2</div>
+    <div class="content">
+      <h3>40/60 Compact Brand</h3>
+      <p>Wider form area, smaller brand panel. More focus on input.</p>
+    </div>
+  </div>
+</div>

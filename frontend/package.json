@@ -1,0 +1,28 @@
+{
+  "name": "docstamp-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "docStamp Document Processing Toolbox - Nuxt + Nuxt UI Frontend",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt generate",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "lint": "eslint . --ext .vue,.ts,.js",
+    "lint:fix": "eslint . --ext .vue,.ts,.js --fix",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@nuxt/icon": "^1.10",
+    "@nuxt/ui": "^2.21",
+    "@nuxtjs/i18n": "^9.5",
+    "axios": "^1.7",
+    "dompurify": "^3.4.7",
+    "highlight.js": "^11.11.1",
+    "katex": "^0.17.0",
+    "marked": "^18.0.4",
+    "mermaid": "^11.15.0",
+    "nuxt": "^3.15"
+  }
+}
