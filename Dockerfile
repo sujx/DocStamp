@@ -24,6 +24,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pandoc \
     poppler-utils \
     libreoffice-core \
+    libpango-1.0-0 \
+    libgdk-pixbuf2.0-0 \
     fonts-noto-cjk \
     curl \
     && rm -rf /var/lib/apt/lists/*

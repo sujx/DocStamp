@@ -44,12 +44,14 @@ def image_process():
             cleanup_files(filepath, output_path)
             return jsonify({"error": result.message}), 400
 
+        actual_output = result.data.get("output_path", output_path)
+
         @after_this_request
         def _cleanup(response):
-            cleanup_files(filepath, output_path)
+            cleanup_files(filepath, actual_output)
             return response
 
-        return send_file(output_path, as_attachment=True, download_name=f"processed_{filename}")
+        return send_file(actual_output, as_attachment=True, download_name=f"processed_{filename}")
     except ValueError as e:
         cleanup_files(filepath, output_path)
         return jsonify({"error": str(e)}), 400

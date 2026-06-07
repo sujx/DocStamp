@@ -15,17 +15,11 @@ def process_image(filepath: str, output_path: str, params: dict) -> ServiceResul
 
     Args:
         filepath: Path to the source image.
-        output_path: Path to write the processed image.
-        params: Dict with:
-            action: "resize" / "crop" / "convert" / "compress"
-            width, height: For resize (pixels)
-            keep_aspect: For resize (bool, default True)
-            left, top, right, bottom: For crop (pixels)
-            target_format: For convert ("png"/"jpeg"/"tiff")
-            quality: For compress (1-100, JPEG only)
+        output_path: Path to write the processed image. May be adjusted for format conversion.
+        params: Dict with action, dimensions, target_format, quality.
 
     Returns:
-        ServiceResult with dict: original_size, processed_size, format, dimensions.
+        ServiceResult with dict: original_size, processed_size, format, dimensions, output_path.
     """
     action = params.get("action", "")
     if action not in ("resize", "crop", "convert", "compress"):
@@ -79,10 +73,12 @@ def process_image(filepath: str, output_path: str, params: dict) -> ServiceResul
         if target_format == "jpg":
             target_format = "jpeg"
 
-        # Ensure output path has correct extension
+        # Adjust output path for target format
         base = os.path.splitext(output_path)[0]
         ext_map = {"png": ".png", "jpeg": ".jpg", "tiff": ".tif"}
-        output_path = base + ext_map.get(target_format, ".png")
+        new_ext = ext_map.get(target_format, os.path.splitext(output_path)[1])
+        if new_ext != os.path.splitext(output_path)[1]:
+            output_path = base + new_ext
 
         if img.mode in ("RGBA", "LA", "P") and target_format in ("jpeg",):
             img = img.convert("RGB")
@@ -116,4 +112,5 @@ def process_image(filepath: str, output_path: str, params: dict) -> ServiceResul
         "format": save_format.lower(),
         "original_dimensions": list(original_dims),
         "processed_dimensions": list(img.size),
+        "output_path": output_path,
     })

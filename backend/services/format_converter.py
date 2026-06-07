@@ -75,10 +75,10 @@ def _html_to_pdf(filepath: str, output_path: str) -> ServiceResult[None]:
     """Convert HTML to PDF using WeasyPrint."""
     try:
         from weasyprint import HTML
-    except ImportError:
+    except (ImportError, OSError) as e:
         return ServiceResult.fail(
             ErrorCode.TOOL_NOT_AVAILABLE,
-            "WeasyPrint not installed. Run: pip install weasyprint",
+            f"WeasyPrint not available: {e}. Install system deps: apt install libpango-1.0-0 libgdk-pixbuf2.0-0",
         )
 
     try:

@@ -8,6 +8,8 @@ import uuid
 
 from werkzeug.utils import secure_filename
 
+from utils.file_security import validate_file_security
+
 
 FORBIDDEN_PATH_CHARS = {"..", "/", "\\"}
 
@@ -45,6 +47,8 @@ def validate_filename(raw_name: str, allowed_exts: set) -> str:
 def save_upload(file, allowed_exts: set, upload_folder: str) -> tuple[str, str]:
     """Save an uploaded file with a unique prefix.
 
+    Runs full security validation: extension whitelist → magic number → size limit.
+
     Args:
         file: Werkzeug FileStorage object.
         allowed_exts: Set of allowed extensions.
@@ -57,6 +61,10 @@ def save_upload(file, allowed_exts: set, upload_folder: str) -> tuple[str, str]:
     unique_name = f"{uuid.uuid4().hex}_{filename}"
     filepath = os.path.join(upload_folder, unique_name)
     file.save(filepath)
+
+    # Full security check: size, extension, magic number
+    validate_file_security(filepath, file.filename)
+
     return unique_name, filepath
 
 

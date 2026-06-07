@@ -9,7 +9,6 @@ Prevents:
 import os
 import struct
 
-from errors import ErrorCode, ServiceError
 
 # ── Extension Whitelist ─────────────────────────────────────────────────
 
@@ -84,23 +83,19 @@ def _validate_size(filepath: str) -> None:
     try:
         size = os.path.getsize(filepath)
     except OSError as e:
-        raise ServiceError(ErrorCode.FILE_NOT_FOUND, f"Cannot read file: {e}")
+        raise ValueError(f"Cannot read file: {e}")
     if size > MAX_FILE_SIZE:
-        raise ServiceError(
-            ErrorCode.FILE_TOO_LARGE,
-            f"File size {_format_size(size)} exceeds limit of {_format_size(MAX_FILE_SIZE)}",
+        raise ValueError(
+            f"File size {_format_size(size)} exceeds limit of {_format_size(MAX_FILE_SIZE)}"
         )
 
 
 def _validate_extension(ext: str) -> None:
     """Check file extension is in the whitelist."""
     if not ext:
-        raise ServiceError(ErrorCode.UNSUPPORTED_FORMAT, "File has no extension")
+        raise ValueError("File has no extension")
     if ext not in ALLOWED_EXTENSIONS:
-        raise ServiceError(
-            ErrorCode.UNSUPPORTED_FORMAT,
-            f"File extension .{ext} is not allowed",
-        )
+        raise ValueError(f"File extension .{ext} is not allowed")
 
 
 def _validate_magic(filepath: str, ext: str) -> None:
@@ -113,12 +108,11 @@ def _validate_magic(filepath: str, ext: str) -> None:
         with open(filepath, "rb") as f:
             header = f.read(len(magic))
     except OSError as e:
-        raise ServiceError(ErrorCode.FILE_NOT_FOUND, f"Cannot read file for magic check: {e}")
+        raise ValueError(f"Cannot read file for magic check: {e}")
 
     if header != magic:
-        raise ServiceError(
-            ErrorCode.MAGIC_NUMBER_MISMATCH,
-            f"File content does not match .{ext} format; upload rejected",
+        raise ValueError(
+            f"File content does not match .{ext} format; upload rejected"
         )
 
 
