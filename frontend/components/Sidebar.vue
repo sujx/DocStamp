@@ -140,6 +140,8 @@ const navItems = computed<NavItem[]>(() => [
       { to: "/properties", icon: "i-heroicons-document-text", label: t("tabs.properties") },
       { to: "/excel-merge", icon: "i-heroicons-table-cells", label: t("tabs.excelMerge") },
       { to: "/format-docx", icon: "i-heroicons-document-check", label: t("tabs.formatDocx") },
+      { to: "/format-convert", icon: "i-heroicons-arrow-path", label: t("tabs.formatConvert") },
+      { to: "/metadata-clean", icon: "i-heroicons-shield-exclamation", label: t("tabs.metadataClean") },
     ],
   },
   {
@@ -148,6 +150,11 @@ const navItems = computed<NavItem[]>(() => [
       { to: "/file-assembly", icon: "i-heroicons-arrows-right-left", label: t("tabs.fileAssembly") },
       { to: "/print-split", icon: "i-heroicons-printer", label: t("tabs.printSplit") },
       { to: "/pdf-editor", icon: "i-heroicons-document", label: t("tabs.pdfEditor") },
+      { to: "/pdf-to-text", icon: "i-heroicons-document-magnifying-glass", label: t("tabs.pdfToText") },
+      { to: "/pdf-merge", icon: "i-heroicons-plus-circle", label: t("tabs.pdfMerge") },
+      { to: "/pdf-compress", icon: "i-heroicons-arrows-pointing-in", label: t("tabs.pdfCompress") },
+      { to: "/page-decorate", icon: "i-heroicons-document-check", label: t("tabs.pageDecorate") },
+      { to: "/image-process", icon: "i-heroicons-photo", label: t("tabs.imageProcess") },
     ],
   },
 ]);

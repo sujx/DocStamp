@@ -1,0 +1,138 @@
+<template>
+  <div class="max-w-3xl mx-auto px-6 py-8">
+    <PageHeader :title="$t('pdfToText.title')" :description="$t('pdfToText.description')" />
+
+    <div class="card" :style="{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-default)' }">
+      <FileUploader
+        :accept="'.pdf'"
+        :max-size="100"
+        :label="$t('pdfToText.uploadLabel')"
+        @file-selected="onFileSelected"
+      />
+
+      <UFormGroup v-if="file" :label="$t('pdfToText.pages')" class="mt-4">
+        <UInput
+          v-model="pagesInput"
+          :placeholder="$t('pdfToText.pagesHint')"
+          size="sm"
+        />
+      </UFormGroup>
+
+      <div class="mt-6 flex gap-3">
+        <UButton
+          color="primary"
+          :disabled="!file" :loading="extracting"
+          @click="extract"
+        >
+          <UIcon name="i-heroicons-document-text" class="w-4 h-4 mr-1.5" />
+          {{ extracting ? $t("common.processing") : $t("pdfToText.extract") }}
+        </UButton>
+        <UButton
+          v-if="result"
+          variant="outline" color="neutral"
+          @click="downloadText"
+        >
+          <UIcon name="i-heroicons-arrow-down-tray" class="w-4 h-4 mr-1.5" />
+          {{ $t("common.download") }}
+        </UButton>
+        <UButton
+          v-if="result"
+          variant="ghost" color="neutral"
+          @click="copyText"
+        >
+          <UIcon name="i-heroicons-clipboard" class="w-4 h-4 mr-1.5" />
+          {{ $t("pdfToText.copy") }}
+        </UButton>
+      </div>
+
+      <div v-if="result" class="mt-6">
+        <div class="text-xs mb-2" :style="{ color: 'var(--color-text-secondary)' }">
+          {{ $t("pdfToText.pageInfo", { total: result.total_pages, extracted: result.extracted_pages }) }}
+        </div>
+        <pre
+          class="result-area"
+          :style="{
+            backgroundColor: 'var(--color-muted)',
+            borderColor: 'var(--color-border-default)',
+            color: 'var(--color-text-primary)',
+          }"
+        >{{ result.text }}</pre>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import axios from "axios";
+import { useDownload } from "~/composables/useDownload";
+
+const { t } = useI18n();
+const toast = useToast();
+
+const file = ref<File | null>(null);
+const pagesInput = ref("");
+const extracting = ref(false);
+const result = ref<{ text: string; total_pages: number; extracted_pages: number } | null>(null);
+
+function onFileSelected(f: File) {
+  file.value = f;
+  result.value = null;
+}
+
+async function extract() {
+  if (!file.value) return;
+  extracting.value = true;
+  try {
+    const fd = new FormData();
+    fd.append("file", file.value);
+    if (pagesInput.value.trim()) {
+      fd.append("pages", pagesInput.value.trim());
+    }
+    const resp = await axios.post("/api/pdf-to-text", fd);
+    result.value = resp.data;
+    toast.add({ title: t("pdfToText.success"), color: "success" });
+  } catch (e: any) {
+    toast.add({ title: e.response?.data?.error || e.message, color: "error" });
+  } finally {
+    extracting.value = false;
+  }
+}
+
+function downloadText() {
+  if (!result.value) return;
+  const name = (file.value?.name || "document").replace(/\.pdf$/i, "") + ".txt";
+  const blob = new Blob([result.value.text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function copyText() {
+  if (!result.value) return;
+  await navigator.clipboard.writeText(result.value.text);
+  toast.add({ title: t("pdfToText.copied"), color: "success" });
+}
+</script>
+
+<style scoped>
+.card {
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 24px;
+}
+.result-area {
+  width: 100%;
+  max-height: 500px;
+  overflow: auto;
+  border: 1px solid;
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}
+</style>

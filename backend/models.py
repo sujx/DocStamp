@@ -21,10 +21,11 @@ def _get_db(db_path: str) -> sqlite3.Connection:
     if not hasattr(_local, "connections"):
         _local.connections = {}
     if db_path not in _local.connections:
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(db_path, timeout=10)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA foreign_keys=ON")
+        conn.execute("PRAGMA busy_timeout=5000")
         _local.connections[db_path] = conn
     return _local.connections[db_path]
 

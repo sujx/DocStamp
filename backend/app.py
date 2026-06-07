@@ -37,14 +37,42 @@ def create_app() -> Flask:
     init_db(app.config["TASK_DB_PATH"])
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
-    # Register blueprints
+    # Register blueprints — one per feature for clear module boundaries
     from blueprints.convert import convert_bp
-    from blueprints.files import files_bp
     from blueprints.download import download_bp
+    from blueprints.properties_bp import properties_bp
+    from blueprints.img2pdf_bp import img2pdf_bp
+    from blueprints.pdf2img_bp import pdf2img_bp
+    from blueprints.print_split_bp import print_split_bp
+    from blueprints.watermark_bp import watermark_bp
+    from blueprints.pdf_editor_bp import pdf_editor_bp
+    from blueprints.excel_merge_bp import excel_merge_bp
+    from blueprints.pdf_to_text_bp import pdf_to_text_bp
+    from blueprints.pdf_merge_bp import pdf_merge_bp
 
     app.register_blueprint(convert_bp)
-    app.register_blueprint(files_bp)
     app.register_blueprint(download_bp)
+    app.register_blueprint(properties_bp)
+    app.register_blueprint(img2pdf_bp)
+    app.register_blueprint(pdf2img_bp)
+    app.register_blueprint(print_split_bp)
+    app.register_blueprint(watermark_bp)
+    app.register_blueprint(pdf_editor_bp)
+    app.register_blueprint(excel_merge_bp)
+    app.register_blueprint(pdf_to_text_bp)
+    app.register_blueprint(pdf_merge_bp)
+
+    from blueprints.pdf_compress_bp import pdf_compress_bp
+    from blueprints.metadata_clean_bp import metadata_clean_bp
+    from blueprints.format_convert_bp import format_convert_bp
+    from blueprints.page_decorate_bp import page_decorate_bp
+    from blueprints.image_process_bp import image_process_bp
+
+    app.register_blueprint(pdf_compress_bp)
+    app.register_blueprint(metadata_clean_bp)
+    app.register_blueprint(format_convert_bp)
+    app.register_blueprint(page_decorate_bp)
+    app.register_blueprint(image_process_bp)
 
     # SPA fallback — serve frontend static files (Nuxt generate output)
     static_dir = app.config["STATIC_FOLDER"]

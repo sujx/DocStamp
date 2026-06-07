@@ -9,41 +9,31 @@ Supports:
 import os
 from io import BytesIO
 
+from errors import ErrorCode, ServiceResult
+
 
 def add_watermark(filepath: str, output_path: str, params: dict,
-                  image_filepath: str = None) -> None:
+                  image_filepath: str = None) -> ServiceResult[None]:
     """Add a text or image watermark to a document.
 
     Args:
         filepath: Path to the source document (.docx or .pdf).
         output_path: Path to write the watermarked document.
-        params: Watermark parameters dict:
-            - watermark_type (str): "text" or "image", default "text"
-            - text (str): Watermark text (for text type)
-            - image (str): Base64 or path to image file (for image type)
-            - font (str): Font name, default "Helvetica"
-            - font_size (int): Font size in pt, default 48
-            - color (str): Hex color, default "#D0D0D0"
-            - opacity (float): 0.0-1.0, default 0.3
-            - rotation (float): Degrees, default -45
-            - position (str): "tile" or "center", default "tile"
-            - spacing_x (int): Horizontal spacing for tile mode, default 200
-            - spacing_y (int): Vertical spacing for tile mode, default 200
-        image_filepath: Optional path to an uploaded image file for
-                        image-type watermarks.
+        params: Watermark parameters dict.
+        image_filepath: Optional path to an uploaded image file.
 
-    Raises:
-        ValueError: If the file format is unsupported or required params missing.
+    Returns:
+        ServiceResult with None on success.
     """
     watermark_type = params.get("watermark_type", "text")
 
     if watermark_type == "text":
         text = params.get("text", "")
         if not text:
-            raise ValueError("Watermark text is required")
+            return ServiceResult.fail(ErrorCode.WATERMARK_TEXT_REQUIRED, "Watermark text is required")
     elif watermark_type == "image":
         if not image_filepath and not params.get("image"):
-            raise ValueError("Watermark image is required")
+            return ServiceResult.fail(ErrorCode.WATERMARK_IMAGE_REQUIRED, "Watermark image is required")
 
     ext = os.path.splitext(filepath)[1].lower()
 
@@ -52,7 +42,9 @@ def add_watermark(filepath: str, output_path: str, params: dict,
     elif ext == ".docx":
         _watermark_docx(filepath, output_path, params, image_filepath)
     else:
-        raise ValueError(f"Unsupported file format: {ext}")
+        return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, f"Unsupported file format: {ext}")
+
+    return ServiceResult.ok(None)
 
 
 def _watermark_pdf(filepath: str, output_path: str, params: dict,
@@ -213,32 +205,27 @@ def _watermark_docx(filepath: str, output_path: str, params: dict,
     doc.save(output_path)
 
 
-def remove_watermark(filepath: str, output_path: str) -> dict:
+def remove_watermark(filepath: str, output_path: str) -> ServiceResult[dict]:
     """Remove watermarks from a Word or PDF file.
 
     DOCX: Clears all header content across all sections (reliable).
     PDF: Attempts best-effort removal by stripping overlay content.
-         Works best for PDFs watermarked by docStamp; results may vary
-         for externally watermarked files.
 
     Args:
         filepath: Path to the source document (.docx or .pdf).
         output_path: Path to write the cleaned document.
 
     Returns:
-        dict with keys: type ("docx" or "pdf"), method, warning (optional).
-
-    Raises:
-        ValueError: If the file format is unsupported.
+        ServiceResult with dict: type, method, optional warning.
     """
     ext = os.path.splitext(filepath)[1].lower()
 
     if ext == ".docx":
-        return _remove_watermark_docx(filepath, output_path)
+        return ServiceResult.ok(_remove_watermark_docx(filepath, output_path))
     elif ext == ".pdf":
-        return _remove_watermark_pdf(filepath, output_path)
+        return ServiceResult.ok(_remove_watermark_pdf(filepath, output_path))
     else:
-        raise ValueError(f"Unsupported file format: {ext}")
+        return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, f"Unsupported file format: {ext}")
 
 
 def _remove_watermark_docx(filepath: str, output_path: str) -> dict:

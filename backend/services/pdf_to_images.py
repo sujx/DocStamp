@@ -2,7 +2,11 @@
 
 import os
 import subprocess
-from typing import List, Optional
+from typing import Optional
+
+from pypdf import PdfReader
+
+from errors import ErrorCode, ServiceResult
 
 
 def pdf_to_images(
@@ -10,8 +14,8 @@ def pdf_to_images(
     output_dir: str,
     fmt: str = "png",
     dpi: int = 200,
-    pages: Optional[List[int]] = None,
-) -> dict:
+    pages: Optional[list[int]] = None,
+) -> ServiceResult[dict]:
     """Convert PDF pages to images.
 
     Args:
@@ -22,35 +26,37 @@ def pdf_to_images(
         pages: 1-indexed list of pages to convert (None = all pages).
 
     Returns:
-        dict with keys: total_pages, converted, files (list of filenames).
+        ServiceResult with dict keys: total_pages, converted, files, dpi, format.
     """
     if not os.path.isfile(filepath):
-        raise ValueError(f"File not found: {filepath}")
+        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"File not found: {filepath}")
 
     os.makedirs(output_dir, exist_ok=True)
 
-    # Validate format
     if fmt not in ("png", "jpeg"):
-        raise ValueError(f"Unsupported format: {fmt}. Use 'png' or 'jpeg'.")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, f"Unsupported format: {fmt}. Use 'png' or 'jpeg'.")
 
-    # Get total page count
-    from pypdf import PdfReader
-    reader = PdfReader(filepath)
+    try:
+        reader = PdfReader(filepath)
+    except Exception as e:
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+
     total_pages = len(reader.pages)
 
     # Resolve page range
     if pages:
         for p in pages:
             if p < 1 or p > total_pages:
-                raise ValueError(f"Page {p} out of range (1-{total_pages})")
+                return ServiceResult.fail(
+                    ErrorCode.PDF_PAGE_OUT_OF_RANGE,
+                    f"Page {p} out of range (1-{total_pages})",
+                )
         first_page = min(pages)
         last_page = max(pages)
     else:
         first_page = 1
         last_page = total_pages
 
-    # pdftoppm outputs files like: prefix-1.png, prefix-2.png, ...
-    # For jpeg: prefix-1.jpg, prefix-2.jpg
     prefix = os.path.join(output_dir, "page")
 
     cmd = [
@@ -66,12 +72,14 @@ def pdf_to_images(
     try:
         subprocess.run(cmd, check=True, capture_output=True, timeout=120)
     except subprocess.CalledProcessError as e:
-        raise RuntimeError(
-            f"pdftoppm failed: {e.stderr.decode('utf-8', errors='replace')}"
-        ) from e
+        return ServiceResult.fail(
+            ErrorCode.CONVERSION_FAILED,
+            f"pdftoppm failed: {e.stderr.decode('utf-8', errors='replace')}",
+        )
     except FileNotFoundError:
-        raise RuntimeError(
-            "pdftoppm not found. Install poppler-utils: apt install poppler-utils"
+        return ServiceResult.fail(
+            ErrorCode.TOOL_NOT_AVAILABLE,
+            "pdftoppm not found. Install poppler-utils: apt install poppler-utils",
         )
 
     # Collect output files
@@ -81,10 +89,9 @@ def pdf_to_images(
             f for f in os.listdir(output_dir)
             if f.startswith("page-") and f.endswith(f".{ext}")
         ],
-        key=lambda x: int(x.replace("page-", "").replace(f".{ext}", ""))
+        key=lambda x: int(x.replace("page-", "").replace(f".{ext}", "")),
     )
 
-    # If specific pages were requested, filter to only those pages
     if pages:
         requested = set(pages)
         files = [
@@ -92,10 +99,10 @@ def pdf_to_images(
             if int(f.replace("page-", "").replace(f".{ext}", "")) in requested
         ]
 
-    return {
+    return ServiceResult.ok({
         "total_pages": total_pages,
         "converted": len(files),
         "files": files,
         "dpi": dpi,
         "format": fmt,
-    }
+    })

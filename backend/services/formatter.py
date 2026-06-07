@@ -12,6 +12,8 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
+from errors import ErrorCode, ServiceResult
+
 
 # ── Font configuration ──────────────────────────────────────────────
 FONT_CONFIG = {
@@ -122,7 +124,7 @@ def _add_page_field(run):
     run._element.append(fld_end)
 
 
-def format_docx(docx_path: str) -> None:
+def format_docx(docx_path: str) -> ServiceResult[None]:
     """Apply GB/T 9704-2012 formatting to a DOCX file in-place.
 
     Modifies the document at docx_path:
@@ -136,6 +138,9 @@ def format_docx(docx_path: str) -> None:
 
     Args:
         docx_path: Path to the .docx file to format.
+
+    Returns:
+        ServiceResult with None on success.
     """
     doc = Document(docx_path)
 
@@ -242,6 +247,7 @@ def format_docx(docx_path: str) -> None:
 
     # ── 4. Save ───────────────────────────────────────────────────
     doc.save(docx_path)
+    return ServiceResult.ok(None)
 
 
 def _get_or_create_footer(doc, sect_pr, footer_type):

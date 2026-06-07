@@ -5,20 +5,8 @@ import os
 from typing import List
 
 from openpyxl import Workbook, load_workbook
-from openpyxl.utils import get_column_letter
 
-
-class StructureMismatchError(ValueError):
-    """Raised when Excel files have incompatible structures."""
-
-    def __init__(self, filename: str, expected: List[str], actual: List[str]):
-        self.filename = filename
-        self.expected = expected
-        self.actual = actual
-        super().__init__(
-            f"Structure mismatch in '{filename}': "
-            f"expected columns {expected}, got {actual}"
-        )
+from errors import ErrorCode, ServiceResult
 
 
 def _is_csv(filepath: str) -> bool:
@@ -61,43 +49,36 @@ def _get_headers_csv(filepath: str) -> List[str]:
 def merge_excel_files(
     filepaths: List[str],
     output_path: str,
-) -> dict:
+) -> ServiceResult[dict]:
     """Merge multiple .xlsx/.csv files with the same structure into one .xlsx.
 
     All files must have the same column headers (based on first row).
     Rows from all files are appended in order, with a single header row.
-    The output is always .xlsx format.
 
     Args:
         filepaths: List of paths to .xlsx or .csv files to merge.
         output_path: Path where the merged .xlsx will be written.
 
     Returns:
-        dict with keys: total_rows, file_count, columns, per_file_rows.
-
-    Raises:
-        StructureMismatchError: If any file has different headers from the first.
-        ValueError: If fewer than 2 files provided.
+        ServiceResult with dict: total_rows, file_count, columns, per_file_rows.
     """
     if len(filepaths) < 2:
-        raise ValueError("At least 2 files are required for merging")
+        return ServiceResult.fail(ErrorCode.EXCEL_INSUFFICIENT_FILES, "At least 2 files are required for merging")
 
-    # Validate all files exist
     for fp in filepaths:
         if not os.path.isfile(fp):
-            raise ValueError(f"File not found: {fp}")
+            return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"File not found: {fp}")
 
-    # Get headers from the first file as the reference
     ref_headers = _get_headers(filepaths[0])
     if not ref_headers:
-        raise ValueError(f"No headers found in '{os.path.basename(filepaths[0])}'")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, f"No headers found in '{os.path.basename(filepaths[0])}'")
 
-    # Validate all other files have the same headers
     for fp in filepaths[1:]:
         headers = _get_headers(fp)
         if headers != ref_headers:
-            raise StructureMismatchError(
-                os.path.basename(fp), ref_headers, headers
+            return ServiceResult.fail(
+                ErrorCode.EXCEL_STRUCTURE_MISMATCH,
+                f"Structure mismatch in '{os.path.basename(fp)}': expected {ref_headers}, got {headers}",
             )
 
     # Create a new workbook and write the header row
@@ -119,12 +100,12 @@ def merge_excel_files(
     wb.save(output_path)
     wb.close()
 
-    return {
+    return ServiceResult.ok({
         "total_rows": total_rows,
         "file_count": len(filepaths),
         "columns": ref_headers,
         "per_file_rows": per_file_rows,
-    }
+    })
 
 
 def _append_xlsx_rows(ws, filepath: str) -> int:

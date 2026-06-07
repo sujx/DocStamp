@@ -16,16 +16,17 @@ import zipfile
 from datetime import datetime
 from xml.etree import ElementTree as ET
 
+from errors import ErrorCode, ServiceResult
 
-def read_properties(filepath: str) -> dict:
+
+def read_properties(filepath: str) -> ServiceResult[dict]:
     """Read core properties from an Office document.
 
     Args:
         filepath: Path to the Office document (.docx/.xlsx/.pptx).
 
     Returns:
-        dict with keys: created, modified, creator, last_modified_by.
-        Values are strings (ISO format for dates) or empty strings.
+        ServiceResult with dict: created, modified, creator, last_modified_by.
     """
     props = {
         "created": "",
@@ -68,22 +69,22 @@ def read_properties(filepath: str) -> dict:
                 props["last_modified_by"] = last_mod_el.text or ""
 
     except (zipfile.BadZipFile, ET.ParseError, KeyError) as e:
-        raise ValueError(f"Failed to read properties: {e}")
+        return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, f"Failed to read properties: {e}")
 
-    return props
+    return ServiceResult.ok(props)
 
 
-def modify_properties(filepath: str, output_path: str, props: dict) -> None:
+def modify_properties(filepath: str, output_path: str, props: dict) -> ServiceResult[None]:
     """Modify core properties of an Office document.
 
     Args:
         filepath: Path to the source Office document.
         output_path: Path to write the modified document.
         props: dict with optional keys: created, modified, creator,
-               last_modified_by. Only provided keys are modified.
+               last_modified_by.
 
-    Raises:
-        ValueError: If the file format is unsupported or the file is corrupt.
+    Returns:
+        ServiceResult with None on success.
     """
     ext = os.path.splitext(filepath)[1].lower()
 
@@ -94,7 +95,9 @@ def modify_properties(filepath: str, output_path: str, props: dict) -> None:
     elif ext == ".pptx":
         _modify_pptx(filepath, output_path, props)
     else:
-        raise ValueError(f"Unsupported file format: {ext}")
+        return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, f"Unsupported file format: {ext}")
+
+    return ServiceResult.ok(None)
 
 
 def _modify_via_xml(filepath: str, output_path: str, props: dict) -> None:
@@ -244,41 +247,34 @@ def batch_modify_properties(
     output_dir: str,
     props: dict,
     unify_time: bool = False,
-) -> list:
+) -> ServiceResult[list]:
     """Modify properties for multiple Office documents in batch.
 
     Args:
         filepaths: List of paths to Office documents.
         output_dir: Directory to write modified files.
-        props: Properties dict with optional keys: created, modified, creator,
-               last_modified_by, unified_time.
-        unify_time: If True, use the same timestamp for both created and
-                    modified (if only one is provided, the other copies it).
+        props: Properties dict.
+        unify_time: If True, use the same timestamp for both created and modified.
 
     Returns:
-        List of dicts: [{"filename": "a.docx", "success": True}, ...]
-
-    Raises:
-        ValueError: If no files provided or all failed.
+        ServiceResult with list of dicts: [{"filename": "a.docx", "success": True}, ...]
     """
     if not filepaths:
-        raise ValueError("No files provided for batch processing")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "No files provided for batch processing")
 
     results = []
 
     for filepath in filepaths:
         filename = os.path.basename(filepath)
         try:
-            # Resolve unified / separate time mode
             resolved_props = _resolve_time_props(props, unify_time)
-
             output_path = os.path.join(output_dir, filename)
             modify_properties(filepath, output_path, resolved_props)
             results.append({"filename": filename, "success": True})
         except Exception as e:
             results.append({"filename": filename, "success": False, "error": str(e)})
 
-    return results
+    return ServiceResult.ok(results)
 
 
 def _resolve_time_props(props: dict, unify_time: bool) -> dict:

@@ -23,6 +23,7 @@ WORKDIR /opt/docstamp
 RUN apt-get update && apt-get install -y --no-install-recommends \
     pandoc \
     poppler-utils \
+    libreoffice-core \
     fonts-noto-cjk \
     curl \
     && rm -rf /var/lib/apt/lists/*

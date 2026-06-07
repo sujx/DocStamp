@@ -2,7 +2,7 @@
 
 ## 项目概述
 
-docStamp 是一站式文档处理工具箱，8 大功能模块。Nuxt 3 + Nuxt UI v2 + Tailwind CSS v3 前端，Flask REST API 后端。绿鹃品牌色系（`#008A3D` + `#F9F7E8`），仪表盘 + 侧边导航 + 多页面路由，中英文双语。
+docStamp 是一站式文档处理工具箱，15 大功能模块。Nuxt 3 + Nuxt UI v2 + Tailwind CSS v3 前端，Flask REST API 后端。绿鹃品牌色系（`#008A3D` + `#F9F7E8`），仪表盘 + 侧边导航 + 多页面路由，中英文双语。
 
 **单体工具定位**：无用户系统、无认证、无 AI — 即开即用，随用随走。
 
@@ -22,11 +22,24 @@ docStamp/
 │   ├── cel.py                  # Celery (memory:// broker, 3 队列: convert/pdf/office)
 │   ├── config_validators.py    # 配置校验 (URL/端口/CORS)
 │   ├── gunicorn.conf.py        # 生产: bind 0.0.0.0:5000, workers=4
-│   ├── blueprints/             # HTTP 路由层 (只做请求/响应)
+│   ├── blueprints/             # HTTP 路由层 (只做请求/响应，每功能一个文件)
 │   │   ├── convert.py          # /api/convert, /api/preview, /api/stats
-│   │   ├── files.py            # /api/properties, /api/watermark, /api/pdf-editor, ...
-│   │   └── download.py         # /api/download, /api/health, /api/tasks/*
-│   ├── services/               # 业务逻辑层 (纯函数，零 Flask 依赖)
+│   │   ├── download.py         # /api/download, /api/health, /api/tasks/*
+│   │   ├── properties_bp.py    # /api/properties/*
+│   │   ├── img2pdf_bp.py       # /api/img2pdf
+│   │   ├── pdf2img_bp.py       # /api/pdf2img
+│   │   ├── print_split_bp.py   # /api/print-split/*
+│   │   ├── watermark_bp.py     # /api/watermark/*
+│   │   ├── pdf_editor_bp.py    # /api/pdf-editor/*
+│   │   ├── excel_merge_bp.py   # /api/excel-merge
+│   │   ├── pdf_to_text_bp.py   # /api/pdf-to-text
+│   │   ├── pdf_merge_bp.py     # /api/pdf-merge
+│   │   ├── pdf_compress_bp.py  # /api/pdf-compress
+│   │   ├── metadata_clean_bp.py # /api/metadata-clean
+│   │   ├── format_convert_bp.py # /api/convert/format
+│   │   ├── page_decorate_bp.py # /api/page-decorate
+│   │   └── image_process_bp.py # /api/image-process
+│   ├── services/               # 业务逻辑层 (纯函数，全部返回 ServiceResult[T])
 │   │   ├── converter.py        # MD → DOCX (Pandoc)
 │   │   ├── formatter.py        # GB/T 9704-2012 格式化
 │   │   ├── watermark.py        # 水印添加/去除
@@ -34,8 +47,15 @@ docStamp/
 │   │   ├── excel_merger.py     # Excel/CSV 合并
 │   │   ├── img2pdf_handler.py  # 图片 → PDF
 │   │   ├── pdf_to_images.py    # PDF → 图片 (pdftoppm)
+│   │   ├── pdf_to_text.py      # PDF → 文本 (pdfminer)
 │   │   ├── print_split.py      # PDF 打印分组
-│   │   └── properties.py       # Office 属性读写
+│   │   ├── properties.py       # Office 属性读写
+│   │   ├── pdf_merger.py       # PDF 合并 (pypdf)
+│   │   ├── pdf_compressor.py   # PDF 压缩
+│   │   ├── metadata_cleaner.py # 元数据清理
+│   │   ├── format_converter.py # 格式互转 (LibreOffice/WeasyPrint)
+│   │   ├── page_decorator.py   # 页码页眉页脚 (reportlab)
+│   │   └── image_processor.py  # 图片处理 (Pillow)
 │   ├── tasks/                  # Celery 异步任务
 │   │   ├── convert.py          # convert_queue
 │   │   ├── pdf.py              # pdf_queue (8 tasks)
@@ -56,7 +76,7 @@ docStamp/
 │   ├── composables/            # useValidation / useTaskStream / useApi / useDownload
 │   ├── components/ui/          # 原子组件 (ButtonPrimary / CardBase / ProgressBar)
 │   ├── layouts/default.vue     # 侧边导航壳
-│   ├── pages/                  # 9 页面 (仪表盘 + 8 工具)
+│   ├── pages/                  # 16 页面 (仪表盘 + 15 工具)
 │   ├── components/             # 15+ 业务组件
 │   └── locales/                # zh-CN / en
 ├── docs/
@@ -142,7 +162,7 @@ def my_service(path: str) -> ServiceResult[dict]:
 
 | 层级 | 规范 | 示例 |
 |------|------|------|
-| 后端 Blueprint | 复数/功能名 | `convert.py`, `files.py` |
+| 后端 Blueprint | `<feature>_bp.py` | `convert.py`, `watermark_bp.py` |
 | 后端 Service | 单数 + `_service` (或原名) | `converter.py`, `watermark.py` |
 | 后端 Model | 小写 | `models.py` |
 | 前端组件 | PascalCase | `DigitalClock.vue`, `ProgressBar.vue` |
@@ -172,7 +192,8 @@ rm -rf frontend/.nuxt frontend/.output
 # 依赖安装
 cd backend && pip3 install --break-system-packages flask flask-cors flask-babel \
     python-docx openpyxl python-pptx markdown bleach img2pdf pypdf Pillow \
-    reportlab gunicorn pydantic celery flask-caching cryptography
+    reportlab gunicorn pydantic celery flask-caching cryptography weasyprint \
+    pdfminer.six
 cd ../frontend && npm install
 
 # 前端 lint

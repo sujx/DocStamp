@@ -97,9 +97,10 @@ def md_preview(body: MdPreviewSchema):
 
 @convert_bp.route("/api/convert", methods=["POST"])
 def md_convert():
-    """Convert Markdown to GB/T 9704-2012 DOCX."""
+    """Convert Markdown to DOCX. Query ?format=plain skips GB/T 9704-2012 formatting."""
     filepath = None
     output_path = None
+    fmt = request.args.get("format", "official")  # "official" or "plain"
     try:
         md_path = None
         if "file" in request.files and request.files["file"].filename:
@@ -123,12 +124,16 @@ def md_convert():
         download_id = f"{uuid.uuid4().hex}.docx"
         output_path = os.path.join(Config.UPLOAD_FOLDER, download_id)
 
-        title = md_to_docx(md_path, output_path)
+        result = md_to_docx(md_path, output_path)
+        if not result.success:
+            cleanup_files(filepath, output_path)
+            return jsonify({"error": result.message}), 400
+        title = result.data
 
-        try:
-            format_docx(output_path)
-        except Exception:
-            pass  # Best-effort formatting
+        if fmt != "plain":
+            fmt_result = format_docx(output_path)
+            if not fmt_result.success:
+                pass  # Best-effort formatting
 
         _increment_stats()
 
@@ -165,7 +170,10 @@ def format_docx_endpoint():
 
         import shutil
         shutil.copy2(filepath, output_path)
-        format_docx(output_path)
+        fmt_result = format_docx(output_path)
+        if not fmt_result.success:
+            cleanup_files(filepath, output_path)
+            return jsonify({"error": fmt_result.message}), 400
 
         title = file.filename.rsplit(".", 1)[0] if file.filename else "document"
 

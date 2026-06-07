@@ -10,27 +10,34 @@ docStamp 是一站式文档处理工具箱。Nuxt 3 + Nuxt UI v2 + Tailwind CSS 
 
 ---
 
-## 二、功能模块（8 个，归为 4 组）
+## 二、功能模块（15 个，归为 4 组）
 
 **侧栏导航**：
 
 ```
 MD 转公文        → /md-to-docx
 水印管理          → /watermark       (添加/去除)
-Office 工具 ▸     → /properties  /excel-merge  /format-docx
-PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor
+Office 工具 ▸     → /properties  /excel-merge  /format-docx  /format-convert  /metadata-clean
+PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-text  /pdf-merge  /pdf-compress  /page-decorate  /image-process
 ```
 
 | # | 模块 | 路由 | 分组 | 说明 |
 |---|------|------|------|------|
 | 1 | MD 转公文 | `/md-to-docx` | — | Markdown → GB/T 9704-2012 DOCX，实时预览 |
-| 2 | 水印管理 | `/watermark` | — | 添加/去除水印 |
-| 3 | 属性修改 | `/properties` | Office | .docx/.xlsx/.pptx 元数据 |
-| 4 | Excel 合并 | `/excel-merge` | Office | .xlsx/.csv 合并 |
+| 2 | 水印管理 | `/watermark` | — | 添加/去除文字和图片水印 |
+| 3 | 属性修改 | `/properties` | Office | .docx/.xlsx/.pptx 元数据修改 |
+| 4 | Excel 合并 | `/excel-merge` | Office | .xlsx/.csv 结构相同合并 |
 | 5 | 格式规范 | `/format-docx` | Office | GB/T 9704-2012 格式化 |
-| 6 | 文件组装 | `/file-assembly` | PDF | 图片合并 + PDF 拆解 |
-| 7 | 打印分组 | `/print-split` | PDF | 批次拆分、暂停/继续/终止 |
-| 8 | PDF 编辑 | `/pdf-editor` | PDF | 删除/插入/重排页面 |
+| 6 | 格式互转 | `/format-convert` | Office | DOCX/HTML → PDF |
+| 7 | 元数据清理 | `/metadata-clean` | Office | 清除文档元数据，保护隐私 |
+| 8 | 文件组装 | `/file-assembly` | PDF | 图片合并 + PDF 拆解 |
+| 9 | 打印分组 | `/print-split` | PDF | 批次拆分、暂停/继续/终止 |
+| 10 | PDF 编辑 | `/pdf-editor` | PDF | 删除/插入/重排页面 |
+| 11 | PDF 转文本 | `/pdf-to-text` | PDF | 提取 PDF 文本内容 |
+| 12 | PDF 合并 | `/pdf-merge` | PDF | 多 PDF 合并，拖拽排序 |
+| 13 | PDF 压缩 | `/pdf-compress` | PDF | 三级压缩（轻度/中度/深度） |
+| 14 | 页码页眉页脚 | `/page-decorate` | PDF | 添加页码/页眉/页脚 |
+| 15 | 图片处理 | `/image-process` | PDF | 缩放/裁剪/格式转换/压缩 |
 
 ---
 
@@ -97,20 +104,40 @@ backend/
 ├── cel.py                  # Celery (memory:// broker, 3 队列)
 ├── config_validators.py    # 启动时配置校验
 ├── gunicorn.conf.py        # 生产配置
-├── blueprints/             # HTTP 路由层
-│   ├── convert.py          # /api/convert/*, /api/preview, /api/stats
-│   ├── files.py            # /api/properties, /api/watermark, /api/pdf-editor, ...
-│   └── download.py         # /api/download, /api/health, /api/tasks/*
-├── services/               # 业务逻辑层 (纯函数，零 Flask 依赖)
+├── blueprints/             # HTTP 路由层（每功能一个文件，共 12 个）
+│   ├── convert.py          # /api/convert, /api/preview, /api/stats
+│   ├── download.py         # /api/download, /api/health, /api/tasks/*
+│   ├── properties_bp.py    # /api/properties/*
+│   ├── img2pdf_bp.py       # /api/img2pdf
+│   ├── pdf2img_bp.py       # /api/pdf2img
+│   ├── print_split_bp.py   # /api/print-split/*
+│   ├── watermark_bp.py     # /api/watermark/*
+│   ├── pdf_editor_bp.py    # /api/pdf-editor/*
+│   ├── excel_merge_bp.py   # /api/excel-merge
+│   ├── pdf_to_text_bp.py   # /api/pdf-to-text
+│   ├── pdf_merge_bp.py     # /api/pdf-merge
+│   ├── pdf_compress_bp.py  # /api/pdf-compress
+│   ├── metadata_clean_bp.py # /api/metadata-clean
+│   ├── format_convert_bp.py # /api/convert/format
+│   ├── page_decorate_bp.py # /api/page-decorate
+│   └── image_process_bp.py # /api/image-process
+├── services/               # 业务逻辑层 (纯函数，零 Flask 依赖，全部返回 ServiceResult[T])
 │   ├── converter.py        # MD → DOCX (Pandoc)
 │   ├── formatter.py        # GB/T 9704-2012 格式化
 │   ├── watermark.py        # 水印添加/去除
-│   ├── pdf_editor.py       # PDF 页面操作
+│   ├── pdf_editor.py       # PDF 删除/插入/重排
 │   ├── excel_merger.py     # Excel/CSV 合并
 │   ├── img2pdf_handler.py  # 图片 → PDF
 │   ├── pdf_to_images.py    # PDF → 图片 (pdftoppm)
+│   ├── pdf_to_text.py      # PDF → 文本 (pdfminer)
 │   ├── print_split.py      # 打印分组
-│   └── properties.py       # Office 属性读写
+│   ├── properties.py       # Office 属性读写
+│   ├── pdf_merger.py       # PDF 合并 (pypdf)
+│   ├── pdf_compressor.py   # PDF 压缩
+│   ├── metadata_cleaner.py # 元数据清理
+│   ├── format_converter.py # 格式互转 (LibreOffice/WeasyPrint)
+│   ├── page_decorator.py   # 页码页眉页脚 (reportlab)
+│   └── image_processor.py  # 图片处理 (Pillow)
 ├── tasks/                  # Celery 异步任务
 │   ├── convert.py          # convert_queue
 │   ├── pdf.py              # pdf_queue (8 tasks)
@@ -171,6 +198,13 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 | `POST` | `/api/pdf-editor/insert` | 插入页面 |
 | `POST` | `/api/pdf-editor/reorder` | 重排页面 |
 | `POST` | `/api/excel-merge` | Excel 合并 |
+| `POST` | `/api/pdf-to-text` | PDF 提取文本 |
+| `POST` | `/api/pdf-merge` | 合并多个 PDF |
+| `POST` | `/api/pdf-compress` | 压缩 PDF |
+| `POST` | `/api/metadata-clean` | 清除元数据 |
+| `POST` | `/api/convert/format` | 格式互转 (DOCX/HTML→PDF) |
+| `POST` | `/api/page-decorate` | 添加页码/页眉/页脚 |
+| `POST` | `/api/image-process` | 图片处理 (缩放/裁剪/转换/压缩) |
 | `GET` | `/api/tasks/<id>` | 任务状态轮询 |
 | `GET` | `/api/tasks/<id>/stream` | 任务进度 SSE |
 
@@ -315,6 +349,12 @@ Flask SPA fallback 路由直接提供 Nuxt 构建输出（`.output/public/`）�
 ---
 
 ## 十一、版本历史
+
+### v3.1 (2026-06)
+- **新增 7 个工具**：PDF 合并、PDF 压缩、格式互转、图片处理、页码页眉页脚、元数据清理、PDF 转文本
+- **蓝图拆分**：`files.py`（678 行）拆分为 12 个独立蓝图文件，功能边界清晰
+- **ServiceResult 全面应用**：所有 16 个 service 统一返回 `ServiceResult[T]`，消除裸 `raise ValueError`
+- **新依赖**：weasyprint (HTML→PDF)、libreoffice-core (DOCX→PDF)
 
 ### v3.0 (2026-06)
 - **架构解耦**：app.py 1278 行 → 62 行 (Blueprint + Service + Utils 分层)

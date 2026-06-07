@@ -9,9 +9,16 @@ import subprocess
 
 from flask_babel import lazy_gettext as _l
 
+from errors import ErrorCode, ServiceResult
+
 
 # Default timeout in seconds for subprocess calls
 SUBPROCESS_TIMEOUT = 120
+
+# Per-tool timeout overrides (seconds)
+_OPERATION_TIMEOUTS = {
+    "pandoc": 300,
+}
 
 
 class ConversionError(Exception):
@@ -93,7 +100,7 @@ def _run_subprocess(
         )
 
 
-def md_to_docx(md_path: str, docx_path: str) -> str:
+def md_to_docx(md_path: str, docx_path: str) -> ServiceResult[str]:
     """Convert a Markdown file to DOCX using Pandoc.
 
     Returns the document title extracted from the first h1 heading.
@@ -102,12 +109,16 @@ def md_to_docx(md_path: str, docx_path: str) -> str:
         md_path: Path to the input .md file.
         docx_path: Path for the output .docx file.
     """
-    _run_subprocess(
-        ["pandoc", md_path, "-o", docx_path,
-         "--from", "markdown+tex_math_dollars+tex_math_single_backslash"],
-        "Markdown to DOCX conversion",
-    )
-    return _extract_title(md_path)
+    try:
+        _run_subprocess(
+            ["pandoc", md_path, "-o", docx_path,
+             "--from", "markdown+tex_math_dollars+tex_math_single_backslash"],
+            "Markdown to DOCX conversion",
+        )
+    except ConversionError as e:
+        return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, str(e))
+
+    return ServiceResult.ok(_extract_title(md_path))
 
 
 def _extract_title(md_path: str) -> str:

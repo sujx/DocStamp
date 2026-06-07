@@ -7,3 +7,6 @@ loglevel = "info"
 accesslog = "/var/log/docstamp/access.log"
 errorlog = "/var/log/docstamp/error.log"
 pidfile = "/var/run/docstamp.pid"
+
+# Preload app before forking workers — ensures SQLite DB is initialized once
+preload_app = True

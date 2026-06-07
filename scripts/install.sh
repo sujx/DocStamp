@@ -28,7 +28,7 @@ _install_system_deps() {
     if command -v apt-get &>/dev/null; then
         apt-get update
         apt-get install -y python3 python3-venv python3-pip \
-            nodejs npm curl fonts-noto-cjk
+            nodejs npm curl fonts-noto-cjk libreoffice-core
         # Install Poetry
         if ! command -v poetry &>/dev/null; then
             curl -sSL https://install.python-poetry.org | python3 -

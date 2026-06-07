@@ -7,8 +7,10 @@ import os
 
 from pypdf import PdfReader, PdfWriter
 
+from errors import ErrorCode, ServiceResult
 
-def split_pdf(filepath: str, output_dir: str, batch_size: int) -> list:
+
+def split_pdf(filepath: str, output_dir: str, batch_size: int) -> ServiceResult[list]:
     """Split a PDF into batches of pages.
 
     Args:
@@ -17,23 +19,21 @@ def split_pdf(filepath: str, output_dir: str, batch_size: int) -> list:
         batch_size: Number of pages per batch.
 
     Returns:
-        List of dicts: [{"batch_no": 1, "pages": 60, "filename": "batch_001.pdf",
-                         "page_range": "1-60"}, ...]
-
-    Raises:
-        ValueError: If the PDF is empty, corrupt, or batch_size is invalid.
+        ServiceResult with list of batch dicts:
+        [{"batch_no": 1, "pages": 60, "filename": "batch_001.pdf",
+          "page_range": "1-60"}, ...]
     """
     if batch_size < 1:
-        raise ValueError("Batch size must be at least 1")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Batch size must be at least 1")
 
     try:
         reader = PdfReader(filepath)
     except Exception as e:
-        raise ValueError(f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
 
     total_pages = len(reader.pages)
     if total_pages == 0:
-        raise ValueError("PDF has no pages")
+        return ServiceResult.fail(ErrorCode.PDF_EMPTY, "PDF has no pages")
 
     batch_count = (total_pages + batch_size - 1) // batch_size
     batches = []
@@ -60,10 +60,10 @@ def split_pdf(filepath: str, output_dir: str, batch_size: int) -> list:
             "page_range": f"{start_page + 1}-{end_page}",
         })
 
-    return batches
+    return ServiceResult.ok(batches)
 
 
-def get_batch_file(task_dir: str, filename: str) -> str:
+def get_batch_file(task_dir: str, filename: str) -> ServiceResult[str]:
     """Get the full path to a batch file.
 
     Args:
@@ -71,12 +71,9 @@ def get_batch_file(task_dir: str, filename: str) -> str:
         filename: Batch filename (e.g., "batch_001.pdf").
 
     Returns:
-        Full path to the batch file.
-
-    Raises:
-        ValueError: If the file does not exist.
+        ServiceResult with full path to the batch file.
     """
     path = os.path.join(task_dir, filename)
     if not os.path.isfile(path):
-        raise ValueError(f"Batch file not found: {filename}")
-    return path
+        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"Batch file not found: {filename}")
+    return ServiceResult.ok(path)

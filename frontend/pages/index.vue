@@ -28,5 +28,12 @@ const tools = computed(() => [
   { to: "/file-assembly", icon: "i-heroicons-arrows-right-left", title: t("tabs.fileAssembly"), description: t("img2pdf.description") },
   { to: "/print-split", icon: "i-heroicons-printer", title: t("tabs.printSplit"), description: t("printSplit.description") },
   { to: "/pdf-editor", icon: "i-heroicons-document", title: t("tabs.pdfEditor"), description: t("pdfEditor.description") },
+  { to: "/pdf-to-text", icon: "i-heroicons-document-magnifying-glass", title: t("tabs.pdfToText"), description: t("pdfToText.description") },
+  { to: "/pdf-merge", icon: "i-heroicons-plus-circle", title: t("tabs.pdfMerge"), description: t("pdfMerge.description") },
+  { to: "/pdf-compress", icon: "i-heroicons-arrows-pointing-in", title: t("tabs.pdfCompress"), description: t("pdfCompress.description") },
+  { to: "/format-convert", icon: "i-heroicons-arrow-path", title: t("tabs.formatConvert"), description: t("formatConvert.description") },
+  { to: "/metadata-clean", icon: "i-heroicons-shield-exclamation", title: t("tabs.metadataClean"), description: t("metadataClean.description") },
+  { to: "/page-decorate", icon: "i-heroicons-document-check", title: t("tabs.pageDecorate"), description: t("pageDecorate.description") },
+  { to: "/image-process", icon: "i-heroicons-photo", title: t("tabs.imageProcess"), description: t("imageProcess.description") },
 ]);
 </script>

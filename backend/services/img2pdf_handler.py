@@ -9,6 +9,8 @@ import os
 import img2pdf
 from PIL import Image
 
+from errors import ErrorCode, ServiceResult
+
 
 # Page size definitions in points (1 point = 1/72 inch)
 PAGE_SIZES = {
@@ -23,7 +25,7 @@ def images_to_pdf(
     image_paths: list,
     output_path: str,
     page_size: str = "original",
-) -> None:
+) -> ServiceResult[dict]:
     """Merge a list of images into a single PDF.
 
     Args:
@@ -32,39 +34,39 @@ def images_to_pdf(
         page_size: Page size preset — "original" keeps image dimensions,
                    "a4", "a4_landscape", "letter", "letter_landscape".
 
-    Raises:
-        ValueError: If no valid images are provided or conversion fails.
+    Returns:
+        ServiceResult with dict containing page_count and file_count.
     """
     if not image_paths:
-        raise ValueError("No images provided")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "No images provided")
 
     # Validate all images exist and are readable
     for path in image_paths:
         if not os.path.isfile(path):
-            raise ValueError(f"Image not found: {path}")
+            return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"Image not found: {path}")
         try:
             with Image.open(path) as img:
                 img.verify()
         except Exception as e:
-            raise ValueError(f"Invalid or corrupt image: {path} ({e})")
+            return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, f"Invalid or corrupt image: {path} ({e})")
 
     if page_size == "original":
-        # Use img2pdf for lossless conversion
-        _merge_lossless(image_paths, output_path)
+        result = _merge_lossless(image_paths, output_path)
     else:
-        # Resize images to fit the specified page size
-        _merge_with_page_size(image_paths, output_path, page_size)
+        result = _merge_with_page_size(image_paths, output_path, page_size)
+
+    if not result.success:
+        return result
+
+    return ServiceResult.ok({"page_count": len(image_paths), "file_count": len(image_paths)})
 
 
-def _merge_lossless(image_paths: list, output_path: str) -> None:
-    """Merge images losslessly using img2pdf.
-
-    Converts RGBA to RGB if needed (img2pdf requires RGB for JPEG-based PDF).
-    """
-    # img2pdf handles PNG/JPEG/TIFF natively
+def _merge_lossless(image_paths: list, output_path: str) -> ServiceResult[None]:
+    """Merge images losslessly using img2pdf."""
     try:
         with open(output_path, "wb") as f:
             f.write(img2pdf.convert(image_paths))
+        return ServiceResult.ok(None)
     except img2pdf.AlphaChannelError:
         # Some PNGs have alpha channels — convert to RGB first
         rgb_paths = []
@@ -84,24 +86,24 @@ def _merge_lossless(image_paths: list, output_path: str) -> None:
         try:
             with open(output_path, "wb") as f:
                 f.write(img2pdf.convert(rgb_paths))
+        except Exception as e:
+            return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, f"Image to PDF conversion failed: {e}")
         finally:
-            # Clean up temporary RGB files
             for p in rgb_paths:
                 if p not in image_paths:
                     try:
                         os.remove(p)
                     except OSError:
                         pass
+        return ServiceResult.ok(None)
+    except Exception as e:
+        return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, f"Image to PDF conversion failed: {e}")
 
 
 def _merge_with_page_size(
     image_paths: list, output_path: str, page_size: str
-) -> None:
-    """Merge images into a PDF with each page set to a fixed size.
-
-    Images are centered and scaled to fit within the page while
-    maintaining aspect ratio.
-    """
+) -> ServiceResult[None]:
+    """Merge images into a PDF with each page set to a fixed size."""
     from reportlab.lib.pagesizes import A4, LETTER
     from reportlab.lib.utils import ImageReader
     from reportlab.pdfgen import canvas
@@ -115,32 +117,34 @@ def _merge_with_page_size(
 
     page_w, page_h = size_map.get(page_size, A4)
 
-    c = canvas.Canvas(output_path, pagesize=(page_w, page_h))
+    try:
+        c = canvas.Canvas(output_path, pagesize=(page_w, page_h))
 
-    for path in image_paths:
-        img = Image.open(path)
-        img_w, img_h = img.size
+        for path in image_paths:
+            img = Image.open(path)
+            img_w, img_h = img.size
 
-        # Scale image to fit page while maintaining aspect ratio
-        margin = 20  # pt margin
-        avail_w = page_w - 2 * margin
-        avail_h = page_h - 2 * margin
+            margin = 20  # pt margin
+            avail_w = page_w - 2 * margin
+            avail_h = page_h - 2 * margin
 
-        scale = min(avail_w / img_w, avail_h / img_h)
-        draw_w = img_w * scale
-        draw_h = img_h * scale
+            scale = min(avail_w / img_w, avail_h / img_h)
+            draw_w = img_w * scale
+            draw_h = img_h * scale
 
-        # Center on page
-        x = (page_w - draw_w) / 2
-        y = (page_h - draw_h) / 2
+            x = (page_w - draw_w) / 2
+            y = (page_h - draw_h) / 2
 
-        c.drawImage(
-            ImageReader(img),
-            x, y,
-            width=draw_w,
-            height=draw_h,
-            preserveAspectRatio=True,
-        )
-        c.showPage()
+            c.drawImage(
+                ImageReader(img),
+                x, y,
+                width=draw_w,
+                height=draw_h,
+                preserveAspectRatio=True,
+            )
+            c.showPage()
 
-    c.save()
+        c.save()
+        return ServiceResult.ok(None)
+    except Exception as e:
+        return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, f"Failed to create PDF: {e}")

@@ -23,6 +23,7 @@ gunicorn = "^23.0"
 pydantic = "^2.13"
 celery = "^5.6"
 cryptography = "^48.0"
+weasyprint = "^63.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0"

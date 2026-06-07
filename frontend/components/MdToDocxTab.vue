@@ -99,15 +99,26 @@
 
     <!-- Action Bar -->
     <div class="action-bar">
-      <UButton
-        color="primary" size="lg"
-        :disabled="!content.trim()" :loading="converting"
-        class="convert-btn"
-        @click="convert"
-      >
-        <UIcon name="i-heroicons-arrow-right-circle" class="w-5 h-5 mr-2" />
-        {{ converting ? $t("md2docx.converting") : $t("md2docx.convert") }}
-      </UButton>
+      <div class="convert-buttons">
+        <UButton
+          variant="outline" size="lg"
+          :disabled="!content.trim()" :loading="convertingPlain"
+          class="convert-btn"
+          @click="convertPlain"
+        >
+          <UIcon name="i-heroicons-document" class="w-5 h-5 mr-2" />
+          {{ convertingPlain ? $t("md2docx.converting") : $t("md2docx.convertPlain") }}
+        </UButton>
+        <UButton
+          color="primary" size="lg"
+          :disabled="!content.trim()" :loading="convertingOfficial"
+          class="convert-btn"
+          @click="convertOfficial"
+        >
+          <UIcon name="i-heroicons-arrow-right-circle" class="w-5 h-5 mr-2" />
+          {{ convertingOfficial ? $t("md2docx.converting") : $t("md2docx.convertOfficial") }}
+        </UButton>
+      </div>
       <p class="privacy-hint text-pretty">
         <UIcon name="i-heroicons-shield-check" class="w-3.5 h-3.5 inline" />
         {{ $t("md2docx.privacy") }}
@@ -121,7 +132,7 @@
 
     <!-- Loading Overlay -->
     <Transition name="overlay-fade">
-      <div v-if="converting" class="loading-overlay">
+      <div v-if="convertingPlain || convertingOfficial" class="loading-overlay">
         <svg class="spinner" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
           <circle class="track" cx="25" cy="25" r="20" fill="none" stroke="var(--color-border-default)" stroke-width="4" />
           <circle class="ring" cx="25" cy="25" r="20" fill="none" stroke="var(--color-brand-700)" stroke-width="4" stroke-linecap="round" stroke-dasharray="90 150" />
@@ -168,7 +179,8 @@ function sanitize(html: string): string {
 const content = ref("");
 const previewHtml = ref("");
 const previewLoading = ref(false);
-const converting = ref(false);
+const convertingPlain = ref(false);
+const convertingOfficial = ref(false);
 const dragOver = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
 const paperEl = ref<HTMLElement | null>(null);
@@ -300,14 +312,15 @@ async function renderPostProcess() {
   }
 }
 
-async function convert() {
+async function doConvert(format: "plain" | "official") {
   if (!content.value.trim()) {
     toast.add({ title: t("md2docx.emptyWarning"), color: "warning" });
     return;
   }
-  converting.value = true;
+  if (format === "plain") convertingPlain.value = true;
+  else convertingOfficial.value = true;
   try {
-    const resp = await axios.post(`${API_BASE}/api/convert`, { content: content.value });
+    const resp = await axios.post(`${API_BASE}/api/convert?format=${format}`, { content: content.value });
     const dlResp = await axios.get(`${API_BASE}/api/download/${resp.data.download_id}`, { responseType: "blob" });
     const url = URL.createObjectURL(dlResp.data);
     const a = document.createElement("a");
@@ -319,9 +332,13 @@ async function convert() {
   } catch (e: any) {
     toast.add({ title: e.response?.data?.error || e.message, color: "error" });
   } finally {
-    converting.value = false;
+    convertingPlain.value = false;
+    convertingOfficial.value = false;
   }
 }
+
+function convertPlain() { doConvert("plain"); }
+function convertOfficial() { doConvert("official"); }
 </script>
 
 <style scoped>
@@ -557,8 +574,15 @@ async function convert() {
   margin-top: 24px;
 }
 
+.convert-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .convert-btn {
-  min-width: 320px;
+  min-width: 160px;
   transition: transform 150ms ease-out, box-shadow 150ms ease-out;
 }
 
