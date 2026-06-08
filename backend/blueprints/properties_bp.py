@@ -8,12 +8,14 @@ from flask_babel import gettext as _
 
 from config import Config
 from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 from services.properties import _resolve_time_props, batch_modify_properties, modify_properties, read_properties
 
 properties_bp = Blueprint("properties", __name__)
 
 
 @properties_bp.route("/api/properties/info", methods=["POST"])
+@rate_limit(max_requests=20, window_seconds=60)
 def properties_info():
     filepath = None
     try:
@@ -36,6 +38,7 @@ def properties_info():
 
 
 @properties_bp.route("/api/properties", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def properties_modify():
     filepath = None
     output_path = None
@@ -79,6 +82,7 @@ def properties_modify():
 
 
 @properties_bp.route("/api/properties/batch", methods=["POST"])
+@rate_limit(max_requests=5, window_seconds=60)
 def properties_batch_modify():
     filepaths = []
     output_dir = None

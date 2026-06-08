@@ -9,12 +9,14 @@ from flask_babel import gettext as _
 
 from config import Config
 from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 from services.pdf_merger import merge_pdfs
 
 pdf_merge_bp = Blueprint("pdf_merge", __name__)
 
 
 @pdf_merge_bp.route("/api/pdf-merge", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def pdf_merge():
     """Merge multiple PDF files into a single PDF."""
     filepaths = []

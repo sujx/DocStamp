@@ -9,12 +9,14 @@ from flask_babel import gettext as _
 
 from config import Config
 from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 from services.page_decorator import add_page_numbers
 
 page_decorate_bp = Blueprint("page_decorate", __name__)
 
 
 @page_decorate_bp.route("/api/page-decorate", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def page_decorate():
     """Add page numbers, headers, or footers to a PDF."""
     filepath = None

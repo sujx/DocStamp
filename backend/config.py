@@ -15,7 +15,8 @@ class Config:
         "DOCSTAMP_UPLOAD_FOLDER",
         os.path.join(os.path.dirname(__file__), "output"),
     )
-    MAX_UPLOAD_SIZE = 100 * 1024 * 1024  # 100 MB
+    MAX_CONTENT_LENGTH = 110 * 1024 * 1024  # 110 MB — Flask-level request body cap
+    MAX_UPLOAD_SIZE = 100 * 1024 * 1024  # 100 MB (legacy, prefer file_security.MAX_FILE_SIZE)
     MAX_MD_SIZE = 16 * 1024 * 1024  # 16 MB
 
     # ── Allowed Extensions per Feature ──────────────────────────────

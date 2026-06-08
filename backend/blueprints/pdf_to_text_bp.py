@@ -5,12 +5,14 @@ from flask_babel import gettext as _
 
 from config import Config
 from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 from services.pdf_to_text import extract_pdf_text, get_pdf_page_count
 
 pdf_to_text_bp = Blueprint("pdf_to_text", __name__)
 
 
 @pdf_to_text_bp.route("/api/pdf-to-text", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def pdf_to_text():
     """Extract text from a PDF file."""
     filepath = None

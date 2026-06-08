@@ -39,7 +39,7 @@ RUN pip install --break-system-packages --no-cache-dir \
     flask flask-cors flask-babel flask-caching \
     python-docx openpyxl python-pptx \
     markdown bleach img2pdf pypdf Pillow reportlab \
-    gunicorn pydantic celery cryptography
+    gunicorn pydantic celery redis cryptography weasyprint
 
 # Copy backend code
 COPY backend/ ./

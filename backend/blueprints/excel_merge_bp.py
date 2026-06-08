@@ -8,12 +8,14 @@ from flask_babel import gettext as _
 
 from config import Config
 from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 from services.excel_merger import merge_excel_files
 
 excel_merge_bp = Blueprint("excel_merge", __name__)
 
 
 @excel_merge_bp.route("/api/excel-merge", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def excel_merge():
     filepaths = []
     output_path = None

@@ -101,7 +101,7 @@ backend/
 ├── json_logging.py         # JSON 结构化日志 (TimedRotatingFileHandler, 30 天)
 ├── models.py               # TaskRecord + OperationLog + BaseCRUD (原始 SQL)
 ├── cache.py                # Flask-Caching SimpleCache
-├── cel.py                  # Celery (memory:// broker, 3 队列)
+├── celery_app.py           # Celery (Redis/Redis broker, 3 队列)
 ├── config_validators.py    # 启动时配置校验
 ├── gunicorn.conf.py        # 生产配置
 ├── blueprints/             # HTTP 路由层（每功能一个文件，共 12 个）
@@ -145,8 +145,9 @@ backend/
 │   └── maintenance.py      # Beat: 定时清理
 ├── utils/
 │   ├── base/               # file_helpers / validators
-│   ├── file_security.py    # 魔数校验
+│   ├── file_security.py    # 魔数校验 + 扩展名白名单 + 大小限制
 │   ├── file_cleanup.py     # 定时文件清理
+│   ├── rate_limit.py       # IP 级别 API 限流装饰器
 │   ├── retry.py            # @retry_on_failure
 │   └── crypto.py           # AES-256 Fernet
 └── tests/
@@ -214,10 +215,10 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 
 ### Celery 配置
 
-- Broker: `memory://`（开发），生产换 Redis/RabbitMQ
-- Result backend: `db+sqlite:///tasks.db`
-- 3 个队列：`convert_queue` / `pdf_queue` / `office_queue`
-- 每队列独立 Worker 进程，避免资源抢占
+- Broker: Redis（生产默认 `redis://127.0.0.1:6379/0`），`memory://` 仅开发用
+- Result backend: Redis（`redis://127.0.0.1:6379/1`）
+- 3 个队列：`convert_queue` / `pdf_queue` / `office_queue`，每队列独立 Worker 容器
+- 并发：每队列 `worker_concurrency=4`，`task_acks_late=True` 防任务丢失
 - Celery Beat: 每日凌晨 3 点清理 7 天前临时文件
 
 ### 任务追踪
@@ -234,9 +235,9 @@ SSE（Server-Sent Events）：`GET /api/tasks/{id}/stream`。前端 `useTaskStre
 
 ### 三层校验
 
-1. **大小限制**：单文件 ≤ 100MB
-2. **扩展名白名单**：仅允许 `pdf/docx/xlsx/pptx/png/jpg/jpeg/tiff/tif/csv/md`
-3. **魔数签名**：校验文件头字节与扩展名匹配（防改扩展名攻击）
+1. **大小限制**：单文件 ≤ 50MB（`file_security.MAX_FILE_SIZE`），Flask 层 `MAX_CONTENT_LENGTH=110MB` 兜底
+2. **扩展名白名单**：`pdf/docx/xlsx/pptx/png/jpg/jpeg/tiff/tif/webp/csv/html/htm/md/markdown/txt`
+3. **魔数签名**：校验文件头字节与扩展名匹配（防改扩展名攻击）；无签名的扩展名（webp/html/htm/csv/md/txt）跳过魔数校验
 
 ### 定时清理
 
@@ -300,17 +301,42 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 ./manage.sh start    # Flask :5000 + Nuxt :8080 (HMR)
 ```
 
-### 生产模式
+### 生产模式（Docker Compose，推荐）
 
 ```bash
-./manage.sh prod     # Gunicorn 4 workers :5000 单端口, 含前端静态
+docker compose up -d   # 6 容器: api + redis + 3×celery + beat
 ```
 
-Flask SPA fallback 路由直接提供 Nuxt 构建输出（`.output/public/`），无需独立 Node.js 进程。
+容器清单：
+| 容器 | 职责 | 端口 |
+|------|------|:---:|
+| `api` | Gunicorn gthread + 静态文件 | `127.0.0.1:5000` |
+| `redis` | Celery broker + 结果后端 + 缓存 | 内部 |
+| `celery-convert` | MD→DOCX, 格式化, 格式互转 | — |
+| `celery-pdf` | 水印, 打印拆分, PDF 编辑, 图片处理 | — |
+| `celery-office` | 属性修改, Excel 合并 | — |
+| `celery-beat` | 定时清理临时文件 | — |
+
+### 生产模式（裸机 / Systemd）
+
+```bash
+./manage.sh prod                    # Gunicorn 单端口
+systemctl start docstamp.service    # 或使用 deploy/docstamp.service
+```
+
+环境变量通过 `/etc/docstamp/env.conf` 注入（模板见 `deploy/env.conf`）。
 
 ### Gunicorn 配置
 
-`gunicorn.conf.py`: `bind 0.0.0.0:5000`, `workers=4`, `timeout=120`。日志输出到 `/var/log/docstamp/`。
+`gunicorn.conf.py`: `bind 127.0.0.1:5000`, `worker_class=gthread`, `threads=4`, `workers=min(8, cpu*2+1)`, `timeout=120`, `max_requests=1000`（防内存泄漏）。日志输出到 `/var/log/docstamp/`。
+
+### 速率限制
+
+双层防御：nginx 层粗粒度限流 + 应用层 `@rate_limit` 装饰器（IP 级别，基于 Flask-Caching）。上传接口按负载分级：轻量 20/min、标准 10/min、重量 5/min。超限返回 429。
+
+### Systemd 安全加固 (`deploy/docstamp.service`)
+
+`NoNewPrivileges=yes`, `ProtectSystem=strict`, `PrivateTmp=yes`, `PrivateDevices=yes`, `CapabilityBoundingSet=`, `SystemCallFilter`, `MemoryMax=2G`。
 
 ---
 
@@ -349,6 +375,14 @@ Flask SPA fallback 路由直接提供 Nuxt 构建输出（`.output/public/`）�
 ---
 
 ## 十一、版本历史
+
+### v3.2 (2026-06)
+- **生产加固**：Gunicorn gthread + 动态 worker 数 + CORS 白名单 + MAX_CONTENT_LENGTH 兜底
+- **速率限制**：新增 `rate_limit.py` 装饰器，15 个 blueprint 21 个上传接口分级限流
+- **Celery 生产化**：Redis broker/backend 替代 memory:// + task_acks_late + reject_on_worker_lost
+- **文件安全收紧**：MAX_FILE_SIZE 100MB→50MB，扩展名白名单补 webp/html/htm
+- **Docker 多容器**：6 容器编排（API + Redis + 3×Worker + Beat）+ Systemd 安全加固 12 项
+- **修复**：孤儿文件清理 + 双白名单同步 + docstring 修正
 
 ### v3.1 (2026-06)
 - **新增 7 个工具**：PDF 合并、PDF 压缩、格式互转、图片处理、页码页眉页脚、元数据清理、PDF 转文本

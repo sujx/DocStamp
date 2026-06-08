@@ -28,7 +28,14 @@ def create_app() -> Flask:
         )
 
     Babel(app, default_locale="en", locale_selector=get_locale)
-    CORS(app)
+    CORS(
+        app,
+        origins=os.environ.get(
+            "DOCSTAMP_CORS_ORIGINS",
+            "http://localhost:8080,http://127.0.0.1:8080",
+        ).split(","),
+        max_age=3600,
+    )
 
     # Infrastructure
     setup_json_logging(app)

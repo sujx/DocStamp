@@ -10,6 +10,7 @@ from werkzeug.utils import secure_filename
 
 from config import Config
 from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 from services.pdf_editor import pdf_delete_pages, pdf_insert_pages, pdf_reorder_pages
 
 pdf_editor_bp = Blueprint("pdf_editor", __name__)
@@ -18,6 +19,7 @@ _pdf_thumbs = {}
 
 
 @pdf_editor_bp.route("/api/pdf-editor/info", methods=["POST"])
+@rate_limit(max_requests=20, window_seconds=60)
 def pdf_editor_info():
     filepath = None
     try:
@@ -87,6 +89,7 @@ def pdf_editor_thumb(thumb_dir: str, filename: str):
 
 
 @pdf_editor_bp.route("/api/pdf-editor/delete", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def pdf_editor_delete():
     filepath = None
     output_path = None
@@ -124,6 +127,7 @@ def pdf_editor_delete():
 
 
 @pdf_editor_bp.route("/api/pdf-editor/insert", methods=["POST"])
+@rate_limit(max_requests=5, window_seconds=60)
 def pdf_editor_insert():
     filepath = None
     insert_path = None
@@ -167,6 +171,7 @@ def pdf_editor_insert():
 
 
 @pdf_editor_bp.route("/api/pdf-editor/reorder", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def pdf_editor_reorder():
     filepath = None
     output_path = None

@@ -9,6 +9,7 @@ from flask_babel import gettext as _
 
 from config import Config
 from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 from services.image_processor import process_image
 
 IMAGE_PROCESS_EXTENSIONS = {"png", "jpg", "jpeg", "tiff", "tif", "webp"}
@@ -17,6 +18,7 @@ image_process_bp = Blueprint("image_process", __name__)
 
 
 @image_process_bp.route("/api/image-process", methods=["POST"])
+@rate_limit(max_requests=5, window_seconds=60)
 def image_process():
     """Resize, crop, convert, or compress an image."""
     filepath = None

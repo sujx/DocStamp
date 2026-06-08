@@ -8,6 +8,7 @@ from flask_babel import gettext as _
 
 from config import Config
 from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 from services.print_split import split_pdf
 
 print_split_bp = Blueprint("print_split", __name__)
@@ -16,6 +17,7 @@ _tasks = {}
 
 
 @print_split_bp.route("/api/print-split", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def print_split_create():
     filepath = None
     try:

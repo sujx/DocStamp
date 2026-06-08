@@ -1,9 +1,23 @@
 services:
-  docstamp:
+  # ── Shared Redis (Celery broker + result backend + cache) ──────────
+  redis:
+    image: redis:7-alpine
+    container_name: docstamp-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+
+  # ── Flask API + static files ───────────────────────────────────────
+  api:
     build: .
-    container_name: docstamp
+    container_name: docstamp-api
     ports:
-      - "8050:5000"
+      - "127.0.0.1:5000:5000"       # Only reachable via reverse proxy
     volumes:
       - output_data:/opt/docstamp/output
       - log_data:/var/log/docstamp
@@ -11,8 +25,87 @@ services:
       - TZ=Asia/Shanghai
       - DOCSTAMP_STATIC=/opt/docstamp/frontend/.output/public
       - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - DOCSTAMP_CORS_ORIGINS=${DOCSTAMP_CORS_ORIGINS:-http://localhost:8080}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # ── Celery workers (one per queue to isolate resource usage) ───────
+  celery-convert:
+    build: .
+    container_name: docstamp-celery-convert
+    command: >
+      celery -A backend.celery_app worker
+      -Q convert_queue --concurrency=4
+      -n convert@%h --loglevel=info
+    volumes:
+      - output_data:/opt/docstamp/output
+      - log_data:/var/log/docstamp
+    environment:
+      - TZ=Asia/Shanghai
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  celery-pdf:
+    build: .
+    container_name: docstamp-celery-pdf
+    command: >
+      celery -A backend.celery_app worker
+      -Q pdf_queue --concurrency=4
+      -n pdf@%h --loglevel=info
+    volumes:
+      - output_data:/opt/docstamp/output
+      - log_data:/var/log/docstamp
+    environment:
+      - TZ=Asia/Shanghai
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  celery-office:
+    build: .
+    container_name: docstamp-celery-office
+    command: >
+      celery -A backend.celery_app worker
+      -Q office_queue --concurrency=4
+      -n office@%h --loglevel=info
+    volumes:
+      - output_data:/opt/docstamp/output
+      - log_data:/var/log/docstamp
+    environment:
+      - TZ=Asia/Shanghai
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  celery-beat:
+    build: .
+    container_name: docstamp-celery-beat
+    command: celery -A backend.celery_app beat --loglevel=info
+    volumes:
+      - output_data:/opt/docstamp/output
+      - log_data:/var/log/docstamp
+    environment:
+      - TZ=Asia/Shanghai
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - redis
     restart: unless-stopped
 
 volumes:
   output_data:
   log_data:
+  redis_data:

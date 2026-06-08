@@ -8,6 +8,7 @@ from flask_babel import gettext as _
 
 from config import Config
 from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 from services.format_converter import convert_document
 
 CONVERT_EXTENSIONS = {"docx", "html", "htm"}
@@ -16,6 +17,7 @@ format_convert_bp = Blueprint("format_convert", __name__)
 
 
 @format_convert_bp.route("/api/convert/format", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def format_convert():
     """Convert a document between formats (DOCX→PDF, HTML→PDF)."""
     filepath = None

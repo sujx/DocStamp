@@ -9,12 +9,14 @@ from flask_babel import gettext as _
 
 from config import Config
 from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 from services.watermark import add_watermark, remove_watermark
 
 watermark_bp = Blueprint("watermark", __name__)
 
 
 @watermark_bp.route("/api/watermark", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def watermark_add():
     filepath = None
     image_path = None
@@ -66,6 +68,7 @@ def watermark_add():
 
 
 @watermark_bp.route("/api/watermark/remove", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def watermark_remove():
     filepath = None
     output_path = None

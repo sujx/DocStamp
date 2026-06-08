@@ -31,7 +31,7 @@ ALLOWED_EXTENSIONS: dict[str, str] = {
     "txt": "text/plain",
 }
 
-MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
+MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB — balanced for doc-processing workloads
 
 # ── Magic Number Signatures ─────────────────────────────────────────────
 

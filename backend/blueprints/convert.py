@@ -13,6 +13,7 @@ from config import Config
 from error_handler import validate_request
 from schemas import MdConvertSchema, MdPreviewSchema
 from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 
 from services.converter import ConversionError, md_to_docx
 from services.formatter import format_docx
@@ -96,6 +97,7 @@ def md_preview(body: MdPreviewSchema):
 
 
 @convert_bp.route("/api/convert", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def md_convert():
     """Convert Markdown to DOCX. Query ?format=plain skips GB/T 9704-2012 formatting."""
     filepath = None
@@ -153,6 +155,7 @@ def md_convert():
 
 
 @convert_bp.route("/api/convert/doc2md", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def format_docx_endpoint():
     """Reformat an existing DOCX per GB/T 9704-2012."""
     filepath = None
