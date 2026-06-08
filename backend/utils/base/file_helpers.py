@@ -63,7 +63,11 @@ def save_upload(file, allowed_exts: set, upload_folder: str) -> tuple[str, str]:
     file.save(filepath)
 
     # Full security check: size, extension, magic number
-    validate_file_security(filepath, file.filename)
+    try:
+        validate_file_security(filepath, file.filename)
+    except ValueError:
+        cleanup_files(filepath)
+        raise
 
     return unique_name, filepath
 

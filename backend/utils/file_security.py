@@ -22,7 +22,10 @@ ALLOWED_EXTENSIONS: dict[str, str] = {
     "jpeg": "image/jpeg",
     "tiff": "image/tiff",
     "tif": "image/tiff",
+    "webp": "image/webp",
     "csv": "text/csv",
+    "html": "text/html",
+    "htm": "text/html",
     "md": "text/markdown",
     "markdown": "text/markdown",
     "txt": "text/plain",
@@ -60,7 +63,7 @@ def validate_file_security(filepath: str, filename: str) -> None:
         filename: Original filename (used for extension detection).
 
     Raises:
-        ServiceError: On any validation failure, with the appropriate ErrorCode.
+        ValueError: On any validation failure, with a descriptive message.
     """
     # 1. Size check
     _validate_size(filepath)
