@@ -2,7 +2,7 @@
   <div class="min-h-dvh" :style="{ backgroundColor: 'var(--color-page)' }">
     <Sidebar />
     <div
-      class="min-h-dvh flex flex-col transition-all duration-200"
+      class="min-h-dvh flex flex-col transition-[margin-left] duration-150"
       :style="{ marginLeft: collapsed ? '64px' : '240px' }"
     >
       <main class="flex-1">

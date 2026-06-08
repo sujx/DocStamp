@@ -5,6 +5,7 @@ All route logic lives in blueprints/ — business logic in services/.
 """
 
 import os
+import time
 from flask import Flask, g, jsonify, request, send_from_directory
 from flask_babel import Babel
 from flask_cors import CORS
@@ -13,7 +14,7 @@ from config import Config
 from json_logging import setup_json_logging
 from error_handler import register_error_handlers
 from cache import init_cache
-from models import init_db
+from models import OperationLog, init_db
 
 
 def create_app() -> Flask:
@@ -43,6 +44,53 @@ def create_app() -> Flask:
     init_cache(app)
     init_db(app.config["TASK_DB_PATH"])
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+    # ── Operation-logging middleware ──────────────────────────────────
+    # Auto-log every /api/* call to operation_logs so the status
+    # dashboard can show per-module usage + visitor counts.
+    _op_log = None
+
+    def _get_op_log():
+        nonlocal _op_log
+        if _op_log is None:
+            _op_log = OperationLog(app.config["TASK_DB_PATH"])
+        return _op_log
+
+    @app.before_request
+    def _start_op_timer():
+        if request.path.startswith("/api/") and request.path != "/api/health":
+            g._op_start = time.time()
+
+    @app.after_request
+    def _commit_op_log(response):
+        start = getattr(g, "_op_start", None)
+        if start is None:
+            return response
+
+        # Extract a short module name from the URL path
+        # e.g. /api/pdf-editor/info → "pdf-editor", /api/convert → "convert"
+        path = request.path
+        parts = [p for p in path.split("/") if p]
+        module = parts[1] if len(parts) > 1 else "unknown"
+
+        duration_ms = int((time.time() - start) * 1000)
+        success = 200 <= response.status_code < 400
+
+        try:
+            _get_op_log().log_operation(
+                session_id=getattr(g, "request_id", "-"),
+                operation_type=module,
+                resource_id=path,
+                resource_type=parts[2] if len(parts) > 2 else "",
+                ip_address=request.remote_addr or "",
+                user_agent=(request.user_agent.string or "")[:200],
+                status="success" if success else "error",
+                duration_ms=duration_ms,
+            )
+        except Exception:
+            pass  # Logging must never break the response
+
+        return response
 
     # Register blueprints — one per feature for clear module boundaries
     from blueprints.convert import convert_bp
@@ -74,12 +122,14 @@ def create_app() -> Flask:
     from blueprints.format_convert_bp import format_convert_bp
     from blueprints.page_decorate_bp import page_decorate_bp
     from blueprints.image_process_bp import image_process_bp
+    from blueprints.stats_bp import stats_bp
 
     app.register_blueprint(pdf_compress_bp)
     app.register_blueprint(metadata_clean_bp)
     app.register_blueprint(format_convert_bp)
     app.register_blueprint(page_decorate_bp)
     app.register_blueprint(image_process_bp)
+    app.register_blueprint(stats_bp)
 
     # SPA fallback — serve frontend static files (Nuxt generate output)
     static_dir = app.config["STATIC_FOLDER"]

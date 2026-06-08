@@ -1,5 +1,5 @@
 # ── Stage 1: Build Nuxt 3 frontend ──────────────────────────────────
-FROM node:22-alpine AS frontend-build
+FROM node:24-alpine AS frontend-build
 
 # Alibaba Cloud npm mirror
 RUN npm config set registry https://registry.npmmirror.com
@@ -39,21 +39,22 @@ RUN pip install --break-system-packages --no-cache-dir \
     flask flask-cors flask-babel flask-caching \
     python-docx openpyxl python-pptx \
     markdown bleach img2pdf pypdf Pillow reportlab \
-    gunicorn pydantic celery redis cryptography weasyprint
+    gunicorn pydantic celery redis cryptography weasyprint pdfminer.six
 
 # Copy backend code
-COPY backend/ ./
+COPY backend/ ./backend/
 
 # Copy frontend static build
 COPY --from=frontend-build /app/frontend/.output/public ./frontend/.output/public
 
-# Runtime directories
-RUN mkdir -p /var/log/docstamp /opt/docstamp/output \
-    && chmod 755 /var/log/docstamp /opt/docstamp/output
+# Runtime directories (match UPLOAD_FOLDER default in backend/config.py)
+RUN mkdir -p /var/log/docstamp /opt/docstamp/backend/output \
+    && chmod 755 /var/log/docstamp /opt/docstamp/backend/output
 
 EXPOSE 5000
 
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
     CMD curl -sf http://localhost:5000/api/health || exit 1
 
-CMD ["gunicorn", "-c", "gunicorn.conf.py", "app:app"]
+# -b 0.0.0.0:5000 overrides gunicorn.conf.py's 127.0.0.1 binding for Docker
+CMD ["gunicorn", "-c", "backend/gunicorn.conf.py", "-b", "0.0.0.0:5000", "backend.app:app"]

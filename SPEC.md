@@ -10,34 +10,38 @@ docStamp 是一站式文档处理工具箱。Nuxt 3 + Nuxt UI v2 + Tailwind CSS 
 
 ---
 
-## 二、功能模块（15 个，归为 4 组）
+## 二、功能模块（16 个，归为 4 组）
 
 **侧栏导航**：
 
 ```
+仪表盘            → /
 MD 转公文        → /md-to-docx
 水印管理          → /watermark       (添加/去除)
 Office 工具 ▸     → /properties  /excel-merge  /format-docx  /format-convert  /metadata-clean
 PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-text  /pdf-merge  /pdf-compress  /page-decorate  /image-process
+使用统计          → /status
 ```
 
 | # | 模块 | 路由 | 分组 | 说明 |
 |---|------|------|------|------|
-| 1 | MD 转公文 | `/md-to-docx` | — | Markdown → GB/T 9704-2012 DOCX，实时预览 |
-| 2 | 水印管理 | `/watermark` | — | 添加/去除文字和图片水印 |
-| 3 | 属性修改 | `/properties` | Office | .docx/.xlsx/.pptx 元数据修改 |
-| 4 | Excel 合并 | `/excel-merge` | Office | .xlsx/.csv 结构相同合并 |
-| 5 | 格式规范 | `/format-docx` | Office | GB/T 9704-2012 格式化 |
-| 6 | 格式互转 | `/format-convert` | Office | DOCX/HTML → PDF |
-| 7 | 元数据清理 | `/metadata-clean` | Office | 清除文档元数据，保护隐私 |
-| 8 | 文件组装 | `/file-assembly` | PDF | 图片合并 + PDF 拆解 |
-| 9 | 打印分组 | `/print-split` | PDF | 批次拆分、暂停/继续/终止 |
-| 10 | PDF 编辑 | `/pdf-editor` | PDF | 删除/插入/重排页面 |
-| 11 | PDF 转文本 | `/pdf-to-text` | PDF | 提取 PDF 文本内容 |
-| 12 | PDF 合并 | `/pdf-merge` | PDF | 多 PDF 合并，拖拽排序 |
-| 13 | PDF 压缩 | `/pdf-compress` | PDF | 三级压缩（轻度/中度/深度） |
-| 14 | 页码页眉页脚 | `/page-decorate` | PDF | 添加页码/页眉/页脚 |
-| 15 | 图片处理 | `/image-process` | PDF | 缩放/裁剪/格式转换/压缩 |
+| 1 | 仪表盘 | `/` | — | 数字时钟 + 工具卡片网格（3 列） |
+| 2 | MD 转公文 | `/md-to-docx` | — | Markdown → GB/T 9704-2012 DOCX，实时预览 |
+| 3 | 水印管理 | `/watermark` | — | 添加/去除文字和图片水印 |
+| 4 | 属性修改 | `/properties` | Office | .docx/.xlsx/.pptx 元数据修改 |
+| 5 | Excel 合并 | `/excel-merge` | Office | .xlsx/.csv 结构相同合并 |
+| 6 | 格式规范 | `/format-docx` | Office | GB/T 9704-2012 格式化 |
+| 7 | 格式互转 | `/format-convert` | Office | DOCX/HTML → PDF |
+| 8 | 元数据清理 | `/metadata-clean` | Office | 清除文档元数据，保护隐私 |
+| 9 | 文件组装 | `/file-assembly` | PDF | 图片合并 + PDF 拆解 |
+| 10 | 打印分组 | `/print-split` | PDF | 批次拆分、暂停/继续/终止 |
+| 11 | PDF 编辑 | `/pdf-editor` | PDF | 删除/插入/重排页面 |
+| 12 | PDF 转文本 | `/pdf-to-text` | PDF | 提取 PDF 文本内容 |
+| 13 | PDF 合并 | `/pdf-merge` | PDF | 多 PDF 合并，拖拽排序 |
+| 14 | PDF 压缩 | `/pdf-compress` | PDF | 三级压缩（轻度/中度/深度） |
+| 15 | 页码页眉页脚 | `/page-decorate` | PDF | 添加页码/页眉/页脚 |
+| 16 | 图片处理 | `/image-process` | PDF | 缩放/裁剪/格式转换/压缩 |
+| 17 | **使用统计** | `/status` | — | 模块调用量 + 访客统计 + ECharts 可视化 |
 
 ---
 
@@ -49,15 +53,26 @@ PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-tex
 |-------|-----|------|
 | `--color-brand-700` | `#008a3d` | 品牌主色 |
 | `--color-brand-800` | `#00662b` | 悬停加深 |
-| `--color-brand-soft` | `rgba(0,138,61,0.08)` | 柔和底色 |
+| `--color-brand-soft` | `rgba(0,138,61,0.08)` | 柔和底色（导航激活态） |
 | `--color-page` | `#f9f7e8` | 米黄页面底 |
 | `--color-surface` | `#ffffff` | 卡片/面板白 |
 | `--color-muted` | `#f4f2e4` | 次级区域 |
-| `--color-text-primary` | `#1a1a1a` | 正文 |
-| `--color-text-secondary` | `#5c5c5c` | 辅助文字 |
-| `--color-text-tertiary` | `#8c8a7a` | 提示/脚注 |
+| `--color-text-primary` | `#1a1a1a` | 正文（~16.6:1 对比度） |
+| `--color-text-secondary` | `#5c5c5c` | 辅助文字（~6.3:1） |
+| `--color-text-tertiary` | `#757265` | 提示/脚注（~4.5:1 WCAG AA） |
 | `--color-border-default` | `#e8e6d8` | 默认边框 |
 | `--color-border-subtle` | `#f0efe5` | 细分隔线 |
+
+### 阴影与圆角
+
+| Token | 值 | 用途 |
+|-------|-----|------|
+| `--radius-sm` | `6px` | 按钮/标签 |
+| `--radius-md` | `10px` | 面板/卡片 |
+| `--radius-lg` | `12px` | 模态框/弹出层 |
+| `--shadow-card` | `0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.05)` | 卡片 |
+| `--shadow-elevated` | `0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04)` | 弹出菜单/下拉 |
+| `--shadow-sidebar` | `1px 0 4px rgba(0,0,0,0.04)` | 侧边栏右边缘 |
 
 ### 字体
 
@@ -104,9 +119,10 @@ backend/
 ├── celery_app.py           # Celery (Redis/Redis broker, 3 队列)
 ├── config_validators.py    # 启动时配置校验
 ├── gunicorn.conf.py        # 生产配置
-├── blueprints/             # HTTP 路由层（每功能一个文件，共 12 个）
-│   ├── convert.py          # /api/convert, /api/preview, /api/stats
+├── blueprints/             # HTTP 路由层（每功能一个文件，共 13 个）
+│   ├── convert.py          # /api/convert, /api/preview, /api/stats (计数)
 │   ├── download.py         # /api/download, /api/health, /api/tasks/*
+│   ├── stats_bp.py         # /api/stats/overview, /api/stats/seed
 │   ├── properties_bp.py    # /api/properties/*
 │   ├── img2pdf_bp.py       # /api/img2pdf
 │   ├── pdf2img_bp.py       # /api/pdf2img
@@ -179,7 +195,9 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 | Method | Path | Purpose |
 |--------|------|---------|
 | `GET` | `/api/health` | 健康检查 |
-| `GET` | `/api/stats` | 转换计数 |
+| `GET` | `/api/stats` | 转换计数（全局累加器） |
+| `GET` | `/api/stats/overview` | 使用统计仪表盘（按模块/日/访客聚合） |
+| `POST` | `/api/stats/seed` | 生成测试数据 |
 | `POST` | `/api/preview` | MD → HTML 预览 |
 | `POST` | `/api/convert` | MD → DOCX |
 | `POST` | `/api/convert/doc2md` | DOCX 格式化 |
@@ -375,6 +393,13 @@ systemctl start docstamp.service    # 或使用 deploy/docstamp.service
 ---
 
 ## 十一、版本历史
+
+### v3.3 (2026-06)
+- **使用统计仪表盘**：新增 `/status` 页面 + `/api/stats/overview` + `/api/stats/seed`，ECharts 可视化（柱状图/饼图/折线图），按模块/日/访客聚合
+- **视觉精细化**：全局阴影增强（卡片/弹出/侧栏），`--color-text-tertiary` #8c8a7a→#757265（WCAG AA 4.5:1），侧栏导航激活态改为圆角背景填充，摘要卡片品牌色顶部强调线
+- **baseline-ui 合规**：Sidebar `transition-all`→`transition-[width]`，移除 `tracking-wide`，骨架屏加载态，空状态一键操作按钮
+- **Docker 修复**：`node:22-alpine`→`node:24-alpine`（npm 锁文件兼容），`COPY backend/ ./`→`COPY backend/ ./backend/`（保留目录结构），gunicorn `-b 0.0.0.0:5000`（容器端口可达），补 `pdfminer.six`
+- **操作日志中间件**：`@app.before_request` / `@app.after_request` 自动记录所有 `/api/*` 调用至 `operation_logs`
 
 ### v3.2 (2026-06)
 - **生产加固**：Gunicorn gthread + 动态 worker 数 + CORS 白名单 + MAX_CONTENT_LENGTH 兜底

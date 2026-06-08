@@ -1,6 +1,6 @@
 # docStamp — 文档处理工具箱
 
-一站式文档处理 Web 应用，15 大功能模块。即开即用，无需注册。
+一站式文档处理 Web 应用，16 大功能模块。即开即用，无需注册。
 
 ## 功能
 
@@ -21,6 +21,7 @@
 | 13 | **PDF 压缩** | `/pdf-compress` | 三级压缩（轻度/中度/深度） |
 | 14 | **页码页眉页脚** | `/page-decorate` | 添加页码/页眉/页脚到 PDF |
 | 15 | **图片处理** | `/image-process` | 缩放/裁剪/格式转换/压缩 |
+| 16 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts 可视化） |
 
 ## 技术栈
 
@@ -107,7 +108,7 @@ docStamp/
 │   ├── docstamp.service        # Systemd 服务（12 项安全加固）
 │   └── env.conf                # 生产环境变量模板
 ├── docker-compose.yml          # 6 容器编排（API + Redis + 3×Worker + Beat）
-├── Dockerfile                  # 多阶段构建（node:22 + python:3.12-slim）
+├── Dockerfile                  # 多阶段构建（node:24-alpine + python:3.12-slim）
 ├── manage.sh                   # 开发/生产管理脚本
 ├── prod-start.sh               # 生产一键启动
 ├── SPEC.md                     # 详细设计规范
@@ -139,7 +140,7 @@ docStamp/
 ## 系统要求
 
 - Python 3.12+
-- Node.js 22+
+- Node.js 24+
 - Redis（生产环境，Celery broker）
 - pandoc / poppler-utils / libreoffice-core（文档处理）
 - libpango + libgdk-pixbuf（WeasyPrint HTML→PDF）

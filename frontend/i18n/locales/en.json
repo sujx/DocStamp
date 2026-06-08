@@ -25,7 +25,20 @@
     "metadataClean": "Metadata Clean",
     "formatConvert": "Format Convert",
     "pageDecorate": "Page Numbers",
-    "imageProcess": "Image Process"
+    "imageProcess": "Image Process",
+    "status": "Usage Stats"
+  },
+  "status": {
+    "title": "Usage Statistics",
+    "description": "Module call counts and website visitor analytics",
+    "totalCalls": "Total Calls",
+    "visitors": "Unique Visitors",
+    "byModule": "Calls by Module",
+    "dailyTrend": "Daily Trend",
+    "modulePie": "Module Share",
+    "days": "Last {n} days",
+    "noData": "No data yet. Click below to generate sample data.",
+    "seedData": "Generate Sample Data"
   },
   "common": {
     "upload": "Upload File",

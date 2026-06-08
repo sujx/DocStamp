@@ -203,3 +203,49 @@ class OperationLog(BaseCRUD):
             "duration_ms": duration_ms,
         }
         return self.insert(data)
+
+    # ── Aggregate queries for the status dashboard ─────────────────
+
+    def _count_all(self) -> int:
+        """Total number of operation log rows."""
+        with self._conn() as db:
+            row = db.execute(
+                "SELECT COUNT(*) FROM operation_logs"
+            ).fetchone()
+            return row[0] if row else 0
+
+    def _by_module(self, since: str) -> list[dict]:
+        """Call counts grouped by operation_type since a given timestamp."""
+        with self._conn() as db:
+            rows = db.execute(
+                """SELECT operation_type, COUNT(*) AS cnt
+                   FROM operation_logs
+                   WHERE created_at >= ?
+                   GROUP BY operation_type""",
+                (since,),
+            ).fetchall()
+            return [dict(r) for r in rows]
+
+    def _daily_counts(self, since: str) -> list[dict]:
+        """Daily call count for trend chart."""
+        with self._conn() as db:
+            rows = db.execute(
+                """SELECT DATE(created_at) AS date, COUNT(*) AS cnt
+                   FROM operation_logs
+                   WHERE created_at >= ?
+                   GROUP BY DATE(created_at)
+                   ORDER BY date""",
+                (since,),
+            ).fetchall()
+            return [dict(r) for r in rows]
+
+    def _count_distinct_ips(self, since: str) -> int:
+        """Count unique visitor IPs since a given timestamp."""
+        with self._conn() as db:
+            row = db.execute(
+                """SELECT COUNT(DISTINCT ip_address)
+                   FROM operation_logs
+                   WHERE created_at >= ? AND ip_address != ''""",
+                (since,),
+            ).fetchone()
+            return row[0] if row else 0

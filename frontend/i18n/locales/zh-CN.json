@@ -25,7 +25,20 @@
     "metadataClean": "元数据清理",
     "formatConvert": "格式互转",
     "pageDecorate": "页码页眉页脚",
-    "imageProcess": "图片处理"
+    "imageProcess": "图片处理",
+    "status": "使用统计"
+  },
+  "status": {
+    "title": "使用统计",
+    "description": "各功能模块调用次数与网站访问情况",
+    "totalCalls": "总调用次数",
+    "visitors": "独立访客",
+    "byModule": "模块调用分布",
+    "dailyTrend": "每日调用趋势",
+    "modulePie": "模块占比",
+    "days": "最近 {n} 天",
+    "noData": "暂无测试数据，点击下方按钮生成示例数据",
+    "seedData": "生成测试数据"
   },
   "common": {
     "upload": "上传文件",

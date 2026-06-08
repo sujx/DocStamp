@@ -19,7 +19,7 @@ services:
     ports:
       - "127.0.0.1:5000:5000"       # Only reachable via reverse proxy
     volumes:
-      - output_data:/opt/docstamp/output
+      - output_data:/opt/docstamp/backend/output
       - log_data:/var/log/docstamp
     environment:
       - TZ=Asia/Shanghai
@@ -41,7 +41,7 @@ services:
       -Q convert_queue --concurrency=4
       -n convert@%h --loglevel=info
     volumes:
-      - output_data:/opt/docstamp/output
+      - output_data:/opt/docstamp/backend/output
       - log_data:/var/log/docstamp
     environment:
       - TZ=Asia/Shanghai
@@ -60,7 +60,7 @@ services:
       -Q pdf_queue --concurrency=4
       -n pdf@%h --loglevel=info
     volumes:
-      - output_data:/opt/docstamp/output
+      - output_data:/opt/docstamp/backend/output
       - log_data:/var/log/docstamp
     environment:
       - TZ=Asia/Shanghai
@@ -79,7 +79,7 @@ services:
       -Q office_queue --concurrency=4
       -n office@%h --loglevel=info
     volumes:
-      - output_data:/opt/docstamp/output
+      - output_data:/opt/docstamp/backend/output
       - log_data:/var/log/docstamp
     environment:
       - TZ=Asia/Shanghai
@@ -95,7 +95,7 @@ services:
     container_name: docstamp-celery-beat
     command: celery -A backend.celery_app beat --loglevel=info
     volumes:
-      - output_data:/opt/docstamp/output
+      - output_data:/opt/docstamp/backend/output
       - log_data:/var/log/docstamp
     environment:
       - TZ=Asia/Shanghai

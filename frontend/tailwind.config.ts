@@ -30,7 +30,7 @@ export default <Config>{
       textColor: {
         primary: "#1a1a1a",
         secondary: "#5c5c5c",
-        tertiary: "#8c8a7a",
+        tertiary: "#757265",
       },
       borderColor: {
         default: "#e8e6d8",
@@ -39,11 +39,12 @@ export default <Config>{
       borderRadius: {
         sm: "6px",
         md: "10px",
-        lg: "14px",
+        lg: "12px",
       },
       boxShadow: {
-        card: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03)",
-        elevated: "0 4px 6px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.03)",
+        card: "0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.05)",
+        elevated: "0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04)",
+        sidebar: "1px 0 4px rgba(0,0,0,0.04)",
       },
     },
   },
