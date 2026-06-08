@@ -2,9 +2,26 @@ module.exports = {
   root: true,
   extends: ["@nuxtjs/eslint-config-typescript"],
   rules: {
-    "vue/multi-word-component-names": "off",
-    "no-console": "warn",
-    // Brand: no hardcoded hex colors — use CSS variables
+    // ── Vue-specific ─────────────────────────────────────────────
+    "vue/multi-word-component-names": ["error", {
+      ignores: ["default", "index", "Sidebar"],
+    }],
+    "vue/component-name-in-template-casing": ["error", "PascalCase"],
+    "vue/html-self-closing": ["error", {
+      html: { void: "never", normal: "always", component: "always" },
+    }],
+    "vue/require-default-prop": "warn",
+    "vue/require-explicit-emits": "warn",
+
+    // ── TypeScript ───────────────────────────────────────────────
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    "@typescript-eslint/explicit-function-return-type": "warn",
+
+    // ── General ──────────────────────────────────────────────────
+    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
+
+    // ── Brand: no hardcoded hex colors — use CSS variables ───────
     "no-restricted-syntax": [
       "error",
       {

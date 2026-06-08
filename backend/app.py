@@ -104,6 +104,16 @@ def create_app() -> Flask:
             if os.path.isfile(dir_index):
                 return send_from_directory(static_dir, os.path.join(path, "index.html"))
 
+        # Before falling back to index.html, check if the request looks like
+        # a static asset (has a file extension).  If so, return 404 instead
+        # of index.html — otherwise the browser receives HTML when it expects
+        # JS/CSS and throws MIME-type errors (e.g. stale _nuxt/*.js hashes).
+        if path and "." in path.rsplit("/", 1)[-1]:
+            return jsonify({
+                "code": 404, "msg": "Asset not found",
+                "requestId": getattr(g, "request_id", "-"),
+            }), 404
+
         # SPA fallback — return root index.html for all unmatched routes
         if os.path.isfile(os.path.join(static_dir, "index.html")):
             return send_from_directory(static_dir, "index.html")

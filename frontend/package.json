@@ -11,12 +11,17 @@
     "preview": "nuxt preview",
     "lint": "eslint . --ext .vue,.ts,.js",
     "lint:fix": "eslint . --ext .vue,.ts,.js --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@nuxt/icon": "^1.10",
     "@nuxt/ui": "^2.21",
     "@nuxtjs/i18n": "^9.5",
+    "@vuelidate/core": "^2.0.3",
+    "@vuelidate/validators": "^2.0.4",
     "axios": "^1.7",
     "dompurify": "^3.4.7",
     "highlight.js": "^11.11.1",
@@ -24,5 +29,10 @@
     "marked": "^18.0.4",
     "mermaid": "^11.15.0",
     "nuxt": "3.15.4"
+  },
+  "devDependencies": {
+    "@vue/test-utils": "^2.4.11",
+    "happy-dom": "^20.10.2",
+    "vitest": "^4.1.8"
   }
 }
