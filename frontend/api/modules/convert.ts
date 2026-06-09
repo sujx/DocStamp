@@ -36,13 +36,6 @@ export const convertApi = {
     return postFormBlob("/api/convert/doc2md", fd);
   },
 
-  /** Convert DOCX/HTML to PDF. */
-  formatConvert: (file: File, targetFormat: string) => {
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("target_format", targetFormat);
-    return postFormBlob("/api/convert/format", fd);
-  },
 
   /** Get total conversion count. */
   stats: () => api.get<StatsResponse>("/api/stats").then((r) => r.data),

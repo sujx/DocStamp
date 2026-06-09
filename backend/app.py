@@ -119,14 +119,12 @@ def create_app() -> Flask:
 
     from blueprints.pdf_compress_bp import pdf_compress_bp
     from blueprints.metadata_clean_bp import metadata_clean_bp
-    from blueprints.format_convert_bp import format_convert_bp
     from blueprints.page_decorate_bp import page_decorate_bp
     from blueprints.image_process_bp import image_process_bp
     from blueprints.stats_bp import stats_bp
 
     app.register_blueprint(pdf_compress_bp)
     app.register_blueprint(metadata_clean_bp)
-    app.register_blueprint(format_convert_bp)
     app.register_blueprint(page_decorate_bp)
     app.register_blueprint(image_process_bp)
     app.register_blueprint(stats_bp)

@@ -181,7 +181,6 @@ const navItems = computed<NavItem[]>(() => [
       { to: "/properties", icon: "i-heroicons-document-text", label: t("tabs.properties") },
       { to: "/excel-merge", icon: "i-heroicons-table-cells", label: t("tabs.excelMerge") },
       { to: "/format-docx", icon: "i-heroicons-document-check", label: t("tabs.formatDocx") },
-      { to: "/format-convert", icon: "i-heroicons-arrow-path", label: t("tabs.formatConvert") },
       { to: "/metadata-clean", icon: "i-heroicons-shield-exclamation", label: t("tabs.metadataClean") },
     ],
   },

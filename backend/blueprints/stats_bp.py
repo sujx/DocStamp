@@ -35,7 +35,6 @@ MODULE_NAMES = {
     "pdf-merge": "PDF 合并",
     "pdf-compress": "PDF 压缩",
     "metadata-clean": "清理元数据",
-    "format-convert": "格式互转",
     "page-decorate": "页码页眉",
     "image-process": "图片处理",
     "format-docx": "格式规范",

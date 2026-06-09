@@ -39,30 +39,6 @@ else
     exit 1
 fi
 
-# ── LibreOffice tarball install (RPM distros 10+ where LO was dropped) ─
-_install_libreoffice_tarball() {
-    local lo_ver="26.2.4"
-    local lo_url="https://mirrors.cloud.tencent.com/libreoffice/libreoffice/stable/${lo_ver}/rpm/x86_64/LibreOffice_${lo_ver}_Linux_x86-64_rpm.tar.gz"
-    local lo_tmp="/tmp/libreoffice-install"
-
-    log_info "LibreOffice 未在仓库中找到，从镜像下载安装 ${lo_ver} ..."
-    mkdir -p "$lo_tmp"
-
-    curl -fsSL -o "$lo_tmp/libreoffice.tar.gz" "$lo_url"
-    tar -xzf "$lo_tmp/libreoffice.tar.gz" -C "$lo_tmp"
-
-    # Install all RPMs from the extracted RPMS/ directory
-    local rpms_dir="$lo_tmp/LibreOffice_${lo_ver}_Linux_x86-64_rpm/RPMS"
-    if [[ -d "$rpms_dir" ]]; then
-        $PKG_MGR install -y "$rpms_dir"/*.rpm
-        log_info "LibreOffice ${lo_ver} 安装完成"
-    else
-        log_error "LibreOffice RPM 目录未找到: $rpms_dir"
-    fi
-
-    rm -rf "$lo_tmp"
-}
-
 # ── System dependencies ─────────────────────────────────────────────
 _install_system_deps() {
     log_info "安装系统依赖..."
@@ -73,11 +49,7 @@ _install_system_deps() {
             apt-get install -y --no-install-recommends \
                 python3 python3-venv python3-pip python3-dev \
                 pandoc poppler-utils curl procps \
-                libpango-1.0-0 libgdk-pixbuf-2.0-0 \
                 fonts-noto-cjk
-            # LibreOffice — try core first (smaller), fall back to full
-            apt-get install -y --no-install-recommends libreoffice-core 2>/dev/null || \
-                apt-get install -y --no-install-recommends libreoffice-writer
             # Node.js — use NodeSource for up-to-date version
             if ! command -v node &>/dev/null; then
                 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
@@ -89,12 +61,7 @@ _install_system_deps() {
             $PKG_MGR install -y \
                 python3 python3-pip python3-devel \
                 pandoc poppler-utils curl procps-ng \
-                pango gdk-pixbuf2 google-noto-cjk-fonts
-            # LibreOffice — RPM 系 10+ 不再内置，需手动下载安装
-            if ! $PKG_MGR install -y libreoffice-core 2>/dev/null && \
-               ! $PKG_MGR install -y libreoffice-writer 2>/dev/null; then
-                _install_libreoffice_tarball
-            fi
+                google-noto-cjk-fonts
             # Node.js
             if ! command -v node &>/dev/null; then
                 curl -fsSL https://rpm.nodesource.com/setup_22.x | bash -
@@ -166,7 +133,7 @@ _install_venv() {
         python-docx openpyxl python-pptx \
         markdown bleach img2pdf pypdf Pillow reportlab \
         gunicorn pydantic celery redis cryptography \
-        weasyprint pdfminer.six
+        pdfminer.six
 
     log_info "Python 依赖安装完成"
 }

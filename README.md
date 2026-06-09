@@ -11,8 +11,7 @@
 | 3 | **属性修改** | `/properties` | 修改 .docx/.xlsx/.pptx 元数据（批量+统一时间） |
 | 4 | **Excel 合并** | `/excel-merge` | 合并 .xlsx/.csv（同结构） |
 | 5 | **格式规范** | `/format-docx` | DOCX 按 GB/T 9704-2012 格式化 |
-| 6 | **格式互转** | `/format-convert` | DOCX/HTML → PDF（LibreOffice / WeasyPrint） |
-| 7 | **元数据清理** | `/metadata-clean` | 清除文档元数据，保护隐私 |
+| 6 | **元数据清理** | `/metadata-clean` | 清除文档元数据，保护隐私 |
 | 8 | **文件组装** | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
 | 9 | **打印分组** | `/print-split` | 按批次拆分 PDF（暂停/继续/终止） |
 | 10 | **PDF 编辑** | `/pdf-editor` | 删除/插入/重排页面，缩略图预览 |
@@ -29,7 +28,7 @@
 |------|------|
 | **后端框架** | Python Flask + Pydantic v2 + Flask-CORS + Flask-Babel + Flask-Caching |
 | **异步任务** | Celery（Redis broker）+ 3 队列 + SSE 进度推送 |
-| **文档处理** | pandoc / pypdf / Pillow / reportlab / pdfminer.six / python-docx / openpyxl / WeasyPrint |
+| **文档处理** | pandoc / pypdf / Pillow / reportlab / pdfminer.six / python-docx / openpyxl |
 | **前端框架** | Nuxt 3.15.4 (SPA) + Nuxt UI v2 + Tailwind CSS v3 |
 | **国际化** | @nuxtjs/i18n v9（zh-CN / en） |
 | **部署** | Gunicorn gthread + Nginx + Docker Compose + Systemd |
@@ -43,7 +42,7 @@
 cd backend && pip3 install --break-system-packages flask flask-cors flask-babel \
     flask-caching python-docx openpyxl python-pptx markdown bleach img2pdf \
     pypdf Pillow reportlab gunicorn pydantic celery redis cryptography \
-    weasyprint pdfminer.six
+    pdfminer.six
 
 # 安装前端依赖
 cd ../frontend && npm install
@@ -146,5 +145,5 @@ docStamp/
 | 内存 | 4GB+ | 2GB |
 | CPU | 4 核+ | 2 核 |
 | Redis | 需要 | 需要 |
-| pandoc / poppler-utils / libreoffice-core | 需要 | 需要 |
+| pandoc / poppler-utils | 需要 | 需要 |
 | Docker (可选) | 推荐 | 推荐 |
