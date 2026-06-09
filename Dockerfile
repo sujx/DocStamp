@@ -8,11 +8,10 @@ RUN npm config set registry https://registry.npmmirror.com
 RUN npm install -g npm@latest
 
 WORKDIR /app/frontend
-# Only copy package.json (not lockfile) so npm resolves latest compatible
-# versions within semver ranges — avoids stale transitive deprecation warnings
-# like glob@10.5.0 / tar@6.2.1
-COPY frontend/package.json ./
-RUN npm install --no-audit --no-fund
+COPY frontend/package*.json ./
+# npm ci with committed lockfile — deterministic, fast, no peer conflicts.
+# Lockfile kept up-to-date via local 'npm install --legacy-peer-deps'
+RUN npm ci --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run build
 
