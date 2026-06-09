@@ -23,6 +23,14 @@ celery.conf.update(
         "CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/1"
     ),
 
+    # Import task modules so Celery registers @celery.task decorated functions
+    include=[
+        "backend.tasks.convert",
+        "backend.tasks.pdf",
+        "backend.tasks.office",
+        "backend.tasks.maintenance",
+    ],
+
     # Queue routing
     task_routes={
         "backend.tasks.convert.*":  {"queue": "convert_queue"},

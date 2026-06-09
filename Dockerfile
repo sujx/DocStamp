@@ -23,11 +23,12 @@ WORKDIR /opt/docstamp
 RUN apt-get update && apt-get install -y --no-install-recommends \
     pandoc \
     poppler-utils \
-    libreoffice-core \
+    libreoffice-writer \
     libpango-1.0-0 \
     libgdk-pixbuf2.0-0 \
     fonts-noto-cjk \
     curl \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 # Alibaba Cloud PyPI mirror
@@ -35,7 +36,7 @@ RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 
 # Install Python dependencies
 COPY backend/pyproject.toml ./
-RUN pip install --break-system-packages --no-cache-dir \
+RUN pip install --break-system-packages --no-cache-dir --root-user-action=ignore \
     flask flask-cors flask-babel flask-caching \
     python-docx openpyxl python-pptx \
     markdown bleach img2pdf pypdf Pillow reportlab \
@@ -44,17 +45,30 @@ RUN pip install --break-system-packages --no-cache-dir \
 # Copy backend code
 COPY backend/ ./backend/
 
+# Python path — needed so that 'from config import Config' works inside the
+# backend package when gunicorn imports 'backend.app:app'
+ENV PYTHONPATH=/opt/docstamp/backend
+
 # Copy frontend static build
 COPY --from=frontend-build /app/frontend/.output/public ./frontend/.output/public
+
+# Entrypoint (copied before USER so root can chmod it)
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 # Runtime directories (match UPLOAD_FOLDER default in backend/config.py)
 RUN mkdir -p /var/log/docstamp /opt/docstamp/backend/output \
     && chmod 755 /var/log/docstamp /opt/docstamp/backend/output
 
+# Non-root user for production security
+RUN useradd --create-home --shell /bin/bash docstamp \
+    && chown -R docstamp:docstamp /opt/docstamp /var/log/docstamp
+USER docstamp
+
 EXPOSE 5000
 
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD curl -sf http://localhost:5000/api/health || exit 1
-
 # -b 0.0.0.0:5000 overrides gunicorn.conf.py's 127.0.0.1 binding for Docker
-CMD ["gunicorn", "-c", "backend/gunicorn.conf.py", "-b", "0.0.0.0:5000", "backend.app:app"]
+# --pid /tmp/gunicorn.pid avoids /var/run permission issues with non-root user
+CMD ["gunicorn", "-c", "backend/gunicorn.conf.py", "-b", "0.0.0.0:5000", \
+     "--pid", "/tmp/gunicorn.pid", "backend.app:app"]
