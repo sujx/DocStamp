@@ -55,24 +55,25 @@ cd .. && ./manage.sh start
 ### Docker 生产部署
 
 ```bash
-# 6 容器一键启动（API + Redis + 3×Celery Worker + Beat）
+# Full 模式（6 容器，4GB+ 推荐）
 docker compose up -d
 
-# 查看状态
-docker compose ps
+# Lite 模式（3 容器，2C2G 推荐）
+docker compose -f docker-compose.lite.yml up -d
+
+# 或使用快捷命令
+./manage.sh lite          # Lite 一键启动
+./manage.sh docker-full   # Full 一键启动
 ```
 
 ### 裸机 Systemd 部署
 
 ```bash
-# 生产模式（Gunicorn 单端口 :5000）
-./manage.sh prod
+# Lite 模式（2C2G ECS 推荐）— Redis + API + Celery + Beat 一键安装
+sudo bash scripts/install.sh install --lite
 
-# 或注册为系统服务（安全加固）
-cp deploy/docstamp.service /etc/systemd/system/
-cp deploy/env.conf /etc/docstamp/env.conf
-# 编辑 /etc/docstamp/env.conf 填入生产环境变量
-systemctl enable --now docstamp
+# Full 模式 — 仅 API，Celery 需额外部署
+sudo bash scripts/install.sh install
 ```
 
 ## 项目结构

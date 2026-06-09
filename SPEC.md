@@ -318,13 +318,24 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 
 ## 九、部署
 
-### 开发模式
+docStamp 提供两种部署模式，按服务器配置选择：
+
+| 模式 | 命令 | 容器/进程数 | 适用 |
+|------|------|:---:|------|
+| **Full** | `docker compose up -d` | 6 容器 | 4GB+ 服务器，生产高并发 |
+| **Lite** | `docker compose -f docker-compose.lite.yml up -d` | 3 容器 | 2C2G 低配服务器 |
+| **裸机 Full** | `sudo bash scripts/install.sh install` | 1 systemd 服务 | 已有 Redis/Celery 外部部署 |
+| **裸机 Lite** | `sudo bash scripts/install.sh install --lite` | 4 systemd 服务 | 2C2G ECS 单机全包 |
+
+快捷命令：
 
 ```bash
-./manage.sh start    # Flask :5000 + Nuxt :8080 (HMR)
+./manage.sh lite         # Docker Lite 一键启动
+./manage.sh docker-full  # Docker Full 一键启动
+./manage.sh prod         # 裸机 Gunicorn 单端口
 ```
 
-### 生产模式（Docker Compose，推荐）
+### Full 模式（Docker Compose，6 容器）
 
 ```bash
 docker compose up -d   # 6 容器: api + redis + 3×celery + beat
@@ -340,12 +351,42 @@ docker compose up -d   # 6 容器: api + redis + 3×celery + beat
 | `celery-office` | 属性修改, Excel 合并 | — |
 | `celery-beat` | 定时清理临时文件 | — |
 
-所有容器均配置健康检查：Redis `redis-cli ping` → API `curl /api/health` → Celery `celery inspect ping` / Beat `pgrep`，通过 `condition: service_healthy` 确保依赖就绪后再启动。容器以非 root 用户 `docstamp` 运行，entrypoint 脚本处理 Docker volume 权限。
-
-### 生产模式（裸机 / Systemd）
+### Lite 模式（Docker Compose，3 容器）
 
 ```bash
-./manage.sh prod                    # Gunicorn 单端口
+docker compose -f docker-compose.lite.yml up -d   # 3 容器: api + redis + celery
+```
+
+| 与 Full 的差异 | Lite | Full |
+|---|---|---|
+| Celery 队列 | 1 Worker 合并处理 3 队列 | 3 Worker 各管一队列 |
+| Beat 调度 | 内嵌在 Worker 中（`-B`） | 独立容器 |
+| Worker 并发 | `--concurrency=2` | `--concurrency=4` |
+| API Workers | `--workers 2` | `workers=min(8, cpu*2+1)` |
+| Redis 内存 | `maxmemory 128mb` | `maxmemory 256mb` |
+| 预估内存 | ~800MB | ~2.5GB |
+
+所有容器均配置健康检查：Redis `redis-cli ping` → API `curl /api/health` → Celery `celery inspect ping` / Beat `pgrep`，通过 `condition: service_healthy` 确保依赖就绪后再启动。容器以非 root 用户 `docstamp` 运行，entrypoint 脚本处理 Docker volume 权限。
+
+### 裸机 Systemd 部署
+
+```bash
+# Lite 模式（2C2G 推荐）— Redis + API + Celery + Beat
+sudo bash scripts/install.sh install --lite
+
+# Full 模式 — 仅 API，Celery 需额外部署
+sudo bash scripts/install.sh install
+```
+
+Lite 模式 systemd 服务清单：
+| 服务 | 内存限制 | 职责 |
+|------|:---:|------|
+| `redis` | — | 消息代理（`maxmemory 128mb`） |
+| `docstamp.service` | 512M | Gunicorn API + 静态文件 |
+| `docstamp-celery.service` | 512M | Celery Worker（3 队列合并, concurrency=2） |
+| `docstamp-beat.service` | 128M | 定时清理调度 |
+
+环境变量通过 `/etc/docstamp/env.conf` 注入（模板见 `deploy/env.conf`）。
 systemctl start docstamp.service    # 或使用 deploy/docstamp.service
 ```
 
@@ -406,6 +447,7 @@ systemctl start docstamp.service    # 或使用 deploy/docstamp.service
 - **非 root 运行**：Dockerfile `USER docstamp` + entrypoint 确保 volume 权限 + gunicorn `--pid /tmp` 避免 `/var/run` 权限问题
 - **关键修复**：Celery worker 任务注册缺失（`include` 配置 → 14 个任务正确注册），`PYTHONPATH` 导入解析（`from config import Config` 在 Gunicorn `backend.app:app` 模式下失效）
 - **构建优化**：pip `--root-user-action=ignore` 消除警告，`procps` 支持健康检查，`.dockerignore` 递归排除 `backend/output`
+- **Full/Lite 双模式部署**：Lite 模式（3 容器/4 systemd 服务）适配 2C2G 低配 ECS，Celery 3 队列合并 + concurrency=2 + Beat 内嵌，预估内存 ~800MB；Full 模式（6 容器）保持独立队列隔离，适用于 4GB+ 生产环境
 - **品牌定名**：产品名定为「鹊随金印」，全站标题/侧栏/页头/页脚统一应用，`.brand-title` CSS 金绿渐变（`#c9a84c`→`#008a3d`）印章浮雕质感
 - **UI/UX 审查 (UI/UX Pro Max)**：侧栏子菜单增加点击切换（修复触摸设备不可达），ToolCard `transition: all`→`transition-[box-shadow,transform]`，`--color-text-tertiary` #757265→#706d60（对比度 3.9:1→4.69:1 WCAG AA）
 - **移动端适配**：侧栏 <1024px 悬浮叠加模式（汉堡按钮 + 遮罩 + 点击关闭），导航项 h-10→min-h-[44px] 触摸目标

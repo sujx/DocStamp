@@ -1,0 +1,28 @@
+[Unit]
+Description=docStamp Celery Beat Scheduler (lite)
+Documentation=https://github.com/grepsu/docStamp
+After=network.target redis.service
+
+[Service]
+Type=simple
+User=docstamp
+Group=docstamp
+WorkingDirectory=/opt/docstamp/backend
+EnvironmentFile=-/etc/docstamp/env.conf
+Environment=PYTHONPATH=/opt/docstamp/backend
+ExecStart=/opt/docstamp/.venv/bin/celery -A celery_app beat --loglevel=info
+Restart=always
+RestartSec=10
+MemoryMax=128M
+
+# ── Security hardening ───────────────────────────────────────────────
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadOnlyPaths=/opt/docstamp/backend
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+PrivateDevices=yes
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target

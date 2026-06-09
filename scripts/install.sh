@@ -79,13 +79,37 @@ _build_frontend() {
     cd "$PROJECT_DIR"
 }
 
+_install_redis() {
+    log_info "安装 Redis..."
+    if command -v apt-get &>/dev/null; then
+        apt-get install -y redis
+    elif command -v dnf &>/dev/null; then
+        dnf install -y redis
+    fi
+    # Tune for low memory
+    sed -i 's/^# maxmemory .*/maxmemory 128mb/' /etc/redis/redis.conf 2>/dev/null || true
+    sed -i 's/^# maxmemory-policy .*/maxmemory-policy allkeys-lru/' /etc/redis/redis.conf 2>/dev/null || true
+    systemctl enable --now redis
+}
+
 _install_systemd() {
     log_info "安装 systemd 服务..."
-    cp "$PROJECT_DIR/docstamp.service" /etc/systemd/system/docstamp.service
+    cp "$PROJECT_DIR/deploy/docstamp.service" /etc/systemd/system/docstamp.service
     systemctl daemon-reload
     systemctl enable docstamp
     systemctl start docstamp
     log_info "docStamp 服务已启动"
+}
+
+_install_systemd_lite() {
+    log_info "安装 systemd 服务 (lite: API + Celery + Beat)..."
+    cp "$PROJECT_DIR/deploy/docstamp.service" /etc/systemd/system/docstamp.service
+    cp "$PROJECT_DIR/deploy/docstamp-celery.service" /etc/systemd/system/docstamp-celery.service
+    cp "$PROJECT_DIR/deploy/docstamp-beat.service" /etc/systemd/system/docstamp-beat.service
+    systemctl daemon-reload
+    systemctl enable docstamp docstamp-celery docstamp-beat
+    systemctl start docstamp docstamp-celery docstamp-beat
+    log_info "docStamp (lite) 3 个服务已启动"
 }
 
 _install_logrotate() {
@@ -93,31 +117,54 @@ _install_logrotate() {
     cp "$PROJECT_DIR/logrotate.conf" /etc/logrotate.d/docstamp
 }
 
-_install_docker() {
-    log_info "使用 Docker Compose 部署..."
+_install_docker_full() {
+    log_info "使用 Docker Compose (full: 6 容器) 部署..."
     cd "$PROJECT_DIR"
-    docker-compose up -d --build
-    log_info "Docker 部署完成 → http://localhost:8050"
+    docker compose up -d --build
+    log_info "Docker (full) 部署完成 → http://localhost:5000"
+    docker compose ps
+}
+
+_install_docker_lite() {
+    log_info "使用 Docker Compose (lite: 3 容器) 部署..."
+    cd "$PROJECT_DIR"
+    docker compose -f docker-compose.lite.yml up -d --build
+    log_info "Docker (lite) 部署完成 → http://localhost:5000"
+    docker compose -f docker-compose.lite.yml ps
 }
 
 _update_local() {
-    log_info "更新 docStamp..."
-    systemctl stop docstamp || true
+    local mode="${1:-full}"
+    log_info "更新 docStamp (${mode})..."
+    if [[ "$mode" == "lite" ]]; then
+        systemctl stop docstamp docstamp-celery docstamp-beat 2>/dev/null || true
+    else
+        systemctl stop docstamp || true
+    fi
     cp -r "$PROJECT_DIR/backend"/*.py "$BACKEND_DIR/"
     cp "$PROJECT_DIR/backend/pyproject.toml" "$BACKEND_DIR/"
-    "$VENV_DIR/bin/poetry" install --no-dev --no-interaction --no-ansi
-    cp -r "$PROJECT_DIR/frontend/src" "$FRONTEND_DIR/"
-    cp "$PROJECT_DIR/frontend/package.json" "$FRONTEND_DIR/"
+    "$VENV_DIR/bin/pip" install --no-cache-dir \
+        flask flask-cors flask-babel flask-caching \
+        python-docx openpyxl python-pptx markdown bleach \
+        img2pdf pypdf Pillow reportlab gunicorn pydantic \
+        celery redis cryptography weasyprint pdfminer.six
+    cp -r "$PROJECT_DIR/frontend"/* "$FRONTEND_DIR/"
     cd "$FRONTEND_DIR" && npm install && npm run build && cd "$PROJECT_DIR"
-    systemctl start docstamp
+    if [[ "$mode" == "lite" ]]; then
+        systemctl start docstamp docstamp-celery docstamp-beat
+    else
+        systemctl start docstamp
+    fi
     log_info "更新完成"
 }
 
 _uninstall_local() {
     log_info "卸载 docStamp..."
-    systemctl stop docstamp || true
-    systemctl disable docstamp || true
+    systemctl stop docstamp docstamp-celery docstamp-beat 2>/dev/null || true
+    systemctl disable docstamp docstamp-celery docstamp-beat 2>/dev/null || true
     rm -f /etc/systemd/system/docstamp.service
+    rm -f /etc/systemd/system/docstamp-celery.service
+    rm -f /etc/systemd/system/docstamp-beat.service
     rm -f /etc/logrotate.d/docstamp
     systemctl daemon-reload
     rm -rf "$APP_DIR"
@@ -134,38 +181,67 @@ _uninstall_local() {
 case "${1:-}" in
     install)
         if [[ "${2:-}" == "--docker" ]]; then
-            _install_docker
-        else
+            _install_docker_full
+        elif [[ "${2:-}" == "--docker-lite" ]]; then
+            _install_docker_lite
+        elif [[ "${2:-}" == "--lite" ]]; then
             _install_system_deps
+            _install_redis
             _create_user
             _setup_dirs
             cp -r "$PROJECT_DIR/backend" "$APP_DIR/"
             cp -r "$PROJECT_DIR/frontend" "$APP_DIR/"
-            cp "$PROJECT_DIR/docstamp.service" "$APP_DIR/"
+            _install_venv
+            _build_frontend
+            _install_logrotate
+            _install_systemd_lite
+            log_info "══════ 安装完成 (lite) ══════"
+            log_info "API:     http://localhost:5000"
+            log_info "服务:     systemctl status docstamp docstamp-celery docstamp-beat"
+        else
+            _install_system_deps
+            _install_redis
+            _create_user
+            _setup_dirs
+            cp -r "$PROJECT_DIR/backend" "$APP_DIR/"
+            cp -r "$PROJECT_DIR/frontend" "$APP_DIR/"
             _install_venv
             _build_frontend
             _install_logrotate
             _install_systemd
-            log_info "══════ 安装完成 ══════"
-            log_info "服务地址: http://localhost:5000"
+            log_info "══════ 安装完成 (full) ══════"
+            log_info "API:     http://localhost:5000"
+            log_info "提示:     生产环境需额外部署 Celery Worker 容器或 systemd 服务"
         fi
         ;;
     update)
         if [[ "${2:-}" == "--docker" ]]; then
-            cd "$PROJECT_DIR" && docker-compose up -d --build
+            cd "$PROJECT_DIR" && docker compose up -d --build
+        elif [[ "${2:-}" == "--docker-lite" ]]; then
+            cd "$PROJECT_DIR" && docker compose -f docker-compose.lite.yml up -d --build
+        elif [[ "${2:-}" == "--lite" ]]; then
+            _update_local lite
         else
-            _update_local
+            _update_local full
         fi
         ;;
     uninstall)
         if [[ "${2:-}" == "--docker" ]]; then
-            cd "$PROJECT_DIR" && docker-compose down -v
+            cd "$PROJECT_DIR" && docker compose down -v
+        elif [[ "${2:-}" == "--docker-lite" ]]; then
+            cd "$PROJECT_DIR" && docker compose -f docker-compose.lite.yml down -v
         else
             _uninstall_local
         fi
         ;;
     *)
-        echo "用法: $0 <install|update|uninstall> [--docker]"
+        echo "用法: $0 <install|update|uninstall> [--docker|--docker-lite|--lite]"
+        echo ""
+        echo "模式:"
+        echo "  (默认)        裸机 full — API systemd 服务"
+        echo "  --lite        裸机 lite — API + Celery + Beat systemd 服务 (2C2G)"
+        echo "  --docker      Docker full — 6 容器 (4GB+)"
+        echo "  --docker-lite Docker lite — 3 容器 (2C2G)"
         exit 1
         ;;
 esac

@@ -228,13 +228,39 @@ case "${1:-}" in
         rm -f "$BACKEND_DIR/output/"*
         log_info "清理完成"
         ;;
+    lite)
+        log_info "══════ 启动 docStamp Lite（精简模式） ══════"
+        log_info "启动 Redis + API + Celery (all queues) + Beat..."
+        cd "$PROJECT_DIR"
+        docker compose -f docker-compose.lite.yml up -d --build
+        docker compose -f docker-compose.lite.yml ps
+        log_info "══════ Lite 模式已启动 ══════"
+        log_info "API: http://localhost:5000/api/health"
+        ;;
+    lite-stop)
+        log_info "停止 Lite 模式..."
+        cd "$PROJECT_DIR"
+        docker compose -f docker-compose.lite.yml down
+        log_info "Lite 模式已停止"
+        ;;
+    lite-status)
+        cd "$PROJECT_DIR"
+        docker compose -f docker-compose.lite.yml ps
+        ;;
+    docker-full)
+        log_info "══════ 启动 docStamp Full（全量模式） ══════"
+        cd "$PROJECT_DIR"
+        docker compose up -d --build
+        docker compose ps
+        log_info "══════ Full 模式已启动 ══════"
+        ;;
     *)
         echo ""
         echo "docStamp 项目管理脚本"
         echo ""
         echo "用法: $0 <command>"
         echo ""
-        echo "命令:"
+        echo "开发命令:"
         echo "  start         启动后端 + 前端（开发模式）"
         echo "  stop          停止所有服务"
         echo "  restart       重启所有服务"
@@ -245,6 +271,12 @@ case "${1:-}" in
         echo "  test          运行后端 pytest 测试"
         echo "  test-cov      运行后端测试（含覆盖率）"
         echo "  clean-output  清理 output 目录文件"
+        echo ""
+        echo "Docker 命令:"
+        echo "  docker-full   Full 模式（6 容器, 4GB+ 推荐）"
+        echo "  lite          Lite 模式（3 容器, 2C2G 推荐）"
+        echo "  lite-stop     停止 Lite 模式"
+        echo "  lite-status   查看 Lite 模式状态"
         echo ""
         ;;
 esac
