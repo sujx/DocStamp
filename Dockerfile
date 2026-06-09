@@ -8,10 +8,10 @@ RUN npm config set registry https://registry.npmmirror.com
 RUN npm install -g npm@latest
 
 WORKDIR /app/frontend
-COPY frontend/package*.json ./
-# npm ci with committed lockfile — deterministic, fast, no peer conflicts.
-# Lockfile kept up-to-date via local 'npm install --legacy-peer-deps'
-RUN npm ci --no-audit --no-fund
+# Only copy package.json — fresh resolution each build within semver ranges.
+# --legacy-peer-deps handles @vuelidate/core <-> vue2/3 peer conflict.
+COPY frontend/package.json ./
+RUN npm install --legacy-peer-deps --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run build
 
