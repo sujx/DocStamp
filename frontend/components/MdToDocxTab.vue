@@ -6,7 +6,7 @@
       <div class="column-panel">
         <div
           class="panel-card"
-          :style="{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-default)' }"
+          
         >
           <!-- Header -->
           <div class="panel-header">
@@ -60,7 +60,7 @@
       <div class="column-panel">
         <div
           class="panel-card preview-panel"
-          :style="{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-default)' }"
+          
         >
           <!-- Header -->
           <div class="panel-header">
@@ -126,7 +126,7 @@
       <a
         href="/GBT9704-2012.pdf" target="_blank"
         class="text-xs underline underline-offset-2"
-        :style="{ color: 'var(--color-text-tertiary)' }"
+        
       >{{ $t("md2docx.gbtLink") }}</a>
     </div>
 

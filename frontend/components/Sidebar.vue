@@ -2,14 +2,14 @@
   <!-- Hamburger toggle (mobile only) -->
   <button
     class="fixed top-3 left-3 z-50 lg:hidden flex items-center justify-center size-11 rounded-lg transition-[background-color] duration-150 cursor-pointer"
-    :style="{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--shadow-elevated)' }"
+    
     :aria-label="mobileOpen ? '关闭导航' : '打开导航'"
     @click="mobileOpen = !mobileOpen"
   >
     <UIcon
       :name="mobileOpen ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'"
       class="size-5"
-      :style="{ color: 'var(--color-text-primary)' }"
+      
     />
   </button>
 
@@ -29,13 +29,13 @@
       collapsed && !isMobile ? 'w-16' : 'w-60',
       isMobile && !mobileOpen ? '-translate-x-full' : 'translate-x-0',
     ]"
-    :style="{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-default)', boxShadow: 'var(--shadow-sidebar)' }"
+    
   >
     <!-- Logo -->
     <div
       class="flex items-center h-14 px-4 border-b shrink-0"
       :class="collapsed && !isMobile ? 'justify-center' : 'gap-3'"
-      :style="{ borderColor: 'var(--color-border-subtle)' }"
+      
     >
       <img src="/logo.svg" alt="鹊随金印" class="size-8 shrink-0" />
       <span v-if="!(collapsed && !isMobile)" class="brand-title truncate">鹊随金印</span>
@@ -85,7 +85,7 @@
               v-if="!(collapsed && !isMobile)"
               :name="hoverGroup === item.key ? 'i-heroicons-chevron-down' : 'i-heroicons-chevron-right'"
               class="size-3.5 shrink-0 transition-transform duration-150"
-              :style="{ color: 'var(--color-text-tertiary)' }"
+              
             />
           </button>
 
@@ -95,7 +95,7 @@
               v-if="hoverGroup === item.key"
               class="absolute z-50 py-1.5 rounded-lg min-w-[168px]"
               :class="(collapsed && !isMobile) ? 'left-full top-0 ml-2' : 'left-2 right-2 top-full mt-1'"
-              :style="{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-default)', boxShadow: 'var(--shadow-elevated)' }"
+              
             >
               <NuxtLink
                 v-for="child in item.children"
@@ -117,7 +117,7 @@
     </nav>
 
     <!-- Bottom: language + collapse -->
-    <div class="px-2 py-2.5 border-t space-y-1.5 shrink-0 overflow-hidden" :style="{ borderColor: 'var(--color-border-subtle)' }">
+    <div class="px-2 py-2.5 border-t space-y-1.5 shrink-0 overflow-hidden" >
       <LanguageSwitcher :collapsed="collapsed && !isMobile" />
       <UButton
         v-if="!isMobile"

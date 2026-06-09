@@ -2,7 +2,7 @@
   <div class="max-w-3xl mx-auto px-6 py-8">
     <PageHeader :title="$t('pdfMerge.title')" :description="$t('pdfMerge.description')" />
 
-    <div class="card" :style="{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-default)' }">
+    <div class="card" >
       <FileUploader
         :accept="'.pdf'"
         :max-size="100"
@@ -12,18 +12,18 @@
       />
 
       <div v-if="files.length > 0" class="mt-4">
-        <div class="text-sm mb-2" :style="{ color: 'var(--color-text-secondary)' }">
+        <div class="text-sm mb-2" >
           {{ $t('pdfMerge.fileCount', { n: files.length }) }}
         </div>
-        <p class="text-xs mb-3" :style="{ color: 'var(--color-text-tertiary)' }">{{ $t('pdfMerge.dragHint') }}</p>
+        <p class="text-xs mb-3" >{{ $t('pdfMerge.dragHint') }}</p>
 
         <div class="space-y-1.5">
           <div
             v-for="(f, i) in files" :key="f.name"
             class="flex items-center gap-2 px-3 py-2 rounded-md text-sm border"
-            :style="{ backgroundColor: 'var(--color-muted)', borderColor: 'var(--color-border-subtle)', color: 'var(--color-text-primary)' }"
+            
           >
-            <UIcon name="i-heroicons-bars-3" class="w-4 h-4 shrink-0 cursor-move" :style="{ color: 'var(--color-text-tertiary)' }" />
+            <UIcon name="i-heroicons-bars-3" class="w-4 h-4 shrink-0 cursor-move"  />
             <span class="flex-1 truncate">{{ f.name }}</span>
             <button
               :disabled="i === 0"
@@ -46,7 +46,7 @@
               :aria-label="$t('pdfMerge.removeFile')"
               @click="removeFile(i)"
             >
-              <UIcon name="i-heroicons-x-mark" class="w-3.5 h-3.5" :style="{ color: 'var(--color-text-tertiary)' }" />
+              <UIcon name="i-heroicons-x-mark" class="w-3.5 h-3.5"  />
             </button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 <template>
   <div class="pt-3">
     <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("printSplit.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty" :style="{ color: 'var(--color-text-secondary)' }">{{ $t("printSplit.description") }}</p>
+    <p class="text-sm mb-5 text-pretty" >{{ $t("printSplit.description") }}</p>
 
     <FileUploader
       ref="uploader"
@@ -11,7 +11,7 @@
       @reset="onReset"
     />
 
-    <div v-if="selectedFile && !task" class="p-4 mt-4 rounded-lg" :style="{ backgroundColor: 'var(--color-surface)' }">
+    <div v-if="selectedFile && !task" class="p-4 mt-4 rounded-lg" >
       <div class="grid grid-cols-2 gap-4 mb-4">
         <UFormGroup :label="$t('printSplit.batchSize')">
           <UInput v-model.number="batchSize" type="number" :min="1" :max="500" />
@@ -32,13 +32,13 @@
     </div>
 
     <!-- Progress -->
-    <div v-if="task" class="p-4 mt-4 rounded-lg" :style="{ backgroundColor: 'var(--color-surface)' }">
+    <div v-if="task" class="p-4 mt-4 rounded-lg" >
       <UProgress :value="downloaded" :max="task.batch_count" color="primary" class="mb-3" />
-      <p class="text-sm mb-3" :style="{ color: 'var(--color-text-secondary)' }">
+      <p class="text-sm mb-3" >
         {{ $t("printSplit.downloaded") }}: {{ downloaded }} / {{ task.batch_count }}
         <span v-if="!allDone && !isPaused" class="ml-2">({{ $t("printSplit.nextDownload") }}: {{ countdown }}s)</span>
         <span v-else-if="isPaused" class="ml-2 font-medium" style="color: #f59e0b;">{{ $t("printSplit.paused") }}</span>
-        <span v-else class="ml-2 font-medium" :style="{ color: 'var(--color-brand-700)' }"><UIcon name="i-heroicons-check-circle" class="w-4 h-4 inline" /> {{ $t("printSplit.allDone") }}</span>
+        <span v-else class="ml-2 font-medium" ><UIcon name="i-heroicons-check-circle" class="w-4 h-4 inline" /> {{ $t("printSplit.allDone") }}</span>
       </p>
       <div class="flex gap-2">
         <UButton v-if="!isPaused && !allDone" color="warning" size="sm" @click="pause">{{ $t("printSplit.pause") }}</UButton>

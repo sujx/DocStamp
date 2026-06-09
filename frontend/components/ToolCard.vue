@@ -2,7 +2,7 @@
   <NuxtLink
     :to="to"
     class="block p-6 rounded-lg border border-transparent transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 group cursor-pointer"
-    :style="{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--shadow-card)' }"
+    
     @mouseenter="hover = true"
     @mouseleave="hover = false"
   >
@@ -16,8 +16,8 @@
         :style="{ color: hover ? '#fff' : 'var(--color-brand-700)' }"
       />
     </div>
-    <h3 class="text-lg font-semibold mb-1 text-balance" :style="{ color: 'var(--color-text-primary)' }">{{ title }}</h3>
-    <p class="text-sm text-pretty" :style="{ color: 'var(--color-text-secondary)' }">{{ description }}</p>
+    <h3 class="text-lg font-semibold mb-1 text-balance" >{{ title }}</h3>
+    <p class="text-sm text-pretty" >{{ description }}</p>
   </NuxtLink>
 </template>
 

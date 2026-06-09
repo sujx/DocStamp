@@ -8,7 +8,7 @@
         :class="activeMode === mode.key
           ? 'border-[var(--color-brand-700)] bg-[var(--color-brand-soft)]'
           : 'border-[var(--color-border-default)] bg-[var(--color-surface)] hover:border-[var(--color-brand-400)]'"
-        :style="{ boxShadow: 'var(--shadow-card)' }"
+        
         @click="activeMode = mode.key"
       >
         <div class="flex items-center gap-3 mb-2">
@@ -18,9 +18,9 @@
           >
             <UIcon :name="mode.icon" class="w-5 h-5" />
           </div>
-          <span class="font-semibold" :style="{ color: 'var(--color-text-primary)' }">{{ mode.title }}</span>
+          <span class="font-semibold" >{{ mode.title }}</span>
         </div>
-        <p class="text-sm pl-[52px]" :style="{ color: 'var(--color-text-secondary)' }">{{ mode.desc }}</p>
+        <p class="text-sm pl-[52px]" >{{ mode.desc }}</p>
       </button>
     </div>
 

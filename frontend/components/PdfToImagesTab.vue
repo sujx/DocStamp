@@ -1,7 +1,7 @@
 <template>
   <div class="pt-3">
     <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("pdf2img.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty" :style="{ color: 'var(--color-text-secondary)' }">{{ $t("pdf2img.description") }}</p>
+    <p class="text-sm mb-5 text-pretty" >{{ $t("pdf2img.description") }}</p>
 
     <FileUploader
       accept=".pdf"
@@ -10,10 +10,10 @@
       @reset="onReset"
     />
 
-    <div v-if="selectedFile" class="p-4 mt-4 rounded-lg" :style="{ backgroundColor: 'var(--color-surface)' }">
-      <div v-if="pageCount !== null" class="flex items-center gap-3 mb-4 p-3 rounded-md" :style="{ backgroundColor: 'var(--color-muted)' }">
-        <UIcon name="i-heroicons-document" class="w-5 h-5 shrink-0" :style="{ color: 'var(--color-brand-700)' }" />
-        <span class="text-sm font-medium" :style="{ color: 'var(--color-text-primary)' }">
+    <div v-if="selectedFile" class="p-4 mt-4 rounded-lg" >
+      <div v-if="pageCount !== null" class="flex items-center gap-3 mb-4 p-3 rounded-md" >
+        <UIcon name="i-heroicons-document" class="w-5 h-5 shrink-0"  />
+        <span class="text-sm font-medium" >
           {{ $t("pdf2img.totalPages", { n: pageCount }) }}
         </span>
       </div>
@@ -33,7 +33,7 @@
       <!-- Progress bar -->
       <div v-if="isProcessing" class="mb-4">
         <UProgress :value="progress" :max="pageCount || 1" color="primary" class="mb-2" />
-        <p class="text-xs text-center" :style="{ color: 'var(--color-text-secondary)' }">
+        <p class="text-xs text-center" >
           {{ $t("pdf2img.convertingProgress", { current: progress, total: pageCount || '?' }) }}
         </p>
       </div>

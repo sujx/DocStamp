@@ -1,7 +1,7 @@
 <template>
   <div class="pt-3">
     <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("excelMerge.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty" :style="{ color: 'var(--color-text-secondary)' }">{{ $t("excelMerge.description") }}</p>
+    <p class="text-sm mb-5 text-pretty" >{{ $t("excelMerge.description") }}</p>
 
     <label class="block mb-4">
       <UButton color="primary" variant="soft" as="span">
@@ -13,7 +13,7 @@
 
     <div v-if="files.length" class="p-3 rounded-md mb-4" style="background:#fff; border:1px solid #e8e6d8;">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-semibold" :style="{ color: 'var(--color-text-secondary)' }">{{ $t("excelMerge.fileCount", { n: files.length }) }}</span>
+        <span class="text-xs font-semibold" >{{ $t("excelMerge.fileCount", { n: files.length }) }}</span>
         <UButton size="xs" variant="ghost" color="neutral" @click="files=[]">{{ $t("common.reset") }}</UButton>
       </div>
       <div
@@ -21,14 +21,14 @@
         class="flex items-center gap-2 py-2 border-t"
         style="border-color:#e8e6d8;"
       >
-        <UIcon name="i-heroicons-table-cells" class="w-4 h-4 shrink-0" :style="{ color: 'var(--color-text-tertiary)' }" />
-        <span class="flex-1 text-sm truncate" :style="{ color: 'var(--color-text-primary)' }">{{ f.name }}</span>
-        <span v-if="f.rowCount !== null" class="text-xs shrink-0" :style="{ color: 'var(--color-text-tertiary)' }">{{ $t("excelMerge.rowsCount", { n: f.rowCount }) }}</span>
+        <UIcon name="i-heroicons-table-cells" class="w-4 h-4 shrink-0"  />
+        <span class="flex-1 text-sm truncate" >{{ f.name }}</span>
+        <span v-if="f.rowCount !== null" class="text-xs shrink-0" >{{ $t("excelMerge.rowsCount", { n: f.rowCount }) }}</span>
         <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-x-mark" :aria-label="$t('common.removeFile')" @click="files.splice(idx,1)" />
       </div>
     </div>
 
-    <div v-if="files.length >= 2" class="p-4 rounded-lg" :style="{ backgroundColor: 'var(--color-surface)' }">
+    <div v-if="files.length >= 2" class="p-4 rounded-lg" >
       <UFormGroup :label="$t('excelMerge.outputFilename')" class="mb-4">
         <UInput v-model="outputFilename" :placeholder="defaultFilename" />
       </UFormGroup>

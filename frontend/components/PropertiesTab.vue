@@ -1,15 +1,15 @@
 <template>
   <div class="pt-3">
     <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("properties.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty" :style="{ color: 'var(--color-text-secondary)' }">{{ $t("properties.description") }}</p>
+    <p class="text-sm mb-5 text-pretty" >{{ $t("properties.description") }}</p>
 
     <!-- Mode toggle -->
     <div class="flex gap-4 mb-4">
-      <label class="flex items-center gap-1.5 text-sm cursor-pointer" :style="{ color: 'var(--color-text-primary)' }">
+      <label class="flex items-center gap-1.5 text-sm cursor-pointer" >
         <input type="radio" v-model="batchMode" :value="false" class="accent-green-700" />
         {{ $t("properties.singleUpload") }}
       </label>
-      <label class="flex items-center gap-1.5 text-sm cursor-pointer" :style="{ color: 'var(--color-text-primary)' }">
+      <label class="flex items-center gap-1.5 text-sm cursor-pointer" >
         <input type="radio" v-model="batchMode" :value="true" class="accent-green-700" />
         {{ $t("properties.batchUpload") }}
       </label>
@@ -45,14 +45,14 @@
     />
 
     <!-- Properties form -->
-    <div v-if="hasFile" class="p-4 mt-4 rounded-lg" :style="{ backgroundColor: 'var(--color-surface)' }">
+    <div v-if="hasFile" class="p-4 mt-4 rounded-lg" >
       <!-- Time mode -->
       <div class="flex gap-4 mb-4">
-        <label class="flex items-center gap-1.5 text-sm cursor-pointer" :style="{ color: 'var(--color-text-primary)' }">
+        <label class="flex items-center gap-1.5 text-sm cursor-pointer" >
           <input type="radio" v-model="timeMode" value="unified" class="accent-green-700" />
           {{ $t("properties.unifiedTime") }}
         </label>
-        <label class="flex items-center gap-1.5 text-sm cursor-pointer" :style="{ color: 'var(--color-text-primary)' }">
+        <label class="flex items-center gap-1.5 text-sm cursor-pointer" >
           <input type="radio" v-model="timeMode" value="separate" class="accent-green-700" />
           {{ $t("properties.separateTime") }}
         </label>

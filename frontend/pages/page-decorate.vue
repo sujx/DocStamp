@@ -2,7 +2,7 @@
   <div class="max-w-3xl mx-auto px-6 py-8">
     <PageHeader :title="$t('pageDecorate.title')" :description="$t('pageDecorate.description')" />
 
-    <div class="card" :style="{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-default)' }">
+    <div class="card" >
       <FileUploader
         :accept="'.pdf'"
         :max-size="100"
@@ -17,7 +17,7 @@
 
         <UFormGroup :label="$t('pageDecorate.text')" class="mt-3">
           <UInput v-model="textTemplate" size="sm" :placeholder="mode === 'page_number' ? '{n} / {total}' : $t('pageDecorate.textPlaceholder')" />
-          <p class="text-xs mt-1" :style="{ color: 'var(--color-text-tertiary)' }">
+          <p class="text-xs mt-1" >
             <code>{n}</code> = {{ $t("pageDecorate.currentPage") }}, <code>{total}</code> = {{ $t("pageDecorate.totalPages") }}
           </p>
         </UFormGroup>

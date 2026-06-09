@@ -2,7 +2,7 @@
   <div class="max-w-3xl mx-auto px-6 py-8">
     <PageHeader :title="$t('imageProcess.title')" :description="$t('imageProcess.description')" />
 
-    <div class="card" :style="{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-default)' }">
+    <div class="card" >
       <FileUploader
         :accept="'.png,.jpg,.jpeg,.tiff,.tif,.webp'"
         :max-size="50"
@@ -25,8 +25,8 @@
               <UInput v-model.number="resizeHeight" type="number" size="sm" :placeholder="$t('imageProcess.auto')" />
             </UFormGroup>
           </div>
-          <label class="flex items-center gap-2 mt-2 text-sm cursor-pointer" :style="{ color: 'var(--color-text-secondary)' }">
-            <input v-model="keepAspect" type="checkbox" class="accent-[var(--color-brand-700)]" />
+          <label class="flex items-center gap-2 mt-2 text-sm cursor-pointer" >
+            <input v-model="keepAspect" type="checkbox" class="accent-brand-700" />
             {{ $t("imageProcess.keepAspect") }}
           </label>
         </template>
@@ -60,7 +60,7 @@
         <template v-if="action === 'compress'">
           <UFormGroup :label="$t('imageProcess.quality')" class="mt-3">
             <UInput v-model.number="compressQuality" type="range" size="sm" :min="1" :max="100" />
-            <span class="text-sm ml-2" :style="{ color: 'var(--color-text-secondary)' }">{{ compressQuality }}%</span>
+            <span class="text-sm ml-2" >{{ compressQuality }}%</span>
           </UFormGroup>
         </template>
       </template>

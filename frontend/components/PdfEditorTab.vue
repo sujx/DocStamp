@@ -1,11 +1,11 @@
 <template>
   <div class="pt-3">
     <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("pdfEditor.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty" :style="{ color: 'var(--color-text-secondary)' }">{{ $t("pdfEditor.description") }}</p>
+    <p class="text-sm mb-5 text-pretty" >{{ $t("pdfEditor.description") }}</p>
 
     <!-- Mode selector -->
     <div class="flex gap-4 mb-4">
-      <label v-for="m in modes" :key="m.value" class="flex items-center gap-1.5 text-sm cursor-pointer" :style="{ color: 'var(--color-text-primary)' }">
+      <label v-for="m in modes" :key="m.value" class="flex items-center gap-1.5 text-sm cursor-pointer" >
         <input type="radio" v-model="mode" :value="m.value" class="accent-green-700" />
         {{ m.label }}
       </label>
@@ -23,7 +23,7 @@
     <!-- Delete mode -->
     <template v-if="mode === 'delete' && pageThumbs.length">
       <div class="mt-4">
-        <p class="text-xs mb-3" :style="{ color: 'var(--color-text-tertiary)' }">{{ $t("pdfEditor.clickToSelect") }}</p>
+        <p class="text-xs mb-3" >{{ $t("pdfEditor.clickToSelect") }}</p>
         <div class="grid gap-3" style="grid-template-columns: repeat(auto-fill,minmax(100px,1fr));">
           <div
             v-for="p in pageThumbs" :key="p.page_no"
@@ -32,10 +32,10 @@
             @click="toggleDeletePage(p.page_no)"
           >
             <img :src="p.thumb" class="w-full object-contain" style="height:130px; background:#f4f2e4;" @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
-            <div class="text-xs text-center py-1" :style="{ backgroundColor: 'var(--color-surface)' }">{{ $t("pdfEditor.page") }} {{ p.page_no }}</div>
+            <div class="text-xs text-center py-1" >{{ $t("pdfEditor.page") }} {{ p.page_no }}</div>
           </div>
         </div>
-        <p v-if="deleteSet.size" class="text-sm mt-3" :style="{ color: 'var(--color-brand-700)' }">
+        <p v-if="deleteSet.size" class="text-sm mt-3" >
           {{ $t("pdfEditor.selectedToDelete", { n: deleteSet.size, m: pageThumbs.length - deleteSet.size }) }}
         </p>
       </div>
@@ -46,7 +46,7 @@
 
     <!-- Insert mode -->
     <template v-if="mode === 'insert' && pageThumbs.length">
-      <div class="mt-4 p-4 rounded-lg" :style="{ backgroundColor: 'var(--color-surface)' }">
+      <div class="mt-4 p-4 rounded-lg" >
         <UFormGroup :label="$t('pdfEditor.insertFile')">
           <FileUploader ref="insertUploader" accept=".pdf" icon="i-heroicons-document" @file-selected="insertFile = $event" @reset="insertFile = null" />
         </UFormGroup>
@@ -78,9 +78,9 @@
             @drop="onDrop(idx)" @dragend="dragIdx=null"
           >
             <img :src="p.thumb" class="w-full object-contain" style="height:130px; background:#f4f2e4;" @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
-            <div class="flex items-center justify-between px-1 py-0.5" :style="{ backgroundColor: 'var(--color-surface)' }">
+            <div class="flex items-center justify-between px-1 py-0.5" >
               <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-up" :disabled="idx===0" @click="movePage(idx,-1)" />
-              <span class="text-xs text-pretty" :style="{ color: 'var(--color-text-tertiary)' }">{{ idx+1 }}</span>
+              <span class="text-xs text-pretty" >{{ idx+1 }}</span>
               <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-down" :disabled="idx===pageThumbs.length-1" @click="movePage(idx,1)" />
             </div>
           </div>
@@ -91,7 +91,7 @@
       </UButton>
     </template>
 
-    <p v-if="pageCount !== null" class="text-xs mt-3" :style="{ color: 'var(--color-text-tertiary)' }">{{ $t("pdfEditor.originalPages") }}: {{ pageCount }}</p>
+    <p v-if="pageCount !== null" class="text-xs mt-3" >{{ $t("pdfEditor.originalPages") }}: {{ pageCount }}</p>
   </div>
 </template>
 

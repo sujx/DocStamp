@@ -1,7 +1,7 @@
 <template>
   <div class="pt-3">
     <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("img2pdf.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty" :style="{ color: 'var(--color-text-secondary)' }">{{ $t("img2pdf.description") }}</p>
+    <p class="text-sm mb-5 text-pretty" >{{ $t("img2pdf.description") }}</p>
 
     <label class="block mb-4">
       <UButton color="primary" variant="soft" as="span">
@@ -12,7 +12,7 @@
     </label>
 
     <div v-if="images.length" class="mb-4">
-      <p class="text-xs mb-3" :style="{ color: 'var(--color-text-tertiary)' }">
+      <p class="text-xs mb-3" >
         <UIcon name="i-heroicons-arrows-pointing-out" class="w-3.5 h-3.5 inline mr-1" />
         {{ $t("img2pdf.dragHint") }}
       </p>
@@ -31,7 +31,7 @@
           <img :src="img.thumb" class="w-full h-36 object-cover block" />
           <div class="flex items-center justify-center gap-0.5 p-0.5">
             <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-up" :disabled="idx===0" @click="moveImage(idx,-1)" />
-            <span class="text-xs px-1" :style="{ color: 'var(--color-text-tertiary)' }">{{ $t("img2pdf.page", { n: idx+1 }) }}</span>
+            <span class="text-xs px-1" >{{ $t("img2pdf.page", { n: idx+1 }) }}</span>
             <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-down" :disabled="idx===images.length-1" @click="moveImage(idx,1)" />
           </div>
           <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-x-mark" class="!absolute top-1 right-1" @click="removeImage(idx)" />
@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <div v-if="images.length" class="p-4 rounded-lg mt-4" :style="{ backgroundColor: 'var(--color-surface)' }">
+    <div v-if="images.length" class="p-4 rounded-lg mt-4" >
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <UFormGroup :label="$t('img2pdf.pageSize')">
           <USelect v-model="pageSize" :options="pageSizeOptions" />

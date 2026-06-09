@@ -1,7 +1,7 @@
 <template>
   <div class="pt-3">
     <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("watermarkRemove.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty" :style="{ color: 'var(--color-text-secondary)' }">{{ $t("watermarkRemove.description") }}</p>
+    <p class="text-sm mb-5 text-pretty" >{{ $t("watermarkRemove.description") }}</p>
 
     <FileUploader
       accept=".pdf,.docx"
@@ -10,7 +10,7 @@
       @reset="selectedFile = null"
     />
 
-    <div v-if="selectedFile" class="p-4 mt-4 rounded-lg" :style="{ backgroundColor: 'var(--color-surface)' }">
+    <div v-if="selectedFile" class="p-4 mt-4 rounded-lg" >
       <UAlert
         color="info"
         :title="selectedFile.name.endsWith('.docx') ? $t('watermarkRemove.docxInfo') : $t('watermarkRemove.pdfInfo')"

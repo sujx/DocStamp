@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-dvh" :style="{ backgroundColor: 'var(--color-page)' }">
+  <div class="min-h-dvh" >
     <!-- Skip-to-content for keyboard users -->
     <a
       href="#main-content"
       class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-medium focus:no-underline"
-      :style="{ backgroundColor: 'var(--color-surface)', color: 'var(--color-brand-700)', boxShadow: 'var(--shadow-elevated)' }"
+      
     >
       {{ $t("a11y.skipToContent") }}
     </a>
