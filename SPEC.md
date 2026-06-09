@@ -330,9 +330,11 @@ docStamp 提供两种部署模式，按服务器配置选择：
 快捷命令：
 
 ```bash
-./manage.sh lite         # Docker Lite 一键启动
-./manage.sh docker-full  # Docker Full 一键启动
-./manage.sh prod         # 裸机 Gunicorn 单端口
+./docker-deploy.sh up --lite   # Docker Lite 一键启动
+./docker-deploy.sh up          # Docker Full 一键启动
+./docker-deploy.sh ps --lite   # 查看状态
+./docker-deploy.sh logs api    # 跟踪 API 日志
+./manage.sh prod               # 裸机 Gunicorn 单端口
 ```
 
 ### Full 模式（Docker Compose，6 容器）
@@ -443,7 +445,7 @@ Lite 模式 systemd 服务清单：
 - **非 root 运行**：Dockerfile `USER docstamp` + entrypoint 确保 volume 权限 + gunicorn `--pid /tmp` 避免 `/var/run` 权限问题
 - **关键修复**：Celery worker 任务注册缺失（`include` 配置 → 14 个任务正确注册），`PYTHONPATH` 导入解析（`from config import Config` 在 Gunicorn `backend.app:app` 模式下失效）
 - **构建优化**：pip `--root-user-action=ignore` 消除警告，`procps` 支持健康检查，`.dockerignore` 递归排除 `backend/output`
-- **Full/Lite 双模式部署**：Lite 模式（3 容器/4 systemd 服务）适配 2C2G 低配 ECS，Celery 3 队列合并 + concurrency=2 + Beat 内嵌，预估内存 ~800MB；Full 模式（6 容器）保持独立队列隔离，适用于 4GB+ 生产环境
+- **Full/Lite 双模式部署**：Lite 模式（3 容器/4 systemd 服务）适配 2C2G 低配 ECS，Celery 3 队列合并 + concurrency=2 + Beat 内嵌，预估内存 ~800MB；Full 模式（6 容器）保持独立队列隔离，适用于 4GB+ 生产环境。统一部署脚本 `docker-deploy.sh`（build/up/down/ps/logs/clean）
 - **品牌定名**：产品名定为「鹊随金印」，全站标题/侧栏/页头/页脚统一应用，`.brand-title` CSS 金绿渐变（`#c9a84c`→`#008a3d`）印章浮雕质感
 - **UI/UX 审查 (UI/UX Pro Max)**：侧栏子菜单增加点击切换（修复触摸设备不可达），ToolCard `transition: all`→`transition-[box-shadow,transform]`，`--color-text-tertiary` #757265→#706d60（对比度 3.9:1→4.69:1 WCAG AA）
 - **移动端适配**：侧栏 <1024px 悬浮叠加模式（汉堡按钮 + 遮罩 + 点击关闭），导航项 h-10→min-h-[44px] 触摸目标

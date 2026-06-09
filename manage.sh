@@ -278,5 +278,11 @@ case "${1:-}" in
         echo "  lite-stop     停止 Lite 模式"
         echo "  lite-status   查看 Lite 模式状态"
         echo ""
+        echo "Docker 部署脚本:"
+        echo "  ./docker-deploy.sh up --lite  一键启动 Lite"
+        echo "  ./docker-deploy.sh ps --lite  查看状态"
+        echo "  ./docker-deploy.sh logs api   跟踪日志"
+        echo "  ./docker-deploy.sh clean      清理数据"
+        echo ""
         ;;
 esac

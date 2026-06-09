@@ -56,14 +56,13 @@ cd .. && ./manage.sh start
 
 ```bash
 # Full 模式（6 容器，4GB+ 推荐）
-docker compose up -d
+./docker-deploy.sh up
 
 # Lite 模式（3 容器，2C2G 推荐）
-docker compose -f docker-compose.lite.yml up -d
+./docker-deploy.sh up --lite
 
-# 或使用快捷命令
-./manage.sh lite          # Lite 一键启动
-./manage.sh docker-full   # Full 一键启动
+# 查看状态 + 健康检查
+./docker-deploy.sh ps --lite
 ```
 
 ### 裸机 Systemd 部署
