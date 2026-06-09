@@ -48,6 +48,30 @@
     --shadow-sidebar: 1px 0 4px rgba(0, 0, 0, 0.04);
   }
 
+  /* ── Brand title: metallic gold-green gradient, seal-embossed feel ── */
+  .brand-title {
+    font-weight: 700;
+    font-size: 1.125rem;
+    letter-spacing: 0.08em;
+    background: linear-gradient(
+      135deg,
+      #c9a84c 0%,
+      #e0c86b 25%,
+      #008a3d 55%,
+      #8b7535 80%,
+      #c9a84c 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* Embossed seal effect via dual-direction shadow */
+    text-shadow:
+      0 -0.5px 0 rgba(255, 255, 255, 0.08),
+      0 0.5px 0 rgba(0, 0, 0, 0.12);
+    -webkit-text-stroke: 0;
+    user-select: none;
+  }
+
   body {
     background-color: var(--color-page);
     color: var(--color-text-primary);
