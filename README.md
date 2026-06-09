@@ -132,17 +132,20 @@ docStamp/
 
 ## 部署模式对比
 
-| 模式 | 命令 | 适用场景 |
-|------|------|------|
-| 开发 | `./manage.sh start` | 本地开发，Flask :5000 + Nuxt :8080 (HMR) |
-| 生产（裸机） | `./manage.sh prod` | 单机单端口，Gunicorn gthread |
-| 生产（Docker） | `docker compose up -d` | 6 容器，Redis + 独立 Worker 扩容 |
-| 生产（Systemd） | `systemctl start docstamp` | 进程守护 + 安全加固 + 开机自启 |
+| 模式 | 命令 | 容器/进程 | 推荐配置 |
+|------|------|:---:|:---:|
+| 开发 | `./manage.sh start` | 2 进程 | 本地开发 |
+| Docker Full | `./manage.sh docker-full` | 6 容器 | 4GB+ 服务器 |
+| Docker Lite | `./manage.sh lite` | 3 容器 | 2C2G ECS |
+| 裸机 Lite | `sudo bash scripts/install.sh install --lite` | 4 systemd 服务 | 2C2G ECS |
+| 裸机 Prod | `./manage.sh prod` | 1 进程 | 已有外部 Redis/Celery |
 
 ## 系统要求
 
-- Python 3.12+
-- Node.js 24+
-- Redis（生产环境，Celery broker）
-- pandoc / poppler-utils / libreoffice-core（文档处理）
-- libpango + libgdk-pixbuf（WeasyPrint HTML→PDF）
+| 组件 | Full 模式 | Lite 模式 |
+|------|:---:|:---:|
+| 内存 | 4GB+ | 2GB |
+| CPU | 4 核+ | 2 核 |
+| Redis | 需要 | 需要 |
+| pandoc / poppler-utils / libreoffice-core | 需要 | 需要 |
+| Docker (可选) | 推荐 | 推荐 |

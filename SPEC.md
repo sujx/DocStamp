@@ -387,10 +387,6 @@ Lite 模式 systemd 服务清单：
 | `docstamp-beat.service` | 128M | 定时清理调度 |
 
 环境变量通过 `/etc/docstamp/env.conf` 注入（模板见 `deploy/env.conf`）。
-systemctl start docstamp.service    # 或使用 deploy/docstamp.service
-```
-
-环境变量通过 `/etc/docstamp/env.conf` 注入（模板见 `deploy/env.conf`）。
 
 ### Gunicorn 配置
 
