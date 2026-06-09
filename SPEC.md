@@ -92,11 +92,15 @@ Nuxt UI v2（`UFormGroup`, `UButton`, `UInput`, `USelect`, `UTabs`, `UAlert`, `U
 - 拖拽元素提供 ▲/▼ 键盘替代 + `touch-action: manipulation`
 - 固定元素 `safe-area-inset` 适配
 - 禁止硬编码颜色（CSS 变量）、禁止 `transition: all`、禁止 `linear-gradient`（除非明确要求）
-- 高对比度模式 `@media (prefers-contrast: high)`
+- `@media (prefers-reduced-motion: reduce)` 全局禁用动画（`animation/transition-duration: 0.01ms`）
+- `@media (prefers-contrast: high)` 高低对比度模式
+- 键盘用户 skip-to-content 跳转链接（`sr-only focus:not-sr-only`）
+- 最小触摸目标 44×44px（`min-h-[44px]`）
+- 文本对比度 ≥ 4.5:1 WCAG AA（text-primary 16.6:1, text-secondary 6.3:1, text-tertiary 4.69:1）
 
 ### 布局
 
-侧边导航（240px，可折叠至 64px）+ 右侧内容区。仪表盘为数字时钟 + 工具卡片网格（3 列）。侧栏状态通过 `localStorage("sidebar_collapsed")` 持久化。
+桌面端：侧边导航（240px，可折叠至 64px）+ 右侧内容区。移动端（<1024px）：侧栏悬浮叠加模式（汉堡按钮 `fixed top-3 left-3 z-50` + 半透明遮罩 `bg-black/30`），点击导航项或遮罩自动关闭。仪表盘为数字时钟 + 工具卡片网格（3 列）。侧栏状态通过 `localStorage("sidebar_collapsed")` 持久化。
 
 ### 仪表盘数字时钟
 
@@ -402,6 +406,9 @@ systemctl start docstamp.service    # 或使用 deploy/docstamp.service
 - **非 root 运行**：Dockerfile `USER docstamp` + entrypoint 确保 volume 权限 + gunicorn `--pid /tmp` 避免 `/var/run` 权限问题
 - **关键修复**：Celery worker 任务注册缺失（`include` 配置 → 14 个任务正确注册），`PYTHONPATH` 导入解析（`from config import Config` 在 Gunicorn `backend.app:app` 模式下失效）
 - **构建优化**：pip `--root-user-action=ignore` 消除警告，`procps` 支持健康检查，`.dockerignore` 递归排除 `backend/output`
+- **UI/UX 审查 (UI/UX Pro Max)**：侧栏子菜单增加点击切换（修复触摸设备不可达），ToolCard `transition: all`→`transition-[box-shadow,transform]`，`--color-text-tertiary` #757265→#706d60（对比度 3.9:1→4.69:1 WCAG AA）
+- **移动端适配**：侧栏 <1024px 悬浮叠加模式（汉堡按钮 + 遮罩 + 点击关闭），导航项 h-10→min-h-[44px] 触摸目标
+- **无障碍增强**：skip-to-content 键盘跳转链接，`prefers-reduced-motion: reduce` 全局禁用动画，所有交互元素 `cursor-pointer`
 
 ### v3.3 (2026-06)
 - **使用统计仪表盘**：新增 `/status` 页面 + `/api/stats/overview` + `/api/stats/seed`，ECharts 可视化（柱状图/饼图/折线图），按模块/日/访客聚合
