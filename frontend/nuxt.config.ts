@@ -1,5 +1,11 @@
 export default defineNuxtConfig({
-  modules: ["@nuxt/ui", "@nuxtjs/i18n", "@nuxt/icon"],
+  modules: [
+    // Nuxt UI v2 内部 safelist 用 'primary' 生成正则但 Tailwind 只认 'green'，
+    // safelistColors: ["green"] 让模式匹配到实际生成的 text-green-400 等类名
+    ["@nuxt/ui", { safelistColors: ["green"] }],
+    "@nuxtjs/i18n",
+    "@nuxt/icon",
+  ],
 
   devtools: { enabled: true },
 
