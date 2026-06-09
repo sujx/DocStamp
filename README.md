@@ -109,6 +109,7 @@ docStamp/
 │   └── env.conf                # 生产环境变量模板
 ├── docker-compose.yml          # 6 容器编排（API + Redis + 3×Worker + Beat）
 ├── Dockerfile                  # 多阶段构建（node:24-alpine + python:3.12-slim）
+├── docker-entrypoint.sh        # Docker 入口（运行时目录 + volume 权限）
 ├── manage.sh                   # 开发/生产管理脚本
 ├── prod-start.sh               # 生产一键启动
 ├── SPEC.md                     # 详细设计规范

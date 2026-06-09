@@ -108,6 +108,7 @@ Nuxt UI v2（`UFormGroup`, `UButton`, `UInput`, `USelect`, `UTabs`, `UAlert`, `U
 
 ```
 backend/
+├── __init__.py              # 包标记（Docker PYTHONPATH 导入必需）
 ├── app.py                  # Flask 工厂 (<70 行)
 ├── config.py               # 集中配置
 ├── errors.py               # ErrorCode 枚举 + ServiceResult + ServiceError
@@ -335,6 +336,8 @@ docker compose up -d   # 6 容器: api + redis + 3×celery + beat
 | `celery-office` | 属性修改, Excel 合并 | — |
 | `celery-beat` | 定时清理临时文件 | — |
 
+所有容器均配置健康检查：Redis `redis-cli ping` → API `curl /api/health` → Celery `celery inspect ping` / Beat `pgrep`，通过 `condition: service_healthy` 确保依赖就绪后再启动。容器以非 root 用户 `docstamp` 运行，entrypoint 脚本处理 Docker volume 权限。
+
 ### 生产模式（裸机 / Systemd）
 
 ```bash
@@ -393,6 +396,12 @@ systemctl start docstamp.service    # 或使用 deploy/docstamp.service
 ---
 
 ## 十一、版本历史
+
+### v3.4 (2026-06)
+- **Docker 生产加固**：6 容器全健康检查体系（Redis ping / API curl / Worker celery ping / Beat pgrep），`depends_on condition: service_healthy` 确保启动顺序正确
+- **非 root 运行**：Dockerfile `USER docstamp` + entrypoint 确保 volume 权限 + gunicorn `--pid /tmp` 避免 `/var/run` 权限问题
+- **关键修复**：Celery worker 任务注册缺失（`include` 配置 → 14 个任务正确注册），`PYTHONPATH` 导入解析（`from config import Config` 在 Gunicorn `backend.app:app` 模式下失效）
+- **构建优化**：pip `--root-user-action=ignore` 消除警告，`procps` 支持健康检查，`.dockerignore` 递归排除 `backend/output`
 
 ### v3.3 (2026-06)
 - **使用统计仪表盘**：新增 `/status` 页面 + `/api/stats/overview` + `/api/stats/seed`，ECharts 可视化（柱状图/饼图/折线图），按模块/日/访客聚合
