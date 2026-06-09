@@ -1,17 +1,14 @@
 # ── Stage 1: Build Nuxt 3 frontend ──────────────────────────────────
-FROM node:24-alpine AS frontend-build
+FROM node:22-alpine AS frontend-build
 
 # Alibaba Cloud npm mirror
 RUN npm config set registry https://registry.npmmirror.com
 
-# Update npm for latest dependency resolution and security fixes
-RUN npm install -g npm@latest
-
 WORKDIR /app/frontend
-# Only copy package.json — fresh resolution each build within semver ranges.
+# Lockfile ensures reproducible builds across machines.
 # --legacy-peer-deps handles @vuelidate/core <-> vue2/3 peer conflict.
-COPY frontend/package.json ./
-RUN npm install --legacy-peer-deps --no-audit --no-fund
+COPY frontend/package*.json ./
+RUN npm ci --legacy-peer-deps --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run build
 
