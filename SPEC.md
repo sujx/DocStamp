@@ -406,6 +406,7 @@ systemctl start docstamp.service    # 或使用 deploy/docstamp.service
 - **非 root 运行**：Dockerfile `USER docstamp` + entrypoint 确保 volume 权限 + gunicorn `--pid /tmp` 避免 `/var/run` 权限问题
 - **关键修复**：Celery worker 任务注册缺失（`include` 配置 → 14 个任务正确注册），`PYTHONPATH` 导入解析（`from config import Config` 在 Gunicorn `backend.app:app` 模式下失效）
 - **构建优化**：pip `--root-user-action=ignore` 消除警告，`procps` 支持健康检查，`.dockerignore` 递归排除 `backend/output`
+- **品牌定名**：产品名定为「鹊随金印」，全站标题/侧栏/页头/页脚统一应用，`.brand-title` CSS 金绿渐变（`#c9a84c`→`#008a3d`）印章浮雕质感
 - **UI/UX 审查 (UI/UX Pro Max)**：侧栏子菜单增加点击切换（修复触摸设备不可达），ToolCard `transition: all`→`transition-[box-shadow,transform]`，`--color-text-tertiary` #757265→#706d60（对比度 3.9:1→4.69:1 WCAG AA）
 - **移动端适配**：侧栏 <1024px 悬浮叠加模式（汉堡按钮 + 遮罩 + 点击关闭），导航项 h-10→min-h-[44px] 触摸目标
 - **无障碍增强**：skip-to-content 键盘跳转链接，`prefers-reduced-motion: reduce` 全局禁用动画，所有交互元素 `cursor-pointer`
