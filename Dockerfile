@@ -4,9 +4,15 @@ FROM node:24-alpine AS frontend-build
 # Alibaba Cloud npm mirror
 RUN npm config set registry https://registry.npmmirror.com
 
+# Update npm for latest dependency resolution and security fixes
+RUN npm install -g npm@latest
+
 WORKDIR /app/frontend
-COPY frontend/package*.json ./
-RUN npm ci
+# Only copy package.json (not lockfile) so npm resolves latest compatible
+# versions within semver ranges — avoids stale transitive deprecation warnings
+# like glob@10.5.0 / tar@6.2.1
+COPY frontend/package.json ./
+RUN npm install --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run build
 
