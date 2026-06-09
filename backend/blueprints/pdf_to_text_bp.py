@@ -11,7 +11,7 @@ from services.pdf_to_text import extract_pdf_text, get_pdf_page_count
 pdf_to_text_bp = Blueprint("pdf_to_text", __name__)
 
 
-@pdf_to_text_bp.route("/api/pdf-to-text", methods=["POST"])
+@pdf_to_text_bp.route("/api/v1/pdf-to-text", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def pdf_to_text():
     """Extract text from a PDF file."""

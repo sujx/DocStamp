@@ -68,7 +68,7 @@ async function onFileSelected(f: File) {
   try {
     const fd = new FormData();
     fd.append("file", f);
-    const resp = await axios.post("/api/pdf-editor/info", fd);
+    const resp = await axios.post("/api/v1/pdf-editor/info", fd);
     pageCount.value = resp.data.total_pages;
   } catch {
     pageCount.value = null;
@@ -100,7 +100,7 @@ async function convert() {
     fd.append("format", format.value);
     fd.append("dpi", String(dpi.value));
     if (pagesStr.value.trim()) fd.append("pages", pagesStr.value.trim());
-    const resp = await axios.post("/api/pdf2img", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/pdf2img", fd, { responseType: "blob" });
     progress.value = total;
     downloadBlob(resp.data, "pdf_images.zip", t("common.success"));
   } catch (e) {

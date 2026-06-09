@@ -41,7 +41,7 @@ export const pdfApi = {
   getInfo: (file: File): Promise<PdfInfoResponse> => {
     const fd = new FormData();
     fd.append("file", file);
-    return postFormJson<PdfInfoResponse>("/api/pdf-editor/info", fd);
+    return postFormJson<PdfInfoResponse>("/api/v1/pdf-editor/info", fd);
   },
 
   /** Delete specified pages from a PDF. */
@@ -49,7 +49,7 @@ export const pdfApi = {
     const fd = new FormData();
     fd.append("file", file);
     fd.append("pages", JSON.stringify(pages));
-    return postFormBlob("/api/pdf-editor/delete", fd);
+    return postFormBlob("/api/v1/pdf-editor/delete", fd);
   },
 
   /** Insert pages from a source PDF into the target at a given position. */
@@ -61,7 +61,7 @@ export const pdfApi = {
     if (insertPages && insertPages.length > 0) {
       fd.append("insert_pages", JSON.stringify(insertPages));
     }
-    return postFormBlob("/api/pdf-editor/insert", fd);
+    return postFormBlob("/api/v1/pdf-editor/insert", fd);
   },
 
   /** Reorder pages of a PDF. */
@@ -69,7 +69,7 @@ export const pdfApi = {
     const fd = new FormData();
     fd.append("file", file);
     fd.append("order", JSON.stringify(newOrder));
-    return postFormBlob("/api/pdf-editor/reorder", fd);
+    return postFormBlob("/api/v1/pdf-editor/reorder", fd);
   },
 
   /** Merge multiple images into a PDF. */
@@ -79,7 +79,7 @@ export const pdfApi = {
     fd.append("page_size", pageSize);
     if (order) fd.append("order", JSON.stringify(order));
     if (outputName) fd.append("filename", outputName);
-    return postFormBlob("/api/img2pdf", fd);
+    return postFormBlob("/api/v1/img2pdf", fd);
   },
 
   /** Convert PDF pages to images. */
@@ -89,14 +89,14 @@ export const pdfApi = {
     fd.append("format", format);
     fd.append("dpi", String(dpi));
     if (pages) fd.append("pages", JSON.stringify(pages));
-    return postFormBlob("/api/pdf2img", fd);
+    return postFormBlob("/api/v1/pdf2img", fd);
   },
 
   /** Merge multiple PDF files into one. */
   merge: (files: File[]) => {
     const fd = new FormData();
     files.forEach((f) => fd.append("files", f));
-    return postFormBlob("/api/pdf-merge", fd);
+    return postFormBlob("/api/v1/pdf-merge", fd);
   },
 
   /** Compress a PDF. */
@@ -104,14 +104,14 @@ export const pdfApi = {
     const fd = new FormData();
     fd.append("file", file);
     fd.append("level", level);
-    return postFormBlob("/api/pdf-compress", fd);
+    return postFormBlob("/api/v1/pdf-compress", fd);
   },
 
   /** Extract text from a PDF. */
   toText: (file: File) => {
     const fd = new FormData();
     fd.append("file", file);
-    return postFormJson<PdfToTextResponse>("/api/pdf-to-text", fd);
+    return postFormJson<PdfToTextResponse>("/api/v1/pdf-to-text", fd);
   },
 };
 
@@ -122,10 +122,10 @@ export const printApi = {
     fd.append("file", file);
     fd.append("batch_size", String(batchSize));
     fd.append("interval", String(intervalSeconds));
-    return postFormJson<{ task_id: string; batches: number }>("/api/print-split", fd);
+    return postFormJson<{ task_id: string; batches: number }>("/api/v1/print-split", fd);
   },
 
   /** Download a specific print batch. */
   downloadBatch: (taskId: string, batchNo: number) =>
-    downloadBlob(`/api/print-split/${encodeURIComponent(taskId)}/batch/${batchNo}`),
+    downloadBlob(`/api/v1/print-split/${encodeURIComponent(taskId)}/batch/${batchNo}`),
 };

@@ -21,7 +21,7 @@ export default api;
 
 /**
  * Download a file blob from a GET endpoint.
- * Used for /api/download/:id and print-split batch endpoints.
+ * Used for /api/v1/download/:id and print-split batch endpoints.
  */
 export async function downloadBlob(url: string): Promise<Blob> {
   const resp = await api.get(url, { responseType: "blob" });

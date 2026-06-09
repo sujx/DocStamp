@@ -11,7 +11,7 @@ import { useApiList, useCache } from "../useApi";
 vi.mock("axios");
 
 describe("useApiList", () => {
-  const mockUrl = "/api/test-items";
+  const mockUrl = "/api/v1/test-items";
 
   beforeEach(() => {
     vi.clearAllMocks();

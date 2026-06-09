@@ -125,7 +125,7 @@ async function modify() {
       }
       if (props.creator) fd.append("creator", props.creator);
       if (props.lastModifiedBy) fd.append("last_modified_by", props.lastModifiedBy);
-      const resp = await axios.post("/api/properties/batch", fd, { responseType: "blob" });
+      const resp = await axios.post("/api/v1/properties/batch", fd, { responseType: "blob" });
       downloadBlob(resp.data, "batch_modified.zip", t("common.success"));
     } else {
       fd.append("file", selectedFile.value!);
@@ -138,7 +138,7 @@ async function modify() {
       }
       if (props.creator) fd.append("creator", props.creator);
       if (props.lastModifiedBy) fd.append("last_modified_by", props.lastModifiedBy);
-      const resp = await axios.post("/api/properties", fd, { responseType: "blob" });
+      const resp = await axios.post("/api/v1/properties", fd, { responseType: "blob" });
       downloadBlob(resp.data, selectedFile.value!.name, t("common.success"));
     }
   } catch (e) {

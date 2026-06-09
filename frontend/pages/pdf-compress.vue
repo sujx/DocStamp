@@ -79,7 +79,7 @@ async function compress() {
     fd.append("file", file.value);
     fd.append("quality", quality.value);
 
-    const resp = await axios.post("/api/pdf-compress", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/pdf-compress", fd, { responseType: "blob" });
     stats.value = {
       original_size: Number(resp.headers["x-original-size"]),
       compressed_size: Number(resp.headers["x-compressed-size"]),

@@ -55,11 +55,11 @@ async function formatFile() {
   try {
     const fd = new FormData();
     fd.append("file", selectedFile.value);
-    const resp = await fetch(`${API}/api/convert/format-docx`, { method: "POST", body: fd });
+    const resp = await fetch(`${API}/api/v1/convert/format-docx`, { method: "POST", body: fd });
     if (!resp.ok) throw new Error((await resp.json()).error || `HTTP ${resp.status}`);
     const json = await resp.json();
 
-    const dlResp = await fetch(`${API}/api/download/${json.download_id}`);
+    const dlResp = await fetch(`${API}/api/v1/download/${json.download_id}`);
     if (!dlResp.ok) throw new Error(`Download failed: HTTP ${dlResp.status}`);
     const blob = await dlResp.blob();
 

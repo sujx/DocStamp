@@ -79,7 +79,7 @@ async function startSplit() {
     fd.append("file", selectedFile.value);
     fd.append("batch_size", String(batchSize.value));
     fd.append("interval", String(intervalUnit.value === "min" ? intervalVal.value * 60 : intervalVal.value));
-    const resp = await axios.post("/api/print-split", fd);
+    const resp = await axios.post("/api/v1/print-split", fd);
     task.value = resp.data;
     downloaded.value = 0;
     scheduleNext();
@@ -105,7 +105,7 @@ async function downloadNext() {
   if (!task.value || downloaded.value >= task.value.batch_count) return;
   const batchNo = downloaded.value + 1;
   try {
-    const resp = await axios.get(`/api/print-split/${task.value.task_id}/batch/${batchNo}`, { responseType: "blob" });
+    const resp = await axios.get(`/api/v1/print-split/${task.value.task_id}/batch/${batchNo}`, { responseType: "blob" });
     const url = URL.createObjectURL(resp.data);
     const a = document.createElement("a");
     a.href = url;

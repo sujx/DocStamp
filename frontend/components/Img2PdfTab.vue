@@ -121,7 +121,7 @@ async function merge() {
     fd.append("page_size", pageSize.value);
     const fname = outputFilename.value.trim() || defaultFilename.value;
     fd.append("filename", fname);
-    const resp = await axios.post("/api/img2pdf", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/img2pdf", fd, { responseType: "blob" });
     downloadBlob(resp.data, fname, t("common.success"));
   } catch (e) {
     showError(e);

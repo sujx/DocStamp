@@ -14,7 +14,7 @@ from services.properties import _resolve_time_props, batch_modify_properties, mo
 properties_bp = Blueprint("properties", __name__)
 
 
-@properties_bp.route("/api/properties/info", methods=["POST"])
+@properties_bp.route("/api/v1/properties/info", methods=["POST"])
 @rate_limit(max_requests=20, window_seconds=60)
 def properties_info():
     filepath = None
@@ -37,7 +37,7 @@ def properties_info():
         cleanup_files(filepath)
 
 
-@properties_bp.route("/api/properties", methods=["POST"])
+@properties_bp.route("/api/v1/properties", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def properties_modify():
     filepath = None
@@ -81,7 +81,7 @@ def properties_modify():
         return jsonify({"error": str(e)}), 500
 
 
-@properties_bp.route("/api/properties/batch", methods=["POST"])
+@properties_bp.route("/api/v1/properties/batch", methods=["POST"])
 @rate_limit(max_requests=5, window_seconds=60)
 def properties_batch_modify():
     filepaths = []

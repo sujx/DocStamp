@@ -88,7 +88,7 @@ async function extract() {
     if (pagesInput.value.trim()) {
       fd.append("pages", pagesInput.value.trim());
     }
-    const resp = await axios.post("/api/pdf-to-text", fd);
+    const resp = await axios.post("/api/v1/pdf-to-text", fd);
     result.value = resp.data;
     toast.add({ title: t("pdfToText.success"), color: "success" });
   } catch (e: any) {

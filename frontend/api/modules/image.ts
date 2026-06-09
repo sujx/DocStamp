@@ -16,6 +16,6 @@ export const imageApi = {
     Object.entries(config).forEach(([k, v]) => {
       fd.append(k, String(v));
     });
-    return postFormBlob("/api/image-process", fd);
+    return postFormBlob("/api/v1/image-process", fd);
   },
 };

@@ -109,7 +109,7 @@ async function merge() {
     }
     fd.append("filename", "merged.pdf");
 
-    const resp = await axios.post("/api/pdf-merge", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/pdf-merge", fd, { responseType: "blob" });
     const url = URL.createObjectURL(resp.data);
     const a = document.createElement("a");
     a.href = url;

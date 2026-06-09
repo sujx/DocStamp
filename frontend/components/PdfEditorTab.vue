@@ -126,7 +126,7 @@ async function onFileSelected(f: File) {
   try {
     const fd = new FormData();
     fd.append("file", f);
-    const resp = await axios.post("/api/pdf-editor/info", fd);
+    const resp = await axios.post("/api/v1/pdf-editor/info", fd);
     pageCount.value = resp.data.total_pages;
     pageThumbs.value = resp.data.pages;
   } catch (e: any) {
@@ -169,7 +169,7 @@ async function doDelete() {
     const fd = new FormData();
     fd.append("file", selectedFile.value);
     fd.append("pages", JSON.stringify([...deleteSet.value]));
-    const resp = await axios.post("/api/pdf-editor/delete", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/pdf-editor/delete", fd, { responseType: "blob" });
     downloadBlob(resp.data, `edited_${selectedFile.value.name}`, t("common.success"));
   } catch (e) { showError(e); } finally { isProcessing.value = false; }
 }
@@ -186,7 +186,7 @@ async function doInsert() {
     fd.append("insert_file", insertFile.value);
     fd.append("at_position", String(insertPosition.value));
     if (insertPagesStr.value.trim()) fd.append("insert_pages", JSON.stringify(insertPagesStr.value.split(",").map(s=>parseInt(s.trim()))));
-    const resp = await axios.post("/api/pdf-editor/insert", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/pdf-editor/insert", fd, { responseType: "blob" });
     downloadBlob(resp.data, `merged_${selectedFile.value.name}`, t("common.success"));
   } catch (e) { showError(e); } finally { isProcessing.value = false; }
 }
@@ -198,7 +198,7 @@ async function doReorder() {
     const fd = new FormData();
     fd.append("file", selectedFile.value);
     fd.append("order", JSON.stringify(pageThumbs.value.map(p => p.page_no)));
-    const resp = await axios.post("/api/pdf-editor/reorder", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/pdf-editor/reorder", fd, { responseType: "blob" });
     downloadBlob(resp.data, `reordered_${selectedFile.value.name}`, t("common.success"));
   } catch (e) { showError(e); } finally { isProcessing.value = false; }
 }

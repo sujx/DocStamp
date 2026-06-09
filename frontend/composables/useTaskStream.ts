@@ -1,6 +1,6 @@
 /** SSE-based task progress composable.
 
-Connects to /api/tasks/{id}/stream and provides reactive progress state.
+Connects to /api/v1/tasks/{id}/stream and provides reactive progress state.
 Falls back gracefully on connection errors (browser will auto-retry SSE).
 
 Usage:
@@ -33,7 +33,7 @@ export function useTaskStream(taskId: string): TaskProgress {
   function connect() {
     if (eventSource) return; // Already connected
 
-    eventSource = new EventSource(`/api/tasks/${encodeURIComponent(taskId)}/stream`);
+    eventSource = new EventSource(`/api/v1/tasks/${encodeURIComponent(taskId)}/stream`);
 
     eventSource.onmessage = (e: MessageEvent) => {
       try {

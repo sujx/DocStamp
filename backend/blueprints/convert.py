@@ -78,12 +78,12 @@ def _safe_download_basename(raw_name):
 
 # ── Routes ──────────────────────────────────────────────────────────
 
-@convert_bp.route("/api/stats", methods=["GET"])
+@convert_bp.route("/api/v1/stats", methods=["GET"])
 def stats():
     return jsonify({"total_conversions": _read_stats()})
 
 
-@convert_bp.route("/api/preview", methods=["POST"])
+@convert_bp.route("/api/v1/preview", methods=["POST"])
 @validate_request(body=MdPreviewSchema)
 def md_preview(body: MdPreviewSchema):
     """Render Markdown to HTML for preview."""
@@ -96,7 +96,7 @@ def md_preview(body: MdPreviewSchema):
     return jsonify({"html": safe_html})
 
 
-@convert_bp.route("/api/convert", methods=["POST"])
+@convert_bp.route("/api/v1/convert", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def md_convert():
     """Convert Markdown to DOCX. Query ?format=plain skips GB/T 9704-2012 formatting."""
@@ -154,7 +154,7 @@ def md_convert():
         return jsonify({"error": str(e)}), 500
 
 
-@convert_bp.route("/api/convert/doc2md", methods=["POST"])
+@convert_bp.route("/api/v1/convert/doc2md", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def format_docx_endpoint():
     """Reformat an existing DOCX per GB/T 9704-2012."""

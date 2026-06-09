@@ -209,7 +209,7 @@ async function addWatermark() {
     fd.append("file", selectedFile.value);
     fd.append("params", JSON.stringify({ ...params }));
     if (watermarkImage.value) fd.append("watermark_image", watermarkImage.value);
-    const resp = await axios.post("/api/watermark", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/watermark", fd, { responseType: "blob" });
     downloadBlob(resp.data, `watermarked_${selectedFile.value.name}`, t("common.success"));
   } catch (e) { showError(e); }
   finally { isProcessing.value = false; }

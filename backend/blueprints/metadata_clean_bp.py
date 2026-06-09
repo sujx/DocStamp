@@ -16,7 +16,7 @@ METADATA_CLEAN_EXTENSIONS = {"docx", "xlsx", "pptx", "pdf"}
 metadata_clean_bp = Blueprint("metadata_clean", __name__)
 
 
-@metadata_clean_bp.route("/api/metadata-clean", methods=["POST"])
+@metadata_clean_bp.route("/api/v1/metadata-clean", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def metadata_clean():
     """Strip all metadata from an Office or PDF file."""

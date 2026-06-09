@@ -45,12 +45,12 @@ def _parse_range(range_header: str, file_size: int) -> tuple:
 
 # ── Routes ──────────────────────────────────────────────────────────
 
-@download_bp.route("/api/health", methods=["GET"])
+@download_bp.route("/api/v1/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok"})
 
 
-@download_bp.route("/api/download/<filename>")
+@download_bp.route("/api/v1/download/<filename>")
 def download_file(filename: str):
     """Serve a generated file with Range request support."""
     for char in Config.FORBIDDEN_PATH_CHARS:
@@ -85,7 +85,7 @@ def download_file(filename: str):
     return response
 
 
-@download_bp.route("/api/tasks/<task_id>")
+@download_bp.route("/api/v1/tasks/<task_id>")
 def task_status(task_id: str):
     record, _ = _get_models()
     r = record.get_by_id(task_id)
@@ -94,7 +94,7 @@ def task_status(task_id: str):
     return jsonify({"code": 200, "data": r, "requestId": getattr(g, "request_id", "-")})
 
 
-@download_bp.route("/api/tasks/<task_id>/stream")
+@download_bp.route("/api/v1/tasks/<task_id>/stream")
 def task_stream(task_id: str):
     record, _ = _get_models()
 

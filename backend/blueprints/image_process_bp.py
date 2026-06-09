@@ -17,7 +17,7 @@ IMAGE_PROCESS_EXTENSIONS = {"png", "jpg", "jpeg", "tiff", "tif", "webp"}
 image_process_bp = Blueprint("image_process", __name__)
 
 
-@image_process_bp.route("/api/image-process", methods=["POST"])
+@image_process_bp.route("/api/v1/image-process", methods=["POST"])
 @rate_limit(max_requests=5, window_seconds=60)
 def image_process():
     """Resize, crop, convert, or compress an image."""

@@ -18,7 +18,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBase: "/api",
+      apiBase: "/api/v1",
     },
   },
 
@@ -55,7 +55,6 @@ export default defineNuxtConfig({
     },
   },
 
-  ssr: false,
 
   compatibilityDate: "2026-06-06",
 });

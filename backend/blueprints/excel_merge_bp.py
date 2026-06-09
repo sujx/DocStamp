@@ -14,7 +14,7 @@ from services.excel_merger import merge_excel_files
 excel_merge_bp = Blueprint("excel_merge", __name__)
 
 
-@excel_merge_bp.route("/api/excel-merge", methods=["POST"])
+@excel_merge_bp.route("/api/v1/excel-merge", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def excel_merge():
     filepaths = []

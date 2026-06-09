@@ -14,7 +14,7 @@ from services.pdf_to_images import pdf_to_images
 pdf2img_bp = Blueprint("pdf2img", __name__)
 
 
-@pdf2img_bp.route("/api/pdf2img", methods=["POST"])
+@pdf2img_bp.route("/api/v1/pdf2img", methods=["POST"])
 @rate_limit(max_requests=5, window_seconds=60)
 def pdf2img_convert():
     filepath = None

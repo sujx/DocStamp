@@ -253,8 +253,8 @@ const lineOption = computed(() => ({
 async function seedData() {
   seeding.value = true;
   try {
-    await axios.post("/api/stats/seed");
-    const resp = await axios.get("/api/stats/overview");
+    await axios.post("/api/v1/stats/seed");
+    const resp = await axios.get("/api/v1/stats/overview");
     if (resp.data?.data) {
       data.value = resp.data.data;
     }
@@ -269,7 +269,7 @@ async function seedData() {
 
 onMounted(async () => {
   try {
-    const resp = await axios.get("/api/stats/overview");
+    const resp = await axios.get("/api/v1/stats/overview");
     if (resp.data?.data) {
       data.value = resp.data.data;
     }

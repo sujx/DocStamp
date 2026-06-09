@@ -17,22 +17,16 @@
 </template>
 
 <script setup lang="ts">
+import { DASHBOARD_TOOLS } from "~/composables/tools.config";
+
 const { t } = useI18n();
 
-const tools = computed(() => [
-  { to: "/md-to-docx", icon: "i-heroicons-document-text", title: t("tabs.md2docx"), description: t("md2docx.description") },
-  { to: "/watermark", icon: "i-heroicons-beaker", title: t("tabs.watermarkManagement"), description: t("watermark.description") },
-  { to: "/properties", icon: "i-heroicons-document-text", title: t("tabs.properties"), description: t("properties.description") },
-  { to: "/excel-merge", icon: "i-heroicons-table-cells", title: t("tabs.excelMerge"), description: t("excelMerge.description") },
-  { to: "/format-docx", icon: "i-heroicons-document-check", title: t("tabs.formatDocx"), description: t("format.description") },
-  { to: "/file-assembly", icon: "i-heroicons-arrows-right-left", title: t("tabs.fileAssembly"), description: t("img2pdf.description") },
-  { to: "/print-split", icon: "i-heroicons-printer", title: t("tabs.printSplit"), description: t("printSplit.description") },
-  { to: "/pdf-editor", icon: "i-heroicons-document", title: t("tabs.pdfEditor"), description: t("pdfEditor.description") },
-  { to: "/pdf-to-text", icon: "i-heroicons-document-magnifying-glass", title: t("tabs.pdfToText"), description: t("pdfToText.description") },
-  { to: "/pdf-merge", icon: "i-heroicons-plus-circle", title: t("tabs.pdfMerge"), description: t("pdfMerge.description") },
-  { to: "/pdf-compress", icon: "i-heroicons-arrows-pointing-in", title: t("tabs.pdfCompress"), description: t("pdfCompress.description") },
-  { to: "/metadata-clean", icon: "i-heroicons-shield-exclamation", title: t("tabs.metadataClean"), description: t("metadataClean.description") },
-  { to: "/page-decorate", icon: "i-heroicons-document-check", title: t("tabs.pageDecorate"), description: t("pageDecorate.description") },
-  { to: "/image-process", icon: "i-heroicons-photo", title: t("tabs.imageProcess"), description: t("imageProcess.description") },
-]);
+const tools = computed(() =>
+  DASHBOARD_TOOLS.map(tool => ({
+    to: tool.to,
+    icon: tool.icon,
+    title: t(tool.label),
+    description: t(tool.desc!),
+  }))
+);
 </script>

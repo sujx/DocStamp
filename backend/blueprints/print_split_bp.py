@@ -16,7 +16,7 @@ print_split_bp = Blueprint("print_split", __name__)
 _tasks = {}
 
 
-@print_split_bp.route("/api/print-split", methods=["POST"])
+@print_split_bp.route("/api/v1/print-split", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def print_split_create():
     filepath = None
@@ -62,7 +62,7 @@ def print_split_create():
         return jsonify({"error": str(e)}), 500
 
 
-@print_split_bp.route("/api/print-split/<task_id>/batch/<int:batch_no>", methods=["GET"])
+@print_split_bp.route("/api/v1/print-split/<task_id>/batch/<int:batch_no>", methods=["GET"])
 def print_split_download(task_id: str, batch_no: int):
     try:
         if task_id not in _tasks:

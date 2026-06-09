@@ -28,13 +28,13 @@ export const watermarkApi = {
       if (v !== undefined && v !== null) fd.append(k, String(v));
     });
     if (imageFile) fd.append("image", imageFile);
-    return postFormBlob("/api/watermark", fd);
+    return postFormBlob("/api/v1/watermark", fd);
   },
 
   /** Remove watermarks from a document. */
   remove: (file: File) => {
     const fd = new FormData();
     fd.append("file", file);
-    return postFormBlob("/api/watermark/remove", fd);
+    return postFormBlob("/api/v1/watermark/remove", fd);
   },
 };

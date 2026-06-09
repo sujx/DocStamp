@@ -100,7 +100,7 @@ async function decorate() {
       start_number: startNumber.value,
     }));
 
-    const resp = await axios.post("/api/page-decorate", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/page-decorate", fd, { responseType: "blob" });
     const url = URL.createObjectURL(resp.data);
     const a = document.createElement("a");
     a.href = url;

@@ -320,8 +320,8 @@ async function doConvert(format: "plain" | "official") {
   if (format === "plain") convertingPlain.value = true;
   else convertingOfficial.value = true;
   try {
-    const resp = await axios.post(`${API_BASE}/api/convert?format=${format}`, { content: content.value });
-    const dlResp = await axios.get(`${API_BASE}/api/download/${resp.data.download_id}`, { responseType: "blob" });
+    const resp = await axios.post(`${API_BASE}/api/v1/convert?format=${format}`, { content: content.value });
+    const dlResp = await axios.get(`${API_BASE}/api/v1/download/${resp.data.download_id}`, { responseType: "blob" });
     const url = URL.createObjectURL(dlResp.data);
     const a = document.createElement("a");
     a.href = url;

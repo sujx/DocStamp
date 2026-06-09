@@ -39,7 +39,7 @@ async function remove() {
   try {
     const fd = new FormData();
     fd.append("file", selectedFile.value);
-    const resp = await axios.post("/api/watermark/remove", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/watermark/remove", fd, { responseType: "blob" });
     downloadBlob(resp.data, `cleaned_${selectedFile.value.name}`, t("common.success"));
   } catch (e) { showError(e); }
   finally { isProcessing.value = false; }

@@ -14,7 +14,7 @@ from services.pdf_compressor import compress_pdf
 pdf_compress_bp = Blueprint("pdf_compress", __name__)
 
 
-@pdf_compress_bp.route("/api/pdf-compress", methods=["POST"])
+@pdf_compress_bp.route("/api/v1/pdf-compress", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def pdf_compress():
     """Compress a PDF file."""

@@ -29,7 +29,7 @@ export const propertiesApi = {
   info: (file: File) => {
     const fd = new FormData();
     fd.append("file", file);
-    return postFormJson<PropertiesInfoResponse>("/api/properties/info", fd);
+    return postFormJson<PropertiesInfoResponse>("/api/v1/properties/info", fd);
   },
 
   /** Modify metadata of a single Office document. */
@@ -39,7 +39,7 @@ export const propertiesApi = {
     Object.entries(props).forEach(([k, v]) => {
       if (v !== undefined && v !== null) fd.append(k, String(v));
     });
-    return postFormBlob("/api/properties", fd);
+    return postFormBlob("/api/v1/properties", fd);
   },
 
   /** Batch-modify metadata on multiple Office documents. */
@@ -49,7 +49,7 @@ export const propertiesApi = {
     Object.entries(props).forEach(([k, v]) => {
       if (v !== undefined && v !== null) fd.append(k, String(v));
     });
-    return postFormBlob("/api/properties/batch", fd);
+    return postFormBlob("/api/v1/properties/batch", fd);
   },
 };
 
@@ -59,14 +59,14 @@ export const officeApi = {
     const fd = new FormData();
     files.forEach((f) => fd.append("files", f));
     if (outputName) fd.append("filename", outputName);
-    return postFormBlob("/api/excel-merge", fd);
+    return postFormBlob("/api/v1/excel-merge", fd);
   },
 
   /** Strip metadata from an Office document. */
   cleanMetadata: (file: File) => {
     const fd = new FormData();
     fd.append("file", file);
-    return postFormBlob("/api/metadata-clean", fd);
+    return postFormBlob("/api/v1/metadata-clean", fd);
   },
 
   /** Add page numbers, headers, and footers to a PDF. */
@@ -79,6 +79,6 @@ export const officeApi = {
     Object.entries(config).forEach(([k, v]) => {
       fd.append(k, String(v));
     });
-    return postFormBlob("/api/page-decorate", fd);
+    return postFormBlob("/api/v1/page-decorate", fd);
   },
 };

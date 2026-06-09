@@ -151,7 +151,7 @@ async function process() {
 
     fd.append("params", JSON.stringify(params));
 
-    const resp = await axios.post("/api/image-process", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/image-process", fd, { responseType: "blob" });
     const url = URL.createObjectURL(resp.data);
     const a = document.createElement("a");
     a.href = url;

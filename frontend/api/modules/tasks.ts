@@ -25,11 +25,11 @@ export interface HealthResponse {
 
 export const tasksApi = {
   /** Health check. */
-  health: () => api.get<HealthResponse>("/api/health").then((r) => r.data),
+  health: () => api.get<HealthResponse>("/api/v1/health").then((r) => r.data),
 
   /** Get a task's current status (polling). */
   status: (taskId: string) =>
     api.get<{ code: number; data: TaskRecord; requestId: string }>(
-      `/api/tasks/${encodeURIComponent(taskId)}`,
+      `/api/v1/tasks/${encodeURIComponent(taskId)}`,
     ).then((r) => r.data.data),
 };

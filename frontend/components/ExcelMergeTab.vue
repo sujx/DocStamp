@@ -79,7 +79,7 @@ async function merge() {
     for (const f of files.value) fd.append("files", f.file);
     const fname = outputFilename.value.trim() || defaultFilename.value;
     fd.append("filename", fname);
-    const resp = await axios.post("/api/excel-merge", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/excel-merge", fd, { responseType: "blob" });
     downloadBlob(resp.data, fname, t("common.success"));
   } catch (e) { showError(e); }
   finally { isProcessing.value = false; }

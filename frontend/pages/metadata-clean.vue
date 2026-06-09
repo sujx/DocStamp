@@ -46,7 +46,7 @@ async function clean() {
     const fd = new FormData();
     fd.append("file", file.value);
 
-    const resp = await axios.post("/api/metadata-clean", fd, { responseType: "blob" });
+    const resp = await axios.post("/api/v1/metadata-clean", fd, { responseType: "blob" });
     result.value = { fields_cleaned: Number(resp.headers["x-fields-cleaned"] || 0) };
 
     const url = URL.createObjectURL(resp.data);

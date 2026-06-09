@@ -4,7 +4,7 @@ Provides loading state, pagination, and fetchList for list-type endpoints.
 Used as a building block for feature-specific composables.
 
 Usage:
-    const { data, loading, pagination, fetchList } = useApiList<T>("/api/items");
+    const { data, loading, pagination, fetchList } = useApiList<T>("/api/v1/items");
     await fetchList({ status: "active" });
 */
 

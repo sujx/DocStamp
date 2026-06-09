@@ -132,6 +132,8 @@
 </template>
 
 <script setup lang="ts">
+import { SIDEBAR_GROUPS } from "~/composables/tools.config";
+
 const collapsed = ref(import.meta.client ? localStorage.getItem("sidebar_collapsed") === "true" : false);
 const hoverGroup = ref<string | null>(null);
 const mobileOpen = ref(false);
@@ -163,42 +165,30 @@ const sidebarWidth = computed(() => {
 });
 provide("sidebarWidth", sidebarWidth);
 
+interface NavChild {
+  to: string; icon: string; label: string;
+}
 interface NavItem {
   key: string;
   to?: string;
   icon: string;
   label: string;
-  children?: { to: string; icon: string; label: string }[];
+  children?: NavChild[];
 }
 
-const navItems = computed<NavItem[]>(() => [
-  { key: "dashboard", to: "/", icon: "i-heroicons-home", label: t("tabs.dashboard") },
-  { key: "md2docx", to: "/md-to-docx", icon: "i-heroicons-arrow-down-tray", label: t("tabs.md2docx") },
-  { key: "watermark", to: "/watermark", icon: "i-heroicons-beaker", label: t("tabs.watermarkManagement") },
-  {
-    key: "office", icon: "i-heroicons-document-text", label: t("tabs.officeTools"),
-    children: [
-      { to: "/properties", icon: "i-heroicons-document-text", label: t("tabs.properties") },
-      { to: "/excel-merge", icon: "i-heroicons-table-cells", label: t("tabs.excelMerge") },
-      { to: "/format-docx", icon: "i-heroicons-document-check", label: t("tabs.formatDocx") },
-      { to: "/metadata-clean", icon: "i-heroicons-shield-exclamation", label: t("tabs.metadataClean") },
-    ],
-  },
-  {
-    key: "pdf", icon: "i-heroicons-document", label: t("tabs.pdfTools"),
-    children: [
-      { to: "/file-assembly", icon: "i-heroicons-arrows-right-left", label: t("tabs.fileAssembly") },
-      { to: "/print-split", icon: "i-heroicons-printer", label: t("tabs.printSplit") },
-      { to: "/pdf-editor", icon: "i-heroicons-document", label: t("tabs.pdfEditor") },
-      { to: "/pdf-to-text", icon: "i-heroicons-document-magnifying-glass", label: t("tabs.pdfToText") },
-      { to: "/pdf-merge", icon: "i-heroicons-plus-circle", label: t("tabs.pdfMerge") },
-      { to: "/pdf-compress", icon: "i-heroicons-arrows-pointing-in", label: t("tabs.pdfCompress") },
-      { to: "/page-decorate", icon: "i-heroicons-document-check", label: t("tabs.pageDecorate") },
-      { to: "/image-process", icon: "i-heroicons-photo", label: t("tabs.imageProcess") },
-    ],
-  },
-  { key: "status", to: "/status", icon: "i-heroicons-chart-bar", label: t("tabs.status") },
-]);
+const navItems = computed<NavItem[]>(() =>
+  SIDEBAR_GROUPS.map(item => {
+    if ("tools" in item) {
+      return {
+        key: item.key,
+        icon: item.icon,
+        label: t(item.label),
+        children: item.tools.map(tool => ({ to: tool.to, icon: tool.icon, label: t(tool.label) })),
+      }
+    }
+    return { key: item.key, to: item.to, icon: item.icon, label: t(item.label) }
+  })
+);
 
 function isActive(href: string): boolean {
   if (href === "/") return route.path === "/";

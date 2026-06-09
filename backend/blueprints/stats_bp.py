@@ -41,7 +41,7 @@ MODULE_NAMES = {
 }
 
 
-@stats_bp.route("/api/stats/overview", methods=["GET"])
+@stats_bp.route("/api/v1/stats/overview", methods=["GET"])
 def stats_overview():
     """Aggregate operation counts by module, daily trend, and unique visitors.
 
@@ -102,7 +102,7 @@ def stats_overview():
 MODULES = list(MODULE_NAMES.keys())
 
 
-@stats_bp.route("/api/stats/seed", methods=["POST"])
+@stats_bp.route("/api/v1/stats/seed", methods=["POST"])
 def seed_test_data():
     """Insert random test data (≤10 records per module) for demo purposes.
 
@@ -142,7 +142,7 @@ def seed_test_data():
             op_log.log_operation(
                 session_id=f"seed-{module}-{i}",
                 operation_type=module,
-                resource_id=f"/api/{module}",
+                resource_id=f"/api/v1/{module}",
                 resource_type="",
                 ip_address=random.choice(test_ips),
                 user_agent=random.choice(test_agents),

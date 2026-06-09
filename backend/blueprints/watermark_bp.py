@@ -15,7 +15,7 @@ from services.watermark import add_watermark, remove_watermark
 watermark_bp = Blueprint("watermark", __name__)
 
 
-@watermark_bp.route("/api/watermark", methods=["POST"])
+@watermark_bp.route("/api/v1/watermark", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def watermark_add():
     filepath = None
@@ -67,7 +67,7 @@ def watermark_add():
         return jsonify({"error": str(e)}), 500
 
 
-@watermark_bp.route("/api/watermark/remove", methods=["POST"])
+@watermark_bp.route("/api/v1/watermark/remove", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def watermark_remove():
     filepath = None

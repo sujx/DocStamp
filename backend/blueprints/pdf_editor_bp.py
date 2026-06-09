@@ -18,7 +18,7 @@ pdf_editor_bp = Blueprint("pdf_editor", __name__)
 _pdf_thumbs = {}
 
 
-@pdf_editor_bp.route("/api/pdf-editor/info", methods=["POST"])
+@pdf_editor_bp.route("/api/v1/pdf-editor/info", methods=["POST"])
 @rate_limit(max_requests=20, window_seconds=60)
 def pdf_editor_info():
     filepath = None
@@ -67,7 +67,7 @@ def pdf_editor_info():
                 "page_no": i + 1,
                 "width": float(page.mediabox.width),
                 "height": float(page.mediabox.height),
-                "thumb": f"/api/pdf-editor/thumb/{os.path.basename(thumb_dir)}/{thumb_file}",
+                "thumb": f"/api/v1/pdf-editor/thumb/{os.path.basename(thumb_dir)}/{thumb_file}",
             })
 
         _pdf_thumbs[fn] = thumb_dir
@@ -78,7 +78,7 @@ def pdf_editor_info():
         return jsonify({"error": str(e)}), 500
 
 
-@pdf_editor_bp.route("/api/pdf-editor/thumb/<thumb_dir>/<filename>")
+@pdf_editor_bp.route("/api/v1/pdf-editor/thumb/<thumb_dir>/<filename>")
 def pdf_editor_thumb(thumb_dir: str, filename: str):
     safe_name = secure_filename(filename)
     safe_thumbs = secure_filename(thumb_dir)
@@ -88,7 +88,7 @@ def pdf_editor_thumb(thumb_dir: str, filename: str):
     return send_file(path, mimetype="image/png")
 
 
-@pdf_editor_bp.route("/api/pdf-editor/delete", methods=["POST"])
+@pdf_editor_bp.route("/api/v1/pdf-editor/delete", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def pdf_editor_delete():
     filepath = None
@@ -126,7 +126,7 @@ def pdf_editor_delete():
         return jsonify({"error": str(e)}), 500
 
 
-@pdf_editor_bp.route("/api/pdf-editor/insert", methods=["POST"])
+@pdf_editor_bp.route("/api/v1/pdf-editor/insert", methods=["POST"])
 @rate_limit(max_requests=5, window_seconds=60)
 def pdf_editor_insert():
     filepath = None
@@ -170,7 +170,7 @@ def pdf_editor_insert():
         return jsonify({"error": str(e)}), 500
 
 
-@pdf_editor_bp.route("/api/pdf-editor/reorder", methods=["POST"])
+@pdf_editor_bp.route("/api/v1/pdf-editor/reorder", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def pdf_editor_reorder():
     filepath = None
