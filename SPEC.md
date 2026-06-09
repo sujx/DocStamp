@@ -59,7 +59,7 @@ PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-tex
 | `--color-muted` | `#f4f2e4` | 次级区域 |
 | `--color-text-primary` | `#1a1a1a` | 正文（~16.6:1 对比度） |
 | `--color-text-secondary` | `#5c5c5c` | 辅助文字（~6.3:1） |
-| `--color-text-tertiary` | `#757265` | 提示/脚注（~4.5:1 WCAG AA） |
+| `--color-text-tertiary` | `#706d60` | 提示/脚注（4.69:1 WCAG AA） |
 | `--color-border-default` | `#e8e6d8` | 默认边框 |
 | `--color-border-subtle` | `#f0efe5` | 细分隔线 |
 

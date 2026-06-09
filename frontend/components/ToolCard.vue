@@ -1,7 +1,7 @@
 <template>
   <NuxtLink
     :to="to"
-    class="block p-6 rounded-lg border border-transparent transition-all duration-200 hover:-translate-y-0.5 group"
+    class="block p-6 rounded-lg border border-transparent transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 group cursor-pointer"
     :style="{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--shadow-card)' }"
     @mouseenter="hover = true"
     @mouseleave="hover = false"

@@ -345,5 +345,8 @@
     "targetFormat": "Target Format",
     "quality": "Quality",
     "process": "Process & Download"
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content"
   }
 }

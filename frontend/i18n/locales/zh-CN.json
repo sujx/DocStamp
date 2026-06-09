@@ -345,5 +345,8 @@
     "targetFormat": "目标格式",
     "quality": "质量",
     "process": "处理并下载"
+  },
+  "a11y": {
+    "skipToContent": "跳到主内容"
   }
 }

@@ -1,11 +1,20 @@
 <template>
   <div class="min-h-dvh" :style="{ backgroundColor: 'var(--color-page)' }">
+    <!-- Skip-to-content for keyboard users -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-medium focus:no-underline"
+      :style="{ backgroundColor: 'var(--color-surface)', color: 'var(--color-brand-700)', boxShadow: 'var(--shadow-elevated)' }"
+    >
+      {{ $t("a11y.skipToContent") }}
+    </a>
+
     <Sidebar />
     <div
       class="min-h-dvh flex flex-col transition-[margin-left] duration-150"
-      :style="{ marginLeft: collapsed ? '64px' : '240px' }"
+      :style="{ marginLeft: sidebarWidth + 'px' }"
     >
-      <main class="flex-1">
+      <main id="main-content" class="flex-1">
         <NuxtPage />
       </main>
       <AppFooter />
@@ -14,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-const collapsed = inject("sidebarCollapsed", ref(false));
+const sidebarWidth = inject("sidebarWidth", ref(240));
 
 useHead({
   titleTemplate: "%s - docStamp",

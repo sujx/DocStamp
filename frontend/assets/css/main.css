@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Respect user motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @layer base {
   :root {
     --color-brand-50: #f0fdf4;
@@ -23,7 +34,7 @@
 
     --color-text-primary: #1a1a1a;
     --color-text-secondary: #5c5c5c;
-    --color-text-tertiary: #757265;
+    --color-text-tertiary: #706d60;
 
     --color-border-default: #e8e6d8;
     --color-border-subtle: #f0efe5;
