@@ -1,8 +1,8 @@
-# docStamp — 设计规范与开发指南
+# 鹊随金印 (docStamp) — 设计规范与开发指南
 
 ## 一、项目概述
 
-docStamp 是一站式文档处理工具箱。Nuxt 3 + Nuxt UI v2 + Tailwind CSS v3 前端，Flask REST API 后端。绿鹃品牌色系（`#008A3D` + `#F9F7E8`），仪表盘 + 侧边导航 + 多页面路由。
+鹊随金印是一站式文档处理工具箱。Nuxt 3 + Nuxt UI v2 + Tailwind CSS v3 前端，Flask REST API 后端。绿鹃品牌色系（`#008A3D` + `#F9F7E8`），仪表盘 + 侧边导航 + 多页面路由。
 
 **定位**：单体工具，无用户系统，无认证，无 AI — 即开即用，随用随走。
 

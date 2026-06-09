@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "docStamp Document Processing Toolbox - Nuxt + Nuxt UI Frontend",
+  "description": "鹊随金印 文档处理工具箱 - Nuxt + Nuxt UI Frontend",
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt generate",

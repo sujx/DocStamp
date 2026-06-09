@@ -26,9 +26,9 @@
 const sidebarWidth = inject("sidebarWidth", ref(240));
 
 useHead({
-  titleTemplate: "%s - docStamp",
+  titleTemplate: "%s - 鹊随金印",
   meta: [
-    { name: "description", content: "docStamp 文档处理工具箱" },
+    { name: "description", content: "鹊随金印 文档处理工具箱" },
     { name: "theme-color", content: "#008a3d" },
   ],
   htmlAttrs: { lang: "zh-CN" },

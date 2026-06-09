@@ -37,8 +37,8 @@
       :class="collapsed && !isMobile ? 'justify-center' : 'gap-3'"
       :style="{ borderColor: 'var(--color-border-subtle)' }"
     >
-      <img src="/logo.svg" alt="docStamp" class="size-8 shrink-0" />
-      <span v-if="!(collapsed && !isMobile)" class="text-lg font-bold truncate" :style="{ color: 'var(--color-text-primary)' }">docStamp</span>
+      <img src="/logo.svg" alt="鹊随金印" class="size-8 shrink-0" />
+      <span v-if="!(collapsed && !isMobile)" class="text-lg font-bold truncate" :style="{ color: 'var(--color-text-primary)' }">鹊随金印</span>
     </div>
 
     <!-- Nav items -->
