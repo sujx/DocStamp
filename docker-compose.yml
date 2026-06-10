@@ -32,7 +32,7 @@ services:
       - DOCSTAMP_STATIC=/opt/docstamp/frontend/.output/public
       - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
       - AI_API_URL=${AI_API_URL:-https://api.deepseek.com/chat/completions}
-      - AI_MODEL=${AI_MODEL:-deepseek-chat}
+      - AI_MODEL=${AI_MODEL:-deepseek-v4-flash}
       - DOCSTAMP_DEEPSEEK_API_KEY=${DOCSTAMP_DEEPSEEK_API_KEY:-}
       - DOCSTAMP_MINERU_API_KEY=${DOCSTAMP_MINERU_API_KEY:-}
       - CELERY_BROKER_URL=redis://redis:6379/0

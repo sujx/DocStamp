@@ -56,7 +56,7 @@ class Config:
     AI_API_URL = os.environ.get(
         "AI_API_URL", "https://api.deepseek.com/chat/completions"
     )
-    AI_MODEL = os.environ.get("AI_MODEL", "deepseek-chat")
+    AI_MODEL = os.environ.get("AI_MODEL", "deepseek-v4-flash")
 
     # ── Frontend Static ─────────────────────────────────────────────
     STATIC_FOLDER = os.environ.get(
