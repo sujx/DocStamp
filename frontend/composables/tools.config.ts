@@ -21,10 +21,10 @@ export const TOOLS: ToolDef[] = [
   { key: "md2docx", to: "/md-to-docx", icon: "i-heroicons-arrow-down-tray", label: "tabs.md2docx", desc: "md2docx.description", order: 2 },
   { key: "watermark", to: "/watermark", icon: "i-heroicons-beaker", label: "tabs.watermarkManagement", desc: "watermark.description", order: 3 },
 
-  // ── Office 工具组 ──
-  { key: "properties", to: "/properties", icon: "i-heroicons-document-text", label: "tabs.properties", desc: "properties.description", group: "office", order: 10 },
-  { key: "excel-merge", to: "/excel-merge", icon: "i-heroicons-table-cells", label: "tabs.excelMerge", desc: "excelMerge.description", group: "office", order: 11 },
-  { key: "format-docx", to: "/format-docx", icon: "i-heroicons-document-check", label: "tabs.formatDocx", desc: "format.description", group: "office", order: 12 },
+  // ── Office 工具（展开到顶层）──
+  { key: "properties", to: "/properties", icon: "i-heroicons-document-text", label: "tabs.properties", desc: "properties.description", order: 10 },
+  { key: "excel-merge", to: "/excel-merge", icon: "i-heroicons-table-cells", label: "tabs.excelMerge", desc: "excelMerge.description", order: 11 },
+  { key: "format-docx", to: "/format-docx", icon: "i-heroicons-document-check", label: "tabs.formatDocx", desc: "format.description", order: 12 },
 
   // ── PDF 工具组 ──
   { key: "file-assembly", to: "/file-assembly", icon: "i-heroicons-arrows-right-left", label: "tabs.fileAssembly", desc: "img2pdf.description", group: "pdf", order: 20 },
