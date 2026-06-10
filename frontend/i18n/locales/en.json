@@ -348,5 +348,17 @@
   },
   "a11y": {
     "skipToContent": "Skip to main content"
+  },
+  "ai": {
+    "correct": "AI Correct",
+    "correcting": "Correcting...",
+    "corrected": "Corrected {n}",
+    "denoise": "AI Denoise",
+    "denoising": "Denoising...",
+    "denoised": "Denoised",
+    "suggestFilename": "AI Filename",
+    "unofficial": "Unofficial",
+    "official": "Official",
+    "officialSuggestion": "AI suggests: Official document format"
   }
 }

@@ -348,5 +348,17 @@
   },
   "a11y": {
     "skipToContent": "跳到主内容"
+  },
+  "ai": {
+    "correct": "AI 纠错",
+    "correcting": "纠错中...",
+    "corrected": "已纠正 {n} 处",
+    "denoise": "AI 去噪",
+    "denoising": "去噪中...",
+    "denoised": "去噪完成",
+    "suggestFilename": "AI 文件名",
+    "unofficial": "非正式公文",
+    "official": "正式公文",
+    "officialSuggestion": "AI 建议：使用正式公文格式"
   }
 }

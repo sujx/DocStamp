@@ -27,6 +27,14 @@
                 <UIcon name="i-heroicons-trash" class="w-3.5 h-3.5 mr-1" />
                 {{ $t("md2docx.clear") }}
               </UButton>
+              <UButton
+                size="xs" color="primary" variant="outline"
+                :loading="aiCorrecting" :disabled="!content.trim()"
+                @click="aiCorrect"
+              >
+                <UIcon name="i-heroicons-sparkles" class="w-3.5 h-3.5 mr-1" />
+                {{ aiCorrecting ? $t("ai.correcting") : $t("ai.correct") }}
+              </UButton>
             </div>
             <input ref="fileInput" type="file" accept=".md,.markdown,.txt" class="hidden" @change="onFileUpload" />
           </div>
@@ -97,6 +105,18 @@
       </div>
     </div>
 
+    <!-- AI format hint -->
+    <div v-if="aiClassified" class="flex justify-center mt-4">
+      <span
+        class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full"
+        :class="aiIsOfficial ? 'bg-brand-soft text-brand-700' : 'text-tertiary'"
+        :style="aiIsOfficial ? {} : { backgroundColor: 'var(--color-muted)' }"
+      >
+        <UIcon :name="aiIsOfficial ? 'i-heroicons-sparkles' : 'i-heroicons-document'" class="size-3" />
+        {{ aiIsOfficial ? $t("ai.officialSuggestion") : $t("ai.unofficial") }}
+      </span>
+    </div>
+
     <!-- Action Bar -->
     <div class="action-bar">
       <div class="convert-buttons">
@@ -153,6 +173,10 @@ import DOMPurify from "dompurify";
 
 const { t } = useI18n();
 const toast = useToast();
+const { correct: aiCorrectText, classify: aiClassifyText, loading: aiCorrecting } = useAi();
+
+const aiClassified = ref(false);
+const aiIsOfficial = ref(false);
 
 // Configure marked
 marked.setOptions({
@@ -311,6 +335,31 @@ async function renderPostProcess() {
     } catch { /* optional */ }
   }
 }
+
+async function aiCorrect() {
+  try {
+    const result = await aiCorrectText(content.value);
+    if (result.changed) {
+      content.value = result.text;
+      doUpdatePreview();
+      toast.add({ title: t("ai.corrected", { n: 1 }), color: "success" });
+    }
+  } catch { /* silent — backend degrades gracefully */ }
+}
+
+// Classify on debounced input (2s after last keystroke)
+let classifyTimer: ReturnType<typeof setTimeout> | null = null;
+watch(content, (val) => {
+  if (classifyTimer) clearTimeout(classifyTimer);
+  if (!val.trim()) { aiClassified.value = false; return; }
+  classifyTimer = setTimeout(async () => {
+    try {
+      const result = await aiClassifyText(val);
+      aiClassified.value = true;
+      aiIsOfficial.value = result.is_official;
+    } catch { aiClassified.value = false; }
+  }, 2000);
+});
 
 async function doConvert(format: "plain" | "official") {
   if (!content.value.trim()) {

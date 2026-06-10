@@ -43,6 +43,14 @@
           <UIcon name="i-heroicons-clipboard" class="w-4 h-4 mr-1.5" />
           {{ $t("pdfToText.copy") }}
         </UButton>
+        <UButton
+          v-if="result"
+          color="primary" variant="outline"
+          :loading="aiDenoising" @click="aiDenoise"
+        >
+          <UIcon name="i-heroicons-sparkles" class="w-4 h-4 mr-1.5" />
+          {{ aiDenoising ? $t("ai.denoising") : $t("ai.denoise") }}
+        </UButton>
       </div>
 
       <div v-if="result" class="mt-6">
@@ -68,6 +76,7 @@ import { useDownload } from "~/composables/useDownload";
 
 const { t } = useI18n();
 const toast = useToast();
+const { denoise: aiDenoiseText, loading: aiDenoising } = useAi();
 
 const file = ref<File | null>(null);
 const pagesInput = ref("");
@@ -113,6 +122,17 @@ async function copyText() {
   if (!result.value) return;
   await navigator.clipboard.writeText(result.value.text);
   toast.add({ title: t("pdfToText.copied"), color: "success" });
+}
+
+async function aiDenoise() {
+  if (!result.value) return;
+  try {
+    const r = await aiDenoiseText(result.value.text);
+    if (r.text !== result.value.text) {
+      result.value.text = r.text;
+      toast.add({ title: t("ai.denoised"), color: "success" });
+    }
+  } catch { /* silent */ }
 }
 </script>
 

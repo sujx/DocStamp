@@ -51,6 +51,9 @@ class Config:
     # ── Encryption ──────────────────────────────────────────────────
     ENCRYPTION_KEY = os.environ.get("DOCSTAMP_ENCRYPTION_KEY", "")
 
+    # ── AI ──────────────────────────────────────────────────────────
+    DEEPSEEK_API_KEY = os.environ.get("DOCSTAMP_DEEPSEEK_API_KEY", "")
+
     # ── Frontend Static ─────────────────────────────────────────────
     STATIC_FOLDER = os.environ.get(
         "DOCSTAMP_STATIC",

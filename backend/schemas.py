@@ -151,3 +151,15 @@ class PaginationSchema(BaseModel):
 class TaskPollSchema(BaseModel):
     """Task status polling parameters."""
     task_id: str = Field(..., min_length=1, max_length=64, description="Celery task UUID")
+
+
+# ── AI endpoints ─────────────────────────────────────────────────────────
+
+class AiTextSchema(BaseModel):
+    """Text payload for AI correction / classify / filename endpoints."""
+    text: str = Field(..., min_length=1, max_length=8000, description="Input text")
+
+
+class AiDenoiseSchema(BaseModel):
+    """Text payload for AI denoise endpoint (larger limit)."""
+    text: str = Field(..., min_length=1, max_length=5000, description="PDF-extracted text to clean")
