@@ -23,25 +23,21 @@ PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-tex
 使用统计          → /status
 ```
 
-| # | 模块 | 路由 | 分组 | 说明 |
-|---|------|------|------|------|
-| 1 | 仪表盘 | `/` | — | 数字时钟 + 工具卡片网格（3 列） |
-| 2 | MD 转公文 | `/md-to-docx` | — | Markdown → GB/T 9704-2012 DOCX，实时预览 |
-| 3 | 水印管理 | `/watermark` | — | 添加/去除文字和图片水印 |
-| 4 | 属性修改 | `/properties` | Office | .docx/.xlsx/.pptx 元数据修改 |
-| 5 | Excel 合并 | `/excel-merge` | Office | .xlsx/.csv 结构相同合并 |
-| 6 | 格式规范 | `/format-docx` | Office | GB/T 9704-2012 格式化 |
-| 7 | 格式互转 | `/format-convert` | Office | DOCX/HTML → PDF |
-| 8 | 元数据清理 | `/metadata-clean` | Office | 清除文档元数据，保护隐私 |
-| 9 | 文件组装 | `/file-assembly` | PDF | 图片合并 + PDF 拆解 |
-| 10 | 打印分组 | `/print-split` | PDF | 批次拆分、暂停/继续/终止 |
-| 11 | PDF 编辑 | `/pdf-editor` | PDF | 删除/插入/重排页面 |
-| 12 | PDF 转文本 | `/pdf-to-text` | PDF | 提取 PDF 文本内容 |
-| 13 | PDF 合并 | `/pdf-merge` | PDF | 多 PDF 合并，拖拽排序 |
-| 14 | PDF 压缩 | `/pdf-compress` | PDF | 三级压缩（轻度/中度/深度） |
-| 15 | 页码页眉页脚 | `/page-decorate` | PDF | 添加页码/页眉/页脚 |
-| 16 | 图片处理 | `/image-process` | PDF | 缩放/裁剪/格式转换/压缩 |
-| 17 | **使用统计** | `/status` | — | 模块调用量 + 访客统计 + ECharts 可视化 |
+| # | 模块 | 路由 | 说明 |
+|---|------|------|------|
+| 1 | 仪表盘 | `/` | 数字时钟 + 工具卡片网格（3 列） |
+| 2 | MD 转公文 | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX + AI 纠错 |
+| 3 | 文档转 MD | `/doc-to-md` | PDF/Word/PPT/图片 → Markdown（MinerU API） |
+| 4 | 水印管理 | `/watermark` | 添加/去除文字和图片水印 |
+| 5 | 属性修改 | `/properties` | 元数据修改 + 元数据清理（双 Tab） |
+| 6 | Excel 合并 | `/excel-merge` | .xlsx/.csv 结构相同合并 |
+| 7 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
+| 8 | 文件组装 | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
+| 9 | 打印分组 | `/print-split` | 批次拆分、暂停/继续/终止 |
+| 10 | PDF 编辑 | `/pdf-editor` | 删除/插入/重排页面 |
+| 11 | 调整 PDF | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚（三 Tab） |
+| 12 | PDF 合并 | `/pdf-merge` | 多 PDF 合并，拖拽排序 |
+| 13 | **使用统计** | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
 
 ---
 
@@ -439,6 +435,14 @@ Lite 模式 systemd 服务清单：
 ---
 
 ## 十一、版本历史
+
+### v3.5 (2026-06)
+- **AI 功能（DeepSeek v4 Flash）**：文本纠错（MD 转公文前自动纠正错别字和标点）、格式意图识别（自动检测正式公文并建议 GB/T 格式）、智能文件名生成、PDF 文本去噪（自动去除页眉页脚/水印残留）。Prompt 级缓存（SHA256, 1h TTL），未配 Key 时静默降级返回原文。
+- **文档转 MD（MinerU API）**：新增「文档转MD」功能，支持 PDF/DOC/DOCX/PPT/PPTX/PNG/JPG → Markdown（vlm 模型 + OCR + 公式/表格识别），200MB/200 页限制。异步轮询 + ZIP 提取 + 24h 缓存。`DOCSTAMP_PUBLIC_URL` 配置公网文件访问地址。
+- **功能重组**：元数据清理合并到属性修改（Tab 切换），PDF 转文本/压缩/页码合并为「调整PDF」三合一页面，图片处理功能删除，Office 工具组展开到侧栏顶层。
+- **品牌定名**：鹊随金印，金绿渐变标题（`#c9a84c`→`#008a3d`）印章浮雕质感。
+- **多厂商 AI 支持**：`AI_API_URL` + `AI_MODEL` 环境变量配置，支持 OpenAI / DeepSeek / Ollama 等任意兼容厂商。
+- **Full/Lite 双模式**：Lite（3 容器/4 systemd 服务，~800MB）适配 2C2G ECS；Full（6 容器）高并发。统一部署脚本 `docker-deploy.sh`。
 
 ### v3.4 (2026-06)
 - **Docker 生产加固**：6 容器全健康检查体系（Redis ping / API curl / Worker celery ping / Beat pgrep），`depends_on condition: service_healthy` 确保启动顺序正确

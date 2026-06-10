@@ -1,26 +1,36 @@
 # 鹊随金印 (docStamp) — 文档处理工具箱
 
-一站式文档处理 Web 应用，16 大功能模块。即开即用，无需注册。
+一站式文档处理 Web 应用，13 大功能模块。即开即用，无需注册。
 
 ## 功能
 
 | # | 功能 | 路由 | 说明 |
 |---|------|------|------|
-| 1 | **MD 转公文** | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX，实时预览 |
-| 2 | **水印管理** | `/watermark` | 添加/去除文字和图片水印 |
-| 3 | **属性修改** | `/properties` | 修改 .docx/.xlsx/.pptx 元数据（批量+统一时间） |
-| 4 | **Excel 合并** | `/excel-merge` | 合并 .xlsx/.csv（同结构） |
-| 5 | **格式规范** | `/format-docx` | DOCX 按 GB/T 9704-2012 格式化 |
-| 6 | **元数据清理** | `/metadata-clean` | 清除文档元数据，保护隐私 |
-| 8 | **文件组装** | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
-| 9 | **打印分组** | `/print-split` | 按批次拆分 PDF（暂停/继续/终止） |
-| 10 | **PDF 编辑** | `/pdf-editor` | 删除/插入/重排页面，缩略图预览 |
-| 11 | **PDF 转文本** | `/pdf-to-text` | 提取 PDF 文本内容 |
-| 12 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
-| 13 | **PDF 压缩** | `/pdf-compress` | 三级压缩（轻度/中度/深度） |
-| 14 | **页码页眉页脚** | `/page-decorate` | 添加页码/页眉/页脚到 PDF |
-| 15 | **图片处理** | `/image-process` | 缩放/裁剪/格式转换/压缩 |
-| 16 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts 可视化） |
+| 1 | **MD 转公文** | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX + AI 纠错 |
+| 2 | **文档转 MD** | `/doc-to-md` | PDF/Word/PPT/图片 → Markdown（MinerU）|
+| 3 | **水印管理** | `/watermark` | 添加/去除文字和图片水印 |
+| 4 | **属性修改** | `/properties` | 元数据修改 + 清理（双 Tab） |
+| 5 | **Excel 合并** | `/excel-merge` | 合并 .xlsx/.csv（同结构） |
+| 6 | **格式规范** | `/format-docx` | DOCX 按 GB/T 9704-2012 格式化 |
+| 7 | **文件组装** | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
+| 8 | **打印分组** | `/print-split` | 按批次拆分 PDF |
+| 9 | **PDF 编辑** | `/pdf-editor` | 删除/插入/重排页面 |
+| 10 | **调整 PDF** | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚 |
+| 11 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
+| 12 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
+
+### AI 功能
+
+| 功能 | 说明 | 接入方式 |
+|------|------|------|
+| 文本纠错 | MD 转公文前自动纠正错别字和标点 | DeepSeek v4 Flash |
+| 格式识别 | 自动检测正式公文，建议 GB/T 格式 | DeepSeek v4 Flash |
+| 智能文件名 | 根据文档内容生成中文文件名 | DeepSeek v4 Flash |
+| PDF 去噪 | 自动去除页眉页脚、水印残留 | DeepSeek v4 Flash |
+| 文档转 MD | PDF/Word/PPT → Markdown | MinerU API |
+
+配置 `DOCSTAMP_DEEPSEEK_API_KEY` + `DOCSTAMP_MINERU_API_KEY` 即可启用。
+支持 OpenAI / Ollama / 硅基流动等任何兼容 API（`AI_API_URL` + `AI_MODEL`）。
 
 ## 技术栈
 
@@ -29,6 +39,7 @@
 | **后端框架** | Python Flask + Pydantic v2 + Flask-CORS + Flask-Babel + Flask-Caching |
 | **异步任务** | Celery（Redis broker）+ 3 队列 + SSE 进度推送 |
 | **文档处理** | pandoc / pypdf / Pillow / reportlab / pdfminer.six / python-docx / openpyxl |
+| **AI** | DeepSeek v4 Flash + MinerU API（可选，不配 Key 自动降级） |
 | **前端框架** | Nuxt 3.15.4 (SPA) + Nuxt UI v2 + Tailwind CSS v3 |
 | **国际化** | @nuxtjs/i18n v9（zh-CN / en） |
 | **部署** | Gunicorn gthread + Nginx + Docker Compose + Systemd |
