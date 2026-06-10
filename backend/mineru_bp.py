@@ -90,7 +90,7 @@ def doc_to_md():
         cleanup_files(filepath)
         return jsonify({"code": 502, "msg": f"MinerU submit failed: {e}"}), 502
 
-    task_id = task.get("task_id")
+    task_id = task.get("data", {}).get("task_id") or task.get("task_id")
     if not task_id:
         cleanup_files(filepath)
         return jsonify({"code": 502, "msg": "MinerU did not return task_id"}), 502
@@ -110,11 +110,10 @@ def doc_to_md():
         except Exception:
             continue
 
-        state = status.get("state", "")
-        if state == "success":
-            zip_url = (
-                status.get("data", {}).get("download_url")
-                or status.get("download_url", "")
+        data = status.get("data", {})
+        state = data.get("state", status.get("state", ""))
+        if state in ("done", "success"):
+            zip_url = data.get("full_zip_url") or data.get("download_url") or ""
             )
             if zip_url:
                 try:
