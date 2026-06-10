@@ -10,7 +10,7 @@ the input unchanged with an empty/silent response.
 import hashlib
 import json
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 
 from cache import cache
 from config import Config
@@ -83,9 +83,9 @@ def _parse_json(raw: str | None) -> dict:
 
 @ai_bp.route("/api/v1/ai/correct", methods=["POST"])
 @validate_request(body=AiTextSchema)
-def ai_correct():
+def ai_correct(body: AiTextSchema):
     """Correct typos and punctuation in Markdown text."""
-    text = request.parsed_body["text"]
+    text = body.text
     if not text.strip():
         return jsonify({"text": text, "changed": False})
 
@@ -101,9 +101,9 @@ def ai_correct():
 
 @ai_bp.route("/api/v1/ai/classify", methods=["POST"])
 @validate_request(body=AiTextSchema)
-def ai_classify():
+def ai_classify(body: AiTextSchema):
     """Detect if text is an official government document."""
-    text = request.parsed_body["text"][:1500]
+    text = body.text[:1500]
     if not text.strip():
         return jsonify({"is_official": False, "confidence": 0})
 
@@ -122,9 +122,9 @@ def ai_classify():
 
 @ai_bp.route("/api/v1/ai/suggest-filename", methods=["POST"])
 @validate_request(body=AiTextSchema)
-def ai_suggest_filename():
+def ai_suggest_filename(body: AiTextSchema):
     """Suggest a Chinese filename based on document content."""
-    text = request.parsed_body["text"][:1000]
+    text = body.text[:1000]
     if not text.strip():
         return jsonify({"filename": ""})
 
@@ -140,9 +140,9 @@ def ai_suggest_filename():
 
 @ai_bp.route("/api/v1/ai/denoise", methods=["POST"])
 @validate_request(body=AiDenoiseSchema)
-def ai_denoise():
+def ai_denoise(body: AiDenoiseSchema):
     """Remove header/footer/watermark noise from PDF-extracted text."""
-    text = request.parsed_body["text"]
+    text = body.text
     if not text.strip():
         return jsonify({"text": text})
 
