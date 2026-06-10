@@ -38,9 +38,16 @@ for f in /etc/docstamp/env.conf "$PROJECT_DIR/.env"; do
 done
 
 # ── Start Gunicorn ─────────────────────────────────────────────────
+# Prefer venv gunicorn (has all deps). Fall back to system gunicorn.
+if [[ -x "$BACKEND_DIR/.venv/bin/gunicorn" ]]; then
+    GUNICORN="$BACKEND_DIR/.venv/bin/gunicorn"
+    log_info "使用 venv gunicorn"
+else
+    GUNICORN="gunicorn"
+fi
 log_info "启动 Gunicorn (4 workers, :$BACKEND_PORT)..."
 cd "$BACKEND_DIR"
-gunicorn -c gunicorn.conf.py wsgi:app &
+"$GUNICORN" -c gunicorn.conf.py wsgi:app &
 GUNICORN_PID=$!
 cd "$PROJECT_DIR"
 
