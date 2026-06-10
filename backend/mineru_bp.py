@@ -20,7 +20,6 @@ from utils.base.file_helpers import cleanup_files, save_upload
 mineru_bp = Blueprint("mineru", __name__)
 
 MINERU_URL = "https://mineru.net/api/v4/extract/task"
-API_KEY = os.environ.get("DOCSTAMP_MINERU_API_KEY", "")
 ALLOWED_EXTS = {"pdf", "doc", "docx", "ppt", "pptx", "png", "jpg", "jpeg"}
 POLL_INTERVAL = 3
 MAX_POLLS = 60
@@ -65,7 +64,7 @@ def doc_to_md():
     filename = os.path.basename(filepath)
     file_url = f"{server_url}/api/v1/download/{filename}"
 
-    if not API_KEY:
+    if not Config.MINERU_API_KEY:
         cleanup_files(filepath)
         return jsonify({"code": 503, "msg": "MinerU API key not configured. Set DOCSTAMP_MINERU_API_KEY."}), 503
 
@@ -75,7 +74,7 @@ def doc_to_md():
     try:
         resp = requests.post(
             MINERU_URL,
-            headers={"Authorization": f"Bearer {API_KEY}"},
+            headers={"Authorization": f"Bearer {Config.MINERU_API_KEY}"},
             json={
                 "url": file_url,
                 "model_version": "vlm",
@@ -103,7 +102,7 @@ def doc_to_md():
         try:
             sr = requests.get(
                 f"{MINERU_URL}/{task_id}",
-                headers={"Authorization": f"Bearer {API_KEY}"},
+                headers={"Authorization": f"Bearer {Config.MINERU_API_KEY}"},
                 timeout=10,
             )
             sr.raise_for_status()
