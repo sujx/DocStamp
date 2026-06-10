@@ -266,7 +266,7 @@ _update_local() {
         flask flask-cors flask-babel flask-caching \
         python-docx openpyxl python-pptx markdown bleach \
         img2pdf pypdf Pillow reportlab gunicorn pydantic \
-        celery redis cryptography weasyprint pdfminer.six
+        celery redis cryptography pdfminer.six requests
 
     # Rebuild frontend
     cd "$FRONTEND_DIR"
