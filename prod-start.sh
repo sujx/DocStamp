@@ -28,6 +28,15 @@ else
     log_info "前端已构建，跳过 build"
 fi
 
+# ── Load environment ───────────────────────────────────────────────
+# Priority: /etc/docstamp/env.conf > project .env > shell env
+for f in /etc/docstamp/env.conf "$PROJECT_DIR/.env"; do
+  if [[ -f "$f" ]]; then
+    set -a; source "$f"; set +a
+    log_info "已加载环境变量: $f"
+  fi
+done
+
 # ── Start Gunicorn ─────────────────────────────────────────────────
 log_info "启动 Gunicorn (4 workers, :$BACKEND_PORT)..."
 cd "$BACKEND_DIR"
