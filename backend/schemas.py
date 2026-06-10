@@ -162,4 +162,4 @@ class AiTextSchema(BaseModel):
 
 class AiDenoiseSchema(BaseModel):
     """Text payload for AI denoise endpoint (larger limit)."""
-    text: str = Field(..., min_length=1, max_length=5000, description="PDF-extracted text to clean")
+    text: str = Field(..., min_length=1, max_length=8000, description="PDF-extracted text to clean")

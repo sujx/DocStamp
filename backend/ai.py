@@ -147,11 +147,16 @@ def ai_denoise(body: AiDenoiseSchema):
     if not text.strip():
         return jsonify({"text": text})
 
-    prompt = (
-        "去除以下 PDF 提取文本中的噪音（页眉、页脚、页码、水印残留、重复标题行）。\n"
-        "保留正文、段落结构、表格、作者署名和落款。\n"
-        "返回 JSON：{\"text\": \"去噪后的全文\"}\n\n" + text[:5000]
+    system = (
+        '你是 PDF 文本清理专家。去除从 PDF 提取的文本中的噪音，保留正文完整性。\n'
+        '需要去除：\n'
+        '1. 页眉（如"第 X 页""Chapter X"）\n'
+        '2. 页脚（如页码、版权声明"© 2025 xxx"）\n'
+        '3. 水印文字残留（如"DRAFT""CONFIDENTIAL""草稿"）\n'
+        '4. 重复的标题行（每页顶部重复出现的内容）\n'
+        '不要去除：正文内容、段落结构、表格数据、作者署名和落款。\n'
+        '返回 JSON：{"text": "去噪后的全文"}'
     )
-    result = _parse_json(_call(prompt, "你是 PDF 文本清理助手。"))
+    result = _parse_json(_call(text[:8000], system))
 
     return jsonify({"text": result.get("text", text)})
