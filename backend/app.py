@@ -120,14 +120,12 @@ def create_app() -> Flask:
     from blueprints.pdf_compress_bp import pdf_compress_bp
     from blueprints.metadata_clean_bp import metadata_clean_bp
     from blueprints.page_decorate_bp import page_decorate_bp
-    from blueprints.image_process_bp import image_process_bp
     from blueprints.stats_bp import stats_bp
     from ai import ai_bp
 
     app.register_blueprint(pdf_compress_bp)
     app.register_blueprint(metadata_clean_bp)
     app.register_blueprint(page_decorate_bp)
-    app.register_blueprint(image_process_bp)
     app.register_blueprint(stats_bp)
     app.register_blueprint(ai_bp)
 
@@ -185,6 +183,3 @@ def create_app() -> Flask:
 
 if __name__ == "__main__":
     create_app().run(host="0.0.0.0", port=5000, debug=True)
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)

@@ -20,7 +20,6 @@ export const TOOLS: ToolDef[] = [
   { key: "dashboard", to: "/", icon: "i-heroicons-home", label: "tabs.dashboard", desc: "dashboard.description", order: 1 },
   { key: "md2docx", to: "/md-to-docx", icon: "i-heroicons-arrow-down-tray", label: "tabs.md2docx", desc: "md2docx.description", order: 2 },
   { key: "watermark", to: "/watermark", icon: "i-heroicons-beaker", label: "tabs.watermarkManagement", desc: "watermark.description", order: 3 },
-  { key: "image-process", to: "/image-process", icon: "i-heroicons-photo", label: "tabs.imageProcess", desc: "imageProcess.description", order: 4 },
 
   // ── Office 工具组 ──
   { key: "properties", to: "/properties", icon: "i-heroicons-document-text", label: "tabs.properties", desc: "properties.description", group: "office", order: 10 },
@@ -31,7 +30,7 @@ export const TOOLS: ToolDef[] = [
   { key: "file-assembly", to: "/file-assembly", icon: "i-heroicons-arrows-right-left", label: "tabs.fileAssembly", desc: "img2pdf.description", group: "pdf", order: 20 },
   { key: "print-split", to: "/print-split", icon: "i-heroicons-printer", label: "tabs.printSplit", desc: "printSplit.description", group: "pdf", order: 21 },
   { key: "pdf-editor", to: "/pdf-editor", icon: "i-heroicons-document", label: "tabs.pdfEditor", desc: "pdfEditor.description", group: "pdf", order: 22 },
-  { key: "pdf-tools", to: "/pdf-tools", icon: "i-heroicons-wrench-screwdriver", label: "tabs.pdfTools2", desc: "pdfTools2.description", group: "pdf", order: 23 },
+  { key: "pdf-tools", to: "/pdf-tools", icon: "i-heroicons-wrench-screwdriver", label: "tabs.pdf-tools", desc: "pdf-tools.description", group: "pdf", order: 23 },
   { key: "pdf-merge", to: "/pdf-merge", icon: "i-heroicons-plus-circle", label: "tabs.pdfMerge", desc: "pdfMerge.description", group: "pdf", order: 24 },
 
   // ── 顶层 ──

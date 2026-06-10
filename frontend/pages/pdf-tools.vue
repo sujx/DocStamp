@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-3xl mx-auto px-6 py-8">
-    <PageHeader :title="$t('pdfTools2.title')" :description="$t('pdfTools2.description')" />
+    <PageHeader :title="$t('pdf-tools.title')" :description="$t('pdf-tools.description')" />
     <UTabs :items="tabs" class="mb-6">
       <template #text><PdfToTextPanel /></template>
       <template #compress><PdfCompressPanel /></template>

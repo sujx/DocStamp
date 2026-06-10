@@ -8,9 +8,9 @@ granularity.
 Usage:
     from utils.rate_limit import rate_limit
 
-    @app.route("/api/image-process", methods=["POST"])
+    @app.route("/api/v1/convert", methods=["POST"])
     @rate_limit(max_requests=5, window_seconds=60)
-    def image_process():
+    def convert():
         ...
 """
 
