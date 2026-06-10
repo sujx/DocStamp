@@ -52,7 +52,7 @@ RUN pip install --break-system-packages --no-cache-dir --root-user-action=ignore
 COPY backend/ ./backend/
 
 # Python path — needed so that 'from config import Config' works inside the
-# backend package when gunicorn imports 'backend.app:app'
+# backend package when gunicorn imports 'backend.wsgi:app'
 ENV PYTHONPATH=/opt/docstamp/backend
 
 # Copy frontend static build
@@ -76,5 +76,6 @@ EXPOSE 5000
 
 # -b 0.0.0.0:5000 overrides gunicorn.conf.py's 127.0.0.1 binding for Docker
 # --pid /tmp/gunicorn.pid avoids /var/run permission issues with non-root user
+# Uses wsgi.py (not app.py) to avoid module-level side effects on import
 CMD ["gunicorn", "-c", "backend/gunicorn.conf.py", "-b", "0.0.0.0:5000", \
-     "--pid", "/tmp/gunicorn.pid", "backend.app:app"]
+     "--pid", "/tmp/gunicorn.pid", "backend.wsgi:app"]

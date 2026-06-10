@@ -175,9 +175,14 @@ def create_app() -> Flask:
     return app
 
 
-# ── Entry point ─────────────────────────────────────────────────────
+# ── Entry points ────────────────────────────────────────────────────
+# Production: Gunicorn calls `backend.wsgi:app` where wsgi.py does
+#   `from app import create_app; app = create_app()`
+# Development: `python3 app.py` triggers the block below.
+# NEVER import this module at module level — use create_app() factory.
 
-app = create_app()
+if __name__ == "__main__":
+    create_app().run(host="0.0.0.0", port=5000, debug=True)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

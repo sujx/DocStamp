@@ -3,7 +3,7 @@
 Uses raw SQL with parameterized queries — no ORM dependency.
 Two tables: task_records (Celery task lifecycle) and operation_logs (audit trail).
 
-Lightweight SQLite backend; the BaseCRUD class provides reusable patterns.
+Lightweight SQLite backend with WAL mode and thread-local connections.
 """
 
 import sqlite3
@@ -17,7 +17,7 @@ _local = threading.local()
 
 
 def _get_db(db_path: str) -> sqlite3.Connection:
-    """Get a thread-local SQLite connection."""
+    """Get or create a thread-local SQLite connection (WAL, FK, busy timeout)."""
     if not hasattr(_local, "connections"):
         _local.connections = {}
     if db_path not in _local.connections:
@@ -30,9 +30,23 @@ def _get_db(db_path: str) -> sqlite3.Connection:
     return _local.connections[db_path]
 
 
+def close_db(db_path: str) -> None:
+    """Close the thread-local connection for the given database path."""
+    conns = getattr(_local, "connections", {})
+    conn = conns.pop(db_path, None)
+    if conn:
+        conn.close()
+
+
 # ── Schema ──────────────────────────────────────────────────────────────
 
 SCHEMA_SQL = """
+-- Schema versioning — allows safe migration in future releases
+CREATE TABLE IF NOT EXISTS schema_version (
+    version INTEGER PRIMARY KEY,
+    applied_at TEXT DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS task_records (
     id TEXT PRIMARY KEY,
     task_type TEXT NOT NULL,
@@ -68,11 +82,29 @@ CREATE INDEX IF NOT EXISTS idx_operation_logs_created ON operation_logs(created_
 CREATE INDEX IF NOT EXISTS idx_operation_logs_type ON operation_logs(operation_type);
 """
 
+CURRENT_SCHEMA_VERSION = 1
+
 
 def init_db(db_path: str) -> None:
-    """Initialize the database schema (idempotent)."""
+    """Initialize database schema and apply any pending migrations.
+
+    Idempotent — safe to call at every startup. The schema_version table
+    tracks which migrations have been applied so we can add tables/columns
+    in future releases without breaking existing installations.
+    """
     conn = _get_db(db_path)
     conn.executescript(SCHEMA_SQL)
+
+    # Record schema version so future migrations can be selective
+    existing = conn.execute(
+        "SELECT version FROM schema_version ORDER BY version DESC LIMIT 1"
+    ).fetchone()
+
+    if existing is None or existing["version"] < CURRENT_SCHEMA_VERSION:
+        conn.execute(
+            "INSERT OR REPLACE INTO schema_version (version) VALUES (?)",
+            (CURRENT_SCHEMA_VERSION,),
+        )
     conn.commit()
 
 

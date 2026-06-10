@@ -31,7 +31,7 @@ fi
 # ── Start Gunicorn ─────────────────────────────────────────────────
 log_info "启动 Gunicorn (4 workers, :$BACKEND_PORT)..."
 cd "$BACKEND_DIR"
-gunicorn -c gunicorn.conf.py app:app &
+gunicorn -c gunicorn.conf.py wsgi:app &
 GUNICORN_PID=$!
 cd "$PROJECT_DIR"
 
