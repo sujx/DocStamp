@@ -2,7 +2,7 @@
   <div class="max-w-3xl mx-auto px-6 py-8">
     <PageHeader :title="$t('metadataClean.title')" :description="$t('metadataClean.description')" />
 
-    <div class="card" >
+    <div class="card bg-surface border-default" >
       <FileUploader
         :accept="'.docx,.xlsx,.pptx,.pdf'"
         :max-size="100"
@@ -17,7 +17,7 @@
         </UButton>
       </div>
 
-      <div v-if="result" class="mt-4 text-sm" >
+      <div v-if="result" class="mt-4 text-sm text-secondary" >
         {{ $t("metadataClean.fieldsRemoved", { n: result.fields_cleaned }) }}
       </div>
     </div>

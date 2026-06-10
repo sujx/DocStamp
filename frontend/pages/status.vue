@@ -1,9 +1,9 @@
 <template>
   <div class="max-w-6xl mx-auto px-6 py-8">
-    <h2 class="text-2xl font-bold mb-1.5 text-balance" >
+    <h2 class="text-2xl font-bold mb-1.5 text-balance text-primary" >
       {{ $t("status.title") }}
     </h2>
-    <p class="text-sm mb-8 text-pretty" >
+    <p class="text-sm mb-8 text-pretty text-secondary" >
       {{ $t("status.description") }}
     </p>
 
@@ -14,11 +14,11 @@
         <div
           v-for="i in 2" :key="'sum-'+i"
           class="rounded-lg p-5 animate-pulse"
-          
+          :style="{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-default)', borderTop: '3px solid var(--color-border-default)', boxShadow: 'var(--shadow-card)' }"
         >
-          <div class="h-3 w-20 rounded mb-2"  />
-          <div class="h-8 w-20 rounded mb-2"  />
-          <div class="h-3 w-24 rounded"  />
+          <div class="h-3 w-20 rounded mb-2 bg-muted"  />
+          <div class="h-8 w-20 rounded mb-2 bg-muted"  />
+          <div class="h-3 w-24 rounded bg-muted"  />
         </div>
       </div>
       <!-- Chart skeleton row -->
@@ -26,30 +26,30 @@
         <div
           v-for="i in 2" :key="'chart-'+i"
           class="rounded-lg p-5 animate-pulse"
-          
+          :style="{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-default)', boxShadow: 'var(--shadow-card)' }"
         >
-          <div class="h-4 w-28 rounded mb-4 pb-3 border-b" >
-            <div class="h-4 w-28 rounded"  />
+          <div class="h-4 w-28 rounded mb-4 pb-3 border-b border-subtle" >
+            <div class="h-4 w-28 rounded bg-muted"  />
           </div>
-          <div class="h-80 rounded"  />
+          <div class="h-80 rounded bg-muted"  />
         </div>
       </div>
       <!-- Line chart skeleton -->
       <div
         class="rounded-lg p-5 animate-pulse"
-        
+        :style="{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-default)', boxShadow: 'var(--shadow-card)' }"
       >
-        <div class="h-4 w-28 rounded mb-4 pb-3 border-b" >
-          <div class="h-4 w-28 rounded"  />
+        <div class="h-4 w-28 rounded mb-4 pb-3 border-b border-subtle" >
+          <div class="h-4 w-28 rounded bg-muted"  />
         </div>
-        <div class="h-72 rounded"  />
+        <div class="h-72 rounded bg-muted"  />
       </div>
     </div>
 
     <!-- No data state -->
     <div v-else-if="!data || data.total === 0" class="py-20 text-center">
-      <UIcon name="i-heroicons-chart-bar" class="size-12 mx-auto mb-4"  />
-      <p class="text-sm mb-4" >{{ $t("status.noData") }}</p>
+      <UIcon name="i-heroicons-chart-bar" class="size-12 mx-auto mb-4 text-tertiary"  />
+      <p class="text-sm mb-4 text-secondary" >{{ $t("status.noData") }}</p>
       <UButton
         :label="$t('status.seedData')"
         :loading="seeding"
@@ -65,23 +65,23 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <div
           class="rounded-lg p-5"
-          
+          :style="{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-default)', borderTop: '3px solid var(--color-brand-700)', boxShadow: 'var(--shadow-card)' }"
         >
-          <p class="text-xs font-medium uppercase mb-2" >
+          <p class="text-xs font-medium uppercase mb-2 text-tertiary" >
             {{ $t("status.totalCalls") }}
           </p>
-          <p class="text-3xl font-bold tabular-nums" >{{ data.total.toLocaleString() }}</p>
-          <p class="text-xs mt-2" >{{ $t("status.days", { n: data.days }) }}</p>
+          <p class="text-3xl font-bold tabular-nums text-brand-700" >{{ data.total.toLocaleString() }}</p>
+          <p class="text-xs mt-2 text-tertiary" >{{ $t("status.days", { n: data.days }) }}</p>
         </div>
         <div
           class="rounded-lg p-5"
-          
+          :style="{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-default)', borderTop: '3px solid var(--color-brand-700)', boxShadow: 'var(--shadow-card)' }"
         >
-          <p class="text-xs font-medium uppercase mb-2" >
+          <p class="text-xs font-medium uppercase mb-2 text-tertiary" >
             {{ $t("status.visitors") }}
           </p>
-          <p class="text-3xl font-bold tabular-nums" >{{ data.unique_visitors.toLocaleString() }}</p>
-          <p class="text-xs mt-2" >{{ $t("status.days", { n: data.days }) }}</p>
+          <p class="text-3xl font-bold tabular-nums text-brand-700" >{{ data.unique_visitors.toLocaleString() }}</p>
+          <p class="text-xs mt-2 text-tertiary" >{{ $t("status.days", { n: data.days }) }}</p>
         </div>
       </div>
 
@@ -90,9 +90,9 @@
         <!-- Bar chart: module distribution -->
         <div
           class="rounded-lg p-5"
-          
+          :style="{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-default)', boxShadow: 'var(--shadow-card)' }"
         >
-          <h3 class="text-sm font-semibold mb-4 pb-3 border-b" >
+          <h3 class="text-sm font-semibold mb-4 pb-3 border-b" :style="{ color: 'var(--color-text-primary)', borderColor: 'var(--color-border-subtle)' }">
             {{ $t("status.byModule") }}
           </h3>
           <VChart :option="barOption" autoresize class="w-full" style="height: 320px" />
@@ -101,9 +101,9 @@
         <!-- Pie chart: module share -->
         <div
           class="rounded-lg p-5"
-          
+          :style="{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-default)', boxShadow: 'var(--shadow-card)' }"
         >
-          <h3 class="text-sm font-semibold mb-4 pb-3 border-b" >
+          <h3 class="text-sm font-semibold mb-4 pb-3 border-b" :style="{ color: 'var(--color-text-primary)', borderColor: 'var(--color-border-subtle)' }">
             {{ $t("status.modulePie") }}
           </h3>
           <VChart :option="pieOption" autoresize class="w-full" style="height: 320px" />
@@ -113,9 +113,9 @@
       <!-- Line chart: daily trend -->
       <div
         class="rounded-lg p-5"
-        
+        :style="{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-default)', boxShadow: 'var(--shadow-card)' }"
       >
-        <h3 class="text-sm font-semibold mb-4 pb-3 border-b" >
+        <h3 class="text-sm font-semibold mb-4 pb-3 border-b" :style="{ color: 'var(--color-text-primary)', borderColor: 'var(--color-border-subtle)' }">
           {{ $t("status.dailyTrend") }}
         </h3>
         <VChart :option="lineOption" autoresize class="w-full" style="height: 300px" />

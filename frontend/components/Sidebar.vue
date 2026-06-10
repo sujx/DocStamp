@@ -1,15 +1,13 @@
 <template>
   <!-- Hamburger toggle (mobile only) -->
   <button
-    class="fixed top-3 left-3 z-50 lg:hidden flex items-center justify-center size-11 rounded-lg transition-[background-color] duration-150 cursor-pointer"
-    
+    class="fixed top-3 left-3 z-50 lg:hidden flex items-center justify-center size-11 rounded-lg transition-[background-color] duration-150 cursor-pointer bg-surface shadow-elevated"
     :aria-label="mobileOpen ? '关闭导航' : '打开导航'"
     @click="mobileOpen = !mobileOpen"
   >
     <UIcon
       :name="mobileOpen ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'"
-      class="size-5"
-      
+      class="size-5 text-primary"
     />
   </button>
 
@@ -24,18 +22,16 @@
 
   <!-- Sidebar -->
   <aside
-    class="fixed left-0 top-0 h-full z-40 flex flex-col border-r transition-[width,transform] duration-150 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]"
+    class="fixed left-0 top-0 h-full z-40 flex flex-col border-r transition-[width,transform] duration-150 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] bg-surface border-default shadow-sidebar"
     :class="[
       collapsed && !isMobile ? 'w-16' : 'w-60',
       isMobile && !mobileOpen ? '-translate-x-full' : 'translate-x-0',
     ]"
-    
   >
     <!-- Logo -->
     <div
-      class="flex items-center h-14 px-4 border-b shrink-0"
+      class="flex items-center h-14 px-4 border-b shrink-0 border-subtle"
       :class="collapsed && !isMobile ? 'justify-center' : 'gap-3'"
-      
     >
       <img src="/logo.svg" alt="鹊随金印" class="size-8 shrink-0" />
       <span v-if="!(collapsed && !isMobile)" class="brand-title truncate">鹊随金印</span>
@@ -84,8 +80,7 @@
             <UIcon
               v-if="!(collapsed && !isMobile)"
               :name="hoverGroup === item.key ? 'i-heroicons-chevron-down' : 'i-heroicons-chevron-right'"
-              class="size-3.5 shrink-0 transition-transform duration-150"
-              
+              class="size-3.5 shrink-0 transition-transform duration-150 text-tertiary"
             />
           </button>
 
@@ -93,9 +88,8 @@
           <Transition name="submenu-fade">
             <div
               v-if="hoverGroup === item.key"
-              class="absolute z-50 py-1.5 rounded-lg min-w-[168px]"
+              class="absolute z-50 py-1.5 rounded-lg min-w-[168px] bg-surface border border-default shadow-elevated"
               :class="(collapsed && !isMobile) ? 'left-full top-0 ml-2' : 'left-2 right-2 top-full mt-1'"
-              
             >
               <NuxtLink
                 v-for="child in item.children"
@@ -117,7 +111,7 @@
     </nav>
 
     <!-- Bottom: language + collapse -->
-    <div class="px-2 py-2.5 border-t space-y-1.5 shrink-0 overflow-hidden" >
+    <div class="px-2 py-2.5 border-t space-y-1.5 shrink-0 overflow-hidden border-subtle" >
       <LanguageSwitcher :collapsed="collapsed && !isMobile" />
       <UButton
         v-if="!isMobile"

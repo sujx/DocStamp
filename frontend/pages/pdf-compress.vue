@@ -2,7 +2,7 @@
   <div class="max-w-3xl mx-auto px-6 py-8">
     <PageHeader :title="$t('pdfCompress.title')" :description="$t('pdfCompress.description')" />
 
-    <div class="card" >
+    <div class="card bg-surface border-default" >
       <FileUploader
         :accept="'.pdf'"
         :max-size="100"
@@ -12,8 +12,8 @@
 
       <UFormGroup v-if="file" :label="$t('pdfCompress.quality')" class="mt-4">
         <div class="flex gap-3">
-          <label v-for="q in qualities" :key="q.key" class="flex items-center gap-1.5 cursor-pointer text-sm" >
-            <input v-model="quality" type="radio" :value="q.key" class="accent-brand-700" />
+          <label v-for="q in qualities" :key="q.key" class="flex items-center gap-1.5 cursor-pointer text-sm text-primary" >
+            <input v-model="quality" type="radio" :value="q.key" class="accent-[var(--color-brand-700)]" />
             {{ q.label }}
           </label>
         </div>
@@ -26,15 +26,15 @@
         </UButton>
       </div>
 
-      <div v-if="stats" class="mt-6 p-4 rounded-lg border" >
+      <div v-if="stats" class="mt-6 p-4 rounded-lg border bg-brand-soft border-default" >
         <div class="text-sm space-y-1">
-          <div >
+          <div :style="{ color: 'var(--color-text-secondary)' }">
             {{ $t("pdfCompress.originalSize") }}: <strong>{{ formatSize(stats.original_size) }}</strong>
           </div>
-          <div >
+          <div :style="{ color: 'var(--color-text-secondary)' }">
             {{ $t("pdfCompress.compressedSize") }}: <strong>{{ formatSize(stats.compressed_size) }}</strong>
           </div>
-          <div >
+          <div :style="{ color: 'var(--color-brand-700)' }">
             {{ $t("pdfCompress.ratio") }}: <strong>{{ stats.ratio }}%</strong>
           </div>
         </div>

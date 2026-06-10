@@ -1,7 +1,7 @@
 <template>
   <div class="pt-3">
     <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("watermark.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty" >{{ $t("watermark.description") }}</p>
+    <p class="text-sm mb-5 text-pretty text-secondary" >{{ $t("watermark.description") }}</p>
 
     <FileUploader
       ref="uploader"
@@ -11,14 +11,14 @@
       @reset="selectedFile = null"
     />
 
-    <div v-if="selectedFile" class="p-4 mt-4 rounded-lg" >
+    <div v-if="selectedFile" class="p-4 mt-4 rounded-lg bg-surface" >
       <!-- Type toggle -->
       <div class="flex gap-4 mb-4">
-        <label class="flex items-center gap-1.5 text-sm cursor-pointer" >
+        <label class="flex items-center gap-1.5 text-sm cursor-pointer text-primary" >
           <input type="radio" v-model="params.watermark_type" value="text" class="accent-green-700" />
           {{ $t("watermark.typeText") }}
         </label>
-        <label class="flex items-center gap-1.5 text-sm cursor-pointer" >
+        <label class="flex items-center gap-1.5 text-sm cursor-pointer text-primary" >
           <input type="radio" v-model="params.watermark_type" value="image" class="accent-green-700" />
           {{ $t("watermark.typeImage") }}
         </label>
@@ -56,21 +56,21 @@
 
         <UFormGroup :label="$t('watermark.opacity')">
           <input type="range" min="0" max="1" step="0.05" v-model.number="params.opacity" class="w-full accent-green-700" />
-          <span class="text-xs text-pretty" >{{ params.opacity }}</span>
+          <span class="text-xs text-pretty text-tertiary" >{{ params.opacity }}</span>
         </UFormGroup>
 
         <UFormGroup :label="$t('watermark.rotation')">
           <input type="range" min="-180" max="180" step="5" v-model.number="params.rotation" class="w-full accent-green-700" />
-          <span class="text-xs text-pretty" >{{ params.rotation }}&deg;</span>
+          <span class="text-xs text-pretty text-tertiary" >{{ params.rotation }}&deg;</span>
         </UFormGroup>
 
         <UFormGroup :label="$t('watermark.position')" class="md:col-span-2">
           <div class="flex gap-4">
-            <label class="flex items-center gap-1.5 text-sm cursor-pointer" >
+            <label class="flex items-center gap-1.5 text-sm cursor-pointer text-primary" >
               <input type="radio" v-model="params.position" value="tile" class="accent-green-700" />
               {{ $t("watermark.positionTile") }}
             </label>
-            <label class="flex items-center gap-1.5 text-sm cursor-pointer" >
+            <label class="flex items-center gap-1.5 text-sm cursor-pointer text-primary" >
               <input type="radio" v-model="params.position" value="center" class="accent-green-700" />
               {{ $t("watermark.positionCenter") }}
             </label>
@@ -89,7 +89,7 @@
 
       <!-- Preview canvas -->
       <div class="mb-4">
-        <p class="text-xs mb-2" >{{ $t("watermark.preview") }}</p>
+        <p class="text-xs mb-2 text-tertiary" >{{ $t("watermark.preview") }}</p>
         <canvas ref="previewCanvas" class="w-full rounded border" style="height:280px; border-color:#e8e6d8;"></canvas>
       </div>
 

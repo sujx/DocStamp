@@ -10,9 +10,9 @@
   >
     <!-- Empty state -->
     <div v-if="!fileName" class="flex flex-col items-center gap-2">
-      <UIcon :name="icon" class="w-8 h-8"  />
-      <p class="text-sm" >{{ $t("common.uploadHint") }}</p>
-      <p v-if="hint" class="text-xs text-pretty" >{{ hint }}</p>
+      <UIcon :name="icon" class="w-8 h-8 text-tertiary"  />
+      <p class="text-sm text-secondary" >{{ $t("common.uploadHint") }}</p>
+      <p v-if="hint" class="text-xs text-pretty text-tertiary" >{{ hint }}</p>
       <label class="cursor-pointer">
         <UButton color="primary" variant="soft" as="span">
           {{ $t("common.upload") }}
@@ -29,10 +29,10 @@
 
     <!-- File selected -->
     <div v-else class="flex items-center gap-3 text-left">
-      <UIcon :name="fileIcon" class="w-6 h-6 shrink-0"  />
+      <UIcon :name="fileIcon" class="w-6 h-6 shrink-0 text-tertiary"  />
       <div class="flex-1 min-w-0">
-        <span class="font-semibold text-sm block truncate" >{{ fileName }}</span>
-        <span v-if="fileSize" class="text-xs text-pretty" >{{ formatSize(fileSize) }}</span>
+        <span class="font-semibold text-sm block truncate text-primary" >{{ fileName }}</span>
+        <span v-if="fileSize" class="text-xs text-pretty text-tertiary" >{{ formatSize(fileSize) }}</span>
       </div>
       <UButton size="xs" variant="ghost" color="neutral" @click="reset">
         {{ $t("common.reset") }}

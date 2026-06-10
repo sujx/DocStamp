@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col items-center justify-center py-16 text-center">
-    <UIcon :name="icon" class="w-16 h-16 mb-4"  />
-    <h3 class="text-lg font-semibold mb-1 text-balance" >{{ title }}</h3>
-    <p class="text-sm mb-6 max-w-md" >{{ description }}</p>
+    <UIcon :name="icon" class="w-16 h-16 mb-4 text-tertiary"  />
+    <h3 class="text-lg font-semibold mb-1 text-balance text-primary" >{{ title }}</h3>
+    <p class="text-sm mb-6 max-w-md text-secondary" >{{ description }}</p>
     <UButton v-if="actionTo" color="primary" :to="actionTo">{{ actionLabel }}</UButton>
   </div>
 </template>

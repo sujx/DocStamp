@@ -2,7 +2,7 @@
   <div class="max-w-3xl mx-auto px-6 py-8">
     <PageHeader :title="$t('pdfToText.title')" :description="$t('pdfToText.description')" />
 
-    <div class="card" >
+    <div class="card bg-surface border-default" >
       <FileUploader
         :accept="'.pdf'"
         :max-size="100"
@@ -46,12 +46,16 @@
       </div>
 
       <div v-if="result" class="mt-6">
-        <div class="text-xs mb-2" >
+        <div class="text-xs mb-2 text-secondary" >
           {{ $t("pdfToText.pageInfo", { total: result.total_pages, extracted: result.extracted_pages }) }}
         </div>
         <pre
           class="result-area"
-          
+          :style="{
+            backgroundColor: 'var(--color-muted)',
+            borderColor: 'var(--color-border-default)',
+            color: 'var(--color-text-primary)',
+          }"
         >{{ result.text }}</pre>
       </div>
     </div>

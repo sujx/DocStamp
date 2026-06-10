@@ -8,19 +8,19 @@
       @dragleave.prevent="isDragover = false"
       @drop.prevent="onDrop"
     >
-      <UIcon name="i-heroicons-document-text" class="w-12 h-12 mx-auto mb-3"  />
-      <p class="text-base font-medium mb-1" >{{ $t("format.docxDragText") }}</p>
-      <p class="text-sm mb-4" >{{ $t("format.docxFormats") }}</p>
+      <UIcon name="i-heroicons-document-text" class="w-12 h-12 mx-auto mb-3 text-tertiary"  />
+      <p class="text-base font-medium mb-1 text-primary" >{{ $t("format.docxDragText") }}</p>
+      <p class="text-sm mb-4 text-secondary" >{{ $t("format.docxFormats") }}</p>
       <label>
         <UButton color="primary" variant="soft" as="span">{{ $t("format.upload") }}</UButton>
         <input type="file" accept=".docx" class="hidden" @change="onFileSelect" />
       </label>
     </div>
 
-    <div v-if="selectedFile" class="p-4 mt-4 rounded-lg" >
+    <div v-if="selectedFile" class="p-4 mt-4 rounded-lg bg-surface shadow-card" >
       <div class="flex items-center gap-3 mb-4">
-        <UIcon name="i-heroicons-document-text" class="w-5 h-5 shrink-0"  />
-        <span class="flex-1 text-sm font-medium truncate" >{{ selectedFile.name }}</span>
+        <UIcon name="i-heroicons-document-text" class="w-5 h-5 shrink-0 text-brand-700"  />
+        <span class="flex-1 text-sm font-medium truncate text-primary" >{{ selectedFile.name }}</span>
         <UButton size="xs" variant="ghost" color="neutral" @click="selectedFile = null">{{ $t("common.reset") }}</UButton>
       </div>
       <UButton color="primary" :loading="isFormatting" block @click="formatFile">

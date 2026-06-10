@@ -1,10 +1,9 @@
 <template>
-  <div class="min-h-dvh" >
+  <div class="min-h-dvh bg-page">
     <!-- Skip-to-content for keyboard users -->
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-medium focus:no-underline"
-      
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-medium focus:no-underline bg-surface text-brand-700 shadow-elevated"
     >
       {{ $t("a11y.skipToContent") }}
     </a>

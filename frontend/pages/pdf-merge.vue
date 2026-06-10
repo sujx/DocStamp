@@ -2,7 +2,7 @@
   <div class="max-w-3xl mx-auto px-6 py-8">
     <PageHeader :title="$t('pdfMerge.title')" :description="$t('pdfMerge.description')" />
 
-    <div class="card" >
+    <div class="card bg-surface border-default" >
       <FileUploader
         :accept="'.pdf'"
         :max-size="100"
@@ -12,18 +12,18 @@
       />
 
       <div v-if="files.length > 0" class="mt-4">
-        <div class="text-sm mb-2" >
+        <div class="text-sm mb-2 text-secondary" >
           {{ $t('pdfMerge.fileCount', { n: files.length }) }}
         </div>
-        <p class="text-xs mb-3" >{{ $t('pdfMerge.dragHint') }}</p>
+        <p class="text-xs mb-3 text-tertiary" >{{ $t('pdfMerge.dragHint') }}</p>
 
         <div class="space-y-1.5">
           <div
             v-for="(f, i) in files" :key="f.name"
             class="flex items-center gap-2 px-3 py-2 rounded-md text-sm border"
-            
+            :style="{ backgroundColor: 'var(--color-muted)', borderColor: 'var(--color-border-subtle)', color: 'var(--color-text-primary)' }"
           >
-            <UIcon name="i-heroicons-bars-3" class="w-4 h-4 shrink-0 cursor-move"  />
+            <UIcon name="i-heroicons-bars-3" class="w-4 h-4 shrink-0 cursor-move text-tertiary"  />
             <span class="flex-1 truncate">{{ f.name }}</span>
             <button
               :disabled="i === 0"
@@ -46,7 +46,7 @@
               :aria-label="$t('pdfMerge.removeFile')"
               @click="removeFile(i)"
             >
-              <UIcon name="i-heroicons-x-mark" class="w-3.5 h-3.5"  />
+              <UIcon name="i-heroicons-x-mark" class="w-3.5 h-3.5 text-tertiary"  />
             </button>
           </div>
         </div>
