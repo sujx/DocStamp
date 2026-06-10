@@ -93,7 +93,10 @@ def doc_to_md():
     task_id = task.get("data", {}).get("task_id") or task.get("task_id")
     if not task_id:
         cleanup_files(filepath)
-        return jsonify({"code": 502, "msg": "MinerU did not return task_id"}), 502
+        return jsonify({
+            "code": 502,
+            "msg": f"MinerU did not return task_id. Response: {json.dumps(task)} | file_url: {file_url}"
+        }), 502
 
     # Poll
     md_content = None
