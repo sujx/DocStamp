@@ -11,7 +11,6 @@ import os
 import time
 import zipfile
 
-import requests
 from flask import Blueprint, jsonify, request, current_app
 
 from cache import cache
@@ -69,6 +68,8 @@ def doc_to_md():
     if not API_KEY:
         cleanup_files(filepath)
         return jsonify({"code": 503, "msg": "MinerU API key not configured. Set DOCSTAMP_MINERU_API_KEY."}), 503
+
+    import requests  # lazy — only needed when MinerU endpoint is called
 
     # Submit to MinerU
     try:
