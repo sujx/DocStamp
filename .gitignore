@@ -38,6 +38,9 @@ poetry.lock
 # Docker
 .dockerignore
 
+# Environment — contains real API keys, NEVER commit
+.env
+
 # OS
 .DS_Store
 Thumbs.db
