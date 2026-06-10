@@ -12,6 +12,7 @@
     "properties": "属性修改",
     "fileAssembly": "文件组装",
     "printSplit": "打印分组",
+    "docToMd": "文档转MD",
     "watermarkManagement": "水印管理",
     "pdfEditor": "PDF编辑",
     "excelMerge": "Excel合并",
@@ -365,5 +366,13 @@
   "pdf-tools": {
     "title": "调整PDF",
     "description": "PDF 转文本、压缩、添加页码页眉页脚"
+  },
+  "docToMd": {
+    "title": "文档转 Markdown",
+    "description": "将 PDF / Word / PPT / 图片精准转换为 Markdown 格式（MinerU API）",
+    "uploadLabel": "上传文档（PDF/DOC/DOCX/PPT/PPTX/PNG/JPG）",
+    "limits": "支持 200MB 以内，200 页以内的文档",
+    "convert": "开始转换",
+    "result": "转换结果"
   }
 }

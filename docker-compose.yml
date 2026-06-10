@@ -34,6 +34,7 @@ services:
       - AI_API_URL=${AI_API_URL:-https://api.deepseek.com/chat/completions}
       - AI_MODEL=${AI_MODEL:-deepseek-chat}
       - DOCSTAMP_DEEPSEEK_API_KEY=${DOCSTAMP_DEEPSEEK_API_KEY:-}
+      - DOCSTAMP_MINERU_API_KEY=${DOCSTAMP_MINERU_API_KEY:-}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - DOCSTAMP_CORS_ORIGINS=${DOCSTAMP_CORS_ORIGINS:-http://localhost:8080}

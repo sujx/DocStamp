@@ -19,7 +19,8 @@ export const TOOLS: ToolDef[] = [
   // ── 顶层 ──
   { key: "dashboard", to: "/", icon: "i-heroicons-home", label: "tabs.dashboard", desc: "dashboard.description", order: 1 },
   { key: "md2docx", to: "/md-to-docx", icon: "i-heroicons-arrow-down-tray", label: "tabs.md2docx", desc: "md2docx.description", order: 2 },
-  { key: "watermark", to: "/watermark", icon: "i-heroicons-beaker", label: "tabs.watermarkManagement", desc: "watermark.description", order: 3 },
+  { key: "doc-to-md", to: "/doc-to-md", icon: "i-heroicons-document-arrow-down", label: "tabs.docToMd", desc: "docToMd.description", order: 3 },
+  { key: "watermark", to: "/watermark", icon: "i-heroicons-beaker", label: "tabs.watermarkManagement", desc: "watermark.description", order: 4 },
 
   // ── Office 工具（展开到顶层）──
   { key: "properties", to: "/properties", icon: "i-heroicons-document-text", label: "tabs.properties", desc: "properties.description", order: 10 },

@@ -122,12 +122,14 @@ def create_app() -> Flask:
     from blueprints.page_decorate_bp import page_decorate_bp
     from blueprints.stats_bp import stats_bp
     from ai import ai_bp
+    from mineru_bp import mineru_bp
 
     app.register_blueprint(pdf_compress_bp)
     app.register_blueprint(metadata_clean_bp)
     app.register_blueprint(page_decorate_bp)
     app.register_blueprint(stats_bp)
     app.register_blueprint(ai_bp)
+    app.register_blueprint(mineru_bp)
 
     # SPA fallback — serve frontend static files (Nuxt generate output)
     static_dir = app.config["STATIC_FOLDER"]

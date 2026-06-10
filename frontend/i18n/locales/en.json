@@ -12,6 +12,7 @@
     "properties": "Properties",
     "fileAssembly": "File Assembly",
     "printSplit": "Print Split",
+    "docToMd": "Doc to MD",
     "watermarkManagement": "Watermark",
     "pdfEditor": "PDF Editor",
     "excelMerge": "Excel Merge",
@@ -365,5 +366,13 @@
   "pdf-tools": {
     "title": "Adjust PDF",
     "description": "PDF to text, compress, add page numbers headers footers"
+  },
+  "docToMd": {
+    "title": "Document to Markdown",
+    "description": "Convert PDF/Word/PPT/images to Markdown (MinerU API)",
+    "uploadLabel": "Upload document (PDF/DOC/DOCX/PPT/PPTX/PNG/JPG)",
+    "limits": "Up to 200MB, 200 pages",
+    "convert": "Convert",
+    "result": "Result"
   }
 }
