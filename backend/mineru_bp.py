@@ -59,10 +59,13 @@ def doc_to_md():
         cleanup_files(filepath)
         return jsonify({"code": 200, "data": {"markdown": cached, "cached": True}})
 
-    # Build public URL
-    server_url = request.host_url.rstrip("/")
+    # Build public URL — use DOCSTAMP_PUBLIC_URL if set (ECS public IP/domain),
+    # otherwise fall back to request.host_url (works behind nginx with proper Host header)
+    public_base = os.environ.get("DOCSTAMP_PUBLIC_URL", "").rstrip("/")
+    if not public_base:
+        public_base = request.host_url.rstrip("/")
     filename = os.path.basename(filepath)
-    file_url = f"{server_url}/api/v1/download/{filename}"
+    file_url = f"{public_base}/api/v1/download/{filename}"
 
     if not Config.MINERU_API_KEY:
         cleanup_files(filepath)
