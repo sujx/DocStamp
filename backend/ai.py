@@ -19,8 +19,9 @@ from schemas import AiTextSchema, AiDenoiseSchema
 
 ai_bp = Blueprint("ai", __name__)
 
-DEEPSEEK_URL = "https://api.deepseek.com/chat/completions"
-API_KEY = Config.DEEPSEEK_API_KEY
+API_KEY = Config.AI_API_KEY
+API_URL = Config.AI_API_URL
+API_MODEL = Config.AI_MODEL
 CACHE_TTL = 3600
 
 
@@ -44,10 +45,10 @@ def _call(prompt: str, system: str = "", temperature: float = 0) -> str | None:
         import requests  # lazy — only needed when AI endpoint is called
 
         resp = requests.post(
-            DEEPSEEK_URL,
+            API_URL,
             headers={"Authorization": f"Bearer {API_KEY}"},
             json={
-                "model": "deepseek-chat",
+                "model": API_MODEL,
                 "temperature": temperature,
                 "messages": [
                     {"role": "system", "content": system},

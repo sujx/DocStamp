@@ -52,7 +52,11 @@ class Config:
     ENCRYPTION_KEY = os.environ.get("DOCSTAMP_ENCRYPTION_KEY", "")
 
     # ── AI ──────────────────────────────────────────────────────────
-    DEEPSEEK_API_KEY = os.environ.get("DOCSTAMP_DEEPSEEK_API_KEY", "")
+    AI_API_KEY = os.environ.get("DOCSTAMP_DEEPSEEK_API_KEY", "")
+    AI_API_URL = os.environ.get(
+        "AI_API_URL", "https://api.deepseek.com/chat/completions"
+    )
+    AI_MODEL = os.environ.get("AI_MODEL", "deepseek-chat")
 
     # ── Frontend Static ─────────────────────────────────────────────
     STATIC_FOLDER = os.environ.get(
