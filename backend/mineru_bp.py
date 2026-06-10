@@ -114,7 +114,6 @@ def doc_to_md():
         state = data.get("state", status.get("state", ""))
         if state in ("done", "success"):
             zip_url = data.get("full_zip_url") or data.get("download_url") or ""
-            )
             if zip_url:
                 try:
                     zr = requests.get(zip_url, timeout=120)
@@ -127,7 +126,7 @@ def doc_to_md():
                 except Exception:
                     pass
             break
-        elif state == "failed":
+        elif state in ("failed", "error"):
             break
 
     cleanup_files(filepath)
