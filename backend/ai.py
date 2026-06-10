@@ -10,7 +10,6 @@ the input unchanged with an empty/silent response.
 import hashlib
 import json
 
-import requests
 from flask import Blueprint, jsonify, request
 
 from cache import cache
@@ -42,6 +41,8 @@ def _call(prompt: str, system: str = "", temperature: float = 0) -> str | None:
         return cached
 
     try:
+        import requests  # lazy — only needed when AI endpoint is called
+
         resp = requests.post(
             DEEPSEEK_URL,
             headers={"Authorization": f"Bearer {API_KEY}"},
