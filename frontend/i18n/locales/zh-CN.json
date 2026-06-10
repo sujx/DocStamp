@@ -19,6 +19,7 @@
     "formatDocx": "格式规范",
     "officeTools": "Office 工具",
     "pdfTools": "PDF 工具",
+    "pdfTools2": "PDF 工具箱",
     "pdfToText": "PDF 转文本",
     "pdfMerge": "PDF 合并",
     "pdfCompress": "PDF 压缩",
@@ -360,5 +361,9 @@
     "unofficial": "非正式公文",
     "official": "正式公文",
     "officialSuggestion": "AI 建议：使用正式公文格式"
+  },
+  "pdfTools2": {
+    "title": "PDF 工具箱",
+    "description": "PDF 转文本、压缩、添加页码页眉页脚"
   }
 }

@@ -19,6 +19,7 @@
     "formatDocx": "Format DOCX",
     "officeTools": "Office Tools",
     "pdfTools": "PDF Tools",
+    "pdfTools2": "PDF Toolbox",
     "pdfToText": "PDF to Text",
     "pdfMerge": "PDF Merge",
     "pdfCompress": "PDF Compress",
@@ -360,5 +361,9 @@
     "unofficial": "Unofficial",
     "official": "Official",
     "officialSuggestion": "AI suggests: Official document format"
+  },
+  "pdfTools2": {
+    "title": "PDF Toolbox",
+    "description": "PDF to text, compress, add page numbers headers footers"
   }
 }
