@@ -1,8 +1,8 @@
 [Unit]
 Description=docStamp Celery Worker (lite — all queues)
 Documentation=https://github.com/grepsu/docStamp
-After=network.target redis.service
-Wants=redis.service
+After=network.target redis.service valkey.service
+Wants=redis.service valkey.service
 
 [Service]
 Type=simple

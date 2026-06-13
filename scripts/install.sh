@@ -73,35 +73,43 @@ _install_system_deps() {
     log_info "系统依赖安装完成"
 }
 
-# ── Redis ───────────────────────────────────────────────────────────
-_install_redis() {
-    if systemctl is-active --quiet redis 2>/dev/null; then
-        log_info "Redis 已在运行，跳过安装"
+# ── Message broker (Redis / Valkey) ──────────────────────────────────
+_install_broker() {
+    local broker="redis"
+    local broker_conf=""
+
+    if systemctl is-active --quiet redis 2>/dev/null || systemctl is-active --quiet valkey 2>/dev/null; then
+        log_info "消息代理已在运行，跳过安装"
         return 0
     fi
 
-    log_info "安装 Redis..."
     case "$PKG_MGR" in
-        apt) apt-get install -y redis ;;
-        dnf|yum) $PKG_MGR install -y redis ;;
+        apt)
+            broker="redis"
+            log_info "安装 Redis..."
+            apt-get install -y redis
+            broker_conf="/etc/redis/redis.conf"
+            ;;
+        dnf|yum)
+            broker="valkey"
+            log_info "安装 Valkey（RHEL 10+ 的 Redis 替代）..."
+            $PKG_MGR install -y valkey
+            broker_conf="/etc/valkey/valkey.conf"
+            ;;
     esac
 
     # Low-memory tuning
-    local redis_conf=""
-    for f in /etc/redis/redis.conf /etc/redis.conf; do
-        [[ -f "$f" ]] && redis_conf="$f" && break
-    done
-    if [[ -n "$redis_conf" ]]; then
-        grep -q '^maxmemory ' "$redis_conf" 2>/dev/null \
-            && sed -i 's/^maxmemory .*/maxmemory 128mb/' "$redis_conf" \
-            || echo "maxmemory 128mb" >> "$redis_conf"
-        grep -q '^maxmemory-policy ' "$redis_conf" 2>/dev/null \
-            && sed -i 's/^maxmemory-policy .*/maxmemory-policy allkeys-lru/' "$redis_conf" \
-            || echo "maxmemory-policy allkeys-lru" >> "$redis_conf"
+    if [[ -n "$broker_conf" && -f "$broker_conf" ]]; then
+        grep -q '^maxmemory ' "$broker_conf" 2>/dev/null \
+            && sed -i 's/^maxmemory .*/maxmemory 128mb/' "$broker_conf" \
+            || echo "maxmemory 128mb" >> "$broker_conf"
+        grep -q '^maxmemory-policy ' "$broker_conf" 2>/dev/null \
+            && sed -i 's/^maxmemory-policy .*/maxmemory-policy allkeys-lru/' "$broker_conf" \
+            || echo "maxmemory-policy allkeys-lru" >> "$broker_conf"
     fi
 
-    systemctl enable --now redis
-    log_info "Redis 已启动"
+    systemctl enable --now "$broker"
+    log_info "$broker 已启动"
 }
 
 # ── App user & directories ──────────────────────────────────────────
@@ -358,7 +366,7 @@ case "${1:-}" in
                 ;;
             --lite)
                 _install_system_deps
-                _install_redis
+                _install_broker
                 _create_user
                 _setup_dirs
                 _copy_app
@@ -375,7 +383,7 @@ case "${1:-}" in
                 ;;
             *)
                 _install_system_deps
-                _install_redis
+                _install_broker
                 _create_user
                 _setup_dirs
                 _copy_app
