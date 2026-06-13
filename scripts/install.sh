@@ -141,7 +141,7 @@ _install_venv() {
         python-docx openpyxl python-pptx \
         markdown bleach img2pdf pypdf Pillow reportlab \
         gunicorn pydantic celery redis cryptography \
-        pdfminer.six requests
+        pdfminer.six requests python-dotenv
 
     log_info "Python 依赖安装完成"
 }

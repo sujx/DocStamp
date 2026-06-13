@@ -40,7 +40,7 @@ RUN pip install --break-system-packages --no-cache-dir --root-user-action=ignore
     flask flask-cors flask-babel flask-caching \
     python-docx openpyxl python-pptx \
     markdown bleach img2pdf pypdf Pillow reportlab \
-    gunicorn pydantic celery redis cryptography pdfminer.six requests \
+    gunicorn pydantic celery redis cryptography pdfminer.six requests python-dotenv \
     && rm -rf /usr/local/lib/python3.12/site-packages/pip \
     && rm -rf /usr/local/lib/python3.12/site-packages/setuptools \
     && find /usr/local/lib/python3.12 -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null; true \

@@ -6,6 +6,17 @@ All route logic lives in blueprints/ — business logic in services/.
 
 import os
 import time
+
+# Load .env before any config reads — works regardless of startup method
+# (gunicorn, python app.py, systemd).  Searches project root and backend/.
+for _dotenv_path in (".env", "../.env"):
+    if os.path.isfile(_dotenv_path):
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(_dotenv_path)
+        except ImportError:
+            pass  # python-dotenv not installed, rely on shell env
+        break
 from flask import Flask, g, jsonify, request, send_from_directory
 from flask_babel import Babel
 from flask_cors import CORS
