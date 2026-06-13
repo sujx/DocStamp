@@ -10,6 +10,7 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm ci --legacy-peer-deps --no-audit --no-fund
 COPY frontend/ ./
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm run build
 
 # ── Stage 2: Python 3.12 runtime ────────────────────────────────────

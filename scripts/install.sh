@@ -151,6 +151,9 @@ _build_frontend() {
     log_info "构建前端..."
     cd "$FRONTEND_DIR"
 
+    # Prevent OOM during Vite/esbuild transform (echarts, mermaid are heavy)
+    export NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=4096"
+
     # Set npm mirror for faster install in China
     npm config set registry https://registry.npmmirror.com 2>/dev/null || true
     npm install
@@ -277,6 +280,7 @@ _update_local() {
         celery redis cryptography pdfminer.six requests
 
     # Rebuild frontend
+    export NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=4096"
     cd "$FRONTEND_DIR"
     npm install --registry=https://registry.npmmirror.com
     npm run build
