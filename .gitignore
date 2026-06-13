@@ -32,6 +32,9 @@ docs/
 frontend/.nuxt/
 frontend/.output/
 
+# Nuxt 4 migration leftovers (srcDir default changed to app/)
+app/
+
 # Poetry
 poetry.lock
 
