@@ -13,7 +13,7 @@
 
 set -euo pipefail
 
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_USER="docstamp"
 APP_DIR="/opt/docstamp"
 VENV_DIR="$APP_DIR/.venv"
