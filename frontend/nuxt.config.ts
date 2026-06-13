@@ -47,6 +47,7 @@ export default defineNuxtConfig({
       { code: "en", name: "English", file: "en.json" },
     ],
     lazy: false,
+    bundle: { optimizeTranslationDirective: false },
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: "docstamp_lang",
