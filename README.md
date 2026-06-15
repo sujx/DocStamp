@@ -86,7 +86,18 @@ sudo bash scripts/install.sh install
 ```
 
 > **RHEL 10 / RockyLinux 10**：Redis 已被 Valkey 替代，install.sh 自动检测并安装对应包。
-> **构建 OOM**：若 `npm run build` 内存溢出，执行 `export NODE_OPTIONS="--max-old-space-size=4096"`。
+
+### ACR 发布（推荐生产部署）
+
+```bash
+# 本地构建 → 推送 → ECS 拉取（ECS 无需编译前端）
+./publish.sh          # 推送到阿里云 ACR（密码从 .env 读取）
+./publish.sh v3.6     # 指定版本号
+
+# ECS 上
+scp docker-compose.prod.yml .env root@你的ECS:/opt/docstamp/
+ssh root@你的ECS 'cd /opt/docstamp && docker compose -f docker-compose.prod.yml up -d'
+```
 
 ## 项目结构
 
