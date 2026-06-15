@@ -78,12 +78,15 @@ cd .. && ./manage.sh start
 ### 裸机 Systemd 部署
 
 ```bash
-# Lite 模式（2C2G ECS 推荐）— Redis + API + Celery + Beat 一键安装
+# Lite 模式（2C2G ECS 推荐）— 消息代理 + API + Celery + Beat 一键安装
 sudo bash scripts/install.sh install --lite
 
 # Full 模式 — 仅 API，Celery 需额外部署
 sudo bash scripts/install.sh install
 ```
+
+> **RHEL 10 / RockyLinux 10**：Redis 已被 Valkey 替代，install.sh 自动检测并安装对应包。
+> **构建 OOM**：若 `npm run build` 内存溢出，执行 `export NODE_OPTIONS="--max-old-space-size=4096"`。
 
 ## 项目结构
 

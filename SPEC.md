@@ -443,6 +443,9 @@ Lite 模式 systemd 服务清单：
 - **品牌定名**：鹊随金印，金绿渐变标题（`#c9a84c`→`#008a3d`）印章浮雕质感。
 - **多厂商 AI 支持**：`AI_API_URL` + `AI_MODEL` 环境变量配置，支持 OpenAI / DeepSeek / Ollama 等任意兼容厂商。
 - **Full/Lite 双模式**：Lite（3 容器/4 systemd 服务，~800MB）适配 2C2G ECS；Full（6 容器）高并发。统一部署脚本 `docker-deploy.sh`。
+- **Valkey 支持**：RHEL 10 / RockyLinux 10 已用 Valkey 替代 Redis。`install.sh` 自动检测发行版选择对应包名（apt→redis，dnf→valkey），systemd 单元同时兼容两种服务名。
+- **python-dotenv 自动加载**：`app.py` 启动时自动查找并加载 `.env`，不再依赖 shell 脚本手动 source。所有启动方式（gunicorn / python / systemd / Docker）统一。
+- **构建 OOM 修复**：`package.json` build/generate 脚本内联 `NODE_OPTIONS=--max-old-space-size=4096`，解决 echarts + mermaid + headlessui 编译时堆内存溢出。
 
 ### v3.4 (2026-06)
 - **Docker 生产加固**：6 容器全健康检查体系（Redis ping / API curl / Worker celery ping / Beat pgrep），`depends_on condition: service_healthy` 确保启动顺序正确
