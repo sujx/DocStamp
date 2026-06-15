@@ -10,7 +10,10 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm ci --legacy-peer-deps --no-audit --no-fund
 COPY frontend/ ./
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+# 2GB for build heap — Docker build usually has >2GB available.
+# For constrained CI, override: docker build --build-arg NODE_HEAP=1536 .
+ARG NODE_HEAP=2048
+ENV NODE_OPTIONS="--max-old-space-size=${NODE_HEAP}"
 RUN npm run build
 
 # ── Stage 2: Python 3.12 runtime ────────────────────────────────────

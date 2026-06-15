@@ -151,8 +151,17 @@ _build_frontend() {
     log_info "构建前端..."
     cd "$FRONTEND_DIR"
 
-    # Prevent OOM during Vite/esbuild transform (echarts, mermaid are heavy)
-    export NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=4096"
+    # Set Node heap based on available memory (min 1.5GB, max 4GB)
+    # Detect available RAM and use 75% of it for the build
+    if [[ -z "${NODE_OPTIONS:-}" ]]; then
+        local mem_kb=$(grep MemTotal /proc/meminfo 2>/dev/null | awk '{print $2}')
+        local mem_mb=$(( mem_kb / 1024 ))
+        local heap_mb=$(( mem_mb * 3 / 4 ))  # 75% of total RAM
+        [[ $heap_mb -lt 1536 ]] && heap_mb=1536
+        [[ $heap_mb -gt 4096 ]] && heap_mb=4096
+        export NODE_OPTIONS="--max-old-space-size=${heap_mb}"
+        log_info "Node 堆内存设为 ${heap_mb}MB（总内存 ${mem_mb}MB）"
+    fi
 
     # Set npm mirror for faster install in China
     npm config set registry https://registry.npmmirror.com 2>/dev/null || true
@@ -279,8 +288,16 @@ _update_local() {
         img2pdf pypdf Pillow reportlab gunicorn pydantic \
         celery redis cryptography pdfminer.six requests
 
-    # Rebuild frontend
-    export NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=4096"
+    # Rebuild frontend — set heap based on available RAM if not already set
+    if [[ -z "${NODE_OPTIONS:-}" ]]; then
+        local mem_kb=$(grep MemTotal /proc/meminfo 2>/dev/null | awk '{print $2}')
+        local mem_mb=$(( mem_kb / 1024 ))
+        local heap_mb=$(( mem_mb * 3 / 4 ))
+        [[ $heap_mb -lt 1536 ]] && heap_mb=1536
+        [[ $heap_mb -gt 4096 ]] && heap_mb=4096
+        export NODE_OPTIONS="--max-old-space-size=${heap_mb}"
+        log_info "Node 堆内存设为 ${heap_mb}MB"
+    fi
     cd "$FRONTEND_DIR"
     npm install --registry=https://registry.npmmirror.com
     npm run build

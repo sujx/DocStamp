@@ -136,7 +136,7 @@ _start_frontend() {
 	rm -rf "$FRONTEND_DIR/.nuxt"
     log_info "启动前端 (Nuxt, 端口 $FRONTEND_PORT)..."
     cd "$FRONTEND_DIR"
-    NODE_OPTIONS="--max-old-space-size=4096" npm run dev > "$PID_DIR/frontend.log" 2>&1 &
+    npm run dev > "$PID_DIR/frontend.log" 2>&1 &
     local pid=$!
     echo "$pid" > "$FRONTEND_PID"
     cd "$PROJECT_DIR"

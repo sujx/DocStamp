@@ -23,7 +23,6 @@ sleep 1
 # ── Build frontend if needed ───────────────────────────────────────
 if [[ ! -f "$FRONTEND_DIR/.output/public/index.html" ]]; then
     log_info "构建前端..."
-    export NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=4096"
     cd "$FRONTEND_DIR" && npm install && npm run build && cd "$PROJECT_DIR"
 else
     log_info "前端已构建，跳过 build"
