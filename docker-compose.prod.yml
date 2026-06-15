@@ -10,7 +10,7 @@
 # 使用前替换下面 REGISTRY 为你的阿里云 ACR 地址，例如：
 #   registry.cn-hangzhou.aliyuncs.com/你的命名空间/docstamp
 # ───────────────────────────────────────────────────────────────────
-x-image: &image docstamp:latest  # ← 替换为你的 Registry 镜像地址
+x-image: &image registry.cn-wulanchabu.aliyuncs.com/grepsu/docstamp:latest
 
 services:
   redis:
