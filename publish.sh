@@ -17,7 +17,13 @@ set -euo pipefail
 ACR_REGISTRY="registry.cn-wulanchabu.aliyuncs.com"
 ACR_NAMESPACE="grepsu"
 ACR_USERNAME="sujx@live.cn"
-ACR_PASSWORD=""          # ← 在这里填入 ACR 固定密码
+# 密码从 .env 读取（.env 在 .gitignore 中，不会提交到代码库）
+if [[ -z "${ACR_PASSWORD:-}" ]] && [[ -f "$PROJECT_DIR/.env" ]]; then
+    ACR_PASSWORD=$(grep '^ACR_PASSWORD=' "$PROJECT_DIR/.env" 2>/dev/null | cut -d= -f2-)
+fi
+if [[ -z "${ACR_PASSWORD:-}" ]]; then
+    err "请设置 ACR_PASSWORD 环境变量或在 .env 中添加 ACR_PASSWORD=xxx"
+fi
 
 IMAGE="${ACR_REGISTRY}/${ACR_NAMESPACE}/docstamp"
 VERSION="${1:-v3.5}"
