@@ -3,9 +3,11 @@
 Uses raw SQL with parameterized queries — no ORM dependency.
 Two tables: task_records (Celery task lifecycle) and operation_logs (audit trail).
 
-Lightweight SQLite backend with WAL mode and thread-local connections.
+Lightweight SQLite backend with WAL mode, thread-local connections,
+and atexit cleanup to prevent connection leaks on shutdown.
 """
 
+import atexit
 import sqlite3
 import threading
 from datetime import datetime, timezone
@@ -106,6 +108,9 @@ def init_db(db_path: str) -> None:
             (CURRENT_SCHEMA_VERSION,),
         )
     conn.commit()
+
+    # Register cleanup so connections close properly on process exit
+    atexit.register(close_db, db_path)
 
 
 # ── Base CRUD ───────────────────────────────────────────────────────────

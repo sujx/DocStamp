@@ -22,6 +22,7 @@ celery.conf.update(
     result_backend=os.environ.get(
         "CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/1"
     ),
+    broker_connection_retry_on_startup=True,
 
     # Import task modules so Celery registers @celery.task decorated functions
     include=[

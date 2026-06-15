@@ -57,5 +57,12 @@ export default defineNuxtConfig({
   },
 
 
+  nitro: {
+    prerender: {
+      crawlLinks: true,
+      concurrency: 1,         // Serial prerender — prevents OOM on 2GB machines
+      failOnError: false,     // Skip pages that fail, don't abort the build
+    },
+  },
   compatibilityDate: "2026-06-06",
 });
