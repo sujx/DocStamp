@@ -446,7 +446,7 @@ Lite 模式 systemd 服务清单：
 - **Valkey 支持**：RHEL 10 / RockyLinux 10 已用 Valkey 替代 Redis。`install.sh` 自动检测发行版选择对应包名（apt→redis，dnf→valkey），systemd 单元同时兼容两种服务名。
 - **python-dotenv 自动加载**：`app.py` 启动时自动查找并加载 `.env`，不再依赖 shell 脚本手动 source。所有启动方式（gunicorn / python / systemd / Docker）统一。
 - **构建 OOM 修复**：`install.sh` 根据 `/proc/meminfo` 自动设置 Node 堆大小（75% RAM），Dockerfile `ARG NODE_HEAP` 可覆盖，SSG 预渲染 `concurrency=1` 串行执行避免内存峰值。
-- **ACR 发布流程**：`publish.sh` — 登录 → 构建 → 打标签（`:v3.5` + `:latest`）→ 推送到阿里云 ACR。密码从 `.env` 读取，脚本可安全提交。`docker-compose.prod.yml` 使用 Registry 镜像，ECS 上无需编译前端。
+- **ACR 发布流程**：`publish.sh` — 登录 → 构建 → 打标签（`:v3.5` + `:latest`）→ 推送到阿里云 ACR。密码从 `.env` 读取，脚本可安全提交。`docker-compose.prod.yml`（Full 6 容器）和 `docker-compose.prod-lite.yml`（Lite 3 容器）使用 Registry 镜像，ECS 上无需编译前端。
 - **架构加固**：Celery broker 默认值 `memory://`→`redis://` 防静默故障，SQLite `atexit` 连接回收，SSG 预渲染 `failOnError=false` 防单页崩溃中止全量构建。
 
 ### v3.4 (2026-06)
