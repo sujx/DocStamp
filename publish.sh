@@ -13,6 +13,8 @@
 # ───────────────────────────────────────────────────────────────────
 set -euo pipefail
 
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # ── 配置（修改这里）─────────────────────────────────────────────────
 ACR_REGISTRY="registry.cn-wulanchabu.aliyuncs.com"
 ACR_NAMESPACE="grepsu"
@@ -38,7 +40,6 @@ if [[ -z "$ACR_PASSWORD" ]]; then
     err "请先在脚本中填入 ACR_PASSWORD（ACR 控制台 → 访问凭证 → 固定密码）"
 fi
 
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_DIR"
 
 # ── Login ──────────────────────────────────────────────────────────
