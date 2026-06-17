@@ -68,7 +68,7 @@ services:
       gunicorn -c backend/gunicorn.conf.py
       -b 0.0.0.0:5000 --workers 2
       --pid /tmp/gunicorn.pid
-      backend.app:app
+      backend.wsgi:app
 
   celery:
     image: *image
