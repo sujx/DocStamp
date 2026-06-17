@@ -79,10 +79,11 @@ def create_app() -> Flask:
             return response
 
         # Extract a short module name from the URL path
-        # e.g. /api/pdf-editor/info → "pdf-editor", /api/convert → "convert"
+        # e.g. /api/v1/pdf-editor/info → "pdf-editor", /api/v1/convert → "convert"
         path = request.path
         parts = [p for p in path.split("/") if p]
-        module = parts[1] if len(parts) > 1 else "unknown"
+        # Skip /api/v1/ prefix — parts[0]="api", parts[1]="v1", parts[2]=<module>
+        module = parts[2] if len(parts) > 2 else (parts[1] if len(parts) > 1 else "unknown")
 
         duration_ms = int((time.time() - start) * 1000)
         success = 200 <= response.status_code < 400
