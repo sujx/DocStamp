@@ -385,6 +385,10 @@
     "uploadLabel": "Upload video (MP4/MOV/AVI/MKV)",
     "sizeHint": "File size up to 100MB",
     "convert": "Convert to WMV",
+    "converting": "Converting...",
+    "sourcePreview": "Source Video",
+    "resultPreview": "Converted Result",
+    "convertAnother": "Convert Another",
     "note": "Converted files can be embedded directly in PowerPoint"
   }
 }

@@ -385,6 +385,10 @@
     "uploadLabel": "上传视频（MP4/MOV/AVI/MKV）",
     "sizeHint": "文件大小不超过 100MB",
     "convert": "转换为 WMV",
+    "converting": "正在转换...",
+    "sourcePreview": "原始视频",
+    "resultPreview": "转换结果",
+    "convertAnother": "转换另一个",
     "note": "转换后文件可在 PowerPoint 中直接嵌入播放"
   }
 }
