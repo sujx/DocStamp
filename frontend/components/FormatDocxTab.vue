@@ -16,7 +16,7 @@
       </label>
     </div>
 
-    <div v-if="selectedFile" class="p-4 mt-4 rounded-lg card bg-surface border-default">
+    <div v-if="selectedFile" class="p-4 mt-4 card bg-surface border-default">
       <div class="flex items-center gap-3 mb-4">
         <UIcon name="i-heroicons-document-text" class="w-5 h-5 shrink-0 text-brand-700" />
         <span class="flex-1 text-sm font-medium truncate text-primary">{{ selectedFile.name }}</span>
@@ -71,8 +71,7 @@ async function formatFile() {
     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
     toast.add({ title: t("common.success"), color: "success" });
   } catch (e: any) {
-    const msg = await e.response?.data?.text?.() || e.message;
-    toast.add({ title: msg ? JSON.parse(msg).error || msg : e.message, color: "error" });
+    toast.add({ title: e.response?.data?.error || e.message, color: "error" });
   } finally {
     isFormatting.value = false;
   }

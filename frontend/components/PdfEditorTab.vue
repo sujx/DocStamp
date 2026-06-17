@@ -70,7 +70,7 @@
         <div class="grid gap-3" style="grid-template-columns: repeat(auto-fill,minmax(100px,1fr));">
           <div
             v-for="(p, idx) in pageThumbs" :key="p.page_no"
-            class="rounded-md overflow-hidden border cursor-grab bg-white transition-all duration-150"
+            class="rounded-md overflow-hidden border cursor-grab bg-white transition-[opacity,transform,border-color] duration-150"
             :class="[{ 'opacity-50 scale-95': dragIdx === idx }, dragOverIdx === idx ? 'border-brand-700' : 'border-default']"
             draggable="true"
             @dragstart="onDragStart(idx)" @dragover.prevent="onDragOver(idx)"

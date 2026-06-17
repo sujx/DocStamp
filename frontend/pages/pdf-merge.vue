@@ -114,8 +114,9 @@ async function merge() {
     const a = document.createElement("a");
     a.href = url;
     a.download = "merged.pdf";
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
     toast.add({ title: t("common.success"), color: "success" });
   } catch (e: any) {
     const msg = await e.response?.data?.text?.() || e.message;

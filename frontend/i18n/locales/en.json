@@ -352,10 +352,7 @@
     "skipToContent": "Skip to main content",
     "removeFile": "Remove file",
     "moveUp": "Move up",
-    "moveDown": "Move down",
-    "deletePage": "Delete page",
-    "insertPage": "Insert page",
-    "reorderPage": "Reorder page"
+    "moveDown": "Move down"
   },
   "ai": {
     "correct": "AI Correct",

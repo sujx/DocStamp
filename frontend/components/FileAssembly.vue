@@ -4,7 +4,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
       <button
         v-for="mode in modes" :key="mode.key"
-        class="text-left p-5 rounded-lg border-2 transition-all duration-150"
+        class="text-left p-5 rounded-lg border-2 transition-[border-color,box-shadow,background-color] duration-150"
         :class="activeMode === mode.key
           ? 'border-[var(--color-brand-700)] bg-[var(--color-brand-soft)]'
           : 'border-[var(--color-border-default)] bg-[var(--color-surface)] hover:border-[var(--color-brand-400)]'"

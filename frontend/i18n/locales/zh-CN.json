@@ -352,10 +352,7 @@
     "skipToContent": "跳到主内容",
     "removeFile": "移除文件",
     "moveUp": "上移",
-    "moveDown": "下移",
-    "deletePage": "删除页面",
-    "insertPage": "插入页面",
-    "reorderPage": "重新排序"
+    "moveDown": "下移"
   },
   "ai": {
     "correct": "AI 纠错",

@@ -40,7 +40,7 @@
           </div>
         </div>
         <div
-          class="result-area"
+          class="result-area bg-muted"
           v-html="renderedMd"
         />
       </div>
@@ -115,9 +115,8 @@ function downloadMd() {
 <style scoped>
 .result-area {
   max-height: 600px; overflow: auto;
-  border: 1px solid var(--color-border-default);
+  border: 1px solid;
   border-radius: 8px; padding: 20px;
-  background: var(--color-muted);
   font-size: 14px; line-height: 1.7;
 }
 </style>
