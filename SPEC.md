@@ -15,7 +15,7 @@
 **侧栏导航**：
 
 ```
-仪表盘            → /
+仪表盘            → /              首页
 MD 转公文        → /md-to-docx
 文档转 MD        → /doc-to-md
 格式规范          → /format-docx

@@ -8,7 +8,7 @@
     "subtitle": "Document Processing Toolbox"
   },
   "tabs": {
-    "dashboard": "Dashboard",
+    "dashboard": "Home",
     "properties": "Properties",
     "fileAssembly": "File Assembly",
     "printSplit": "Print Split",

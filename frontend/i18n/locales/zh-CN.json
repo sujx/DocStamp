@@ -8,7 +8,7 @@
     "subtitle": "文档处理工具箱"
   },
   "tabs": {
-    "dashboard": "仪表盘",
+    "dashboard": "首页",
     "properties": "属性修改",
     "fileAssembly": "文件组装",
     "printSplit": "打印分组",
