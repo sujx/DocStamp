@@ -470,7 +470,8 @@ Lite 模式 systemd 服务清单：
 
 ### v3.6 (2026-06)
 
-- **视频转换**：新增视频转换功能（MP4 → WMV），解决 PowerPoint 无法嵌入 MP4 的问题。后端 `services/video_converter.py` + `blueprints/video_convert_bp.py`，使用 ffmpeg（WMV2+WMA2 codec 确保 PPT 兼容）。文件限制 100MB，速率限制 5次/分钟。Dockerfile 新增 ffmpeg 依赖
+- **视频转换**：新增视频转换功能（MP4 → WMV），解决 PowerPoint 无法嵌入 MP4 的问题。上传后显示 MP4 源文件预览，转换过程显示旋转动画，完成后提供 WMV 下载。后端 `services/video_converter.py` + `blueprints/video_convert_bp.py`，ffmpeg WMV2+WMA2 codec（`-hwaccel none` 避免 libopenh264 缺失）。文件限制 100MB（`MAX_FILE_SIZE` 50→100MB），速率限制 5次/分钟。Dockerfile 新增 ffmpeg + libopenh264-7，视频格式跳过魔数校验（MP4 ftyp box 大小不固定，交由 ffmpeg 验证）
+- **使用统计补充**：`stats_bp.py` 新增 `video-convert` 和 `doc-to-md` 模块中文标签
 - **侧栏优化**：仪表盘 → 首页，仪表盘页面去除标题文字。品牌 Logo 改用 Vite import 方式加载（`import logoUrl from "~/public/logo.svg"`），绕过 Nuxt 3.15 + Vite 6 `virtual:public` 模块 bug
 
 ### v3.5.2 (2026-06)
