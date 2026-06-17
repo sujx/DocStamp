@@ -5,6 +5,7 @@
       :label="$t('videoConvert.uploadLabel')"
       :hint="$t('videoConvert.sizeHint')"
       @file-selected="onFileSelected"
+      @reset="() => {}"
     />
 
     <!-- Source video preview (stays visible during conversion) -->
@@ -108,6 +109,7 @@ function onFileSelected(f: File) {
 async function convert() {
   if (!file.value) return;
   converting.value = true;
+  const startTime = Date.now();
   try {
     const fd = new FormData();
     fd.append("file", file.value);
@@ -122,9 +124,22 @@ async function convert() {
     converted.value = true;
     toast.add({ title: t("common.success"), color: "success" });
   } catch (e: any) {
-    toast.add({ title: e.response?.data?.error || e.message, color: "error" });
+    let msg = e.message;
+    try {
+      // Blob error body — need .text() to extract server message
+      if (e.response?.data instanceof Blob) {
+        const text = await e.response.data.text();
+        msg = JSON.parse(text).error || text;
+      } else if (e.response?.data?.error) {
+        msg = e.response.data.error;
+      }
+    } catch { /* keep e.message */ }
+    toast.add({ title: msg, color: "error" });
   } finally {
-    converting.value = false;
+    // Keep spinner visible for at least 300ms so user can see it
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, 300 - elapsed);
+    setTimeout(() => { converting.value = false; }, remaining);
   }
 }
 
