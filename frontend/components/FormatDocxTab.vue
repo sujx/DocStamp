@@ -2,25 +2,24 @@
   <div>
     <div
       class="border-2 border-dashed rounded-lg p-12 text-center transition-colors duration-150 cursor-pointer"
-      :class="isDragover ? 'border-[var(--color-brand-700)]' : 'border-[var(--color-border-default)]'"
-      :style="{ backgroundColor: isDragover ? 'var(--color-brand-soft)' : 'var(--color-surface)' }"
+      :class="isDragover ? 'border-brand-700 bg-brand-soft' : 'border-default bg-surface'"
       @dragover.prevent="isDragover = true"
       @dragleave.prevent="isDragover = false"
       @drop.prevent="onDrop"
     >
-      <UIcon name="i-heroicons-document-text" class="w-12 h-12 mx-auto mb-3 text-tertiary"  />
-      <p class="text-base font-medium mb-1 text-primary" >{{ $t("format.docxDragText") }}</p>
-      <p class="text-sm mb-4 text-secondary" >{{ $t("format.docxFormats") }}</p>
+      <UIcon name="i-heroicons-document-text" class="w-12 h-12 mx-auto mb-3 text-tertiary" />
+      <p class="text-base font-medium mb-1 text-primary">{{ $t("format.docxDragText") }}</p>
+      <p class="text-sm mb-4 text-secondary">{{ $t("format.docxFormats") }}</p>
       <label>
         <UButton color="primary" variant="soft" as="span">{{ $t("format.upload") }}</UButton>
         <input type="file" accept=".docx" class="hidden" @change="onFileSelect" />
       </label>
     </div>
 
-    <div v-if="selectedFile" class="p-4 mt-4 rounded-lg bg-surface shadow-card" >
+    <div v-if="selectedFile" class="p-4 mt-4 rounded-lg card bg-surface border-default">
       <div class="flex items-center gap-3 mb-4">
-        <UIcon name="i-heroicons-document-text" class="w-5 h-5 shrink-0 text-brand-700"  />
-        <span class="flex-1 text-sm font-medium truncate text-primary" >{{ selectedFile.name }}</span>
+        <UIcon name="i-heroicons-document-text" class="w-5 h-5 shrink-0 text-brand-700" />
+        <span class="flex-1 text-sm font-medium truncate text-primary">{{ selectedFile.name }}</span>
         <UButton size="xs" variant="ghost" color="neutral" @click="selectedFile = null">{{ $t("common.reset") }}</UButton>
       </div>
       <UButton color="primary" :loading="isFormatting" block @click="formatFile">
@@ -31,9 +30,10 @@
 </template>
 
 <script setup lang="ts">
+import axios from "axios";
+
 const { t } = useI18n();
 const toast = useToast();
-const API = "http://localhost:5000";
 
 const isDragover = ref(false);
 const selectedFile = ref<File | null>(null);
@@ -55,24 +55,24 @@ async function formatFile() {
   try {
     const fd = new FormData();
     fd.append("file", selectedFile.value);
-    const resp = await fetch(`${API}/api/v1/convert/format-docx`, { method: "POST", body: fd });
-    if (!resp.ok) throw new Error((await resp.json()).error || `HTTP ${resp.status}`);
-    const json = await resp.json();
 
-    const dlResp = await fetch(`${API}/api/v1/download/${json.download_id}`);
-    if (!dlResp.ok) throw new Error(`Download failed: HTTP ${dlResp.status}`);
-    const blob = await dlResp.blob();
+    // Step 1: Convert
+    const resp = await axios.post("/api/v1/convert/doc2md", fd);
+    const { download_id, filename } = resp.data;
 
-    const url = URL.createObjectURL(blob);
+    // Step 2: Download
+    const dlResp = await axios.get(`/api/v1/download/${download_id}`, { responseType: "blob" });
+    const url = URL.createObjectURL(dlResp.data);
     const a = document.createElement("a");
     a.href = url;
-    a.download = json.filename;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
     toast.add({ title: t("common.success"), color: "success" });
   } catch (e: any) {
-    toast.add({ title: e.message || "Error", color: "error" });
+    const msg = await e.response?.data?.text?.() || e.message;
+    toast.add({ title: msg ? JSON.parse(msg).error || msg : e.message, color: "error" });
   } finally {
     isFormatting.value = false;
   }
