@@ -33,7 +33,7 @@ def video_convert():
         output_name = f"{uuid.uuid4().hex}.wmv"
         output_path = os.path.join(Config.UPLOAD_FOLDER, output_name)
 
-        from tasks.video import video_convert_async
+        from backend.tasks.video import video_convert_async
         task = video_convert_async.delay(filepath, output_path, filename)
 
         return jsonify({
