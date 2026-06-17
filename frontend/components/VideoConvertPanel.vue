@@ -2,6 +2,7 @@
   <div class="card bg-surface border-default">
     <!-- Upload -->
     <div
+      v-if="!file"
       class="border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-150 cursor-pointer border-default bg-surface"
       @dragover.prevent
       @drop.prevent="onDrop"
