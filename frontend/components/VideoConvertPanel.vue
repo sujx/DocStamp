@@ -53,8 +53,7 @@
         </div>
       </div>
 
-      <UProgress :value="progress" size="sm" color="green" />
-      <p class="text-xs text-center text-tertiary">{{ progress }}%</p>
+      <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-brand-700 mx-auto" />
     </div>
 
     <!-- Done -->
