@@ -473,6 +473,11 @@ Lite 模式 systemd 服务清单：
 - **Stats 模块名修复**：操作日志中间件 `parts[1]` → `parts[2]`，修复所有真实流量被记录为 `"v1"` 的 bug（路径 `/api/v1/convert` 解析错误）
 - **下载可靠性修复**：`pdf-merge.vue` 下载补全 `document.body.appendChild(a)` + `setTimeout` 延迟回收（防止 Firefox/Safari 静默失败）
 - **CORS 默认值更新**：`docker-compose.local.yml` 默认包含 `https://doc.sujx.net`
+- **数据库持久化**：5 个 compose 文件新增 `db_data` 卷挂载 + `DOCSTAMP_TASK_DB` 环境变量，修复容器重启后操作日志/统计数据丢失。Dockerfile + entrypoint 预创建 `/opt/docstamp/backend/data` 目录确保非 root 用户可写
+- **字体自托管**：Plus Jakarta Sans 从 Google Fonts CDN（国内 ~4.8s 延迟）改为本地 TTF 自托管（`public/fonts/`，256KB），`font-display: swap` 消除渲染阻塞
+- **Docker 构建优化**：`publish.sh` 使用 `--build-arg BUST_FRONTEND=$(date +%s)` 精准破前端构建缓存（~2min），替代 `--no-cache` 全量重建（~8min）；Dockerfile `npm ci` 添加 ETXTBSY 重试
+- **Nginx 部署要点**：`/_nuxt/` 静态资源 location 需保留 `proxy_pass http://127.0.0.1:5000`（否则 nginx 本地找文件 → 404），同时设置 `expires 1y` + `Cache-Control: public, immutable`
+- **Sidebar 顺序调整**：格式规范移至文档转 MD 之后（order 12→4）
 - **清理**：移除未使用的 a11y i18n 键（deletePage/insertPage/reorderPage），doc-to-md 遗留 CSS 变量转为 Tailwind 工具类
 
 ### v3.5.1 (2026-06)
