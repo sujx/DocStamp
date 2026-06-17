@@ -31,13 +31,14 @@ def mp4_to_wmv(input_path: str, output_path: str) -> ServiceResult[dict]:
 
     cmd = [
         "ffmpeg",
-        "-y",                              # overwrite output
+        "-y",
+        "-hwaccel", "none",                # avoid broken libopenh264
         "-i", input_path,
         "-c:v", "wmv2",                    # WMV2 codec — max PPT compat
         "-c:a", "wmav2",                   # WMA2 audio
         "-q:v", "3",                        # quality (2-5, lower = better)
         "-q:a", "3",
-        "-loglevel", "error",              # only errors to stderr
+        "-loglevel", "error",
         output_path,
     ]
 

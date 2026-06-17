@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pandoc \
     poppler-utils \
     ffmpeg \
+    libopenh264-7 \
     fonts-noto-cjk \
     curl \
     procps \
