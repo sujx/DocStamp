@@ -71,6 +71,16 @@ import axios from "axios";
 const { t } = useI18n();
 const toast = useToast();
 
+// ── Diagnostic: detect component remount ──
+let mountId = 0;
+onMounted(() => {
+  mountId++;
+  toast.add({ title: `[MOUNT #${mountId}] VideoConvertPanel`, color: "info", timeout: 2000 });
+});
+onUnmounted(() => {
+  toast.add({ title: `[UNMOUNT #${mountId}] VideoConvertPanel`, color: "warning", timeout: 2000 });
+});
+
 interface State {
   step: "upload" | "ready" | "converting" | "done";
   file: File | null;
@@ -87,6 +97,10 @@ const state = reactive<State>({
   fileSizeFmt: "",
   resultBlob: null,
   resultName: "",
+});
+
+watch(() => state.step, (val, old) => {
+  toast.add({ title: `[STEP] ${old} → ${val}`, color: "info", timeout: 1500 });
 });
 
 function fmtSize(bytes: number): string {
