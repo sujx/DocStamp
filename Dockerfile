@@ -16,6 +16,11 @@ COPY frontend/ ./
 # For constrained CI, override: docker build --build-arg NODE_HEAP=1536 .
 ARG NODE_HEAP=2048
 ENV NODE_OPTIONS="--max-old-space-size=${NODE_HEAP}"
+
+# BUST_FRONTEND: pass --build-arg BUST_FRONTEND=$(date +%s) to force
+# npm run build to re-execute while keeping npm ci + apt + pip cached.
+# This ensures JS chunk hashes match the HTML without rebuilding the world.
+ARG BUST_FRONTEND
 RUN npm run build
 
 # ── Stage 2: Python 3.12 runtime ────────────────────────────────────

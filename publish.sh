@@ -47,11 +47,13 @@ log "登录 ACR..."
 echo "$ACR_PASSWORD" | docker login --username "$ACR_USERNAME" --password-stdin "$ACR_REGISTRY"
 
 # ── Build ──────────────────────────────────────────────────────────
-# --no-cache ensures npm run build always re-runs, generating fresh
-# JS chunk hashes that match the HTML.  Without it, Docker layer caching
-# reuses a stale frontend build → 404 on all /_nuxt/*.js requests.
+# --build-arg BUST_FRONTEND=$(date +%s) only invalidates the npm run build
+# layer (generating fresh JS chunk hashes) while keeping npm ci, apt, pip
+# layers cached.  This avoids the 5-minute full rebuild of --no-cache.
 log "构建镜像 ${IMAGE}:${VERSION} ..."
-docker build --no-cache -t "${IMAGE}:${VERSION}" .
+docker build \
+  --build-arg BUST_FRONTEND="$(date +%s)" \
+  -t "${IMAGE}:${VERSION}" .
 
 # ── Tag latest ─────────────────────────────────────────────────────
 log "标记 latest..."
