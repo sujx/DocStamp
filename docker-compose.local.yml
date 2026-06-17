@@ -1,0 +1,106 @@
+# ───────────────────────────────────────────────────────────────────
+# docStamp — 本地构建 Lite 部署（3 容器，无需 ACR）
+#
+# 直接使用本地 Dockerfile 构建镜像，不需要推送 / 拉取镜像仓库。
+# 适合：单服务器自建、开发验证、无 ACR 环境。
+#
+# 使用：
+#   1. 编辑 .env 文件（可选，设置 AI Key、域名等）
+#   2. docker compose -f docker-compose.local.yml up -d
+#   3. 配置 nginx 反向代理到 127.0.0.1:5000
+#
+# 资源：Redis 128MB + API 2 workers + Celery 2 concurrency → ~800MB
+# ───────────────────────────────────────────────────────────────────
+
+services:
+  # ── Redis ──────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: docstamp-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 128mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # ── Flask API + 前端静态文件 ──────────────────────────────────────
+  api:
+    build: .
+    container_name: docstamp-api
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - output_data:/opt/docstamp/backend/output
+      - log_data:/var/log/docstamp
+    environment:
+      - TZ=Asia/Shanghai
+      - DOCSTAMP_STATIC=/opt/docstamp/frontend/.output/public
+      - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
+      - AI_API_URL=${AI_API_URL:-https://api.deepseek.com/chat/completions}
+      - AI_MODEL=${AI_MODEL:-deepseek-v4-flash}
+      - DOCSTAMP_DEEPSEEK_API_KEY=${DOCSTAMP_DEEPSEEK_API_KEY:-}
+      - DOCSTAMP_MINERU_API_KEY=${DOCSTAMP_MINERU_API_KEY:-}
+      - DOCSTAMP_PUBLIC_URL=${DOCSTAMP_PUBLIC_URL:-}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - DOCSTAMP_CORS_ORIGINS=${DOCSTAMP_CORS_ORIGINS:-http://localhost:8080,https://md2.sujx.net}
+      - PYTHONPATH=/opt/docstamp/backend
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    command: >
+      gunicorn -c backend/gunicorn.conf.py
+      -b 0.0.0.0:5000 --workers 2
+      --pid /tmp/gunicorn.pid
+      backend.wsgi:app
+
+  # ── Celery All-in-One（3 队列合并 + Beat 内嵌）───────────────────
+  celery:
+    build: .
+    container_name: docstamp-celery
+    command: >
+      celery -A backend.celery_app worker
+      -Q convert_queue,pdf_queue,office_queue
+      --concurrency=2
+      -B --loglevel=info
+    volumes:
+      - output_data:/opt/docstamp/backend/output
+      - log_data:/var/log/docstamp
+    environment:
+      - TZ=Asia/Shanghai
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
+      - PYTHONPATH=/opt/docstamp/backend
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A backend.celery_app inspect ping -t 5 2>/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    mem_limit: 512M
+
+volumes:
+  output_data:
+  log_data:
+  redis_data:
