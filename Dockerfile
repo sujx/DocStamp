@@ -8,7 +8,9 @@ WORKDIR /app/frontend
 # Lockfile ensures reproducible builds across machines.
 # --legacy-peer-deps handles @vuelidate/core <-> vue2/3 peer conflict.
 COPY frontend/package*.json ./
-RUN npm ci --legacy-peer-deps --no-audit --no-fund
+# retry once in case of ETXTBSY (esbuild binary write/exec race on overlay2)
+RUN npm ci --legacy-peer-deps --no-audit --no-fund || \
+    sleep 2 && npm ci --legacy-peer-deps --no-audit --no-fund
 COPY frontend/ ./
 # 2GB for build heap — Docker build usually has >2GB available.
 # For constrained CI, override: docker build --build-arg NODE_HEAP=1536 .
