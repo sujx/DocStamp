@@ -8,7 +8,7 @@
     />
 
     <!-- Source video preview -->
-    <div v-if="file && !converted" class="mt-6">
+    <div v-if="file && !converted && !converting" class="mt-6">
       <p class="text-sm font-semibold text-primary mb-3">{{ $t("videoConvert.sourcePreview") }}</p>
       <video
         ref="sourceVideo"
@@ -55,8 +55,8 @@
     </div>
 
     <!-- Convert button (before conversion) -->
-    <div v-if="file && !converted" class="mt-6 flex gap-3">
-      <UButton color="primary" @click="convert">
+    <div v-if="file && !converted && !converting" class="mt-6 flex gap-3">
+      <UButton color="primary" type="button" @click="convert">
         <UIcon name="i-heroicons-video-camera" class="w-4 h-4 mr-1.5" />
         {{ $t("videoConvert.convert") }}
       </UButton>
