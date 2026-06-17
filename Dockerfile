@@ -19,9 +19,9 @@ ENV NODE_OPTIONS="--max-old-space-size=${NODE_HEAP}"
 
 # BUST_FRONTEND: pass --build-arg BUST_FRONTEND=$(date +%s) to force
 # npm run build to re-execute while keeping npm ci + apt + pip cached.
-# This ensures JS chunk hashes match the HTML without rebuilding the world.
+# Must be referenced in the RUN command itself, not just declared as ARG.
 ARG BUST_FRONTEND
-RUN npm run build
+RUN BUST_FRONTEND=${BUST_FRONTEND} npm run build
 
 # ── Stage 2: Python 3.12 runtime ────────────────────────────────────
 FROM python:3.12-slim-bookworm
