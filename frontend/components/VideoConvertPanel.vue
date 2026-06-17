@@ -37,16 +37,24 @@
         preload="metadata"
       />
 
-      <UButton color="primary" block :loading="converting" @click="doConvert">
+      <UButton color="primary" block @click="startConvert">
         <UIcon name="i-heroicons-video-camera" class="w-4 h-4 mr-1.5" />
         {{ $t("videoConvert.convert") }}
       </UButton>
     </div>
 
-    <!-- Converting -->
-    <div v-if="converting" class="mt-6 flex flex-col items-center py-10">
-      <UIcon name="i-heroicons-arrow-path" class="w-10 h-10 animate-spin text-brand-700" />
-      <p class="mt-4 text-sm text-secondary">{{ $t("videoConvert.converting") }}</p>
+    <!-- Converting: progress bar + message -->
+    <div v-if="converting" class="mt-6 space-y-4">
+      <div class="flex items-center gap-3 p-3 rounded-lg bg-muted">
+        <UIcon name="i-heroicons-video-camera" class="w-6 h-6 text-brand-700 shrink-0" />
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium truncate text-primary">{{ file?.name }}</p>
+          <p class="text-xs text-tertiary">{{ progressMessage || $t("videoConvert.converting") }}</p>
+        </div>
+      </div>
+
+      <UProgress :value="progress" size="sm" color="green" />
+      <p class="text-xs text-center text-tertiary">{{ progress }}%</p>
     </div>
 
     <!-- Done -->
@@ -81,7 +89,6 @@
 import axios from "axios";
 
 const { t } = useI18n();
-const toast = useToast();
 
 const file = ref<File | null>(null);
 const sourceUrl = ref("");
@@ -91,6 +98,37 @@ const resultBlob = ref<Blob | null>(null);
 const resultName = ref("");
 const resultSizeFmt = ref("");
 const errorMsg = ref("");
+const progress = ref(0);
+const progressMessage = ref("");
+
+let eventSource: EventSource | null = null;
+
+function connectSSE(taskId: string) {
+  closeSSE();
+  eventSource = new EventSource(`/api/v1/tasks/${encodeURIComponent(taskId)}/stream`);
+
+  eventSource.onmessage = (e: MessageEvent) => {
+    try {
+      const data = JSON.parse(e.data);
+      if (data.progress !== undefined) progress.value = data.progress;
+      if (data.status) {
+        if (data.status === "success") onTaskSuccess(data.result_data ? JSON.parse(data.result_data) : null);
+        else if (data.status === "failure") onTaskFail(data.error_message || "Conversion failed");
+      }
+      if (data.progress_message) progressMessage.value = data.progress_message;
+    } catch { /* ignore parse errors */ }
+  };
+
+  eventSource.onerror = () => {
+    if (done.value) closeSSE();
+  };
+}
+
+function closeSSE() {
+  if (eventSource) { eventSource.close(); eventSource = null; }
+}
+
+onUnmounted(() => closeSSE());
 
 function fmtSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -108,40 +146,58 @@ function onDrop(evt: DragEvent) {
   if (f) setFile(f);
 }
 
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100 MB
+
 function setFile(f: File) {
+  if (f.size > MAX_VIDEO_SIZE) {
+    errorMsg.value = `File exceeds ${fmtSize(MAX_VIDEO_SIZE)} limit`;
+    return;
+  }
   resetState();
   file.value = f;
   sourceUrl.value = URL.createObjectURL(f);
 }
 
-async function doConvert() {
+async function startConvert() {
   if (!file.value) return;
   errorMsg.value = "";
   converting.value = true;
+  progress.value = 0;
+  progressMessage.value = t("videoConvert.converting");
+
   try {
     const fd = new FormData();
     fd.append("file", file.value);
-    const resp = await axios.post("/api/v1/video-convert", fd, { responseType: "blob" });
-
-    resultBlob.value = resp.data;
-    resultName.value = file.value.name.replace(/\.[^.]+$/, "") + ".wmv";
-    resultSizeFmt.value = fmtSize(resp.data.size);
-    done.value = true;
-    toast.add({ title: t("common.success"), color: "success" });
-  } catch (e: any) {
-    let msg = e.message || "Unknown error";
-    try {
-      if (e.response?.data instanceof Blob) {
-        const text = await e.response.data.text();
-        msg = JSON.parse(text).error || text;
-      } else if (e.response?.data?.error) {
-        msg = e.response.data.error;
-      }
-    } catch { /* keep e.message */ }
-    errorMsg.value = msg;
-  } finally {
+    const resp = await axios.post("/api/v1/video-convert", fd);
+    connectSSE(resp.data.task_id);
+  } catch (err: any) {
+    errorMsg.value = err.response?.data?.error || err.message || "Upload failed";
     converting.value = false;
   }
+}
+
+async function onTaskSuccess(result: Record<string, unknown> | null) {
+  closeSSE();
+  progress.value = 100;
+
+  if (result?.download_id) {
+    try {
+      const dlResp = await axios.get(`/api/v1/download/${result.download_id}`, { responseType: "blob" });
+      resultBlob.value = dlResp.data;
+    } catch { /* download failed but conversion succeeded */ }
+  }
+
+  resultName.value = (result?.filename as string) || file.value?.name?.replace(/\.[^.]+$/, "") + ".wmv" || "";
+  if (result?.size) resultSizeFmt.value = fmtSize(result.size as number);
+
+  converting.value = false;
+  done.value = true;
+}
+
+function onTaskFail(err: string) {
+  closeSSE();
+  converting.value = false;
+  errorMsg.value = err || "Conversion failed";
 }
 
 function download() {
@@ -156,6 +212,7 @@ function download() {
 }
 
 function resetState() {
+  closeSSE();
   if (sourceUrl.value) { URL.revokeObjectURL(sourceUrl.value); sourceUrl.value = ""; }
   file.value = null;
   converting.value = false;
@@ -164,5 +221,7 @@ function resetState() {
   resultName.value = "";
   resultSizeFmt.value = "";
   errorMsg.value = "";
+  progress.value = 0;
+  progressMessage.value = "";
 }
 </script>

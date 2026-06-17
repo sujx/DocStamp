@@ -29,6 +29,7 @@ celery.conf.update(
         "backend.tasks.convert",
         "backend.tasks.pdf",
         "backend.tasks.office",
+        "backend.tasks.video",
         "backend.tasks.maintenance",
     ],
 
@@ -37,6 +38,7 @@ celery.conf.update(
         "backend.tasks.convert.*":  {"queue": "convert_queue"},
         "backend.tasks.pdf.*":      {"queue": "pdf_queue"},
         "backend.tasks.office.*":   {"queue": "office_queue"},
+        "backend.tasks.video.*":    {"queue": "pdf_queue"},
     },
 
     # Worker settings

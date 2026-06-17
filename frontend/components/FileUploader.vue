@@ -46,10 +46,12 @@ const props = defineProps({
   icon: { type: String, default: "i-heroicons-arrow-up-tray" },
   hint: { type: String, default: "" },
   accept: { type: String, default: "" },
+  maxSize: { type: Number, default: 0 }, // 0 = no limit, bytes
 });
 
 const emit = defineEmits<{
   "file-selected": [file: File];
+  "file-rejected": [reason: string];
   reset: [];
 }>();
 
@@ -88,6 +90,10 @@ function onDrop(evt: DragEvent) {
 }
 
 function setFile(f: File) {
+  if (props.maxSize > 0 && f.size > props.maxSize) {
+    emit("file-rejected", `File exceeds ${formatSize(props.maxSize)} limit`);
+    return;
+  }
   file.value = f;
   fileName.value = f.name;
   fileSize.value = f.size;
