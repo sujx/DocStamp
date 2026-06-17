@@ -40,7 +40,7 @@
 | **异步任务** | Celery（Redis broker）+ 3 队列 + SSE 进度推送 |
 | **文档处理** | pandoc / pypdf / Pillow / reportlab / pdfminer.six / python-docx / openpyxl |
 | **AI** | DeepSeek v4 Flash + MinerU API（可选，不配 Key 自动降级） |
-| **前端框架** | Nuxt 3.15.4 (SPA) + Nuxt UI v2 + Tailwind CSS v3 |
+| **前端框架** | Nuxt 3.15.4 (SPA) + Nuxt UI v2 + Tailwind CSS v3 + Flat Design + Plus Jakarta Sans |
 | **国际化** | @nuxtjs/i18n v9（zh-CN / en） |
 | **部署** | Gunicorn gthread + Nginx + Docker Compose + Systemd |
 
@@ -62,7 +62,17 @@ cd ../frontend && npm install
 cd .. && ./manage.sh start
 ```
 
-### Docker 生产部署
+### Docker 本地构建部署（无需 ACR）
+
+```bash
+# Lite 模式 — 本地 Dockerfile 构建，3 容器，适合单服务器
+docker compose -f docker-compose.local.yml up -d
+
+# 查看状态
+docker compose -f docker-compose.local.yml ps
+```
+
+### Docker 生产部署（ACR 镜像）
 
 ```bash
 # Full 模式（6 容器，4GB+ 推荐）
@@ -124,14 +134,17 @@ docStamp/
 │       ├── retry.py            # @retry_on_failure 重试装饰器
 │       └── crypto.py           # AES-256 Fernet 字段加密
 ├── frontend/                   # Nuxt 3 SPA
-│   ├── composables/            # useValidation / useTaskStream / useApi / useDownload
-│   ├── components/ui/          # 原子组件（ButtonPrimary / CardBase / ProgressBar）
+│   ├── composables/            # tools.config / useValidation / useTaskStream / useApi / useDownload / useAi
+│   ├── components/ui/          # 原子组件（CardBase / SkeletonBlock）
 │   ├── pages/                  # 16 个路由页面（仪表盘 + 15 工具）
 │   └── locales/                # zh-CN / en
 ├── deploy/
 │   ├── docstamp.service        # Systemd 服务（12 项安全加固）
 │   └── env.conf                # 生产环境变量模板
-├── docker-compose.yml          # 6 容器编排（API + Redis + 3×Worker + Beat）
+├── docker-compose.local.yml    # 3 容器 Lite 编排（本地构建，无需 ACR）
+├── docker-compose.prod-lite.yml # 3 容器 Lite 编排（ACR 镜像）
+├── docker-compose.prod.yml     # 6 容器 Full 编排（ACR 镜像）
+├── docker-compose.yml          # 6 容器 Full 编排（本地构建）
 ├── Dockerfile                  # 多阶段构建（node:24-alpine + python:3.12-slim）
 ├── docker-entrypoint.sh        # Docker 入口（运行时目录 + volume 权限）
 ├── manage.sh                   # 开发/生产管理脚本
@@ -158,8 +171,10 @@ docStamp/
 | 模式 | 命令 | 容器/进程 | 推荐配置 |
 |------|------|:---:|:---:|
 | 开发 | `./manage.sh start` | 2 进程 | 本地开发 |
-| Docker Full | `./manage.sh docker-full` | 6 容器 | 4GB+ 服务器 |
-| Docker Lite | `./manage.sh lite` | 3 容器 | 2C2G ECS |
+| Docker Local | `docker compose -f docker-compose.local.yml up -d` | 3 容器 | 单服务器，无需 ACR |
+| Docker Full | `docker compose up -d` | 6 容器 | 4GB+ 服务器 |
+| Docker Lite | `docker compose -f docker-compose.lite.yml up -d` | 3 容器 | 2C2G ECS |
+| Docker Prod Lite | `docker compose -f docker-compose.prod-lite.yml up -d` | 3 容器 | 2C2G ECS（ACR 镜像）|
 | 裸机 Lite | `sudo bash scripts/install.sh install --lite` | 4 systemd 服务 | 2C2G ECS |
 | 裸机 Prod | `./manage.sh prod` | 1 进程 | 已有外部 Redis/Celery |
 

@@ -354,6 +354,14 @@ docStamp 提供两种部署模式，按服务器配置选择：
 ./manage.sh prod               # 裸机 Gunicorn 单端口
 ```
 
+### Local 模式（本地构建，3 容器，无需 ACR）
+
+```bash
+docker compose -f docker-compose.local.yml up -d   # 3 容器: redis + api + celery(all)
+```
+
+适合自建服务器和无镜像仓库环境。`build: .` 直接从本地 Dockerfile 构建。
+
 ### Full 模式（Docker Compose，6 容器）
 
 ```bash
@@ -456,6 +464,16 @@ Lite 模式 systemd 服务清单：
 ---
 
 ## 十一、版本历史
+
+### v3.5.2 (2026-06)
+
+- **Code Review 全面修复**：FormatDocxTab 错误处理修复（JSON 端点误用 `.text()` + `JSON.parse` → 直读 `e.response.data.error`），`transition-all` 违规修复（3 组件 → 具体属性列表），CSS `--shadow-*` 变量与 Tailwind 配置同步为 `none`
+- **Docker 本地构建编排**：新增 `docker-compose.local.yml`，本地 Dockerfile 构建，3 容器 Lite 模式，无需 ACR。适合自建服务器和无容器镜像仓库环境
+- **Docker 启动修复**：`docker-compose.prod-lite.yml` gunicorn 入口 `backend.app:app` → `backend.wsgi:app`（app.py 为工厂函数，模块级无 `app` 属性）
+- **Stats 模块名修复**：操作日志中间件 `parts[1]` → `parts[2]`，修复所有真实流量被记录为 `"v1"` 的 bug（路径 `/api/v1/convert` 解析错误）
+- **下载可靠性修复**：`pdf-merge.vue` 下载补全 `document.body.appendChild(a)` + `setTimeout` 延迟回收（防止 Firefox/Safari 静默失败）
+- **CORS 默认值更新**：`docker-compose.local.yml` 默认包含 `https://md2.sujx.net`
+- **清理**：移除未使用的 a11y i18n 键（deletePage/insertPage/reorderPage），doc-to-md 遗留 CSS 变量转为 Tailwind 工具类
 
 ### v3.5.1 (2026-06)
 
