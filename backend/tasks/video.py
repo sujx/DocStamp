@@ -31,7 +31,7 @@ class TrackedTask(Task):
 
     def on_retry(self, exc, task_id, args, kwargs, einfo):
         __record.update_progress(
-            task_id, "progress", progress_message=f"正在重试: {exc}",
+            task_id, "progress", message=f"正在重试: {exc}",
         )
 
 
@@ -41,12 +41,12 @@ def video_convert_async(self, input_path: str, output_path: str, original_name: 
     _record.create_task(self.request.id, "video_convert", "pdf_queue")
 
     _record.update_progress(self.request.id, "started", progress=0,
-                           progress_message="Preparing video...")
+                           message="Preparing video...")
 
     from backend.services.video_converter import mp4_to_wmv
 
     _record.update_progress(self.request.id, "progress", progress=20,
-                           progress_message="Converting with ffmpeg...")
+                           message="Converting with ffmpeg...")
 
     result = mp4_to_wmv(input_path, output_path)
 
@@ -59,7 +59,7 @@ def video_convert_async(self, input_path: str, output_path: str, original_name: 
         return {"error": result.message}
 
     _record.update_progress(self.request.id, "progress", progress=90,
-                           progress_message="Finalizing...")
+                           message="Finalizing...")
 
     base = original_name.rsplit(".", 1)[0] if "." in original_name else original_name
     download_name = f"{base}.wmv"
