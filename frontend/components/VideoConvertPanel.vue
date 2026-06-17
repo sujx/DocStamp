@@ -1,83 +1,67 @@
 <template>
   <div class="card bg-surface border-default">
-    <FileUploader
-      :accept="'.mp4,.mov,.avi,.mkv'"
-      :label="$t('videoConvert.uploadLabel')"
-      :hint="$t('videoConvert.sizeHint')"
-      @file-selected="onFileSelected"
-      @reset="() => {}"
-    />
-
-    <!-- Source video preview (stays visible during conversion) -->
-    <div v-if="file && !converted" class="mt-6 relative">
-      <p class="text-sm font-semibold text-primary mb-3">{{ $t("videoConvert.sourcePreview") }}</p>
-
-      <!-- Converting overlay -->
-      <div
-        v-if="converting"
-        class="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg"
-        style="background: rgba(0,0,0,0.75);"
-      >
-        <UIcon name="i-heroicons-arrow-path" class="w-10 h-10 animate-spin text-white" />
-        <p class="mt-4 text-sm text-white">{{ $t("videoConvert.converting") }}</p>
-      </div>
-
-      <video
-        :src="sourceUrl"
-        class="w-full rounded-lg"
-        style="max-height:320px; background:#000;"
-        controls
-        preload="metadata"
-      />
-      <p class="text-xs mt-2 text-tertiary">
-        {{ file.name }} &middot; {{ formatSize(file.size) }}
-      </p>
+    <!-- Step 1: Upload -->
+    <div
+      v-if="!state.file"
+      class="border-2 border-dashed rounded-lg p-6 text-center transition-colors duration-150 cursor-pointer border-default bg-surface"
+      @dragover.prevent
+      @drop.prevent="onDrop"
+    >
+      <UIcon name="i-heroicons-video-camera" class="w-8 h-8 mx-auto text-tertiary" />
+      <p class="text-sm mt-2 text-secondary">{{ $t("videoConvert.uploadLabel") }}</p>
+      <p class="text-xs mt-1 text-tertiary">{{ $t("videoConvert.sizeHint") }}</p>
+      <label class="cursor-pointer mt-3 inline-block">
+        <span class="px-4 py-2 rounded-md text-sm font-medium text-white bg-brand-700 hover:bg-brand-800 transition-colors duration-150">
+          {{ $t("common.upload") }}
+        </span>
+        <input type="file" accept=".mp4,.mov,.avi,.mkv" class="hidden" @change="onFileInput" />
+      </label>
     </div>
 
-    <!-- Result: WMV preview + download -->
-    <div v-if="converted" class="mt-6">
-      <p class="text-sm font-semibold text-primary mb-3">{{ $t("videoConvert.resultPreview") }}</p>
-      <video
-        :src="resultUrl"
-        class="w-full rounded-lg"
-        style="max-height:320px; background:#000;"
-        controls
-        preload="metadata"
-      />
-      <p class="text-xs mt-2 text-tertiary">
-        {{ resultFilename }} &middot; {{ formatSize(resultSize) }}
-      </p>
+    <!-- Step 2: File ready, preview -->
+    <div v-if="state.file && state.step === 'ready'" class="space-y-4">
+      <div class="flex items-center gap-3 p-3 rounded-lg bg-muted">
+        <UIcon name="i-heroicons-video-camera" class="w-6 h-6 text-brand-700 shrink-0" />
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium truncate text-primary">{{ state.fileName }}</p>
+          <p class="text-xs text-tertiary">{{ state.fileSizeFmt }}</p>
+        </div>
+        <button type="button" class="text-sm text-secondary hover:text-red-600 transition-colors duration-150" @click="resetState">✕</button>
+      </div>
 
-      <div class="mt-4 flex gap-3">
-        <button type="button" class="flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium text-white bg-brand-700 hover:bg-brand-800 cursor-pointer transition-colors duration-150" @click.prevent.stop="download">
+      <button
+        type="button"
+        class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium text-white bg-brand-700 hover:bg-brand-800 cursor-pointer transition-colors duration-150"
+        @click="doConvert"
+      >
+        <UIcon name="i-heroicons-video-camera" class="w-4 h-4" />
+        {{ $t("videoConvert.convert") }}
+      </button>
+    </div>
+
+    <!-- Step 3: Converting -->
+    <div v-if="state.step === 'converting'" class="flex flex-col items-center py-12">
+      <UIcon name="i-heroicons-arrow-path" class="w-10 h-10 animate-spin text-brand-700" />
+      <p class="mt-4 text-sm text-secondary">{{ $t("videoConvert.converting") }}</p>
+    </div>
+
+    <!-- Step 4: Done -->
+    <div v-if="state.step === 'done'" class="space-y-4">
+      <div class="p-4 rounded-lg bg-brand-soft text-center">
+        <UIcon name="i-heroicons-check-circle" class="w-8 h-8 mx-auto text-brand-700" />
+        <p class="text-sm font-medium mt-2 text-primary">{{ $t("common.success") }}</p>
+        <p class="text-xs mt-1 text-tertiary">{{ state.resultName }}</p>
+      </div>
+      <div class="flex gap-3">
+        <button type="button" class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium text-white bg-brand-700 hover:bg-brand-800 cursor-pointer transition-colors duration-150" @click="doDownload">
           <UIcon name="i-heroicons-arrow-down-tray" class="w-4 h-4" />
           {{ $t("common.download") }}
         </button>
-        <button type="button" class="flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium text-secondary border border-default bg-surface hover:bg-muted cursor-pointer transition-colors duration-150" @click.prevent.stop="resetAll">
+        <button type="button" class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium text-secondary border border-default bg-surface hover:bg-muted cursor-pointer transition-colors duration-150" @click="resetState">
           {{ $t("videoConvert.convertAnother") }}
         </button>
       </div>
     </div>
-
-    <!-- Convert button -->
-    <div v-if="file && !converted" class="mt-6 flex gap-3">
-      <button
-        type="button"
-        :disabled="converting"
-        class="flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium text-white transition-colors duration-150"
-        :class="converting ? 'bg-brand-400 cursor-not-allowed' : 'bg-brand-700 hover:bg-brand-800 cursor-pointer'"
-        @click.prevent.stop="convert"
-      >
-        <span v-if="converting" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-        <UIcon v-else name="i-heroicons-video-camera" class="w-4 h-4" />
-        {{ converting ? $t("videoConvert.converting") : $t("videoConvert.convert") }}
-      </button>
-    </div>
-
-    <p v-if="!file" class="text-xs mt-2 text-tertiary">
-      <UIcon name="i-heroicons-information-circle" class="w-3.5 h-3.5 inline" />
-      {{ $t("videoConvert.note") }}
-    </p>
   </div>
 </template>
 
@@ -87,56 +71,62 @@ import axios from "axios";
 const { t } = useI18n();
 const toast = useToast();
 
-const file = ref<File | null>(null);
-const sourceUrl = ref("");
-const converting = ref(false);
-const converted = ref(false);
-const resultUrl = ref("");
-const resultBlob = ref<Blob | null>(null);
-const resultFilename = ref("");
-const resultSize = ref(0);
+interface State {
+  step: "upload" | "ready" | "converting" | "done";
+  file: File | null;
+  fileName: string;
+  fileSizeFmt: string;
+  resultBlob: Blob | null;
+  resultName: string;
+}
 
-function formatSize(bytes: number): string {
+const state = reactive<State>({
+  step: "upload",
+  file: null,
+  fileName: "",
+  fileSizeFmt: "",
+  resultBlob: null,
+  resultName: "",
+});
+
+function fmtSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1048576).toFixed(1)} MB`;
 }
 
-function onFileSelected(f: File) {
-  if (sourceUrl.value) URL.revokeObjectURL(sourceUrl.value);
-  if (resultUrl.value) URL.revokeObjectURL(resultUrl.value);
-
-  file.value = f;
-  sourceUrl.value = URL.createObjectURL(f);
-  converted.value = false;
-  resultUrl.value = "";
-  resultBlob.value = null;
+function setFile(f: File) {
+  state.file = f;
+  state.fileName = f.name;
+  state.fileSizeFmt = fmtSize(f.size);
+  state.step = "ready";
+  state.resultBlob = null;
+  state.resultName = "";
 }
 
-async function convert() {
-  const f = file.value;
-  if (!f) {
-    toast.add({ title: "DEBUG: file is null", color: "error" });
-    return;
-  }
-  toast.add({ title: "DEBUG: starting conversion for " + f.name, color: "info", timeout: 2000 });
-  converting.value = true;
+function onFileInput(evt: Event) {
+  const f = (evt.target as HTMLInputElement).files?.[0];
+  if (f) setFile(f);
+}
+
+function onDrop(evt: DragEvent) {
+  const f = evt.dataTransfer?.files?.[0];
+  if (f) setFile(f);
+}
+
+async function doConvert() {
+  if (!state.file) return;
+  state.step = "converting";
   try {
     const fd = new FormData();
-    fd.append("file", f);
-
+    fd.append("file", state.file);
     const resp = await axios.post("/api/v1/video-convert", fd, { responseType: "blob" });
-    resultBlob.value = resp.data;
-
-    const base = f.name.replace(/\.[^.]+$/, "");
-    resultFilename.value = `${base}.wmv`;
-    resultSize.value = resp.data.size;
-    resultUrl.value = URL.createObjectURL(resp.data);
-    converted.value = true;
+    state.resultBlob = resp.data;
+    state.resultName = state.fileName.replace(/\.[^.]+$/, "") + ".wmv";
+    state.step = "done";
     toast.add({ title: t("common.success"), color: "success" });
   } catch (e: any) {
-    toast.add({ title: "DEBUG: in catch, type=" + typeof e + " msg=" + String(e.message).substring(0, 80), color: "error", timeout: 5000 });
-    let msg = e.message || "Unknown error";
+    let msg = e.message;
     try {
       if (e.response?.data instanceof Blob) {
         const text = await e.response.data.text();
@@ -144,36 +134,29 @@ async function convert() {
       } else if (e.response?.data?.error) {
         msg = e.response.data.error;
       }
-    } catch (ex: any) {
-      toast.add({ title: "DEBUG: extract error: " + String(ex).substring(0, 80), color: "error", timeout: 5000 });
-    }
-    toast.add({ title: msg, color: "error", timeout: 8000 });
-  } finally {
-    converting.value = false;
-    toast.add({ title: "DEBUG: finally, file=" + (file.value ? file.value.name : "null") + " converted=" + converted.value, color: "info", timeout: 2000 });
+    } catch { /* keep e.message */ }
+    toast.add({ title: msg, color: "error" });
+    state.step = "ready";
   }
 }
 
-function download() {
-  if (!resultBlob.value) return;
-  const url = URL.createObjectURL(resultBlob.value);
+function doDownload() {
+  if (!state.resultBlob) return;
+  const url = URL.createObjectURL(state.resultBlob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = resultFilename.value;
+  a.download = state.resultName;
   document.body.appendChild(a);
   a.click();
   setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
 }
 
-function resetAll() {
-  if (sourceUrl.value) URL.revokeObjectURL(sourceUrl.value);
-  if (resultUrl.value) URL.revokeObjectURL(resultUrl.value);
-  file.value = null;
-  sourceUrl.value = "";
-  converted.value = false;
-  resultUrl.value = "";
-  resultBlob.value = null;
-  resultFilename.value = "";
-  resultSize.value = 0;
+function resetState() {
+  state.step = "upload";
+  state.file = null;
+  state.fileName = "";
+  state.fileSizeFmt = "";
+  state.resultBlob = null;
+  state.resultName = "";
 }
 </script>
