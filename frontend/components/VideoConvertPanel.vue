@@ -7,11 +7,21 @@
       @file-selected="onFileSelected"
     />
 
-    <!-- Source video preview -->
-    <div v-if="file && !converted && !converting" class="mt-6">
+    <!-- Source video preview (stays visible during conversion) -->
+    <div v-if="file && !converted" class="mt-6 relative">
       <p class="text-sm font-semibold text-primary mb-3">{{ $t("videoConvert.sourcePreview") }}</p>
+
+      <!-- Converting overlay -->
+      <div
+        v-if="converting"
+        class="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg"
+        style="background: rgba(0,0,0,0.75);"
+      >
+        <UIcon name="i-heroicons-arrow-path" class="w-10 h-10 animate-spin text-white" />
+        <p class="mt-4 text-sm text-white">{{ $t("videoConvert.converting") }}</p>
+      </div>
+
       <video
-        ref="sourceVideo"
         :src="sourceUrl"
         class="w-full rounded-lg"
         style="max-height:320px; background:#000;"
@@ -21,12 +31,6 @@
       <p class="text-xs mt-2 text-tertiary">
         {{ file.name }} &middot; {{ formatSize(file.size) }}
       </p>
-    </div>
-
-    <!-- Converting spinner -->
-    <div v-if="converting" class="mt-6 flex flex-col items-center justify-center py-12">
-      <UIcon name="i-heroicons-arrow-path" class="w-10 h-10 animate-spin text-brand-700" />
-      <p class="mt-4 text-sm text-secondary">{{ $t("videoConvert.converting") }}</p>
     </div>
 
     <!-- Result: WMV preview + download -->
@@ -54,9 +58,9 @@
       </div>
     </div>
 
-    <!-- Convert button (before conversion) -->
-    <div v-if="file && !converted && !converting" class="mt-6 flex gap-3">
-      <UButton color="primary" type="button" @click="convert">
+    <!-- Convert button -->
+    <div v-if="file && !converted" class="mt-6 flex gap-3">
+      <UButton color="primary" type="button" :disabled="converting" :loading="converting" @click="convert">
         <UIcon name="i-heroicons-video-camera" class="w-4 h-4 mr-1.5" />
         {{ $t("videoConvert.convert") }}
       </UButton>
