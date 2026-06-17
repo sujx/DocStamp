@@ -33,7 +33,7 @@
       class="flex items-center h-14 px-4 border-b shrink-0 border-subtle"
       :class="collapsed && !isMobile ? 'justify-center' : 'gap-3'"
     >
-      <UIcon name="i-heroicons-document-check" class="size-8 shrink-0 text-brand-700" />
+      <img :src="logoUrl" alt="鹊随金印" class="size-8 shrink-0" />
       <span v-if="!(collapsed && !isMobile)" class="brand-title truncate">鹊随金印</span>
     </div>
 
@@ -127,6 +127,7 @@
 
 <script setup lang="ts">
 import { SIDEBAR_GROUPS } from "~/composables/tools.config";
+import logoUrl from "~/public/logo.svg";
 
 const collapsed = ref(import.meta.client ? localStorage.getItem("sidebar_collapsed") === "true" : false);
 const hoverGroup = ref<string | null>(null);
