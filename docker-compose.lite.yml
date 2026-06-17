@@ -39,6 +39,7 @@ services:
     volumes:
       - output_data:/opt/docstamp/backend/output
       - log_data:/var/log/docstamp
+      - db_data:/opt/docstamp/backend/data
     environment:
       - TZ=Asia/Shanghai
       - DOCSTAMP_STATIC=/opt/docstamp/frontend/.output/public
@@ -50,6 +51,7 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - DOCSTAMP_CORS_ORIGINS=${DOCSTAMP_CORS_ORIGINS:-http://localhost:8080}
+      - DOCSTAMP_TASK_DB=/opt/docstamp/backend/data/tasks.db
       - PYTHONPATH=/opt/docstamp/backend
     depends_on:
       redis:
@@ -80,11 +82,13 @@ services:
     volumes:
       - output_data:/opt/docstamp/backend/output
       - log_data:/var/log/docstamp
+      - db_data:/opt/docstamp/backend/data
     environment:
       - TZ=Asia/Shanghai
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
+      - DOCSTAMP_TASK_DB=/opt/docstamp/backend/data/tasks.db
       - PYTHONPATH=/opt/docstamp/backend
     depends_on:
       redis:
@@ -102,3 +106,4 @@ volumes:
   output_data:
   log_data:
   redis_data:
+  db_data:
