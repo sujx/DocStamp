@@ -52,7 +52,7 @@ services:
       - DOCSTAMP_PUBLIC_URL=${DOCSTAMP_PUBLIC_URL:-}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
-      - DOCSTAMP_CORS_ORIGINS=${DOCSTAMP_CORS_ORIGINS:-http://localhost:8080,https://md2.sujx.net}
+      - DOCSTAMP_CORS_ORIGINS=${DOCSTAMP_CORS_ORIGINS:-http://localhost:8080,https://doc.sujx.net}
       - PYTHONPATH=/opt/docstamp/backend
     depends_on:
       redis:

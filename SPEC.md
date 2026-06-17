@@ -472,7 +472,7 @@ Lite 模式 systemd 服务清单：
 - **Docker 启动修复**：`docker-compose.prod-lite.yml` gunicorn 入口 `backend.app:app` → `backend.wsgi:app`（app.py 为工厂函数，模块级无 `app` 属性）
 - **Stats 模块名修复**：操作日志中间件 `parts[1]` → `parts[2]`，修复所有真实流量被记录为 `"v1"` 的 bug（路径 `/api/v1/convert` 解析错误）
 - **下载可靠性修复**：`pdf-merge.vue` 下载补全 `document.body.appendChild(a)` + `setTimeout` 延迟回收（防止 Firefox/Safari 静默失败）
-- **CORS 默认值更新**：`docker-compose.local.yml` 默认包含 `https://md2.sujx.net`
+- **CORS 默认值更新**：`docker-compose.local.yml` 默认包含 `https://doc.sujx.net`
 - **清理**：移除未使用的 a11y i18n 键（deletePage/insertPage/reorderPage），doc-to-md 遗留 CSS 变量转为 Tailwind 工具类
 
 ### v3.5.1 (2026-06)
