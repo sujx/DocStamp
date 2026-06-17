@@ -6,5 +6,5 @@
 </template>
 
 <script setup lang="ts">
-const VideoConvertPanel = defineAsyncComponent(() => import("~/components/VideoConvertPanel.vue"));
+import VideoConvertPanel from "~/components/VideoConvertPanel.vue";
 </script>
