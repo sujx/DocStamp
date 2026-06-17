@@ -1,6 +1,6 @@
 <template>
   <div
-    class="card-base"
+    class="card bg-surface border-default"
     :style="{ borderRadius: `var(--radius-${radius})` }"
   >
     <slot />
@@ -14,11 +14,3 @@ withDefaults(defineProps<{
   radius: "md",
 });
 </script>
-
-<style scoped>
-.card-base {
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
-  padding: 1rem;
-}
-</style>

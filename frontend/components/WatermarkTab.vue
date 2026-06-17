@@ -90,7 +90,7 @@
       <!-- Preview canvas -->
       <div class="mb-4">
         <p class="text-xs mb-2 text-tertiary" >{{ $t("watermark.preview") }}</p>
-        <canvas ref="previewCanvas" class="w-full rounded border" style="height:280px; border-color:#e8e6d8;"></canvas>
+        <canvas ref="previewCanvas" class="w-full rounded border border-default h-[280px]"></canvas>
       </div>
 
       <UButton color="primary" :loading="isProcessing" block @click="addWatermark">
@@ -146,7 +146,7 @@ function drawPreview() {
   const ctx = canvas.getContext("2d")!;
   canvas.width = 400;
   canvas.height = 280;
-  ctx.fillStyle = "#f9f7e8";
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-page').trim() || '#f9f7e8';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   if (params.watermark_type === "text" && params.text) {

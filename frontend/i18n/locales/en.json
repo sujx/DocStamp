@@ -349,7 +349,13 @@
     "process": "Process & Download"
   },
   "a11y": {
-    "skipToContent": "Skip to main content"
+    "skipToContent": "Skip to main content",
+    "removeFile": "Remove file",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "deletePage": "Delete page",
+    "insertPage": "Insert page",
+    "reorderPage": "Reorder page"
   },
   "ai": {
     "correct": "AI Correct",

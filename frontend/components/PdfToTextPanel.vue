@@ -59,6 +59,5 @@ async function aiDenoise() {
 </script>
 
 <style scoped>
-.card { border: 1px solid; border-radius: 10px; padding: 24px; }
 .result-area { width: 100%; max-height: 500px; overflow: auto; border: 1px solid; border-radius: 8px; padding: 16px; font-size: 13px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; font-family: "JetBrains Mono", "Fira Code", monospace; }
 </style>

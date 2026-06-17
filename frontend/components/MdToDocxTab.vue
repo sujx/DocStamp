@@ -534,7 +534,7 @@ function convertOfficial() { doConvert("official"); }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg-soft, #f4f2e4);
+  background: var(--color-muted);
   border-radius: 50%;
   margin-bottom: 4px;
   color: var(--color-text-tertiary);

@@ -59,10 +59,3 @@ async function clean() {
 }
 </script>
 
-<style scoped>
-.card {
-  border: 1px solid;
-  border-radius: 10px;
-  padding: 24px;
-}
-</style>

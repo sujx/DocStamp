@@ -42,9 +42,12 @@ export default <Config>{
         lg: "12px",
       },
       boxShadow: {
-        card: "0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.05)",
-        elevated: "0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04)",
-        sidebar: "1px 0 4px rgba(0,0,0,0.04)",
+        card: "none",
+        elevated: "none",
+        sidebar: "none",
+      },
+      transitionDuration: {
+        DEFAULT: "150ms",
       },
     },
   },

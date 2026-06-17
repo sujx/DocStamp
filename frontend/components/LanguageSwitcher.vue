@@ -67,11 +67,11 @@ function setLang(lang: string) {
   padding: 0;
 }
 .lang-btn:hover {
-  background: var(--color-muted, #f4f2e4);
+  background: var(--color-muted);
 }
 .lang-btn.active {
-  background: var(--color-brand-soft, rgba(0,138,61,0.08));
-  outline: 1px solid var(--color-brand-700, #008a3d);
+  background: var(--color-brand-soft);
+  outline: 1px solid var(--color-brand-700);
   outline-offset: -1px;
 }
 .flag {

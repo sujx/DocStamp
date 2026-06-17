@@ -20,8 +20,7 @@
         <div
           v-for="(img, idx) in images" :key="img.id"
           class="relative rounded-md overflow-hidden border cursor-grab bg-white transition-transform duration-150"
-          :class="{ 'opacity-50 scale-95': dragIdx === idx }"
-          :style="dragOverIdx === idx ? { borderColor: '#008a3d' } : { borderColor: '#e8e6d8' }"
+          :class="[{ 'opacity-50 scale-95': dragIdx === idx }, dragOverIdx === idx ? 'border-brand-700' : 'border-default']"
           draggable="true"
           @dragstart="onDragStart(idx)"
           @dragover.prevent="onDragOver(idx)"
@@ -30,11 +29,11 @@
         >
           <img :src="img.thumb" class="w-full h-36 object-cover block" />
           <div class="flex items-center justify-center gap-0.5 p-0.5">
-            <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-up" :disabled="idx===0" @click="moveImage(idx,-1)" />
+            <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-up" :disabled="idx===0" :aria-label="$t('a11y.moveUp')" @click="moveImage(idx,-1)" />
             <span class="text-xs px-1 text-tertiary" >{{ $t("img2pdf.page", { n: idx+1 }) }}</span>
-            <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-down" :disabled="idx===images.length-1" @click="moveImage(idx,1)" />
+            <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-down" :disabled="idx===images.length-1" :aria-label="$t('a11y.moveDown')" @click="moveImage(idx,1)" />
           </div>
-          <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-x-mark" class="!absolute top-1 right-1" @click="removeImage(idx)" />
+          <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-x-mark" :aria-label="$t('a11y.removeFile')" class="!absolute top-1 right-1" @click="removeImage(idx)" />
         </div>
       </div>
     </div>

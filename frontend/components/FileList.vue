@@ -16,7 +16,7 @@
       <UIcon :name="f.icon || 'i-heroicons-document'" class="w-4 h-4 shrink-0 text-tertiary"  />
       <span class="flex-1 text-sm truncate text-primary" >{{ f.name }}</span>
       <span v-if="f.meta" class="text-xs shrink-0 text-tertiary" >{{ f.meta }}</span>
-      <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-x-mark" @click="$emit('remove', idx)" />
+      <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-x-mark" :aria-label="$t('a11y.removeFile')" @click="$emit('remove', idx)" />
     </div>
   </div>
 </template>

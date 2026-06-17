@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-3xl mx-auto px-6 py-8">
+  <div class="max-w-5xl mx-auto px-6 py-8">
     <PageHeader :title="$t('pdfMerge.title')" :description="$t('pdfMerge.description')" />
 
     <div class="card bg-surface border-default" >
@@ -126,10 +126,3 @@ async function merge() {
 }
 </script>
 
-<style scoped>
-.card {
-  border: 1px solid;
-  border-radius: 10px;
-  padding: 24px;
-}
-</style>

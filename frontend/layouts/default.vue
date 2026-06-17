@@ -14,7 +14,9 @@
       :style="{ marginLeft: sidebarWidth + 'px' }"
     >
       <main id="main-content" class="flex-1">
-        <NuxtPage />
+        <Transition name="page-fade" mode="out-in">
+          <NuxtPage />
+        </Transition>
       </main>
       <AppFooter />
     </div>

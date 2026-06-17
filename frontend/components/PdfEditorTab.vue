@@ -31,7 +31,7 @@
             :class="deleteSet.has(p.page_no) ? 'border-red-500' : 'border-neutral-200'"
             @click="toggleDeletePage(p.page_no)"
           >
-            <img :src="p.thumb" class="w-full object-contain" style="height:130px; background:#f4f2e4;" @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
+            <img :src="p.thumb" class="w-full object-contain h-[130px] bg-muted" @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
             <div class="text-xs text-center py-1 bg-surface" >{{ $t("pdfEditor.page") }} {{ p.page_no }}</div>
           </div>
         </div>
@@ -71,17 +71,16 @@
           <div
             v-for="(p, idx) in pageThumbs" :key="p.page_no"
             class="rounded-md overflow-hidden border cursor-grab bg-white transition-all duration-150"
-            :class="{ 'opacity-50 scale-95': dragIdx===idx }"
-            :style="dragOverIdx===idx ? { borderColor:'#008a3d' } : { borderColor:'#e8e6d8' }"
+            :class="[{ 'opacity-50 scale-95': dragIdx === idx }, dragOverIdx === idx ? 'border-brand-700' : 'border-default']"
             draggable="true"
             @dragstart="onDragStart(idx)" @dragover.prevent="onDragOver(idx)"
             @drop="onDrop(idx)" @dragend="dragIdx=null"
           >
-            <img :src="p.thumb" class="w-full object-contain" style="height:130px; background:#f4f2e4;" @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
+            <img :src="p.thumb" class="w-full object-contain h-[130px] bg-muted" @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
             <div class="flex items-center justify-between px-1 py-0.5 bg-surface" >
-              <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-up" :disabled="idx===0" @click="movePage(idx,-1)" />
+              <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-up" :disabled="idx===0" :aria-label="$t('a11y.moveUp')" @click="movePage(idx,-1)" />
               <span class="text-xs text-pretty text-tertiary" >{{ idx+1 }}</span>
-              <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-down" :disabled="idx===pageThumbs.length-1" @click="movePage(idx,1)" />
+              <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-down" :disabled="idx===pageThumbs.length-1" :aria-label="$t('a11y.moveDown')" @click="movePage(idx,1)" />
             </div>
           </div>
         </div>

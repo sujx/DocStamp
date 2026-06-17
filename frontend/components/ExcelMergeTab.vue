@@ -11,20 +11,19 @@
       <input type="file" multiple accept=".xlsx,.csv" class="hidden" @change="onFilesSelected" />
     </label>
 
-    <div v-if="files.length" class="p-3 rounded-md mb-4" style="background:#fff; border:1px solid #e8e6d8;">
+    <div v-if="files.length" class="p-3 rounded-md mb-4 bg-surface border border-default">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-semibold text-secondary" >{{ $t("excelMerge.fileCount", { n: files.length }) }}</span>
         <UButton size="xs" variant="ghost" color="neutral" @click="files=[]">{{ $t("common.reset") }}</UButton>
       </div>
       <div
         v-for="(f, idx) in files" :key="f.id"
-        class="flex items-center gap-2 py-2 border-t"
-        style="border-color:#e8e6d8;"
+        class="flex items-center gap-2 py-2 border-t border-subtle"
       >
         <UIcon name="i-heroicons-table-cells" class="w-4 h-4 shrink-0 text-tertiary"  />
         <span class="flex-1 text-sm truncate text-primary" >{{ f.name }}</span>
         <span v-if="f.rowCount !== null" class="text-xs shrink-0 text-tertiary" >{{ $t("excelMerge.rowsCount", { n: f.rowCount }) }}</span>
-        <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-x-mark" :aria-label="$t('common.removeFile')" @click="files.splice(idx,1)" />
+        <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-x-mark" :aria-label="$t('a11y.removeFile')" @click="files.splice(idx,1)" />
       </div>
     </div>
 

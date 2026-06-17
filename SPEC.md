@@ -17,8 +17,10 @@
 ```
 仪表盘            → /
 MD 转公文        → /md-to-docx
+文档转 MD        → /doc-to-md
+格式规范          → /format-docx
 水印管理          → /watermark       (添加/去除)
-Office 工具 ▸     → /properties  /excel-merge  /format-docx  /format-convert  /metadata-clean
+Office 工具 ▸     → /properties  /excel-merge  /metadata-clean
 PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-text  /pdf-merge  /pdf-compress  /page-decorate  /image-process
 使用统计          → /status
 ```
@@ -66,13 +68,14 @@ PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-tex
 | `--radius-sm` | `6px` | 按钮/标签 |
 | `--radius-md` | `10px` | 面板/卡片 |
 | `--radius-lg` | `12px` | 模态框/弹出层 |
-| `--shadow-card` | `0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.05)` | 卡片 |
-| `--shadow-elevated` | `0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04)` | 弹出菜单/下拉 |
-| `--shadow-sidebar` | `1px 0 4px rgba(0,0,0,0.04)` | 侧边栏右边缘 |
+| `--shadow-card` | `none` | 卡片（Flat Design: 边框替代阴影） |
+| `--shadow-elevated` | `none` | 弹出菜单/下拉 |
+| `--shadow-sidebar` | `none` | 侧边栏右边缘 |
 
 ### 字体
 
-- UI：PingFang SC / Microsoft YaHei / system-ui
+- UI：**Plus Jakarta Sans** + PingFang SC / Microsoft YaHei / system-ui
+- 标题：Plus Jakarta Sans 优先（字重 700），中西文混排
 - 编辑区：JetBrains Mono / Fira Code
 - 公文预览：仿宋_GB2312 / FangSong / 黑体 / 楷体
 
@@ -84,13 +87,17 @@ Nuxt UI v2（`UFormGroup`, `UButton`, `UInput`, `USelect`, `UTabs`, `UAlert`, `U
 
 - 所有标题 `text-balance`，正文 `text-pretty`
 - 使用 `h-dvh` 替代 `h-screen`
-- 图标按钮 `aria-label`，表单错误 `aria-describedby`
+- 图标按钮 `aria-label`（统一使用 `a11y.*` i18n 键）
+- 表单错误 `aria-describedby`
 - 拖拽元素提供 ▲/▼ 键盘替代 + `touch-action: manipulation`
 - 固定元素 `safe-area-inset` 适配
-- 禁止硬编码颜色（CSS 变量）、禁止 `transition: all`、禁止 `linear-gradient`（除非明确要求）
+- 全局 `:focus-visible` 轮廓（2px brand-700，offset 2px）
+- 禁止硬编码颜色（仅 CSS 变量 / Tailwind token）、禁止 `transition: all`、禁止 `linear-gradient`（除非明确要求）
 - `@media (prefers-reduced-motion: reduce)` 全局禁用动画（`animation/transition-duration: 0.01ms`）
 - `@media (prefers-contrast: high)` 高低对比度模式
 - 键盘用户 skip-to-content 跳转链接（`sr-only focus:not-sr-only`）
+- 页面过渡：150ms opacity 淡入淡出（`mode="out-in"`，`prefers-reduced-motion` 自动跳过）
+- 所有悬停状态统一 `duration-150` 过渡
 - 最小触摸目标 44×44px（`min-h-[44px]`）
 - 文本对比度 ≥ 4.5:1 WCAG AA（text-primary 16.6:1, text-secondary 6.3:1, text-tertiary 4.69:1）
 
@@ -289,18 +296,32 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 
 | Composable | 功能 |
 |-----------|------|
+| `tools.config.ts` | 工具定义（ToolDef/ToolGroup）、侧栏分组、仪表盘卡片 |
 | `useValidation` | Vuelidate 封装：`v$` 状态 + `errors` 字典 + `validate()` |
 | `useTaskStream` | SSE 进度监听：`{ progress, status, message, result, error, connect, close }` |
 | `useApi` | 通用 API 封装：`{ data, loading, pagination, fetchList }` + `useCache` |
-| `useDownload` | Blob 下载封装 |
+| `useDownload` | Blob 下载封装 + 错误提取 |
+| `useAi` | AI 功能封装（纠错/分类/去噪/文件名生成） |
 
 ### 原子组件 (`components/ui/`)
 
 | 组件 | 说明 |
 |------|------|
-| `ButtonPrimary.vue` | 品牌绿主按钮 |
-| `CardBase.vue` | 基础卡片（shadow/radius token） |
-| `ProgressBar.vue` | 进度条（含 ARIA `role="progressbar"`） |
+| `CardBase.vue` | 基础卡片（`.card` 全局工具类：边框 + 圆角 + 内边距） |
+| `SkeletonBlock.vue` | 骨架屏占位块（可配置宽高，`animate-pulse`） |
+
+### 全局 CSS 工具类
+
+| 类名 | 说明 |
+|------|------|
+| `.card` | 卡片容器：`border + border-radius(var(--radius-md)) + padding: 1.5rem`（定义于 `@layer components`） |
+| `.brand-title` | 品牌标题：Plus Jakarta Sans 700 + 字距 0.08em + 品牌绿实色（Flat Design，无渐变） |
+
+### 关键架构决策
+
+- **Panel 去重**：`PdfToTextPanel` / `PdfCompressPanel` / `PageDecoratePanel` 是各自功能的唯一实现。独立页面（`pdf-to-text.vue` 等）和 Tab 页（`pdf-tools.vue`）共享同一 Panel 组件，消除逻辑重复。
+- **懒加载**：Panel 组件通过 `defineAsyncComponent(() => import(...))` 按需加载。
+- **已删除组件**：`AppHeader.vue`（未使用，功能由 Sidebar 覆盖）、`ButtonPrimary.vue`（由 Nuxt UI `<UButton>` 替代）、`ProgressBar.vue`（由 Nuxt UI `<UProgress>` 替代）。
 
 ### 命名规范
 
@@ -436,7 +457,18 @@ Lite 模式 systemd 服务清单：
 
 ## 十一、版本历史
 
-### v3.5 (2026-06)
+### v3.5.1 (2026-06)
+
+- **UI/UX Pro Max — Flat Design 全面升级**：品牌标题去渐变（金绿渐变 → 品牌绿实色），全局阴影归零（`shadow-card/elevated/sidebar: none`，边框替代阴影视觉分隔），全局悬停过渡统一 `duration-150`
+- **字体升级**：UI 字体栈新增 Plus Jakarta Sans 优先（Google Fonts，400/500/600/700），中西文混排
+- **全局 `.card` 工具类**：`@layer components` 定义卡片容器（`border + radius-md + padding: 1.5rem`），消除 10+ 文件中的重复 scoped CSS
+- **页面宽度标准化**：所有工具页面统一 `max-w-5xl`（原混用 3xl/4xl/5xl/6xl）
+- **硬编码颜色清零**：全局替换 `#e8e6d8`/`#f4f2e4`/`#008a3d` 内联样式为 Tailwind token（`border-default`/`bg-muted`/`text-brand-700`），修复 CSS 变量名错误（`--color-bg-soft`→`--color-muted`）
+- **死代码清理**：删除 `AppHeader.vue`（未导入）、`ButtonPrimary.vue`（`UButton` 替代）、`ProgressBar.vue`（`UProgress` 替代）；`CardBase.vue` 对齐全局 `.card` 模式
+- **PageHeader 增强**：支持 `title`/`description` props 渲染，回退链接改用 `ULink` + 悬停态过渡
+- **Panel 去重**：`pdf-to-text.vue` / `pdf-compress.vue` / `page-decorate.vue` 改为委托 Panel 组件（~150 行 → ~10 行），与 `pdf-tools.vue` Tab 页共享唯一实现
+- **页面过渡**：`layouts/default.vue` 增加 `<Transition name="page-fade" mode="out-in">`（150ms opacity），`prefers-reduced-motion` 自动跳过
+- **无障碍增强**：全局 `:focus-visible` 轮廓（2px brand-700 + 2px offset），所有图标按钮补 `aria-label`（统一 `a11y.*` i18n 键），新增骨架屏组件 `SkeletonBlock.vue`
 - **AI 功能（DeepSeek v4 Flash）**：文本纠错（MD 转公文前自动纠正错别字和标点）、格式意图识别（自动检测正式公文并建议 GB/T 格式）、智能文件名生成、PDF 文本去噪（自动去除页眉页脚/水印残留）。Prompt 级缓存（SHA256, 1h TTL），未配 Key 时静默降级返回原文。
 - **文档转 MD（MinerU API）**：新增「文档转MD」功能，支持 PDF/DOC/DOCX/PPT/PPTX/PNG/JPG → Markdown（vlm 模型 + OCR + 公式/表格识别），200MB/200 页限制。异步轮询 + ZIP 提取 + 24h 缓存。`DOCSTAMP_PUBLIC_URL` 配置公网文件访问地址。
 - **功能重组**：元数据清理合并到属性修改（Tab 切换），PDF 转文本/压缩/页码合并为「调整PDF」三合一页面，图片处理功能删除，Office 工具组展开到侧栏顶层。

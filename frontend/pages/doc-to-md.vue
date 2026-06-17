@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto px-6 py-8">
+  <div class="max-w-5xl mx-auto px-6 py-8">
     <PageHeader :title="$t('docToMd.title')" :description="$t('docToMd.description')" />
 
     <div class="card bg-surface border-default">
@@ -113,7 +113,6 @@ function downloadMd() {
 </script>
 
 <style scoped>
-.card { border: 1px solid; border-radius: 10px; padding: 24px; }
 .result-area {
   max-height: 600px; overflow: auto;
   border: 1px solid var(--color-border-default);

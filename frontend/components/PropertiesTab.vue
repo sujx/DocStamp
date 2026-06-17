@@ -27,8 +27,7 @@
       <div v-if="batchFiles.length" class="flex flex-wrap gap-1.5 mb-4">
         <span
           v-for="(f, i) in batchFiles" :key="i"
-          class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded font-medium"
-          style="background: rgba(0,138,61,0.07); color: #008a3d;"
+          class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded font-medium bg-brand-soft text-brand-700"
         >
           {{ f.name }}
           <button class="hover:text-red-600" @click="batchFiles.splice(i,1)">&times;</button>
