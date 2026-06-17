@@ -42,6 +42,8 @@ MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB — supports video uploads
 
 # Maps file extension → expected leading bytes
 # ZIP-based formats (docx/xlsx/pptx) share the PK signature
+# Video formats use variable-length headers (MP4 ftyp box size varies,
+# WMV/AVI structs differ).  Skipped here — ffmpeg validates on conversion.
 MAGIC_SIGNATURES: dict[str, bytes] = {
     "pdf": b"%PDF",
     "png": b"\x89PNG\r\n\x1a\n",
@@ -50,8 +52,6 @@ MAGIC_SIGNATURES: dict[str, bytes] = {
     "docx": b"PK\x03\x04",
     "xlsx": b"PK\x03\x04",
     "pptx": b"PK\x03\x04",
-    "mp4": b"\x00\x00\x00\x18ftyp",
-    "wmv": b"0\x26\xb2u",
 }
 
 
