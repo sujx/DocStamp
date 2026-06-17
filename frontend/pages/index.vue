@@ -1,9 +1,6 @@
 <template>
   <div class="max-w-5xl mx-auto px-6 py-8">
-    <div class="mb-10 flex items-center">
-      <DigitalClock />
-    </div>
-
+    <h1 class="text-2xl font-bold text-primary mb-6">{{ $t("tabs.dashboard") }}</h1>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <ToolCard
         v-for="tool in tools" :key="tool.to"
