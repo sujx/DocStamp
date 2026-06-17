@@ -42,9 +42,12 @@
 
     <!-- Done -->
     <div v-if="done" class="mt-6 space-y-4">
-      <p class="text-sm font-semibold text-primary">{{ $t("videoConvert.resultPreview") }}</p>
-      <video :src="resultUrl" class="w-full rounded-lg" style="max-height:360px; background:#000;" controls />
-      <p class="text-xs text-tertiary">{{ resultName }} &middot; {{ resultSizeFmt }}</p>
+      <div class="p-6 rounded-lg bg-brand-soft border border-default text-center">
+        <UIcon name="i-heroicons-check-circle" class="w-10 h-10 mx-auto text-brand-700" />
+        <p class="text-sm font-semibold mt-3 text-primary">{{ $t("common.success") }}</p>
+        <p class="text-xs mt-1 text-tertiary">{{ resultName }} &middot; {{ resultSizeFmt }}</p>
+        <p class="text-xs mt-2 text-tertiary">{{ $t("videoConvert.note") }}</p>
+      </div>
       <div class="flex gap-3">
         <UButton color="primary" class="flex-1" @click="download">
           <UIcon name="i-heroicons-arrow-down-tray" class="w-4 h-4 mr-1.5" />
@@ -74,7 +77,6 @@ const toast = useToast();
 const file = ref<File | null>(null);
 const converting = ref(false);
 const done = ref(false);
-const resultUrl = ref("");
 const resultBlob = ref<Blob | null>(null);
 const resultName = ref("");
 const resultSizeFmt = ref("");
@@ -114,7 +116,6 @@ async function doConvert() {
     resultBlob.value = resp.data;
     resultName.value = file.value.name.replace(/\.[^.]+$/, "") + ".wmv";
     resultSizeFmt.value = fmtSize(resp.data.size);
-    resultUrl.value = URL.createObjectURL(resp.data);
     done.value = true;
     toast.add({ title: t("common.success"), color: "success" });
   } catch (e: any) {
@@ -145,11 +146,9 @@ function download() {
 }
 
 function resetState() {
-  if (resultUrl.value) URL.revokeObjectURL(resultUrl.value);
   file.value = null;
   converting.value = false;
   done.value = false;
-  resultUrl.value = "";
   resultBlob.value = null;
   resultName.value = "";
   resultSizeFmt.value = "";
