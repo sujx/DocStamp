@@ -68,8 +68,8 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 # Runtime directories (match UPLOAD_FOLDER default in backend/config.py)
-RUN mkdir -p /var/log/docstamp /opt/docstamp/backend/output \
-    && chmod 755 /var/log/docstamp /opt/docstamp/backend/output
+RUN mkdir -p /var/log/docstamp /opt/docstamp/backend/output /opt/docstamp/backend/data \
+    && chmod 755 /var/log/docstamp /opt/docstamp/backend/output /opt/docstamp/backend/data
 
 # Non-root user for production security
 RUN useradd --create-home --shell /bin/bash docstamp \

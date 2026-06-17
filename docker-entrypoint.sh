@@ -5,6 +5,6 @@
 # We check writability and surface a clear error rather than a cryptic crash.
 set -e
 
-mkdir -p /var/log/docstamp /opt/docstamp/backend/output
+mkdir -p /var/log/docstamp /opt/docstamp/backend/output /opt/docstamp/backend/data
 
 exec "$@"
