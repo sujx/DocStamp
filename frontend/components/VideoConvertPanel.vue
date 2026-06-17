@@ -17,7 +17,7 @@
       </label>
     </div>
 
-    <!-- File ready + Convert button -->
+    <!-- File ready: preview + Convert button -->
     <div v-if="file && !converting && !done" class="mt-6 space-y-4">
       <div class="flex items-center gap-3 p-3 rounded-lg bg-muted">
         <UIcon name="i-heroicons-video-camera" class="w-6 h-6 text-brand-700 shrink-0" />
@@ -27,6 +27,15 @@
         </div>
         <button type="button" class="text-sm text-tertiary hover:text-red-600" @click="resetState">✕</button>
       </div>
+
+      <video
+        v-if="sourceUrl"
+        :src="sourceUrl"
+        class="w-full rounded-lg"
+        style="max-height:300px; background:#000;"
+        controls
+        preload="metadata"
+      />
 
       <UButton color="primary" block :loading="converting" @click="doConvert">
         <UIcon name="i-heroicons-video-camera" class="w-4 h-4 mr-1.5" />
@@ -75,6 +84,7 @@ const { t } = useI18n();
 const toast = useToast();
 
 const file = ref<File | null>(null);
+const sourceUrl = ref("");
 const converting = ref(false);
 const done = ref(false);
 const resultBlob = ref<Blob | null>(null);
@@ -90,18 +100,18 @@ function fmtSize(bytes: number): string {
 
 function onFileInput(evt: Event) {
   const f = (evt.target as HTMLInputElement).files?.[0];
-  if (f) {
-    resetState();
-    file.value = f;
-  }
+  if (f) setFile(f);
 }
 
 function onDrop(evt: DragEvent) {
   const f = evt.dataTransfer?.files?.[0];
-  if (f) {
-    resetState();
-    file.value = f;
-  }
+  if (f) setFile(f);
+}
+
+function setFile(f: File) {
+  resetState();
+  file.value = f;
+  sourceUrl.value = URL.createObjectURL(f);
 }
 
 async function doConvert() {
@@ -146,6 +156,7 @@ function download() {
 }
 
 function resetState() {
+  if (sourceUrl.value) { URL.revokeObjectURL(sourceUrl.value); sourceUrl.value = ""; }
   file.value = null;
   converting.value = false;
   done.value = false;
