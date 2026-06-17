@@ -33,7 +33,7 @@
       class="flex items-center h-14 px-4 border-b shrink-0 border-subtle"
       :class="collapsed && !isMobile ? 'justify-center' : 'gap-3'"
     >
-      <img src="/logo.svg" alt="鹊随金印" class="size-8 shrink-0" />
+      <UIcon name="i-heroicons-document-check" class="size-8 shrink-0 text-brand-700" />
       <span v-if="!(collapsed && !isMobile)" class="brand-title truncate">鹊随金印</span>
     </div>
 
