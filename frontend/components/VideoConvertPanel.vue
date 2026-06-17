@@ -107,39 +107,43 @@ function onFileSelected(f: File) {
 }
 
 async function convert() {
-  if (!file.value) return;
+  const f = file.value;
+  if (!f) {
+    toast.add({ title: "DEBUG: file is null", color: "error" });
+    return;
+  }
+  toast.add({ title: "DEBUG: starting conversion for " + f.name, color: "info", timeout: 2000 });
   converting.value = true;
-  const startTime = Date.now();
   try {
     const fd = new FormData();
-    fd.append("file", file.value);
+    fd.append("file", f);
 
     const resp = await axios.post("/api/v1/video-convert", fd, { responseType: "blob" });
     resultBlob.value = resp.data;
 
-    const base = file.value.name.replace(/\.[^.]+$/, "");
+    const base = f.name.replace(/\.[^.]+$/, "");
     resultFilename.value = `${base}.wmv`;
     resultSize.value = resp.data.size;
     resultUrl.value = URL.createObjectURL(resp.data);
     converted.value = true;
     toast.add({ title: t("common.success"), color: "success" });
   } catch (e: any) {
-    let msg = e.message;
+    toast.add({ title: "DEBUG: in catch, type=" + typeof e + " msg=" + String(e.message).substring(0, 80), color: "error", timeout: 5000 });
+    let msg = e.message || "Unknown error";
     try {
-      // Blob error body — need .text() to extract server message
       if (e.response?.data instanceof Blob) {
         const text = await e.response.data.text();
         msg = JSON.parse(text).error || text;
       } else if (e.response?.data?.error) {
         msg = e.response.data.error;
       }
-    } catch { /* keep e.message */ }
-    toast.add({ title: msg, color: "error" });
+    } catch (ex: any) {
+      toast.add({ title: "DEBUG: extract error: " + String(ex).substring(0, 80), color: "error", timeout: 5000 });
+    }
+    toast.add({ title: msg, color: "error", timeout: 8000 });
   } finally {
-    // Keep spinner visible for at least 300ms so user can see it
-    const elapsed = Date.now() - startTime;
-    const remaining = Math.max(0, 300 - elapsed);
-    setTimeout(() => { converting.value = false; }, remaining);
+    converting.value = false;
+    toast.add({ title: "DEBUG: finally, file=" + (file.value ? file.value.name : "null") + " converted=" + converted.value, color: "info", timeout: 2000 });
   }
 }
 
