@@ -29,9 +29,14 @@ ALLOWED_EXTENSIONS: dict[str, str] = {
     "md": "text/markdown",
     "markdown": "text/markdown",
     "txt": "text/plain",
+    "mp4": "video/mp4",
+    "wmv": "video/x-ms-wmv",
+    "avi": "video/x-msvideo",
+    "mkv": "video/x-matroska",
+    "mov": "video/quicktime",
 }
 
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB — balanced for doc-processing workloads
+MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB — supports video uploads
 
 # ── Magic Number Signatures ─────────────────────────────────────────────
 
@@ -45,6 +50,8 @@ MAGIC_SIGNATURES: dict[str, bytes] = {
     "docx": b"PK\x03\x04",
     "xlsx": b"PK\x03\x04",
     "pptx": b"PK\x03\x04",
+    "mp4": b"\x00\x00\x00\x18ftyp",
+    "wmv": b"0\x26\xb2u",
 }
 
 

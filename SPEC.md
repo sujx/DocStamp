@@ -10,7 +10,7 @@
 
 ---
 
-## 二、功能模块（16 个，归为 4 组）
+## 二、功能模块（14 个，归为 4 组）
 
 **侧栏导航**：
 
@@ -20,6 +20,7 @@ MD 转公文        → /md-to-docx
 文档转 MD        → /doc-to-md
 格式规范          → /format-docx
 水印管理          → /watermark       (添加/去除)
+视频转换          → /video-convert   (MP4→WMV)
 Office 工具 ▸     → /properties  /excel-merge  /metadata-clean
 PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-text  /pdf-merge  /pdf-compress  /page-decorate  /image-process
 使用统计          → /status
@@ -34,7 +35,8 @@ PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-tex
 | 5 | 属性修改 | `/properties` | 元数据修改 + 元数据清理（双 Tab） |
 | 6 | Excel 合并 | `/excel-merge` | .xlsx/.csv 结构相同合并 |
 | 7 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
-| 8 | 文件组装 | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
+| 8 | 视频转换 | `/video-convert` | MP4 → WMV（PPT 嵌入） |
+| 9 | 文件组装 | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
 | 9 | 打印分组 | `/print-split` | 批次拆分、暂停/继续/终止 |
 | 10 | PDF 编辑 | `/pdf-editor` | 删除/插入/重排页面 |
 | 11 | 调整 PDF | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚（三 Tab） |
@@ -232,6 +234,7 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 | `POST` | `/api/convert/format` | 格式互转 (DOCX/HTML→PDF) |
 | `POST` | `/api/page-decorate` | 添加页码/页眉/页脚 |
 | `POST` | `/api/image-process` | 图片处理 (缩放/裁剪/转换/压缩) |
+| `POST` | `/api/video-convert` | 视频转换 MP4→WMV |
 | `GET` | `/api/tasks/<id>` | 任务状态轮询 |
 | `GET` | `/api/tasks/<id>/stream` | 任务进度 SSE |
 
@@ -464,6 +467,10 @@ Lite 模式 systemd 服务清单：
 ---
 
 ## 十一、版本历史
+
+### v3.6 (2026-06)
+
+- **视频转换**：新增视频转换功能（MP4 → WMV），解决 PowerPoint 无法嵌入 MP4 的问题。后端 `services/video_converter.py` + `blueprints/video_convert_bp.py`，使用 ffmpeg（WMV2+WMA2 codec 确保 PPT 兼容）。文件限制 100MB，速率限制 5次/分钟。Dockerfile 新增 ffmpeg 依赖
 
 ### v3.5.2 (2026-06)
 

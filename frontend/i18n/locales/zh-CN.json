@@ -28,7 +28,8 @@
     "formatConvert": "格式互转",
     "pageDecorate": "页码页眉页脚",
     "imageProcess": "图片处理",
-    "status": "使用统计"
+    "status": "使用统计",
+    "videoConvert": "视频转换"
   },
   "status": {
     "title": "使用统计",
@@ -377,5 +378,13 @@
     "limits": "支持 200MB 以内，200 页以内的文档",
     "convert": "开始转换",
     "result": "转换结果"
+  },
+  "videoConvert": {
+    "title": "视频转换",
+    "description": "将 MP4 视频转换为 WMV 格式，解决 PowerPoint 无法嵌入 MP4 的问题",
+    "uploadLabel": "上传视频（MP4/MOV/AVI/MKV）",
+    "sizeHint": "文件大小不超过 100MB",
+    "convert": "转换为 WMV",
+    "note": "转换后文件可在 PowerPoint 中直接嵌入播放"
   }
 }

@@ -28,7 +28,8 @@
     "formatConvert": "Format Convert",
     "pageDecorate": "Page Numbers",
     "imageProcess": "Image Process",
-    "status": "Usage Stats"
+    "status": "Usage Stats",
+    "videoConvert": "Video Convert"
   },
   "status": {
     "title": "Usage Statistics",
@@ -377,5 +378,13 @@
     "limits": "Up to 200MB, 200 pages",
     "convert": "Convert",
     "result": "Result"
+  },
+  "videoConvert": {
+    "title": "Video Convert",
+    "description": "Convert MP4 videos to WMV format for embedding in PowerPoint",
+    "uploadLabel": "Upload video (MP4/MOV/AVI/MKV)",
+    "sizeHint": "File size up to 100MB",
+    "convert": "Convert to WMV",
+    "note": "Converted files can be embedded directly in PowerPoint"
   }
 }

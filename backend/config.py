@@ -26,7 +26,8 @@ class Config:
     WATERMARK_EXTENSIONS = {"docx", "pdf"}
     EXCEL_EXTENSIONS = {"xlsx", "csv"}
     MD_EXTENSIONS = {"md", "markdown", "txt"}
-    DOWNLOAD_EXTENSIONS = {"docx", "md"}
+    VIDEO_EXTENSIONS = {"mp4", "wmv", "avi", "mkv", "mov"}
+    DOWNLOAD_EXTENSIONS = {"docx", "md", "wmv"}
 
     # ── Security ────────────────────────────────────────────────────
     FORBIDDEN_PATH_CHARS = {"..", "/", "\\"}

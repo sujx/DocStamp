@@ -36,6 +36,7 @@ WORKDIR /opt/docstamp
 RUN apt-get update && apt-get install -y --no-install-recommends \
     pandoc \
     poppler-utils \
+    ffmpeg \
     fonts-noto-cjk \
     curl \
     procps \
