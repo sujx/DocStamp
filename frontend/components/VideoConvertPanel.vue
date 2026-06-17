@@ -49,22 +49,29 @@
       </p>
 
       <div class="mt-4 flex gap-3">
-        <UButton color="primary" @click="download">
-          <UIcon name="i-heroicons-arrow-down-tray" class="w-4 h-4 mr-1.5" />
+        <button type="button" class="flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium text-white bg-brand-700 hover:bg-brand-800 cursor-pointer transition-colors duration-150" @click.prevent.stop="download">
+          <UIcon name="i-heroicons-arrow-down-tray" class="w-4 h-4" />
           {{ $t("common.download") }}
-        </UButton>
-        <UButton variant="outline" color="neutral" @click="resetAll">
+        </button>
+        <button type="button" class="flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium text-secondary border border-default bg-surface hover:bg-muted cursor-pointer transition-colors duration-150" @click.prevent.stop="resetAll">
           {{ $t("videoConvert.convertAnother") }}
-        </UButton>
+        </button>
       </div>
     </div>
 
     <!-- Convert button -->
     <div v-if="file && !converted" class="mt-6 flex gap-3">
-      <UButton color="primary" type="button" :disabled="converting" :loading="converting" @click="convert">
-        <UIcon name="i-heroicons-video-camera" class="w-4 h-4 mr-1.5" />
-        {{ $t("videoConvert.convert") }}
-      </UButton>
+      <button
+        type="button"
+        :disabled="converting"
+        class="flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium text-white transition-colors duration-150"
+        :class="converting ? 'bg-brand-400 cursor-not-allowed' : 'bg-brand-700 hover:bg-brand-800 cursor-pointer'"
+        @click.prevent.stop="convert"
+      >
+        <span v-if="converting" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        <UIcon v-else name="i-heroicons-video-camera" class="w-4 h-4" />
+        {{ converting ? $t("videoConvert.converting") : $t("videoConvert.convert") }}
+      </button>
     </div>
 
     <p v-if="!file" class="text-xs mt-2 text-tertiary">
