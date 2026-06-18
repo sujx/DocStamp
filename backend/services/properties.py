@@ -68,7 +68,7 @@ def read_properties(filepath: str) -> ServiceResult[dict]:
             if last_mod_el is not None:
                 props["last_modified_by"] = last_mod_el.text or ""
 
-    except (zipfile.BadZipFile, ET.ParseError, KeyError) as e:
+    except (FileNotFoundError, zipfile.BadZipFile, ET.ParseError, KeyError) as e:
         return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, f"Failed to read properties: {e}")
 
     return ServiceResult.ok(props)
@@ -88,14 +88,17 @@ def modify_properties(filepath: str, output_path: str, props: dict) -> ServiceRe
     """
     ext = os.path.splitext(filepath)[1].lower()
 
-    if ext == ".docx":
-        _modify_docx(filepath, output_path, props)
-    elif ext == ".xlsx":
-        _modify_xlsx(filepath, output_path, props)
-    elif ext == ".pptx":
-        _modify_pptx(filepath, output_path, props)
-    else:
-        return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, f"Unsupported file format: {ext}")
+    try:
+        if ext == ".docx":
+            _modify_docx(filepath, output_path, props)
+        elif ext == ".xlsx":
+            _modify_xlsx(filepath, output_path, props)
+        elif ext == ".pptx":
+            _modify_pptx(filepath, output_path, props)
+        else:
+            return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, f"Unsupported file format: {ext}")
+    except Exception as e:
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, str(e))
 
     return ServiceResult.ok(None)
 
