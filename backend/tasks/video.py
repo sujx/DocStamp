@@ -35,7 +35,7 @@ class TrackedTask(Task):
         )
 
 
-@celery.task(base=TrackedTask, bind=True, queue="pdf_queue")
+@celery.task(base=TrackedTask, bind=True, queue="pdf_queue", result_expires=6 * 3600)
 def video_convert_async(self, input_path: str, output_path: str, original_name: str):
     """Convert a video to WMV format (async, with progress)."""
     _record.create_task(self.request.id, "video_convert", "pdf_queue")

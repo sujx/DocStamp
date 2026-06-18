@@ -36,14 +36,17 @@ def _inject_request_id(app: Flask) -> None:
 
 # ── Global Error Handlers ───────────────────────────────────────────────
 
-def _format_error(code: int, msg: str) -> tuple:
+def _format_error(code: int, msg: str, exc_type: str = "") -> tuple:
     """Build a standardized error response tuple."""
     body = {
         "code": code,
         "msg": msg,
         "requestId": getattr(g, "request_id", "-"),
     }
-    return jsonify(body), code
+    resp = jsonify(body)
+    if exc_type:
+        resp.headers["X-Error-Type"] = exc_type
+    return resp, code
 
 
 def register_error_handlers(app: Flask) -> None:
@@ -58,12 +61,12 @@ def register_error_handlers(app: Flask) -> None:
         """Pydantic validation failure → 422."""
         errors = e.errors()
         first_message = errors[0]["msg"] if errors else "Validation failed"
-        return _format_error(422, first_message)
+        return _format_error(422, first_message, "ValidationError")
 
     @app.errorhandler(ServiceError)
     def handle_service_error(e: ServiceError):
         """Business logic error → status from exception."""
-        return _format_error(e.status, e.message)
+        return _format_error(e.status, e.message, "ServiceError")
 
     @app.errorhandler(ValueError)
     def handle_value_error(e: ValueError):
@@ -88,7 +91,7 @@ def register_error_handlers(app: Flask) -> None:
         is_debug = app.config.get("DEBUG", False)
         msg = str(e) if is_debug else "系统异常"
         app.logger.exception("Unhandled exception: %s", e)
-        return _format_error(500, msg)
+        return _format_error(500, msg, e.__class__.__name__)
 
 
 # ── Request Validation Decorator ────────────────────────────────────────

@@ -41,6 +41,9 @@ celery.conf.update(
         "backend.tasks.video.*":    {"queue": "pdf_queue"},
     },
 
+    # Result expiry — shorter for large video files, longer for office docs
+    result_expire=12 * 3600,    # Default: 12 hours
+
     # Worker settings
     worker_concurrency=4,       # Raised from 2 for production throughput
     task_track_started=True,
