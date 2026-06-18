@@ -9,6 +9,7 @@ from flask_babel import gettext as _
 from werkzeug.utils import secure_filename
 
 from config import Config
+from utils.base.file_helpers import safe_download_name
 from models import OperationLog, TaskRecord
 
 download_bp = Blueprint("download", __name__)
@@ -47,7 +48,12 @@ def _parse_range(range_header: str, file_size: int) -> tuple:
 
 @download_bp.route("/api/v1/health", methods=["GET"])
 def health():
-    return jsonify({"status": "ok"})
+    import shutil
+    deps = {
+        "ffmpeg": shutil.which("ffmpeg") is not None,
+        "pandoc": shutil.which("pandoc") is not None,
+    }
+    return jsonify({"status": "ok", "deps": deps})
 
 
 @download_bp.route("/api/v1/download/<filename>")
@@ -79,7 +85,7 @@ def download_file(filename: str):
         response.headers["Accept-Ranges"] = "bytes"
         response.headers["Content-Length"] = str(length)
     else:
-        response = send_file(filepath, mimetype=mimetype, as_attachment=True, download_name=safe_name)
+        response = send_file(filepath, mimetype=mimetype, as_attachment=True, download_name=safe_download_name(safe_name))
         response.headers["Accept-Ranges"] = "bytes"
         response.headers["Content-Length"] = str(file_size)
     return response

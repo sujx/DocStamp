@@ -80,3 +80,16 @@ def cleanup_files(*paths: str) -> None:
                 os.remove(path)
         except OSError:
             pass
+
+
+def safe_download_name(filename: str) -> str:
+    """Sanitize a filename for Content-Disposition header.
+
+    Strips characters unsafe in HTTP headers: <>\"'\\n\\r\\t\\\\.
+    Falls back to 'download' if everything is stripped.
+    """
+    unsafe = '<>"\'\n\r\t\\'
+    name = filename.translate(str.maketrans("", "", unsafe))
+    name = "".join(c for c in name if ord(c) >= 32)
+    name = name.strip(" .")
+    return name or "download"
