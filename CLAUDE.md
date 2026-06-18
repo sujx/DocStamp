@@ -74,7 +74,7 @@ docStamp/
 │   ├── app.config.ts           # Nuxt UI v2: primary:green, gray:cool
 │   ├── assets/css/main.css     # CSS 变量 (品牌 token)
 │   ├── composables/            # useValidation / useTaskStream / useApi / useDownload
-│   ├── components/ui/          # 原子组件 (ButtonPrimary / CardBase / ProgressBar)
+│   ├── components/ui/          # 原子组件 (CardBase / SkeletonBlock)
 │   ├── layouts/default.vue     # 侧边导航壳
 │   ├── pages/                  # 16 页面 (仪表盘 + 15 工具)
 │   ├── components/             # 15+ 业务组件
@@ -145,6 +145,7 @@ def my_service(path: str) -> ServiceResult[dict]:
 - 禁止 `transition: all`，仅对 opacity/transform/border-color 过渡
 - 表单校验：Vuelidate (`useFormValidation` composable)
 - 异步进度：SSE (`useTaskStream` composable)
+- API 错误提取：统一使用 `extractError(e)` 工具函数（`composables/useError.ts`），禁止 `.text()` + `JSON.parse` 手动拼接
 - 数字时钟：rem/vw/clamp 响应式，`role="timer"` + `aria-label`
 
 ### 设计 Token
@@ -165,7 +166,7 @@ def my_service(path: str) -> ServiceResult[dict]:
 | 后端 Blueprint | `<feature>_bp.py` | `convert.py`, `watermark_bp.py` |
 | 后端 Service | 单数 + `_service` (或原名) | `converter.py`, `watermark.py` |
 | 后端 Model | 小写 | `models.py` |
-| 前端组件 | PascalCase | `DigitalClock.vue`, `ProgressBar.vue` |
+| 前端组件 | PascalCase | `VideoConvertPanel.vue`, `ToolCard.vue` |
 | 前端 composables | `useXxx.ts` | `useValidation.ts`, `useTaskStream.ts` |
 | 前端 pages | kebab-case 路由 | `md-to-docx.vue`, `file-assembly.vue` |
 
