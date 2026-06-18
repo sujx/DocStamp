@@ -17,7 +17,8 @@
 | 9 | **PDF 编辑** | `/pdf-editor` | 删除/插入/重排页面 |
 | 10 | **调整 PDF** | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚 |
 | 11 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
-| 12 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
+| 12 | **视频转换** | `/video-convert` | MP4 → WMV（PPT 嵌入），异步 + 进度 |
+| 13 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
 
 ### AI 功能
 
@@ -161,7 +162,8 @@ docStamp/
 - **ServiceResult[T]** — 所有 Service 函数强制 success/failure 分支处理
 - **异步任务** — Celery 3 队列 + TaskRecord 生命周期追踪 + SSE 实时进度
 - **速率限制** — 双层防御（Nginx 粗粒度 + 应用层 `@rate_limit` IP 级），上传接口按负载分级限流
-- **文件安全** — 三层校验（50MB 大小 / 扩展名白名单 / 魔数签名）+ 定时清理
+- **文件安全** — 三层校验（100MB 大小 / 扩展名白名单 / 魔数签名，视频格式跳过）+ 文件名 XSS 净化
+- **API 版本化** — 全部响应带 `X-API-Version: 3.6` 头
 - **安全加固** — Systemd `NoNewPrivileges` + `ProtectSystem=strict` + `PrivateTmp` 等 12 项
 - **操作审计** — TaskRecord + OperationLog 全量记录
 - **JSON 日志** — 结构化日志 + 每日轮转 + 30 天保留

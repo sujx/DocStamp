@@ -473,7 +473,10 @@ Lite 模式 systemd 服务清单：
 - **视频转换**：新增视频转换功能（MP4 → WMV），解决 PowerPoint 无法嵌入 MP4 的问题。上传后显示 MP4 源文件预览，异步转换（Celery `video_convert_async` task + SSE 进度推送 + `UProgress` 进度条），完成后提供 WMV 下载。后端 `services/video_converter.py` + `blueprints/video_convert_bp.py` + `tasks/video.py`，ffmpeg WMV2+WMA2 codec。文件限制 100MB（前端即时拦截 + 后端 `MAX_FILE_SIZE`），速率限制 5次/分钟。Dockerfile 新增 ffmpeg + libopenh264-7，视频格式跳过魔数校验。FileUploader 组件新增 `maxSize` prop 前端校验
 - **使用统计补充**：`stats_bp.py` 新增 `video-convert` 和 `doc-to-md` 模块中文标签
 - **侧栏优化**：仪表盘 → 首页，仪表盘页面去除标题文字。侧栏默认收起（64px 图标模式，展开偏好持久化 localStorage），移动端悬浮遮罩模式 + 0 占位。品牌 Logo 改用 Vite import 方式加载（`import logoUrl from "~/public/logo.svg"`），绕过 Nuxt 3.15 + Vite 6 `virtual:public` 模块 bug
-- **移动端适配**：16 个页面统一响应式 padding（`px-4 sm:px-6 py-6 sm:py-8`），视频转换面板按钮移动端竖向堆叠（`flex-col sm:flex-row`），触摸目标 ≥ 44px（`min-h-[44px]`），FileUploader 组件新增 `maxSize` prop 前端拦截
+- **移动端适配**：16 个页面统一响应式 padding（`px-4 sm:px-6 py-6 sm:py-8`），视频转换面板按钮移动端竖向堆叠（`flex-col sm:flex-row`），触摸目标 ≥ 44px（`min-h-[44px]`），FileUploader 组件新增 `maxSize` prop 前端拦截。
+- **基础设施加固**：Celery `result_expire` 默认 12h（视频 6h），API 响应头 `X-API-Version: 3.6`，健康检查含 ffmpeg/pandoc 依赖探测，下载文件名 XSS 净化（`safe_download_name()`），`pyproject.toml` 补充 6 个缺失依赖
+- **测试覆盖**：pytest 4 个 service（video_converter/pdf_merger/properties/metadata_cleaner），12 条测试。发现并修复 3 个未处理异常：`read_properties` 缺 FileNotFoundError、`clean_metadata` 缺 FileNotFoundError、`modify_properties` 缺 PackageNotFoundError
+- **文档同步**：SPEC 定位描述"无 AI"→"可选 AI"，CLAUDE.md 删除 3 个已死组件引用，新增 `composables/useError.ts` 统一错误提取工具
 
 ### v3.5.2 (2026-06)
 
