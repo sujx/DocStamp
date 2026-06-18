@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-const sidebarWidth = inject("sidebarWidth", ref(240));
+const sidebarWidth = inject("sidebarWidth", ref(64));
 
 useHead({
   titleTemplate: "%s - 鹊随金印",

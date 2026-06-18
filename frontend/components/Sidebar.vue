@@ -129,7 +129,7 @@
 import { SIDEBAR_GROUPS } from "~/composables/tools.config";
 import logoUrl from "~/public/logo.svg";
 
-const collapsed = ref(import.meta.client ? localStorage.getItem("sidebar_collapsed") === "true" : false);
+const collapsed = ref(import.meta.client ? localStorage.getItem("sidebar_collapsed") !== "false" : true);
 const hoverGroup = ref<string | null>(null);
 const mobileOpen = ref(false);
 const isMobile = ref(false);
