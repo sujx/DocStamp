@@ -73,6 +73,11 @@ def create_app() -> Flask:
             g._op_start = time.time()
 
     @app.after_request
+    def _set_version_header(response):
+        response.headers["X-API-Version"] = "3.6"
+        return response
+
+    @app.after_request
     def _commit_op_log(response):
         start = getattr(g, "_op_start", None)
         if start is None:

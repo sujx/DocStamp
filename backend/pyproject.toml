@@ -24,6 +24,12 @@ pydantic = "^2.13"
 celery = "^5.6"
 cryptography = "^48.0"
 weasyprint = "^63.0"
+markdown = "^3.7"
+bleach = "^6.0"
+redis = "^5.0"
+pdfminer-six = "^20240706"
+requests = "^2.32"
+python-dotenv = "^1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0"
