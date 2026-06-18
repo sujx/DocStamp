@@ -3,7 +3,7 @@
     <!-- Upload -->
     <div
       v-if="!file"
-      class="border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-150 cursor-pointer border-default bg-surface"
+      class="border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-colors duration-150 cursor-pointer border-default bg-surface"
       @dragover.prevent
       @drop.prevent="onDrop"
     >
@@ -38,7 +38,7 @@
         preload="metadata"
       />
 
-      <UButton color="primary" block @click="startConvert">
+      <UButton color="primary" block class="min-h-[44px]" @click="startConvert">
         <UIcon name="i-heroicons-video-camera" class="w-4 h-4 mr-1.5" />
         {{ $t("videoConvert.convert") }}
       </UButton>
@@ -65,12 +65,12 @@
         <p class="text-xs mt-1 text-tertiary">{{ resultName }} &middot; {{ resultSizeFmt }}</p>
         <p class="text-xs mt-2 text-tertiary">{{ $t("videoConvert.note") }}</p>
       </div>
-      <div class="flex gap-3">
-        <UButton color="primary" class="flex-1" @click="download">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <UButton color="primary" class="flex-1 min-h-[44px]" @click="download">
           <UIcon name="i-heroicons-arrow-down-tray" class="w-4 h-4 mr-1.5" />
           {{ $t("common.download") }}
         </UButton>
-        <UButton variant="outline" color="neutral" class="flex-1" @click="resetState">
+        <UButton variant="outline" color="neutral" class="flex-1 min-h-[44px]" @click="resetState">
           {{ $t("videoConvert.convertAnother") }}
         </UButton>
       </div>

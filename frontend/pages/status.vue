@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-6xl mx-auto px-6 py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
     <h2 class="text-2xl font-bold mb-1.5 text-balance text-primary" >
       {{ $t("status.title") }}
     </h2>
