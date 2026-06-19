@@ -477,6 +477,8 @@ Lite 模式 systemd 服务清单：
 - **基础设施加固**：Celery `result_expire` 默认 12h（视频 6h），API 响应头 `X-API-Version: 3.6`，健康检查含 ffmpeg/pandoc 依赖探测，下载文件名 XSS 净化（`safe_download_name()`），`pyproject.toml` 补充 6 个缺失依赖
 - **测试覆盖**：pytest 4 个 service（video_converter/pdf_merger/properties/metadata_cleaner），12 条测试。发现并修复 3 个未处理异常：`read_properties` 缺 FileNotFoundError、`clean_metadata` 缺 FileNotFoundError、`modify_properties` 缺 PackageNotFoundError
 - **文档同步**：SPEC 定位描述"无 AI"→"可选 AI"，CLAUDE.md 删除 3 个已死组件引用，新增 `composables/useError.ts` 统一错误提取工具
+- **PV/UV 统计**：新增 `/api/v1/track` beacon 端点 + `usePageView.ts` composable（`sendBeacon` 优先），layout 中 `watch(route.fullPath)` 自动追踪每次页面浏览。独立访客 IP 通过 `X-Forwarded-For` 头获取（nginx 代理后 `remote_addr` 始终为 127.0.0.1 的修复）
+- **SEO 基础**：`robots.txt` + `/sitemap.xml`（14 个页面自动生成）+ Open Graph meta 标签（`og:title/description/type`）+ keywords
 
 ### v3.5.2 (2026-06)
 
