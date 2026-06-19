@@ -39,7 +39,56 @@ MODULE_NAMES = {
     "doc-to-md": "文档转MD",
     "format-docx": "格式规范",
     "video-convert": "视频转换",
+    "pageview": "页面浏览",
 }
+
+
+@stats_bp.route("/sitemap.xml")
+def sitemap():
+    """Generate sitemap for all tool pages."""
+    pages = [
+        "",  # home
+        "/md-to-docx", "/doc-to-md", "/format-docx",
+        "/watermark", "/video-convert",
+        "/properties", "/excel-merge",
+        "/file-assembly", "/print-split", "/pdf-editor",
+        "/pdf-tools", "/pdf-merge", "/status",
+    ]
+    base = request.host_url.rstrip("/")
+    items = "\n".join(
+        f"  <url><loc>{base}{p}</loc><changefreq>monthly</changefreq><priority>{'1.0' if p == '' else '0.8'}</priority></url>"
+        for p in pages
+    )
+    xml = f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{items}\n</urlset>'
+    from flask import Response
+    return Response(xml, mimetype="application/xml")
+
+
+@stats_bp.route("/api/v1/track", methods=["POST"])
+def track_pageview():
+    """Record a page view.  Frontend sends {page: 'video-convert'} on each nav.
+
+    No auth required — lightweight beacon, swallowed silently on failure.
+    """
+    try:
+        op_log = _get_op_log()
+        data = request.get_json(silent=True) or {}
+        page = (data.get("page") or "/").strip()[:100]
+        op_log.log_operation(
+            session_id=getattr(g, "request_id", "-"),
+            operation_type="pageview",
+            resource_id=page,
+            resource_type="pv",
+            ip_address=(request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+                        or request.headers.get("X-Real-IP", "")
+                        or request.remote_addr
+                        or ""),
+            user_agent=(request.user_agent.string or "")[:200],
+            status="success",
+        )
+    except Exception:
+        pass  # Never break on analytics
+    return jsonify({"ok": True})
 
 
 @stats_bp.route("/api/v1/stats/overview", methods=["GET"])

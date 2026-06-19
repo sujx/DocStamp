@@ -22,13 +22,25 @@
 </template>
 
 <script setup lang="ts">
+import { trackPageView } from "~/composables/usePageView";
+
+const route = useRoute();
 const sidebarWidth = inject("sidebarWidth", ref(64));
+
+// Track page views on each navigation
+watch(() => route.fullPath, (path) => {
+  trackPageView(path);
+}, { immediate: true });
 
 useHead({
   titleTemplate: "%s - 鹊随金印",
   meta: [
-    { name: "description", content: "鹊随金印 文档处理工具箱" },
+    { name: "description", content: "鹊随金印 — 一站式文档处理工具箱。MD转公文、PDF水印、视频转换、Excel合并等13项功能，即开即用。" },
     { name: "theme-color", content: "#008a3d" },
+    { name: "keywords", content: "文档处理,PDF转换,MD转DOCX,视频转换,水印,Excel合并,GB/T 9704" },
+    { property: "og:title", content: "鹊随金印 - 文档处理工具箱" },
+    { property: "og:description", content: "一站式文档处理，13项功能，即开即用" },
+    { property: "og:type", content: "website" },
   ],
   htmlAttrs: { lang: "zh-CN" },
 });
