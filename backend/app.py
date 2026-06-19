@@ -99,7 +99,12 @@ def create_app() -> Flask:
                 operation_type=module,
                 resource_id=path,
                 resource_type=parts[2] if len(parts) > 2 else "",
-                ip_address=request.remote_addr or "",
+                # Behind nginx proxy, remote_addr is always 127.0.0.1.
+                # Read real client IP from X-Forwarded-For (leftmost is client).
+                ip_address=(request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+                            or request.headers.get("X-Real-IP", "")
+                            or request.remote_addr
+                            or ""),
                 user_agent=(request.user_agent.string or "")[:200],
                 status="success" if success else "error",
                 duration_ms=duration_ms,
