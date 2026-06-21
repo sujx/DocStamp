@@ -144,6 +144,7 @@ def create_app() -> Flask:
     from blueprints.page_decorate_bp import page_decorate_bp
     from blueprints.stats_bp import stats_bp
     from blueprints.video_convert_bp import video_convert_bp
+    from blueprints.rss_detect_bp import rss_detect_bp
     from ai import ai_bp
     from mineru_bp import mineru_bp
 
@@ -152,6 +153,7 @@ def create_app() -> Flask:
     app.register_blueprint(page_decorate_bp)
     app.register_blueprint(stats_bp)
     app.register_blueprint(video_convert_bp)
+    app.register_blueprint(rss_detect_bp)
     app.register_blueprint(ai_bp)
     app.register_blueprint(mineru_bp)
 

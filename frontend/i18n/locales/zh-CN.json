@@ -29,7 +29,8 @@
     "pageDecorate": "页码页眉页脚",
     "imageProcess": "图片处理",
     "status": "使用统计",
-    "videoConvert": "视频转换"
+    "videoConvert": "视频转换",
+    "rssDetect": "RSS 探测"
   },
   "status": {
     "title": "使用统计",
@@ -390,5 +391,17 @@
     "resultPreview": "转换结果",
     "convertAnother": "转换另一个",
     "note": "转换后文件可在 PowerPoint 中直接嵌入播放"
+  },
+  "rssDetect": {
+    "title": "RSS 订阅探测",
+    "description": "输入网站 URL，自动发现 RSS/Atom 订阅地址",
+    "placeholder": "输入网站地址，如 sspai.com",
+    "detect": "探测",
+    "detecting": "探测中...",
+    "noFeeds": "未发现 RSS 订阅地址",
+    "foundFeeds": "发现 {n} 个订阅源",
+    "copy": "复制",
+    "copied": "已复制",
+    "open": "打开"
   }
 }

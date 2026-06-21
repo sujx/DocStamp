@@ -1,0 +1,40 @@
+{
+  "_comment": "RSS feed detection rules. Add new sites here following the format below.",
+  "_formats": {
+    "feeds": "Direct feed URLs for a domain",
+    "path_rules": "Path patterns with :param capture → feed URL substitution"
+  },
+  "sspai.com": {
+    "feeds": [
+      {"url": "https://sspai.com/feed", "title": "少数派 RSS", "type": "rss"}
+    ]
+  },
+  "ruanyifeng.com": {
+    "feeds": [
+      {"url": "https://feeds.feedburner.com/ruanyifeng", "title": "阮一峰的网络日志", "type": "rss"}
+    ]
+  },
+  "github.com": {
+    "path_rules": [
+      {"pattern": "/:user/:repo/releases", "feed": "https://github.com/:user/:repo/releases.atom", "title": ":user/:repo Releases", "type": "atom"},
+      {"pattern": "/:user/:repo/commits/:branch", "feed": "https://github.com/:user/:repo/commits/:branch.atom", "title": ":user/:repo Commits (:branch)", "type": "atom"},
+      {"pattern": "/:user/:repo", "feed": "https://github.com/:user/:repo/releases.atom", "title": ":user/:repo Releases", "type": "atom"}
+    ]
+  },
+  "v2ex.com": {
+    "feeds": [
+      {"url": "https://www.v2ex.com/feed/tab/tech.xml", "title": "V2EX 技术", "type": "rss"},
+      {"url": "https://www.v2ex.com/feed/tab/creative.xml", "title": "V2EX 创意", "type": "rss"}
+    ]
+  },
+  "zhihu.com": {
+    "path_rules": [
+      {"pattern": "/column/:slug", "feed": "https://rsshub.app/zhihu/zhuanlan/:slug", "title": "知乎专栏: :slug", "type": "rss"}
+    ]
+  },
+  "weixin.qq.com": {
+    "feeds": [
+      {"url": "https://feeds.qq.com/weixinmp", "title": "微信公众号聚合 RSS", "type": "rss"}
+    ]
+  }
+}
