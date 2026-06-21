@@ -479,6 +479,7 @@ Lite 模式 systemd 服务清单：
 - **文档同步**：SPEC 定位描述"无 AI"→"可选 AI"，CLAUDE.md 删除 3 个已死组件引用，新增 `composables/useError.ts` 统一错误提取工具
 - **PV/UV 统计**：新增 `/api/v1/track` beacon 端点 + `usePageView.ts` composable（`sendBeacon` 优先），layout 中 `watch(route.fullPath)` 自动追踪每次页面浏览。独立访客 IP 通过 `X-Forwarded-For` 头获取（nginx 代理后 `remote_addr` 始终为 127.0.0.1 的修复）
 - **SEO 基础**：`robots.txt` + `/sitemap.xml`（14 个页面自动生成）+ Open Graph meta 标签（`og:title/description/type`）+ keywords
+- **RSS 订阅探测器**：参考 [RSSHub-Radar](https://github.com/DIYgod/RSSHub-Radar) 规则引擎设计，三层模块化探测（HTML `<link>` 扫描 → 常见路径探测 → `rss_rules.json` 站点规则匹配）。规则通过 JSON 文件扩展，支持 `feeds`（直连）和 `path_rules`（`:param` 捕获）两种格式。后端 `services/rss_detector.py` + `blueprints/rss_detect_bp.py`，前端输入 URL → 显示订阅源列表（可复制/打开）。零新依赖（stdlib `html.parser`）
 
 ### v3.5.2 (2026-06)
 
