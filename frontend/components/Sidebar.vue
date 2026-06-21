@@ -129,7 +129,12 @@
 import { SIDEBAR_GROUPS } from "~/composables/tools.config";
 import logoUrl from "~/public/logo.svg";
 
-const collapsed = ref(import.meta.client ? localStorage.getItem("sidebar_collapsed") !== "false" : true);
+const collapsed = ref(true);
+// Sync with localStorage after mount (avoid SSR hydration mismatch)
+onMounted(() => {
+  const saved = localStorage.getItem("sidebar_collapsed");
+  collapsed.value = saved !== null ? saved !== "false" : true;
+});
 const hoverGroup = ref<string | null>(null);
 const mobileOpen = ref(false);
 const isMobile = ref(false);

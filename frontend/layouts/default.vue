@@ -25,7 +25,7 @@
 import { trackPageView } from "~/composables/usePageView";
 
 const route = useRoute();
-const sidebarWidth = inject("sidebarWidth", ref(64));
+const sidebarWidth = inject("sidebarWidth", ref(64)); // default collapsed (SSR-safe)
 
 // Track page views on each navigation
 watch(() => route.fullPath, (path) => {
