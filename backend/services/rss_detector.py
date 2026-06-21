@@ -78,9 +78,15 @@ def detect_feeds(url: str) -> ServiceResult[list[dict]]:
         })
         resp.raise_for_status()
 
+        # Force correct encoding for Chinese/eastern character sets
+        if resp.encoding and resp.encoding.lower() in ("iso-8859-1", "latin-1", "windows-1252"):
+            resp.encoding = resp.apparent_encoding or "utf-8"
+
+        html_text = resp.text[:500_000]
+
         # Parse HTML for <link> tags
         parser = _LinkParser()
-        parser.feed(resp.text[:500_000])  # first 500KB is enough
+        parser.feed(html_text)  # first 500KB is enough
         parser.close()
 
         for f in parser.feeds:
