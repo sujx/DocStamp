@@ -118,9 +118,13 @@ def stats_overview():
     by_module = []
     for r in raw:
         module = r.get("operation_type", "unknown")
+        # Only count known tool modules — filter out noise
+        # (.env probes, settings, download, tasks, config, etc.)
+        if module not in MODULE_NAMES:
+            continue
         by_module.append({
             "module": module,
-            "label": MODULE_NAMES.get(module, module),
+            "label": MODULE_NAMES[module],
             "count": r.get("cnt", 0),
         })
     by_module.sort(key=lambda x: x["count"], reverse=True)
