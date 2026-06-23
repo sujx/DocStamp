@@ -6,5 +6,5 @@
 </template>
 
 <script setup lang="ts">
-const PageDecoratePanel = defineAsyncComponent(() => import("~/components/PageDecoratePanel.vue"));
+import PageDecoratePanel from "~/components/PageDecoratePanel.vue";
 </script>

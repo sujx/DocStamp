@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from flask import Blueprint, jsonify, g, request
 
 from config import Config
-from models import OperationLog
+from backend.models import OperationLog
 
 stats_bp = Blueprint("stats", __name__)
 

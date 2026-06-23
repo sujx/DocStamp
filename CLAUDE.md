@@ -4,7 +4,7 @@
 
 docStamp 是一站式文档处理工具箱，15 大功能模块。Nuxt 3 + Nuxt UI v2 + Tailwind CSS v3 前端，Flask REST API 后端。绿鹃品牌色系（`#008A3D` + `#F9F7E8`），仪表盘 + 侧边导航 + 多页面路由，中英文双语。
 
-**单体工具定位**：无用户系统、无认证、无 AI — 即开即用，随用随走。
+**单体工具定位**：无用户系统、无认证、AI 可选（未配 Key 自动降级）——即开即用，随用随走。
 
 ## 项目结构
 
@@ -146,7 +146,7 @@ def my_service(path: str) -> ServiceResult[dict]:
 - 表单校验：Vuelidate (`useFormValidation` composable)
 - 异步进度：SSE (`useTaskStream` composable)
 - API 错误提取：统一使用 `extractError(e)` 工具函数（`composables/useError.ts`），禁止 `.text()` + `JSON.parse` 手动拼接
-- 数字时钟：rem/vw/clamp 响应式，`role="timer"` + `aria-label`
+- 视频预览：`URL.createObjectURL` + revoke 防止内存泄漏，WMV 浏览器不可预览（改为下载卡片）
 
 ### 设计 Token
 

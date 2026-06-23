@@ -6,5 +6,5 @@
 </template>
 
 <script setup lang="ts">
-const PdfToTextPanel = defineAsyncComponent(() => import("~/components/PdfToTextPanel.vue"));
+import PdfToTextPanel from "~/components/PdfToTextPanel.vue";
 </script>

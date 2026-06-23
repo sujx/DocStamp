@@ -6,5 +6,5 @@
 </template>
 
 <script setup lang="ts">
-const PdfCompressPanel = defineAsyncComponent(() => import("~/components/PdfCompressPanel.vue"));
+import PdfCompressPanel from "~/components/PdfCompressPanel.vue";
 </script>

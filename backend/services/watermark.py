@@ -25,6 +25,8 @@ def add_watermark(filepath: str, output_path: str, params: dict,
     Returns:
         ServiceResult with None on success.
     """
+    if not os.path.isfile(filepath):
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Input file not found")
     watermark_type = params.get("watermark_type", "text")
 
     if watermark_type == "text":
@@ -206,6 +208,9 @@ def _watermark_docx(filepath: str, output_path: str, params: dict,
 
 
 def remove_watermark(filepath: str, output_path: str) -> ServiceResult[dict]:
+    """Remove watermarks from a Word or PDF file."""
+    if not os.path.isfile(filepath):
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Input file not found")
     """Remove watermarks from a Word or PDF file.
 
     DOCX: Clears all header content across all sections (reliable).

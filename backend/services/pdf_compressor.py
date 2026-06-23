@@ -9,21 +9,9 @@ from errors import ErrorCode, ServiceResult
 
 
 def compress_pdf(filepath: str, output_path: str, quality: str = "medium") -> ServiceResult[dict]:
-    """Compress a PDF file.
-
-    Strategy:
-      - "low": metadata stripping only
-      - "medium": compress_content_streams + metadata strip
-      - "high": medium + downscale images via Pillow
-
-    Args:
-        filepath: Path to the source PDF.
-        output_path: Path to write the compressed PDF.
-        quality: Compression level — "low", "medium", or "high".
-
-    Returns:
-        ServiceResult with dict: original_size, compressed_size, ratio.
-    """
+    """Compress a PDF file (low/medium/high)."""
+    if not os.path.isfile(filepath):
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Input file not found")
     if quality not in ("low", "medium", "high"):
         return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Quality must be 'low', 'medium', or 'high'")
 
