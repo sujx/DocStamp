@@ -2,11 +2,12 @@
 
 Two-tier strategy:
     1. Local SQLite database (instant, confirmed results)
-    2. Web search API — submits the company name directly as the search query
+    2. Web search API — submits "{name} 官网" as the search query
 
 Set COMPANY_LOOKUP_API_KEY (or DOCSTAMP_DEEPSEEK_API_KEY) to enable web search.
 """
 
+import re
 import time
 from typing import Optional
 from urllib.parse import urlparse
@@ -21,15 +22,19 @@ from models import CompanyRecord
 # ── Web Search ─────────────────────────────────────────────────────────────
 
 def _search_web(name: str) -> Optional[dict]:
-    """Submit the company name as-is to the web search API and return the
+    """Submit the company name to the web search API and return the
     first plausible official website URL.
 
-    No preprocessing, no short-name extraction, no query rewriting.
-    The search engine handles all query optimization internally.
+    Appends '官网' for Chinese names and 'official website' for English
+    names — this tells the search engine we want the website URL, not
+    general information about the company.
     """
     api_key = Config.COMPANY_LOOKUP_API_KEY
     if not api_key:
         return None
+
+    has_chinese = bool(re.search(r'[一-鿿]', name))
+    query = f"{name.strip()} 官网" if has_chinese else f"{name.strip()} official website"
 
     try:
         resp = requests.post(
@@ -39,7 +44,7 @@ def _search_web(name: str) -> Optional[dict]:
                 "Content-Type": "application/json",
             },
             json={
-                "search_query": name.strip()[:70],
+                "search_query": query[:70],
                 "search_engine": Config.COMPANY_LOOKUP_SEARCH_ENGINE,
                 "search_intent": True,
                 "count": 10,
