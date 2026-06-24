@@ -2,11 +2,12 @@
 
 Two-tier strategy:
     1. Local SQLite database (instant, confirmed results)
-    2. Web search API — submits "{name} 官网" as the search query
+    2. AI LLM — asks the model for the company's official website
 
-Set COMPANY_LOOKUP_API_KEY (or DOCSTAMP_DEEPSEEK_API_KEY) to enable web search.
+Uses the same AI config as other AI features (AI_API_KEY / AI_API_URL / AI_MODEL).
 """
 
+import json
 import re
 import time
 from typing import Optional
@@ -19,22 +20,35 @@ from errors import ErrorCode, ServiceResult
 from models import CompanyRecord
 
 
-# ── Web Search ─────────────────────────────────────────────────────────────
+# ── LLM Lookup ────────────────────────────────────────────────────────────
 
-def _search_web(name: str) -> Optional[dict]:
-    """Submit the company name to the web search API and return the
-    first plausible official website URL, plus diagnostic info.
+def _ask_llm(name: str) -> Optional[dict]:
+    """Ask the AI model for a company's official website.
 
-    Appends '官网' for Chinese names and 'official website' for English
-    names — this tells the search engine we want the website URL, not
-    general information about the company.
+    The LLM answers from its training data — no web search tool needed.
     """
     api_key = Config.COMPANY_LOOKUP_API_KEY
     if not api_key:
         return None
 
     has_chinese = bool(re.search(r'[一-鿿]', name))
-    query = f"{name.strip()} 官网" if has_chinese else f"{name.strip()} official website"
+
+    if has_chinese:
+        system = "你是一个企业信息查询助手。只返回JSON，不要其他内容。"
+        prompt = (
+            f'查询公司"{name}"的正式全称和官方网站地址。\n'
+            f'返回JSON格式：{{"name": "公司正式全称", "website": "https://官网地址"}}\n'
+            f'如果不知道官网地址，website设为null。\n'
+            f'只返回JSON。'
+        )
+    else:
+        system = "You are a company information assistant. Only return JSON, nothing else."
+        prompt = (
+            f'Find the official full name and website for company "{name}".\n'
+            f'Return JSON: {{"name": "official company name", "website": "https://website"}}\n'
+            f'Set website to null if unknown.\n'
+            f'Only return JSON.'
+        )
 
     try:
         resp = requests.post(
@@ -44,48 +58,68 @@ def _search_web(name: str) -> Optional[dict]:
                 "Content-Type": "application/json",
             },
             json={
-                "search_query": query[:70],
-                "search_engine": Config.COMPANY_LOOKUP_SEARCH_ENGINE,
-                "search_intent": True,
-                "count": 10,
+                "model": Config.COMPANY_LOOKUP_MODEL,
+                "temperature": 0,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": prompt},
+                ],
             },
             timeout=15,
         )
         resp.raise_for_status()
         data = resp.json()
 
-        # API-level errors (1701: rate limit, 1702: no engine, 1703: no data)
-        error_code = data.get("error", {}).get("code", "")
-        if error_code in ("1701", "1702", "1703"):
-            return {"_error": f"Search API error {error_code}: {data.get('error', {}).get('message', '')}"}
+        content = ""
+        if "choices" in data and len(data["choices"]) > 0:
+            content = data["choices"][0].get("message", {}).get("content", "")
 
-        results = data.get("search_result") or []
-        if not results:
-            return {"_error": f"Search API returned 0 results for query '{query}'"}
+        if not content:
+            return None
 
-        # Score all plausible candidates and pick the best
-        best_url = None
-        best_score = -1
-        all_links = []
-        for r in results:
-            link = (r.get("link") or "").strip()
-            all_links.append(link)
-            website = _validate_url(link)
-            if not website or not _is_plausible_official_site(website):
-                continue
-            score = _score_for_official_site(website, r, name)
-            if score > best_score:
-                best_score = score
-                best_url = website
+        parsed = _parse_json(content)
+        if not parsed:
+            return None
 
-        if best_url:
-            return {"website": best_url, "name": name.strip()}
+        website = parsed.get("website")
+        if not website or website == "null" or website is None:
+            return None
 
-        # No plausible result — return diagnostics
-        return {"_error": f"No plausible result in {len(results)} results: {all_links[:5]}"}
+        website = _validate_url(website)
+        if not website:
+            return None
 
-    except requests.RequestException as e:
-        return {"_error": f"API request failed: {e}"}
+        return {
+            "website": website,
+            "name": parsed.get("name", name.strip()),
+        }
+
+    except requests.RequestException:
+        return None
+
+
+def _parse_json(content: str) -> Optional[dict]:
+    """Parse JSON from LLM response, handling markdown code fences."""
+    if not content:
+        return None
+    content = content.strip()
+    if content.startswith("```"):
+        lines = content.split("\n")
+        if lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        content = "\n".join(lines)
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        match = re.search(r'\{.*\}', content, re.DOTALL)
+        if match:
+            try:
+                return json.loads(match.group())
+            except json.JSONDecodeError:
+                pass
+        return None
 
 
 # ── Public API ────────────────────────────────────────────────────────────
@@ -93,7 +127,7 @@ def _search_web(name: str) -> Optional[dict]:
 def lookup_company(name: str, db: CompanyRecord) -> ServiceResult[dict]:
     """Look up a company's official website.
 
-    Checks local DB first, then web search API.
+    Checks local DB first, then asks the AI LLM.
     """
     if not name or not name.strip():
         return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Company name is required")
@@ -111,17 +145,11 @@ def lookup_company(name: str, db: CompanyRecord) -> ServiceResult[dict]:
             "confirmed": bool(local.get("confirmed_at")),
         })
 
-    # ── Tier 2: Web search ─────────────────────────────────────────────
-    result = _search_web(name)
+    # ── Tier 2: AI LLM ─────────────────────────────────────────────────
+    result = _ask_llm(name)
     if result:
-        if "_error" in result:
-            # Search was attempted but failed — include diagnostics
-            return ServiceResult.fail(
-                ErrorCode.LOOKUP_NOT_FOUND,
-                f"No official website found for '{name}'. {result['_error']}",
-            )
         return ServiceResult.ok({
-            "name": name.strip(),
+            "name": result["name"],
             "website": result["website"],
             "source": "web",
             "confirmed": False,
@@ -130,7 +158,7 @@ def lookup_company(name: str, db: CompanyRecord) -> ServiceResult[dict]:
     if not Config.COMPANY_LOOKUP_API_KEY:
         return ServiceResult.fail(
             ErrorCode.LOOKUP_NOT_FOUND,
-            f"No local record for '{name}' and COMPANY_LOOKUP_API_KEY is not configured.",
+            f"No local record for '{name}' and AI_API_KEY is not configured.",
         )
 
     return ServiceResult.fail(
@@ -195,25 +223,17 @@ def batch_lookup(names: list[str], db_path: str) -> list[dict]:
             continue
 
         if web_searches > 0:
-            time.sleep(0.5)
+            time.sleep(0.3)
         web_searches += 1
 
-        web_result = _search_web(name)
+        web_result = _ask_llm(name)
         if web_result:
-            if "_error" in web_result:
-                results.append({
-                    "name": name,
-                    "website": "",
-                    "source": "error",
-                    "error": web_result["_error"],
-                })
-            else:
-                results.append({
-                    "name": name,
-                    "website": web_result["website"],
-                    "source": "web",
-                    "confirmed": False,
-                })
+            results.append({
+                "name": web_result["name"],
+                "website": web_result["website"],
+                "source": "web",
+                "confirmed": False,
+            })
         else:
             results.append({
                 "name": name,
@@ -245,95 +265,3 @@ def _validate_url(raw_url: str) -> Optional[str]:
         return raw_url
     except Exception:
         return None
-
-
-def _score_for_official_site(url: str, result: dict, company_name: str) -> int:
-    """Score a search result by how likely it is to be the official website.
-
-    Higher score = more likely to be the actual official site (not a news
-    article, directory listing, or other indirect reference).
-    """
-    score = 0
-    try:
-        parsed = urlparse(url)
-        hostname = (parsed.hostname or "").lower()
-        path = (parsed.path or "").rstrip("/")
-    except Exception:
-        return 0
-
-    # Strong signals for official website
-    if len(path) <= 1:                    # Root path (/) = homepage
-        score += 10
-    elif path in ("/index.html", "/index.htm", "/index.php", "/home"):
-        score += 8                         # Common homepage paths
-    elif len(path.split("/")) <= 2:       # One level deep (/en, /zh, /about)
-        score += 4
-
-    # Commercial TLDs — companies use these for official sites
-    if hostname.endswith((".com", ".cn", ".com.cn")):
-        score += 3
-
-    # Clean domain — official sites usually have simple domains
-    parts = hostname.split(".")
-    if len(parts) == 2:                   # e.g. example.com
-        score += 3
-    elif len(parts) == 3 and parts[0] == "www":  # e.g. www.example.com
-        score += 2
-
-    # Title signals — official site titles usually contain the company name
-    title = (result.get("title") or "").lower()
-    name_lower = company_name.lower()
-    if title and len(title) > 2:
-        # Title contains company name keywords
-        name_chars = set(name_lower) - {" ", "（", "）", "(", ")"}
-        title_chars = set(title)
-        overlap = len(name_chars & title_chars) / max(len(name_chars), 1)
-        if overlap > 0.5:
-            score += 2
-        # Title looks like a homepage (ends with 官网/首页/网站)
-        if any(title.endswith(t) for t in ("官网", "官方网站", "首页", "网站", "official website", "home", "homepage")):
-            score += 2
-
-    # Content signals — official sites don't have "news" or "article" in title
-    content_lower = (result.get("content") or "").lower()
-    news_signals = ["新闻", "资讯", "news", "article", "报道", "发布"]
-    if not any(s in title for s in news_signals) and not any(s in content_lower[:100] for s in news_signals):
-        score += 1
-
-    # Penalties for non-official-site signals
-    if len(path) > 1:
-        path_depth = len([p for p in path.split("/") if p])
-        score -= path_depth * 2              # Deep paths are rarely official homepages
-    if len(hostname) > 30:
-        score -= 3                           # Very long domains
-    if any(hostname.endswith("." + t) for t in ("blogspot.com", "wordpress.com", "github.io")):
-        score -= 20
-
-    return score
-
-
-def _is_plausible_official_site(url: str) -> bool:
-    """Reject URLs that are clearly NOT a company's official website."""
-    try:
-        parsed = urlparse(url)
-        hostname = (parsed.hostname or "").lower()
-    except Exception:
-        return False
-
-    noise = [
-        "baike.baidu.com", "zh.wikipedia.org", "en.wikipedia.org", "wikipedia.org",
-        "zhihu.com", "weibo.com", "douyin.com", "xiaohongshu.com",
-        "tieba.baidu.com", "douban.com",
-        "tianyancha.com", "qichacha.com", "qixin.com", "aiqicha.baidu.com",
-        "gsxt.gov.cn",
-        "quote.eastmoney.com", "xueqiu.com", "10jqka.com.cn",
-        "static.cninfo.com.cn",
-    ]
-    for nd in noise:
-        if hostname == nd or hostname.endswith("." + nd):
-            return False
-
-    if hostname.endswith(".gov.cn"):
-        return False
-
-    return True
