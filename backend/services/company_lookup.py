@@ -1,8 +1,9 @@
 """Company name → official website lookup service.
 
-Two-tier strategy:
+Three-tier strategy:
     1. Local SQLite database (instant, confirmed results)
-    2. AI LLM — asks the model for the company's official website
+    2. AI LLM direct (DeepSeek by default — training data, fast)
+    3. AI LLM with web search (Zhipu GLM-4 — real-time, for new companies)
 
 Uses the same AI config as other AI features (AI_API_KEY / AI_API_URL / AI_MODEL).
 """
@@ -98,6 +99,89 @@ def _ask_llm(name: str) -> Optional[dict]:
         return None
 
 
+def _ask_llm_with_web_search(name: str) -> Optional[dict]:
+    """Fallback: ask an LLM with web_search tool enabled for real-time data.
+
+    Used when Tier 1 (_ask_llm) returns null — the company may be too new
+    for the LLM's training data, but a live web search can find it.
+    """
+    api_key = Config.COMPANY_LOOKUP_WEB_SEARCH_KEY
+    if not api_key:
+        return None
+
+    has_chinese = bool(re.search(r'[一-鿿]', name))
+
+    if has_chinese:
+        system = "你是一个企业信息查询助手。只返回JSON，不要其他内容。"
+        prompt = (
+            f'查询公司"{name}"的正式全称和官方网站地址。\n'
+            f'如果需要，请使用web_search工具搜索最新信息。\n'
+            f'返回JSON格式：{{"name": "公司正式全称", "website": "https://官网地址"}}\n'
+            f'如果找不到官网地址，website设为null。\n'
+            f'只返回JSON。'
+        )
+    else:
+        system = "You are a company information assistant. Only return JSON, nothing else."
+        prompt = (
+            f'Find the official full name and website for company "{name}".\n'
+            f'Use web_search if needed to find current information.\n'
+            f'Return JSON: {{"name": "official company name", "website": "https://website"}}\n'
+            f'Set website to null if unknown.\n'
+            f'Only return JSON.'
+        )
+
+    try:
+        resp = requests.post(
+            Config.COMPANY_LOOKUP_WEB_SEARCH_URL,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": Config.COMPANY_LOOKUP_WEB_SEARCH_MODEL,
+                "temperature": 0,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": prompt},
+                ],
+                "tools": [{
+                    "type": "web_search",
+                    "web_search": {"enable": True},
+                }],
+            },
+            timeout=30,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+
+        content = ""
+        if "choices" in data and len(data["choices"]) > 0:
+            content = data["choices"][0].get("message", {}).get("content", "")
+
+        if not content:
+            return None
+
+        parsed = _parse_json(content)
+        if not parsed:
+            return None
+
+        website = parsed.get("website")
+        if not website or website == "null" or website is None:
+            return None
+
+        website = _validate_url(website)
+        if not website:
+            return None
+
+        return {
+            "website": website,
+            "name": parsed.get("name", name.strip()),
+        }
+
+    except requests.RequestException:
+        return None
+
+
 def _parse_json(content: str) -> Optional[dict]:
     """Parse JSON from LLM response, handling markdown code fences."""
     if not content:
@@ -145,8 +229,13 @@ def lookup_company(name: str, db: CompanyRecord) -> ServiceResult[dict]:
             "confirmed": bool(local.get("confirmed_at")),
         })
 
-    # ── Tier 2: AI LLM ─────────────────────────────────────────────────
+    # ── Tier 2: AI LLM (training data) ─────────────────────────────────
     result = _ask_llm(name)
+
+    # ── Tier 3: LLM with web search (real-time) ────────────────────────
+    if not result:
+        result = _ask_llm_with_web_search(name)
+
     if result:
         return ServiceResult.ok({
             "name": result["name"],
@@ -226,7 +315,7 @@ def batch_lookup(names: list[str], db_path: str) -> list[dict]:
             time.sleep(0.3)
         web_searches += 1
 
-        web_result = _ask_llm(name)
+        web_result = _ask_llm(name) or _ask_llm_with_web_search(name)
         if web_result:
             results.append({
                 "name": web_result["name"],

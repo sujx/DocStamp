@@ -61,7 +61,7 @@ class Config:
     AI_MODEL = os.environ.get("AI_MODEL", "deepseek-v4-flash")
 
     # ── Company Lookup ─────────────────────────────────────────────
-    # Uses the AI LLM (DeepSeek by default) to look up company websites.
+    # Tier 1: LLM direct lookup (DeepSeek by default, from training data).
     # Falls back to AI_API_KEY / AI_API_URL / AI_MODEL if not set separately.
     COMPANY_LOOKUP_API_KEY = os.environ.get(
         "COMPANY_LOOKUP_API_KEY", AI_API_KEY
@@ -71,6 +71,20 @@ class Config:
     )
     COMPANY_LOOKUP_MODEL = os.environ.get(
         "COMPANY_LOOKUP_MODEL", AI_MODEL
+    )
+
+    # Tier 2: LLM with web search tool (Zhipu GLM-4 by default).
+    # Used when Tier 1 returns null (e.g. new 2026 companies).
+    # Falls back to Tier 1 key if not set separately.
+    COMPANY_LOOKUP_WEB_SEARCH_KEY = os.environ.get(
+        "COMPANY_LOOKUP_WEB_SEARCH_KEY", COMPANY_LOOKUP_API_KEY
+    )
+    COMPANY_LOOKUP_WEB_SEARCH_URL = os.environ.get(
+        "COMPANY_LOOKUP_WEB_SEARCH_URL",
+        "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+    )
+    COMPANY_LOOKUP_WEB_SEARCH_MODEL = os.environ.get(
+        "COMPANY_LOOKUP_WEB_SEARCH_MODEL", "glm-4-flash"
     )
 
     # ── Frontend Static ─────────────────────────────────────────────
