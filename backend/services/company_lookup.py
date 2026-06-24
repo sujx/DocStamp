@@ -2,13 +2,11 @@
 
 Two-tier strategy:
     1. Local SQLite database (instant, confirmed results)
-    2. LLM-powered web search (Zhipu/DeepSeek with web_search tool)
+    2. Zhipu BigModel web search API (raw search results, no LLM interpretation)
 
 Set COMPANY_LOOKUP_API_KEY (or DOCSTAMP_DEEPSEEK_API_KEY) to enable web search.
-Without an API key, only local DB results are returned.
 """
 
-import json
 import re
 import time
 from typing import Optional
@@ -21,125 +19,54 @@ from errors import ErrorCode, ServiceResult
 from models import CompanyRecord
 
 
-# ── LLM Web Search ────────────────────────────────────────────────────────
+# ── Web Search (Zhipu dedicated endpoint) ────────────────────────────────
 
-def _search_llm(name: str) -> Optional[dict]:
-    """Use an LLM with web search capability to find a company's official website.
+def _search_web(name: str) -> Optional[dict]:
+    """Search for a company's official website using Zhipu's web search API.
 
-    Calls an OpenAI-compatible chat completion API with web_search tool enabled.
-    The LLM searches the web and extracts the correct website URL.
+    Uses the dedicated /api/paas/v4/web_search endpoint which returns
+    raw search results directly — no LLM chat, no interpretation layer.
 
-    Supported providers (set via COMPANY_LOOKUP_API_URL + COMPANY_LOOKUP_MODEL):
-        - Zhipu BigModel (glm-4-flash with web_search tool)
-        - Any OpenAI-compatible API with web search support
-
-    Returns {"website": "https://...", "title": "..."} or None.
+    Returns {"website": "https://...", "name": "..."} or None.
     """
     api_key = Config.COMPANY_LOOKUP_API_KEY
     if not api_key:
         return None
 
-    api_url = Config.COMPANY_LOOKUP_API_URL
-    model = Config.COMPANY_LOOKUP_MODEL
-
-    has_chinese = bool(re.search(r'[一-鿿]', name))
-
-    if has_chinese:
-        prompt = (
-            f'查找公司"{name}"的官方网站地址。'
-            f'只返回JSON对象，包含键：website（完整URL）、name（公司名称）。'
-            f'如果找不到官网，返回：{{"website": null, "name": "{name}"}}。'
-            f'不要返回百科页面、社交媒体、股票页面。只返回公司自己的官方网站。'
-        )
-    else:
-        prompt = (
-            f'Find the official website URL for the company "{name}". '
-            f"Return ONLY a JSON object with keys: website (the full URL), name (company name). "
-            f"If you cannot find the official website, return: {{\"website\": null, \"name\": \"{name}\"}}. "
-            f"Do not return encyclopedia pages (baike, wikipedia), social media, or stock pages. "
-            f"Return the company's OWN official website."
-        )
+    query = f"{name} 官网"
 
     try:
         resp = requests.post(
-            api_url,
+            Config.COMPANY_LOOKUP_API_URL,
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
             },
             json={
-                "model": model,
-                "temperature": 0,
-                "messages": [
-                    {"role": "system", "content": "You are a helpful assistant that finds company websites. Always respond in valid JSON format."},
-                    {"role": "user", "content": prompt},
-                ],
-                "tools": [{
-                    "type": "web_search",
-                    "web_search": {"enable": True},
-                }],
+                "search_query": query[:70],       # API limit: 70 chars
+                "search_engine": Config.COMPANY_LOOKUP_SEARCH_ENGINE,
+                "search_intent": True,
+                "count": 10,
             },
-            timeout=30,
+            timeout=15,
         )
         resp.raise_for_status()
         data = resp.json()
 
-        content = ""
-        if "choices" in data and len(data["choices"]) > 0:
-            choice = data["choices"][0]
-            msg = choice.get("message", {})
-            content = msg.get("content", "")
-
-        if not content:
+        results = data.get("search_result") or []
+        if not results:
             return None
 
-        parsed = _parse_llm_json(content)
-        if not parsed:
-            return None
+        # Pick the best candidate — first result that passes validation
+        for r in results:
+            link = (r.get("link") or "").strip()
+            website = _validate_url(link)
+            if website and _is_plausible_official_site(website, name):
+                return {"website": website, "name": name.strip()}
 
-        website = parsed.get("website")
-        if not website or website == "null" or website is None:
-            return None
-
-        website = _validate_url(website)
-        if not website:
-            return None
-
-        return {"website": website, "title": parsed.get("name", name.strip())}
+        return None
 
     except requests.RequestException:
-        return None
-
-
-def _parse_llm_json(content: str) -> Optional[dict]:
-    """Parse JSON from LLM response, handling markdown code fences."""
-    if not content:
-        return None
-
-    content = content.strip()
-    if content.startswith("```"):
-        lines = content.split("\n")
-        if lines[0].startswith("```"):
-            lines = lines[1:]
-        if lines and lines[-1].strip() == "```":
-            lines = lines[:-1]
-        content = "\n".join(lines)
-
-    try:
-        return json.loads(content)
-    except json.JSONDecodeError:
-        match = re.search(r'\{[^{}]*"website"\s*:\s*"[^"]*"[^{}]*\}', content, re.DOTALL)
-        if match:
-            try:
-                return json.loads(match.group())
-            except json.JSONDecodeError:
-                pass
-        match = re.search(r'\{.*\}', content, re.DOTALL)
-        if match:
-            try:
-                return json.loads(match.group())
-            except json.JSONDecodeError:
-                pass
         return None
 
 
@@ -148,8 +75,7 @@ def _parse_llm_json(content: str) -> Optional[dict]:
 def lookup_company(name: str, db: CompanyRecord) -> ServiceResult[dict]:
     """Look up a company's official website.
 
-    Checks local DB first, then LLM web search.
-    Without an API key, only local DB results are returned.
+    Checks local DB first, then web search API.
     """
     if not name or not name.strip():
         return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Company name is required")
@@ -167,8 +93,8 @@ def lookup_company(name: str, db: CompanyRecord) -> ServiceResult[dict]:
             "confirmed": bool(local.get("confirmed_at")),
         })
 
-    # ── Tier 2: LLM web search ─────────────────────────────────────────
-    result = _search_llm(name)
+    # ── Tier 2: Web search API ─────────────────────────────────────────
+    result = _search_web(name)
     if result:
         return ServiceResult.ok({
             "name": name.strip(),
@@ -180,13 +106,12 @@ def lookup_company(name: str, db: CompanyRecord) -> ServiceResult[dict]:
     if not Config.COMPANY_LOOKUP_API_KEY:
         return ServiceResult.fail(
             ErrorCode.LOOKUP_NOT_FOUND,
-            f"No local record for '{name}' and COMPANY_LOOKUP_API_KEY is not configured. "
-            f"Set the API key to enable web search.",
+            f"No local record for '{name}' and COMPANY_LOOKUP_API_KEY is not configured.",
         )
 
     return ServiceResult.fail(
         ErrorCode.LOOKUP_NOT_FOUND,
-        f"No official website found for '{name}'. Try a more complete company name.",
+        f"No official website found for '{name}'.",
     )
 
 
@@ -249,7 +174,7 @@ def batch_lookup(names: list[str], db_path: str) -> list[dict]:
             time.sleep(0.5)
         web_searches += 1
 
-        web_result = _search_llm(name)
+        web_result = _search_web(name)
         if web_result:
             results.append({
                 "name": name,
@@ -288,3 +213,39 @@ def _validate_url(raw_url: str) -> Optional[str]:
         return raw_url
     except Exception:
         return None
+
+
+def _is_plausible_official_site(url: str, company_name: str) -> bool:
+    """Check if a URL is likely to be a company's official website.
+
+    Rejects encyclopedia, social media, business registry, and other
+    clearly-not-official-site URLs.
+    """
+    try:
+        parsed = urlparse(url)
+        hostname = (parsed.hostname or "").lower()
+        path = (parsed.path or "").lower()
+        full = hostname + path
+    except Exception:
+        return False
+
+    # Known noise domains
+    noise_domains = [
+        "baike.baidu.com", "baike.eastmoney.com",
+        "zh.wikipedia.org", "en.wikipedia.org", "wikipedia.org",
+        "zhihu.com", "weibo.com", "douyin.com", "xiaohongshu.com",
+        "tieba.baidu.com", "douban.com",
+        "tianyancha.com", "qichacha.com", "qixin.com", "aiqicha.baidu.com",
+        "gsxt.gov.cn",
+        "quote.eastmoney.com", "xueqiu.com", "10jqka.com.cn",
+        "static.cninfo.com.cn",
+    ]
+    for nd in noise_domains:
+        if hostname == nd or hostname.endswith("." + nd):
+            return False
+
+    # gov.cn domains (unless company is government-related)
+    if hostname.endswith(".gov.cn") and "政府" not in company_name:
+        return False
+
+    return True
