@@ -23,7 +23,7 @@ from models import CompanyRecord
 
 def _search_web(name: str) -> Optional[dict]:
     """Submit the company name to the web search API and return the
-    first plausible official website URL.
+    first plausible official website URL, plus diagnostic info.
 
     Appends '官网' for Chinese names and 'official website' for English
     names — this tells the search engine we want the website URL, not
@@ -54,17 +54,29 @@ def _search_web(name: str) -> Optional[dict]:
         resp.raise_for_status()
         data = resp.json()
 
+        # API-level errors (1701: rate limit, 1702: no engine, 1703: no data)
+        error_code = data.get("error", {}).get("code", "")
+        if error_code in ("1701", "1702", "1703"):
+            return {"_error": f"Search API error {error_code}: {data.get('error', {}).get('message', '')}"}
+
         results = data.get("search_result") or []
+        if not results:
+            return {"_error": f"Search API returned 0 results for query '{query}'"}
+
+        # Collect all plausible candidates for diagnostics
+        all_links = []
         for r in results:
             link = (r.get("link") or "").strip()
+            all_links.append(link)
             website = _validate_url(link)
             if website and _is_plausible_official_site(website):
                 return {"website": website, "name": name.strip()}
 
-        return None
+        # No plausible result — return diagnostics
+        return {"_error": f"No plausible result in {len(results)} results: {all_links[:5]}"}
 
-    except requests.RequestException:
-        return None
+    except requests.RequestException as e:
+        return {"_error": f"API request failed: {e}"}
 
 
 # ── Public API ────────────────────────────────────────────────────────────
@@ -93,6 +105,12 @@ def lookup_company(name: str, db: CompanyRecord) -> ServiceResult[dict]:
     # ── Tier 2: Web search ─────────────────────────────────────────────
     result = _search_web(name)
     if result:
+        if "_error" in result:
+            # Search was attempted but failed — include diagnostics
+            return ServiceResult.fail(
+                ErrorCode.LOOKUP_NOT_FOUND,
+                f"No official website found for '{name}'. {result['_error']}",
+            )
         return ServiceResult.ok({
             "name": name.strip(),
             "website": result["website"],
@@ -173,12 +191,20 @@ def batch_lookup(names: list[str], db_path: str) -> list[dict]:
 
         web_result = _search_web(name)
         if web_result:
-            results.append({
-                "name": name,
-                "website": web_result["website"],
-                "source": "web",
-                "confirmed": False,
-            })
+            if "_error" in web_result:
+                results.append({
+                    "name": name,
+                    "website": "",
+                    "source": "error",
+                    "error": web_result["_error"],
+                })
+            else:
+                results.append({
+                    "name": name,
+                    "website": web_result["website"],
+                    "source": "web",
+                    "confirmed": False,
+                })
         else:
             results.append({
                 "name": name,
