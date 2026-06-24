@@ -5,7 +5,15 @@ All route logic lives in blueprints/ — business logic in services/.
 """
 
 import os
+import sys
 import time
+
+# Ensure the project root is on sys.path so that `from backend.xxx`
+# imports resolve correctly regardless of working directory (dev mode
+# runs as `python3 app.py` from backend/; gunicorn does the same).
+_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
 
 # Load .env before any config reads — works regardless of startup method
 # (gunicorn, python app.py, systemd).  Searches project root and backend/.
