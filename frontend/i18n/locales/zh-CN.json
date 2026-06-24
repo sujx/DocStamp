@@ -427,6 +427,8 @@
     "importErrors": "{n} 条失败",
     "chooseFile": "选择文件",
     "dbCount": "本地已收录 {n} 家公司",
+    "sampleHint": "每行一个公司全称，如：",
+    "fillSample": "填入示例",
     "batchProgress": "查询中 {current}/{total}",
     "localHit": "本地命中 {n} 条，需联网查询 {m} 条",
   },

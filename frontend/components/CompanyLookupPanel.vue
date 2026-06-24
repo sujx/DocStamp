@@ -144,6 +144,12 @@
           :rows="6"
           :disabled="batchRunning"
         />
+        <!-- Sample hint -->
+        <div class="flex items-center gap-2 text-xs text-tertiary">
+          <UIcon name="i-heroicons-light-bulb" class="w-3.5 h-3.5" />
+          <span>{{ $t('companyLookup.sampleHint') }}</span>
+          <UButton size="2xs" variant="ghost" color="primary" @click="fillSample">{{ $t('companyLookup.fillSample') }}</UButton>
+        </div>
         <div class="flex items-center gap-3">
           <UButton
             color="primary"
@@ -444,6 +450,16 @@ const unconfirmedCount = computed(() =>
 );
 
 let batchEventSource: EventSource | null = null;
+
+function fillSample() {
+  batchNames.value = [
+    "腾讯科技有限公司",
+    "阿里巴巴集团控股有限公司",
+    "华为技术有限公司",
+    "北京字节跳动科技有限公司",
+    "小米科技有限责任公司",
+  ].join("\n");
+}
 
 async function doBatchLookup() {
   const names = batchNames.value

@@ -426,10 +426,11 @@
     "importSuccess": "Successfully imported {n} records",
     "importErrors": "{n} failed",
     "chooseFile": "Choose File",
-    "dbCount": "{n} companies in local database",
+    "dbCount": "{n} in local DB",
+    "sampleHint": "One full company name per line, e.g.:",
+    "fillSample": "Fill Samples",
     "batchProgress": "Processing {current}/{total}",
     "localHit": "{n} local hit(s), {m} need(s) web search",
-    "dbCount": "{n} companies in local database"
   },
   "rssDetect": {
     "title": "RSS Feed Detector",
