@@ -66,11 +66,7 @@ def company_lookup():
 @company_lookup_bp.route("/api/v1/company-lookup/batch", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def company_lookup_batch():
-    """Start an async batch company lookup.
-
-    Returns a task_id for SSE progress streaming via
-    /api/v1/tasks/{task_id}/stream.
-    """
+    """Batch company lookup. ≤10 synchronous, >10 async via Celery."""
     data = request.get_json(silent=True) or {}
     names = data.get("names") or []
 
@@ -86,7 +82,6 @@ def company_lookup_batch():
             "requestId": getattr(g, "request_id", "-"),
         }), 400
 
-    # Trim and filter empty names
     names = [n.strip() for n in names if n and n.strip()]
     if not names:
         return jsonify({
@@ -94,9 +89,21 @@ def company_lookup_batch():
             "requestId": getattr(g, "request_id", "-"),
         }), 400
 
+    # ≤10: synchronous (no Celery needed, instant results)
+    if len(names) <= 10:
+        from services.company_lookup import batch_lookup
+        db_path = Config().TASK_DB_PATH
+        init_db(db_path)
+        results = batch_lookup(names, db_path)
+        return jsonify({
+            "code": 200,
+            "data": {"results": results, "total": len(names)},
+            "requestId": getattr(g, "request_id", "-"),
+        })
+
+    # >10: async via Celery with SSE progress
     from backend.tasks.lookup import company_lookup_batch as batch_task
     task = batch_task.delay(names)
-
     return jsonify({
         "code": 200,
         "data": {"task_id": task.id, "total": len(names)},

@@ -461,39 +461,44 @@ async function doBatchLookup() {
 
   try {
     const resp = await axios.post("/api/v1/company-lookup/batch", { names });
-    const taskId = resp.data.data.task_id;
+    const data = resp.data.data;
 
-    // Connect SSE stream
+    // ≤10: synchronous — results returned directly
+    if (data.results) {
+      batchResults.value = data.results;
+      batchRunning.value = false;
+      return;
+    }
+
+    // >10: async — connect SSE stream
+    const taskId = data.task_id;
     batchEventSource = new EventSource(
       `/api/v1/tasks/${encodeURIComponent(taskId)}/stream`
     );
 
     batchEventSource.onmessage = (e: MessageEvent) => {
       try {
-        const data = JSON.parse(e.data);
-        if (data.progress !== undefined) batchProgress.value = data.progress;
-        if (data.status) {
-          if (data.status === "success" && data.result_data) {
-            const parsed = JSON.parse(data.result_data);
-            batchResults.value = parsed;
+        const d = JSON.parse(e.data);
+        if (d.progress !== undefined) batchProgress.value = d.progress;
+        if (d.status) {
+          if (d.status === "success" && d.result_data) {
+            batchResults.value = JSON.parse(d.result_data);
             batchRunning.value = false;
             batchEventSource?.close();
-          } else if (data.status === "failure") {
-            batchError.value = data.error_message || "Batch lookup failed";
+          } else if (d.status === "failure") {
+            batchError.value = d.error_message || "Batch lookup failed";
             batchRunning.value = false;
             batchEventSource?.close();
           }
         }
-        if (data.progress_message) batchMessage.value = data.progress_message;
+        if (d.progress_message) batchMessage.value = d.progress_message;
       } catch {
         // Ignore parse errors
       }
     };
 
     batchEventSource.onerror = () => {
-      if (!batchRunning.value) {
-        batchEventSource?.close();
-      }
+      if (!batchRunning.value) batchEventSource?.close();
     };
   } catch (e: any) {
     batchError.value = e.response?.data?.msg || e.message || "Batch lookup failed";
