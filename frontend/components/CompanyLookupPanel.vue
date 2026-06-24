@@ -3,6 +3,24 @@
     <!-- Tab switcher -->
     <UTabs v-model="activeTab" :items="tabs" class="mb-4" />
 
+    <!-- DB toolbar (always visible) -->
+    <div class="flex items-center gap-2 mb-4 pb-3 border-b border-default">
+      <span class="text-xs text-tertiary mr-1">{{ $t('companyLookup.dbCount', { n: dbCount }) }}</span>
+      <div class="flex gap-1 ml-auto">
+        <UButton color="neutral" variant="ghost" size="2xs" :loading="exportingDb" @click="exportDb">
+          <UIcon name="i-heroicons-cloud-arrow-down" class="w-3 h-3 mr-0.5" />
+          {{ $t('companyLookup.exportDb') }}
+        </UButton>
+        <label class="cursor-pointer">
+          <UButton color="neutral" variant="ghost" size="2xs" as="span" :loading="importingDb">
+            <UIcon name="i-heroicons-cloud-arrow-up" class="w-3 h-3 mr-0.5" />
+            {{ $t('companyLookup.importDb') }}
+          </UButton>
+          <input type="file" accept=".csv,.json" class="hidden" @change="importDb" />
+        </label>
+      </div>
+    </div>
+
     <!-- ════════════════════════════════════════════════════════
          TAB 1: Single Query
          ════════════════════════════════════════════════════════ -->
@@ -186,20 +204,6 @@
             </UButton>
           </div>
 
-          <!-- DB Export / Import -->
-          <div class="flex gap-2 mt-1">
-            <UButton color="neutral" variant="ghost" size="xs" :loading="exportingDb" @click="exportDb">
-              <UIcon name="i-heroicons-cloud-arrow-down" class="w-3.5 h-3.5 mr-1" />
-              {{ $t('companyLookup.exportDb') }}
-            </UButton>
-            <label class="cursor-pointer">
-              <UButton color="neutral" variant="ghost" size="xs" as="span" :loading="importingDb">
-                <UIcon name="i-heroicons-cloud-arrow-up" class="w-3.5 h-3.5 mr-1" />
-                {{ $t('companyLookup.importDb') }}
-              </UButton>
-              <input type="file" accept=".csv,.json" class="hidden" @change="importDb" />
-            </label>
-          </div>
         </div>
 
         <!-- Table -->
@@ -566,6 +570,15 @@ function exportCsv() {
 
 const exportingDb = ref(false);
 const importingDb = ref(false);
+const dbCount = ref(0);
+
+async function fetchDbCount() {
+  try {
+    const resp = await axios.get("/api/v1/company-lookup/export?format=json");
+    dbCount.value = resp.data.data?.length || 0;
+  } catch { /* ignore */ }
+}
+onMounted(() => fetchDbCount());
 
 async function exportDb() {
   exportingDb.value = true;
@@ -610,6 +623,7 @@ async function importDb(e: Event) {
   } finally {
     importingDb.value = false;
     input.value = "";
+    fetchDbCount();
   }
 }
 
