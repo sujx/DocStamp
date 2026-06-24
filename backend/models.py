@@ -436,10 +436,14 @@ def _normalize_company_name(name: str) -> str:
 
     - Lowercase
     - Strip whitespace
+    - Remove parenthetical annotations: 腾讯科技（深圳）→ 腾讯科技
     - Remove common suffixes like 有限公司, Inc., Ltd., etc.
     """
     import re
     name = name.strip().lower()
+    # Remove parenthetical annotations: （xxx）, (xxx), [xxx]
+    name = re.sub(r"[（(]\s*[^）)]*\s*[）)]", "", name)
+    name = re.sub(r"\[[^\]]*\]", "", name)
     # Remove common company suffixes for matching flexibility
     suffixes = [
         r"有限公司", r"股份有限公司", r"有限责任公司",
@@ -450,3 +454,25 @@ def _normalize_company_name(name: str) -> str:
     for suffix in suffixes:
         name = re.sub(suffix, "", name).strip()
     return name
+
+
+def normalize_existing_records(db_path: str) -> int:
+    """One-time migration: re-normalize all company_records names in place.
+
+    Fixes records stored before parenthetical stripping was added to
+    _normalize_company_name (e.g. '腾讯科技（深圳）' → '腾讯科技').
+    """
+    import sqlite3
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute("SELECT id, name FROM company_records").fetchall()
+    updated = 0
+    for row in rows:
+        old = row["name"]
+        new = _normalize_company_name(old)
+        if new != old:
+            conn.execute("UPDATE company_records SET name=? WHERE id=?", (new, row["id"]))
+            updated += 1
+    conn.commit()
+    conn.close()
+    return updated
