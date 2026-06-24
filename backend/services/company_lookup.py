@@ -27,47 +27,71 @@ def _search_web(name: str) -> Optional[dict]:
     Uses the dedicated /api/paas/v4/web_search endpoint which returns
     raw search results directly — no LLM chat, no interpretation layer.
 
+    Tries multiple query strategies:
+        1. Short name + 官网 (best signal-to-noise ratio)
+        2. Full name + 官网
+        3. Short name alone
+
     Returns {"website": "https://...", "name": "..."} or None.
     """
     api_key = Config.COMPANY_LOOKUP_API_KEY
     if not api_key:
         return None
 
-    query = f"{name} 官网"
+    short = _short_name(name)
+    has_chinese = bool(re.search(r'[一-鿿]', name))
 
-    try:
-        resp = requests.post(
-            Config.COMPANY_LOOKUP_API_URL,
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "search_query": query[:70],       # API limit: 70 chars
-                "search_engine": Config.COMPANY_LOOKUP_SEARCH_ENGINE,
-                "search_intent": True,
-                "count": 10,
-            },
-            timeout=15,
-        )
-        resp.raise_for_status()
-        data = resp.json()
+    if has_chinese:
+        queries = [
+            f"{short} 官网",
+            f"{name} 官网",
+            short,
+        ]
+    else:
+        queries = [
+            f"{name} official website",
+            f"{name} website",
+            name,
+        ]
 
-        results = data.get("search_result") or []
-        if not results:
-            return None
+    for query in queries:
+        query = query.strip()[:70]  # API limit: 70 chars
+        if len(query) < 2:
+            continue
 
-        # Pick the best candidate — first result that passes validation
-        for r in results:
-            link = (r.get("link") or "").strip()
-            website = _validate_url(link)
-            if website and _is_plausible_official_site(website, name):
-                return {"website": website, "name": name.strip()}
+        try:
+            resp = requests.post(
+                Config.COMPANY_LOOKUP_API_URL,
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "search_query": query,
+                    "search_engine": Config.COMPANY_LOOKUP_SEARCH_ENGINE,
+                    "search_intent": True,
+                    "count": 10,
+                },
+                timeout=15,
+            )
+            resp.raise_for_status()
+            data = resp.json()
 
-        return None
+            results = data.get("search_result") or []
+            if not results:
+                continue
 
-    except requests.RequestException:
-        return None
+            # Pick the best candidate — first plausible result
+            for r in results:
+                link = (r.get("link") or "").strip()
+                website = _validate_url(link)
+                if website and _is_plausible_official_site(website, name):
+                    return {"website": website, "name": name.strip()}
+
+        except requests.RequestException:
+            continue
+
+    return None
 
 
 # ── Public API ────────────────────────────────────────────────────────────
@@ -213,6 +237,54 @@ def _validate_url(raw_url: str) -> Optional[str]:
         return raw_url
     except Exception:
         return None
+
+
+def _short_name(name: str) -> str:
+    """Extract the core company name by removing corporate suffixes and city prefixes.
+
+    Examples:
+        北京星系数科控股有限公司 → 星系数科
+        神州高铁技术股份有限公司 → 神州高铁
+    """
+    suffixes = [
+        "技术股份有限公司", "科技股份有限公司",
+        "股份有限公司", "有限责任公司", "有限公司", "责任公司",
+        "集团有限公司", "集团公司", "集团",
+        "技术有限公司", "科技有限公司",
+        "网络科技有限公司", "信息技术有限公司",
+        "网络技术有限公司", "在线网络技术有限公司",
+        "计算机系统有限公司", "计算机科技有限公司",
+        "信息科技有限公司", "软件技术有限公司",
+        "控股集团有限公司", "控股有限公司", "控股集团",
+    ]
+    eng_suffixes = [
+        " inc.", " inc", " ltd.", " ltd", " llc.", " llc",
+        " corp.", " corp", " corporation", " co.", " co",
+        " limited", " incorporated",
+    ]
+    city_prefixes = [
+        "北京市", "上海市", "深圳市", "广州市", "杭州市",
+        "成都市", "武汉市", "南京市", "天津市", "重庆市",
+        "苏州市", "西安市", "东莞市", "长沙市", "郑州市",
+        "北京", "上海", "深圳", "广州", "杭州",
+        "成都", "武汉", "南京", "天津", "重庆",
+        "苏州", "西安", "东莞", "长沙", "郑州",
+    ]
+
+    short = name.strip()
+    for suffix in sorted(suffixes, key=len, reverse=True):
+        if short.endswith(suffix):
+            short = short[:-len(suffix)].strip()
+            break
+    for suffix in sorted(eng_suffixes, key=len, reverse=True):
+        if short.lower().endswith(suffix.lower()):
+            short = short[:-len(suffix)].strip()
+            break
+    for prefix in sorted(city_prefixes, key=len, reverse=True):
+        if short.startswith(prefix) and len(short) - len(prefix) >= 2:
+            short = short[len(prefix):].strip()
+            break
+    return short
 
 
 def _is_plausible_official_site(url: str, company_name: str) -> bool:
