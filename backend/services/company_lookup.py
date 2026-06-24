@@ -63,14 +63,23 @@ def _search_web(name: str) -> Optional[dict]:
         if not results:
             return {"_error": f"Search API returned 0 results for query '{query}'"}
 
-        # Collect all plausible candidates for diagnostics
+        # Score all plausible candidates and pick the best
+        best_url = None
+        best_score = -1
         all_links = []
         for r in results:
             link = (r.get("link") or "").strip()
             all_links.append(link)
             website = _validate_url(link)
-            if website and _is_plausible_official_site(website):
-                return {"website": website, "name": name.strip()}
+            if not website or not _is_plausible_official_site(website):
+                continue
+            score = _score_for_official_site(website, r, name)
+            if score > best_score:
+                best_score = score
+                best_url = website
+
+        if best_url:
+            return {"website": best_url, "name": name.strip()}
 
         # No plausible result — return diagnostics
         return {"_error": f"No plausible result in {len(results)} results: {all_links[:5]}"}
@@ -236,6 +245,71 @@ def _validate_url(raw_url: str) -> Optional[str]:
         return raw_url
     except Exception:
         return None
+
+
+def _score_for_official_site(url: str, result: dict, company_name: str) -> int:
+    """Score a search result by how likely it is to be the official website.
+
+    Higher score = more likely to be the actual official site (not a news
+    article, directory listing, or other indirect reference).
+    """
+    score = 0
+    try:
+        parsed = urlparse(url)
+        hostname = (parsed.hostname or "").lower()
+        path = (parsed.path or "").rstrip("/")
+    except Exception:
+        return 0
+
+    # Strong signals for official website
+    if len(path) <= 1:                    # Root path (/) = homepage
+        score += 10
+    elif path in ("/index.html", "/index.htm", "/index.php", "/home"):
+        score += 8                         # Common homepage paths
+    elif len(path.split("/")) <= 2:       # One level deep (/en, /zh, /about)
+        score += 4
+
+    # Commercial TLDs — companies use these for official sites
+    if hostname.endswith((".com", ".cn", ".com.cn")):
+        score += 3
+
+    # Clean domain — official sites usually have simple domains
+    parts = hostname.split(".")
+    if len(parts) == 2:                   # e.g. example.com
+        score += 3
+    elif len(parts) == 3 and parts[0] == "www":  # e.g. www.example.com
+        score += 2
+
+    # Title signals — official site titles usually contain the company name
+    title = (result.get("title") or "").lower()
+    name_lower = company_name.lower()
+    if title and len(title) > 2:
+        # Title contains company name keywords
+        name_chars = set(name_lower) - {" ", "（", "）", "(", ")"}
+        title_chars = set(title)
+        overlap = len(name_chars & title_chars) / max(len(name_chars), 1)
+        if overlap > 0.5:
+            score += 2
+        # Title looks like a homepage (ends with 官网/首页/网站)
+        if any(title.endswith(t) for t in ("官网", "官方网站", "首页", "网站", "official website", "home", "homepage")):
+            score += 2
+
+    # Content signals — official sites don't have "news" or "article" in title
+    content_lower = (result.get("content") or "").lower()
+    news_signals = ["新闻", "资讯", "news", "article", "报道", "发布"]
+    if not any(s in title for s in news_signals) and not any(s in content_lower[:100] for s in news_signals):
+        score += 1
+
+    # Penalties for non-official-site signals
+    if len(path) > 1:
+        path_depth = len([p for p in path.split("/") if p])
+        score -= path_depth * 2              # Deep paths are rarely official homepages
+    if len(hostname) > 30:
+        score -= 3                           # Very long domains
+    if any(hostname.endswith("." + t) for t in ("blogspot.com", "wordpress.com", "github.io")):
+        score -= 20
+
+    return score
 
 
 def _is_plausible_official_site(url: str) -> bool:
