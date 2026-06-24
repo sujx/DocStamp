@@ -31,6 +31,7 @@ celery.conf.update(
         "backend.tasks.office",
         "backend.tasks.video",
         "backend.tasks.maintenance",
+        "backend.tasks.lookup",
     ],
 
     # Queue routing
@@ -39,6 +40,7 @@ celery.conf.update(
         "backend.tasks.pdf.*":      {"queue": "pdf_queue"},
         "backend.tasks.office.*":   {"queue": "office_queue"},
         "backend.tasks.video.*":    {"queue": "pdf_queue"},
+        "backend.tasks.lookup.*":   {"queue": "convert_queue"},
     },
 
     # Result expiry — shorter for large video files, longer for office docs

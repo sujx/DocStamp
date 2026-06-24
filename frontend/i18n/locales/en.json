@@ -30,7 +30,8 @@
     "imageProcess": "Image Process",
     "status": "Usage Stats",
     "videoConvert": "Video Convert",
-    "rssDetect": "RSS Detector"
+    "rssDetect": "RSS Detector",
+    "companyLookup": "Company Lookup"
   },
   "status": {
     "title": "Usage Statistics",
@@ -391,6 +392,36 @@
     "resultPreview": "Converted Result",
     "convertAnother": "Convert Another",
     "note": "Converted files can be embedded directly in PowerPoint"
+  },
+  "companyLookup": {
+    "title": "Company Website Lookup",
+    "description": "Enter a company name to find its official website. Confirmed results are saved locally for instant future queries.",
+    "singleQuery": "Single Query",
+    "batchQuery": "Batch Query",
+    "placeholder": "e.g. Apple, Tesla",
+    "batchPlaceholder": "One company name per line",
+    "search": "Search",
+    "searching": "Searching...",
+    "notFound": "No official website found. Try a more complete company name.",
+    "foundResults": "{n} result(s) found",
+    "sourceLocal": "Local DB",
+    "sourceWeb": "Web Search",
+    "confirmed": "Verified",
+    "unconfirmed": "Pending",
+    "confirm": "Confirm",
+    "confirming": "Confirming...",
+    "confirmAll": "Confirm All",
+    "manualEdit": "Edit",
+    "editName": "Correct company name",
+    "editWebsite": "Correct website URL",
+    "saveCorrection": "Save & Confirm",
+    "copy": "Copy",
+    "open": "Open",
+    "copied": "Copied",
+    "exportCsv": "Export CSV",
+    "batchProgress": "Processing {current}/{total}",
+    "localHit": "{n} local hit(s), {m} need(s) web search",
+    "dbCount": "{n} companies in local database"
   },
   "rssDetect": {
     "title": "RSS Feed Detector",

@@ -82,9 +82,21 @@ CREATE INDEX IF NOT EXISTS idx_task_records_status ON task_records(status);
 CREATE INDEX IF NOT EXISTS idx_task_records_created ON task_records(created_at);
 CREATE INDEX IF NOT EXISTS idx_operation_logs_created ON operation_logs(created_at);
 CREATE INDEX IF NOT EXISTS idx_operation_logs_type ON operation_logs(operation_type);
+
+CREATE TABLE IF NOT EXISTS company_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    website TEXT NOT NULL,
+    source TEXT DEFAULT 'web',
+    confirmed_at TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_company_name ON company_records(name);
 """
 
-CURRENT_SCHEMA_VERSION = 1
+CURRENT_SCHEMA_VERSION = 2
 
 
 def init_db(db_path: str) -> None:
@@ -286,3 +298,120 @@ class OperationLog(BaseCRUD):
                 (since,),
             ).fetchone()
             return row[0] if row else 0
+
+
+# ── CompanyRecord Model ──────────────────────────────────────────────────
+
+class CompanyRecord(BaseCRUD):
+    """Local database of confirmed company name → website mappings.
+
+    Serves as the primary lookup source. Web search results are only
+    stored after the user confirms they are correct.
+    """
+
+    def __init__(self, db_path: str):
+        super().__init__("company_records", db_path)
+
+    def find_by_name(self, name: str) -> Optional[dict]:
+        """Exact name match (case-insensitive via normalized name)."""
+        normalized = _normalize_company_name(name)
+        with self._conn() as db:
+            row = db.execute(
+                "SELECT * FROM company_records WHERE name=?",
+                (normalized,),
+            ).fetchone()
+            return dict(row) if row else None
+
+    def search_by_name(self, keyword: str) -> list[dict]:
+        """Fuzzy search by name LIKE %keyword%."""
+        normalized = _normalize_company_name(keyword)
+        with self._conn() as db:
+            rows = db.execute(
+                "SELECT * FROM company_records WHERE name LIKE ? ORDER BY name LIMIT 50",
+                (f"%{normalized}%",),
+            ).fetchall()
+            return [dict(r) for r in rows]
+
+    def upsert(self, name: str, website: str, source: str = "web") -> dict:
+        """Insert or update a company record. Returns the saved record."""
+        normalized = _normalize_company_name(name)
+        existing = self.find_by_name(normalized)
+        now = datetime.now(timezone.utc).isoformat()
+        if existing:
+            data = {"website": website, "source": source, "updated_at": now}
+            self.update_by_id(existing["id"], data)
+            return {**existing, **data}
+        else:
+            data = {
+                "name": normalized,
+                "website": website,
+                "source": source,
+                "confirmed_at": now,
+                "created_at": now,
+                "updated_at": now,
+            }
+            self.insert(data)
+            return self.find_by_name(normalized)
+
+    def confirm(self, name: str, website: str, source: str = "web") -> None:
+        """Mark a record as user-confirmed with timestamp.
+
+        If the website differs from what's stored, update it too.
+        """
+        normalized = _normalize_company_name(name)
+        now = datetime.now(timezone.utc).isoformat()
+        existing = self.find_by_name(normalized)
+        if existing:
+            data = {
+                "website": website,
+                "source": source,
+                "confirmed_at": now,
+                "updated_at": now,
+            }
+            self.update_by_id(existing["id"], data)
+        else:
+            data = {
+                "name": normalized,
+                "website": website,
+                "source": source,
+                "confirmed_at": now,
+                "created_at": now,
+                "updated_at": now,
+            }
+            self.insert(data)
+
+    def count(self) -> int:
+        """Total number of company records in local DB."""
+        with self._conn() as db:
+            row = db.execute("SELECT COUNT(*) FROM company_records").fetchone()
+            return row[0] if row else 0
+
+    def list_all(self, page: int = 1, size: int = 50) -> list[dict]:
+        """List all records with pagination, newest first."""
+        with self._conn() as db:
+            rows = db.execute(
+                "SELECT * FROM company_records ORDER BY updated_at DESC LIMIT ? OFFSET ?",
+                (size, (page - 1) * size),
+            ).fetchall()
+            return [dict(r) for r in rows]
+
+
+def _normalize_company_name(name: str) -> str:
+    """Normalize company name for consistent lookup.
+
+    - Lowercase
+    - Strip whitespace
+    - Remove common suffixes like 有限公司, Inc., Ltd., etc.
+    """
+    import re
+    name = name.strip().lower()
+    # Remove common company suffixes for matching flexibility
+    suffixes = [
+        r"有限公司", r"股份有限公司", r"有限责任公司",
+        r"inc\.?$", r"ltd\.?$", r"llc\.?$", r"corp\.?$",
+        r"corporation\.?$", r"incorporated\.?$", r"limited\.?$",
+        r"co\.?$", r"co\.,?\s*ltd\.?$",
+    ]
+    for suffix in suffixes:
+        name = re.sub(suffix, "", name).strip()
+    return name

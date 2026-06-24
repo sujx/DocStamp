@@ -1,6 +1,6 @@
 # 鹊随金印 (docStamp) — 文档处理工具箱
 
-一站式文档处理 Web 应用，13 大功能模块。即开即用，无需注册。
+一站式文档处理 Web 应用，15 大功能模块。即开即用，无需注册。
 
 ## 功能
 
@@ -18,7 +18,9 @@
 | 10 | **调整 PDF** | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚 |
 | 11 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
 | 12 | **视频转换** | `/video-convert` | MP4 → WMV（PPT 嵌入），异步 + 进度 |
-| 13 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
+| 13 | **RSS 探测** | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
+| 14 | **公司查询** | `/company-lookup` | 输入公司名查官网，本地库缓存 + 搜索引擎比对 |
+| 15 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
 
 ### AI 功能
 
@@ -125,7 +127,7 @@ docStamp/
 │   ├── cache.py                # Flask-Caching（限流 + 统计缓存）
 │   ├── celery_app.py           # Celery（Redis broker，3 队列）
 │   ├── gunicorn.conf.py        # Gunicorn gthread 生产配置
-│   ├── blueprints/             # HTTP 路由层（15 个功能 × 1 文件）
+│   ├── blueprints/             # HTTP 路由层（17 个功能 × 1 文件）
 │   ├── services/               # 业务逻辑层（纯函数，全返回 ServiceResult[T]）
 │   ├── tasks/                  # Celery 异步任务（convert / pdf / office / maintenance）
 │   └── utils/
@@ -137,7 +139,7 @@ docStamp/
 ├── frontend/                   # Nuxt 3 SPA
 │   ├── composables/            # tools.config / useValidation / useTaskStream / useApi / useDownload / useAi
 │   ├── components/ui/          # 原子组件（CardBase / SkeletonBlock）
-│   ├── pages/                  # 16 个路由页面（仪表盘 + 15 工具）
+│   ├── pages/                  # 17 个路由页面（仪表盘 + 16 工具）
 │   └── locales/                # zh-CN / en
 ├── deploy/
 │   ├── docstamp.service        # Systemd 服务（12 项安全加固）

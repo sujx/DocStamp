@@ -10,7 +10,7 @@
 
 ---
 
-## 二、功能模块（14 个，归为 4 组）
+## 二、功能模块（16 个，归为 4 组）
 
 **侧栏导航**：
 
@@ -21,6 +21,8 @@ MD 转公文        → /md-to-docx
 格式规范          → /format-docx
 水印管理          → /watermark       (添加/去除)
 视频转换          → /video-convert   (MP4→WMV)
+RSS 探测          → /rss-detect      (Feed 发现)
+公司查询          → /company-lookup  (官网查询)
 Office 工具 ▸     → /properties  /excel-merge  /metadata-clean
 PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-text  /pdf-merge  /pdf-compress  /page-decorate  /image-process
 使用统计          → /status
@@ -36,12 +38,14 @@ PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-tex
 | 6 | Excel 合并 | `/excel-merge` | .xlsx/.csv 结构相同合并 |
 | 7 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
 | 8 | 视频转换 | `/video-convert` | MP4 → WMV（PPT 嵌入） |
-| 9 | 文件组装 | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
-| 9 | 打印分组 | `/print-split` | 批次拆分、暂停/继续/终止 |
-| 10 | PDF 编辑 | `/pdf-editor` | 删除/插入/重排页面 |
-| 11 | 调整 PDF | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚（三 Tab） |
-| 12 | PDF 合并 | `/pdf-merge` | 多 PDF 合并，拖拽排序 |
-| 13 | **使用统计** | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
+| 9 | RSS 探测 | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
+| 10 | 公司查询 | `/company-lookup` | 输入公司名查官网，本地库缓存 + 搜索引擎比对 |
+| 11 | 文件组装 | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
+| 12 | 打印分组 | `/print-split` | 批次拆分、暂停/继续/终止 |
+| 13 | PDF 编辑 | `/pdf-editor` | 删除/插入/重排页面 |
+| 14 | 调整 PDF | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚（三 Tab） |
+| 15 | PDF 合并 | `/pdf-merge` | 多 PDF 合并，拖拽排序 |
+| 16 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
 
 ---
 
