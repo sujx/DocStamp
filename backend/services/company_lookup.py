@@ -66,7 +66,7 @@ def _ask_llm(name: str) -> Optional[dict]:
                     {"role": "user", "content": prompt},
                 ],
             },
-            timeout=15,
+            timeout=8,
         )
         resp.raise_for_status()
         data = resp.json()
@@ -286,8 +286,12 @@ def confirm_company(
         return ServiceResult.fail(ErrorCode.LOOKUP_FAILED, f"Failed to save record: {e}")
 
 
-def batch_lookup(names: list[str], db_path: str) -> list[dict]:
-    """Synchronous batch lookup for Celery task use."""
+def batch_lookup(names: list[str], db_path: str, fast: bool = False) -> list[dict]:
+    """Synchronous batch lookup.
+
+    When fast=True (sync API path), only uses Tier 1 (LLM direct) to keep
+    response time reasonable. Skips Tier 2 web search fallback.
+    """
     from models import _normalize_company_name
     db = CompanyRecord(db_path)
     results: list[dict] = []
@@ -312,10 +316,14 @@ def batch_lookup(names: list[str], db_path: str) -> list[dict]:
             continue
 
         if web_searches > 0:
-            time.sleep(0.3)
+            time.sleep(0.1)
         web_searches += 1
 
-        web_result = _ask_llm(name) or _ask_llm_with_web_search(name)
+        # Tier 1 always; Tier 2 only if not in fast mode
+        web_result = _ask_llm(name)
+        if not web_result and not fast:
+            web_result = _ask_llm_with_web_search(name)
+
         if web_result:
             results.append({
                 "name": web_result["name"],

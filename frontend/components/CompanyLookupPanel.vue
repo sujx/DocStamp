@@ -456,11 +456,11 @@ async function doBatchLookup() {
   batchError.value = "";
   batchResults.value = [];
   batchProgress.value = 0;
-  batchMessage.value = "";
+  batchMessage.value = `${names.length} companies, please wait...`;
   batchRunning.value = true;
 
   try {
-    const resp = await axios.post("/api/v1/company-lookup/batch", { names });
+    const resp = await axios.post("/api/v1/company-lookup/batch", { names }, { timeout: 60000 });
     const data = resp.data.data;
 
     // ≤10: synchronous — results returned directly

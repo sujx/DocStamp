@@ -94,7 +94,7 @@ def company_lookup_batch():
         from services.company_lookup import batch_lookup
         db_path = Config().TASK_DB_PATH
         init_db(db_path)
-        results = batch_lookup(names, db_path)
+        results = batch_lookup(names, db_path, fast=True)
         return jsonify({
             "code": 200,
             "data": {"results": results, "total": len(names)},
