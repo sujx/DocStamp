@@ -182,6 +182,89 @@ def _ask_llm_with_web_search(name: str) -> Optional[dict]:
         return None
 
 
+def _ask_llm_batch(names: list[str]) -> Optional[list[dict]]:
+    """Ask the LLM for multiple company websites in a single API call.
+
+    Much faster than N separate calls — all names in one prompt.
+    """
+    api_key = Config.COMPANY_LOOKUP_API_KEY
+    if not api_key:
+        return None
+
+    has_chinese = any(re.search(r'[一-鿿]', n) for n in names)
+    numbered = "\n".join(f"{i+1}. {n}" for i, n in enumerate(names))
+
+    if has_chinese:
+        system = "你是一个企业信息查询助手。只返回JSON数组，不要其他内容。"
+        prompt = (
+            f"查找以下{len(names)}家公司的官方网站地址：\n"
+            f"{numbered}\n\n"
+            f'返回JSON数组：{{"results": [{{"name": "公司名称", "website": "https://官网"}}, ...]}}\n'
+            f"不知道官网的，website设为null。只返回JSON。"
+        )
+    else:
+        system = "You are a company information assistant. Only return a JSON array."
+        prompt = (
+            f"Find official websites for these {len(names)} companies:\n"
+            f"{numbered}\n\n"
+            f'Return JSON: {{"results": [{{"name": "...", "website": "https://..."}}, ...]}}\n'
+            f"Set website to null if unknown. Only return JSON."
+        )
+
+    try:
+        resp = requests.post(
+            Config.COMPANY_LOOKUP_API_URL,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": Config.COMPANY_LOOKUP_MODEL,
+                "temperature": 0,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": prompt},
+                ],
+            },
+            timeout=30,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+
+        content = ""
+        if "choices" in data and len(data["choices"]) > 0:
+            content = data["choices"][0].get("message", {}).get("content", "")
+
+        if not content:
+            return None
+
+        parsed = _parse_json(content)
+        if not parsed:
+            return None
+
+        results = parsed.get("results", [])
+        if not results:
+            return None
+
+        out = []
+        for r in results:
+            website = r.get("website")
+            if website and website != "null" and website is not None:
+                website = _validate_url(website)
+            else:
+                website = None
+            out.append({
+                "name": r.get("name", ""),
+                "website": website or "",
+                "source": "web" if website else "error",
+                "confirmed": False,
+            })
+        return out
+
+    except requests.RequestException:
+        return None
+
+
 def _parse_json(content: str) -> Optional[dict]:
     """Parse JSON from LLM response, handling markdown code fences."""
     if not content:
@@ -289,13 +372,16 @@ def confirm_company(
 def batch_lookup(names: list[str], db_path: str, fast: bool = False) -> list[dict]:
     """Synchronous batch lookup.
 
-    When fast=True (sync API path), only uses Tier 1 (LLM direct) to keep
-    response time reasonable. Skips Tier 2 web search fallback.
+    When fast=True: checks local DB first, then sends all remaining names
+    in a single LLM API call.  Much faster than per-name calls.
     """
     from models import _normalize_company_name
     db = CompanyRecord(db_path)
+
+    # ── Check local DB first ──────────────────────────────────────────
     results: list[dict] = []
-    web_searches = 0
+    remaining: list[str] = []
+    result_map: dict[str, dict] = {}  # normalized_name → result
 
     for name in names:
         name = name.strip()
@@ -304,40 +390,59 @@ def batch_lookup(names: list[str], db_path: str, fast: bool = False) -> list[dic
             continue
 
         normalized = _normalize_company_name(name)
-
         local = db.find_by_name(normalized)
         if local:
-            results.append({
+            r = {
                 "name": name,
                 "website": local["website"],
                 "source": "local",
                 "confirmed": bool(local.get("confirmed_at")),
-            })
-            continue
-
-        if web_searches > 0:
-            time.sleep(0.1)
-        web_searches += 1
-
-        # Tier 1 always; Tier 2 only if not in fast mode
-        web_result = _ask_llm(name)
-        if not web_result and not fast:
-            web_result = _ask_llm_with_web_search(name)
-
-        if web_result:
-            results.append({
-                "name": web_result["name"],
-                "website": web_result["website"],
-                "source": "web",
-                "confirmed": False,
-            })
+            }
+            results.append(r)
         else:
-            results.append({
-                "name": name,
-                "website": "",
-                "source": "error",
-                "error": "Not found",
-            })
+            remaining.append(name)
+
+    # ── Single API call for all remaining ─────────────────────────────
+    if remaining:
+        if fast:
+            llm_results = _ask_llm_batch(remaining)
+        else:
+            # Slow path: one at a time with web search fallback
+            llm_results = []
+            for i, name in enumerate(remaining):
+                if i > 0:
+                    time.sleep(0.1)
+                r = _ask_llm(name) or _ask_llm_with_web_search(name)
+                if r:
+                    llm_results.append({
+                        "name": r["name"],
+                        "website": r["website"],
+                        "source": "web",
+                        "confirmed": False,
+                    })
+                else:
+                    llm_results.append({
+                        "name": name,
+                        "website": "",
+                        "source": "error",
+                        "error": "Not found",
+                    })
+
+        if llm_results:
+            # Match results back to original names
+            llm_map: dict[str, dict] = {}
+            for r in llm_results:
+                key = _normalize_company_name(r.get("name", ""))
+                llm_map[key] = r
+            for name in remaining:
+                key = _normalize_company_name(name)
+                if key in llm_map:
+                    results.append(llm_map[key])
+                else:
+                    results.append({
+                        "name": name, "website": "",
+                        "source": "error", "error": "Not found",
+                    })
 
     return results
 
