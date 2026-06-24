@@ -185,6 +185,21 @@
               {{ $t('companyLookup.exportCsv') }}
             </UButton>
           </div>
+
+          <!-- DB Export / Import -->
+          <div class="flex gap-2 mt-1">
+            <UButton color="neutral" variant="ghost" size="xs" :loading="exportingDb" @click="exportDb">
+              <UIcon name="i-heroicons-cloud-arrow-down" class="w-3.5 h-3.5 mr-1" />
+              {{ $t('companyLookup.exportDb') }}
+            </UButton>
+            <label class="cursor-pointer">
+              <UButton color="neutral" variant="ghost" size="xs" as="span" :loading="importingDb">
+                <UIcon name="i-heroicons-cloud-arrow-up" class="w-3.5 h-3.5 mr-1" />
+                {{ $t('companyLookup.importDb') }}
+              </UButton>
+              <input type="file" accept=".csv,.json" class="hidden" @change="importDb" />
+            </label>
+          </div>
         </div>
 
         <!-- Table -->
@@ -547,6 +562,59 @@ function exportCsv() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+const exportingDb = ref(false);
+const importingDb = ref(false);
+
+async function exportDb() {
+  exportingDb.value = true;
+  try {
+    const resp = await axios.get("/api/v1/company-lookup/export", { responseType: "blob" });
+    const url = URL.createObjectURL(new Blob([resp.data], { type: "text/csv;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "company_records.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.add({ title: t("companyLookup.exportDb") + " OK", color: "success" });
+  } catch (e: any) {
+    toast.add({ title: extractError(e), color: "error" });
+  } finally {
+    exportingDb.value = false;
+  }
+}
+
+async function importDb(e: Event) {
+  const input = e.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+  importingDb.value = true;
+  try {
+    const form = new FormData();
+    form.append("file", file);
+    const resp = await axios.post("/api/v1/company-lookup/import", form);
+    const data = resp.data.data;
+    if (data.errors?.length) {
+      toast.add({
+        title: `${t("companyLookup.importSuccess", { n: data.imported })} · ${t("companyLookup.importErrors", { n: data.skipped })}`,
+        color: data.imported > 0 ? "warning" : "error",
+      });
+    } else {
+      toast.add({ title: t("companyLookup.importSuccess", { n: data.imported }), color: "success" });
+    }
+  } catch (e: any) {
+    toast.add({ title: extractError(e), color: "error" });
+  } finally {
+    importingDb.value = false;
+    input.value = "";
+  }
+}
+
+function extractError(e: any): string {
+  return e.response?.data?.msg || e.message || "Unknown error";
 }
 
 // ── Shared helpers ───────────────────────────────────────────────────────

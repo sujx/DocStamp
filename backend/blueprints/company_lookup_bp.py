@@ -1,12 +1,18 @@
 """Company name → website lookup blueprint.
 
-Three endpoints:
-    POST /api/v1/company-lookup        — single synchronous lookup
-    POST /api/v1/company-lookup/batch  — batch async lookup (Celery + SSE)
+Endpoints:
+    POST /api/v1/company-lookup         — single synchronous lookup
+    POST /api/v1/company-lookup/batch   — batch async lookup (Celery + SSE)
     POST /api/v1/company-lookup/confirm — confirm and save to local DB
+    GET  /api/v1/company-lookup/export  — export DB as CSV/JSON
+    POST /api/v1/company-lookup/import  — import CSV/JSON into DB
 """
 
-from flask import Blueprint, g, jsonify, request
+import csv
+import io
+import json
+
+from flask import Blueprint, g, jsonify, request, Response
 
 from config import Config
 from models import CompanyRecord, init_db
@@ -142,5 +148,100 @@ def company_lookup_confirm():
     return jsonify({
         "code": 200,
         "data": result.data,
+        "requestId": getattr(g, "request_id", "-"),
+    })
+
+
+# ── Export / Import ────────────────────────────────────────────────────────
+
+
+@company_lookup_bp.route("/api/v1/company-lookup/export", methods=["GET"])
+@rate_limit(max_requests=10, window_seconds=60)
+def company_lookup_export():
+    """Export all company records as CSV or JSON."""
+    fmt = (request.args.get("format") or "csv").lower()
+    db = _get_company_db()
+    records = db.export_all()
+
+    if fmt == "json":
+        return jsonify({"code": 200, "data": records,
+                        "requestId": getattr(g, "request_id", "-")})
+
+    output = io.StringIO()
+    output.write("﻿")
+    writer = csv.writer(output)
+    writer.writerow(["name", "website", "source", "confirmed_at", "created_at"])
+    for r in records:
+        writer.writerow([
+            r.get("name", ""), r.get("website", ""), r.get("source", ""),
+            r.get("confirmed_at", ""), r.get("created_at", ""),
+        ])
+    csv_data = output.getvalue()
+    output.close()
+    return Response(
+        csv_data,
+        mimetype="text/csv; charset=utf-8",
+        headers={"Content-Disposition": "attachment; filename=company_records.csv"},
+    )
+
+
+@company_lookup_bp.route("/api/v1/company-lookup/import", methods=["POST"])
+@rate_limit(max_requests=5, window_seconds=60)
+def company_lookup_import():
+    """Import company records from uploaded CSV or JSON file."""
+    file = request.files.get("file")
+    if not file:
+        return jsonify({
+            "code": 400, "msg": "No file provided",
+            "requestId": getattr(g, "request_id", "-"),
+        }), 400
+
+    filename = (file.filename or "").lower()
+    try:
+        content = file.read().decode("utf-8-sig")
+    except UnicodeDecodeError:
+        try:
+            file.seek(0)
+            content = file.read().decode("gbk")
+        except Exception:
+            return jsonify({
+                "code": 400, "msg": "Cannot decode file. Use UTF-8 or GBK encoding.",
+                "requestId": getattr(g, "request_id", "-"),
+            }), 400
+
+    records = []
+    if filename.endswith(".json"):
+        try:
+            data = json.loads(content)
+            records = data if isinstance(data, list) else [data]
+        except json.JSONDecodeError:
+            return jsonify({
+                "code": 400, "msg": "Invalid JSON file",
+                "requestId": getattr(g, "request_id", "-"),
+            }), 400
+    else:
+        reader = csv.DictReader(io.StringIO(content))
+        for row in reader:
+            if row.get("name"):
+                records.append(row)
+
+    if not records:
+        return jsonify({
+            "code": 400, "msg": "No valid records found in file",
+            "requestId": getattr(g, "request_id", "-"),
+        }), 400
+
+    if len(records) > 10000:
+        return jsonify({
+            "code": 400, "msg": "Maximum 10000 records per import",
+            "requestId": getattr(g, "request_id", "-"),
+        }), 400
+
+    db = _get_company_db()
+    result = db.import_batch(records)
+
+    return jsonify({
+        "code": 200,
+        "data": result,
         "requestId": getattr(g, "request_id", "-"),
     })

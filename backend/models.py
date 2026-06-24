@@ -395,6 +395,41 @@ class CompanyRecord(BaseCRUD):
             ).fetchall()
             return [dict(r) for r in rows]
 
+    def export_all(self) -> list[dict]:
+        """Return all confirmed records for export."""
+        with self._conn() as db:
+            rows = db.execute(
+                "SELECT name, website, source, confirmed_at, created_at "
+                "FROM company_records ORDER BY updated_at DESC"
+            ).fetchall()
+            return [dict(r) for r in rows]
+
+    def import_batch(self, records: list[dict]) -> dict:
+        """Batch upsert records. Returns {imported, skipped, errors}."""
+        imported = 0
+        skipped = 0
+        errors: list[str] = []
+
+        for i, rec in enumerate(records):
+            name = (rec.get("name") or "").strip()
+            website = (rec.get("website") or "").strip()
+            if not name or not website:
+                errors.append(f"Row {i + 1}: missing name or website")
+                skipped += 1
+                continue
+            if "://" not in website:
+                errors.append(f"Row {i + 1}: invalid URL for '{name}'")
+                skipped += 1
+                continue
+            try:
+                self.upsert(name, website, source=rec.get("source", "import"))
+                imported += 1
+            except Exception as e:
+                errors.append(f"Row {i + 1} ({name}): {e}")
+                skipped += 1
+
+        return {"imported": imported, "skipped": skipped, "errors": errors}
+
 
 def _normalize_company_name(name: str) -> str:
     """Normalize company name for consistent lookup.
