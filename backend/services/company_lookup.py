@@ -270,6 +270,11 @@ def _short_name(name: str) -> str:
         "成都", "武汉", "南京", "天津", "重庆",
         "苏州", "西安", "东莞", "长沙", "郑州",
     ]
+    # "中国" prefix — many state-owned enterprises use this,
+    # but the brand name after "中国" is usually what people search for
+    china_prefixes = [
+        "中国", "China ", "china ",
+    ]
 
     short = name.strip()
     for suffix in sorted(suffixes, key=len, reverse=True):
@@ -281,6 +286,11 @@ def _short_name(name: str) -> str:
             short = short[:-len(suffix)].strip()
             break
     for prefix in sorted(city_prefixes, key=len, reverse=True):
+        if short.startswith(prefix) and len(short) - len(prefix) >= 2:
+            short = short[len(prefix):].strip()
+            break
+    # Strip "中国" prefix if the remaining name still has substance
+    for prefix in sorted(china_prefixes, key=len, reverse=True):
         if short.startswith(prefix) and len(short) - len(prefix) >= 2:
             short = short[len(prefix):].strip()
             break
