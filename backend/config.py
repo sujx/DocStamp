@@ -60,6 +60,20 @@ class Config:
     )
     AI_MODEL = os.environ.get("AI_MODEL", "deepseek-v4-flash")
 
+    # ── Company Lookup (web search via LLM) ─────────────────────────
+    # Uses Zhipu BigModel web search by default. Falls back to
+    # DOCSTAMP_DEEPSEEK_API_KEY + AI_API_URL if not set.
+    COMPANY_LOOKUP_API_KEY = os.environ.get(
+        "COMPANY_LOOKUP_API_KEY", os.environ.get("DOCSTAMP_DEEPSEEK_API_KEY", "")
+    )
+    COMPANY_LOOKUP_API_URL = os.environ.get(
+        "COMPANY_LOOKUP_API_URL",
+        "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+    )
+    COMPANY_LOOKUP_MODEL = os.environ.get(
+        "COMPANY_LOOKUP_MODEL", "glm-4-flash"
+    )
+
     # ── Frontend Static ─────────────────────────────────────────────
     STATIC_FOLDER = os.environ.get(
         "DOCSTAMP_STATIC",
