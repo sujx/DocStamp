@@ -429,14 +429,17 @@ def batch_lookup(names: list[str], db_path: str, fast: bool = False) -> list[dic
                     })
 
         if llm_results:
-            # Match results by position (LLM returns in same order as input)
             for i, name in enumerate(remaining):
                 if i < len(llm_results) and llm_results[i].get("website"):
                     results.append(llm_results[i])
-                elif i < len(llm_results):
+                    continue
+                # Batch returned null — retry with web search (same as single query fallback)
+                time.sleep(0.3)
+                r = _ask_llm_with_web_search(name)
+                if r:
                     results.append({
-                        "name": name, "website": "",
-                        "source": "error", "error": "Not found",
+                        "name": name, "website": r["website"],
+                        "source": "web", "confirmed": False,
                     })
                 else:
                     results.append({
@@ -444,11 +447,20 @@ def batch_lookup(names: list[str], db_path: str, fast: bool = False) -> list[dic
                         "source": "error", "error": "Not found",
                     })
         else:
-            for name in remaining:
-                results.append({
-                    "name": name, "website": "",
-                    "source": "error", "error": "Not found",
-                })
+            for i, name in enumerate(remaining):
+                if i > 0:
+                    time.sleep(0.3)
+                r = _ask_llm_with_web_search(name)
+                if r:
+                    results.append({
+                        "name": name, "website": r["website"],
+                        "source": "web", "confirmed": False,
+                    })
+                else:
+                    results.append({
+                        "name": name, "website": "",
+                        "source": "error", "error": "Not found",
+                    })
 
     return results
 
