@@ -226,7 +226,7 @@ def _ask_llm_batch(names: list[str]) -> Optional[list[dict]]:
                     {"role": "user", "content": prompt},
                 ],
             },
-            timeout=30,
+            timeout=10,
         )
         resp.raise_for_status()
         data = resp.json()
@@ -429,20 +429,26 @@ def batch_lookup(names: list[str], db_path: str, fast: bool = False) -> list[dic
                     })
 
         if llm_results:
-            # Match results back to original names
-            llm_map: dict[str, dict] = {}
-            for r in llm_results:
-                key = _normalize_company_name(r.get("name", ""))
-                llm_map[key] = r
-            for name in remaining:
-                key = _normalize_company_name(name)
-                if key in llm_map:
-                    results.append(llm_map[key])
+            # Match results by position (LLM returns in same order as input)
+            for i, name in enumerate(remaining):
+                if i < len(llm_results) and llm_results[i].get("website"):
+                    results.append(llm_results[i])
+                elif i < len(llm_results):
+                    results.append({
+                        "name": name, "website": "",
+                        "source": "error", "error": "Not found",
+                    })
                 else:
                     results.append({
                         "name": name, "website": "",
                         "source": "error", "error": "Not found",
                     })
+        else:
+            for name in remaining:
+                results.append({
+                    "name": name, "website": "",
+                    "source": "error", "error": "Not found",
+                })
 
     return results
 
