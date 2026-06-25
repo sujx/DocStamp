@@ -19,7 +19,7 @@
 | 11 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
 | 12 | **视频转换** | `/video-convert` | MP4 → WMV（PPT 嵌入），异步 + 进度 |
 | 13 | **RSS 探测** | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
-| 14 | **公司查询** | `/company-lookup` | 输入公司名查官网，本地库缓存 + 搜索引擎比对 |
+| 14 | **公司查询** | `/company-lookup` | 输入公司名查官网，本地库缓存 + AI 大模型 + 实时搜索 |
 | 15 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
 
 ### AI 功能

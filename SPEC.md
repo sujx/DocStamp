@@ -39,7 +39,7 @@ PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-tex
 | 7 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
 | 8 | 视频转换 | `/video-convert` | MP4 → WMV（PPT 嵌入） |
 | 9 | RSS 探测 | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
-| 10 | 公司查询 | `/company-lookup` | 输入公司名查官网，本地库缓存 + 搜索引擎比对 |
+| 10 | 公司查询 | `/company-lookup` | 输入公司名查官网，本地库缓存 + AI 大模型查询 + 实时搜索 |
 | 11 | 文件组装 | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
 | 12 | 打印分组 | `/print-split` | 批次拆分、暂停/继续/终止 |
 | 13 | PDF 编辑 | `/pdf-editor` | 删除/插入/重排页面 |
@@ -484,6 +484,8 @@ Lite 模式 systemd 服务清单：
 - **PV/UV 统计**：新增 `/api/v1/track` beacon 端点 + `usePageView.ts` composable（`sendBeacon` 优先），layout 中 `watch(route.fullPath)` 自动追踪每次页面浏览。独立访客 IP 通过 `X-Forwarded-For` 头获取（nginx 代理后 `remote_addr` 始终为 127.0.0.1 的修复）
 - **SEO 基础**：`robots.txt` + `/sitemap.xml`（14 个页面自动生成）+ Open Graph meta 标签（`og:title/description/type`）+ keywords
 - **RSS 订阅探测器**：参考 [RSSHub-Radar](https://github.com/DIYgod/RSSHub-Radar) 规则引擎设计，三层模块化探测（HTML `<link>` 扫描 → 常见路径探测 → `rss_rules.json` 站点规则匹配）。规则通过 JSON 文件扩展，支持 `feeds`（直连）和 `path_rules`（`:param` 捕获）两种格式。后端 `services/rss_detector.py` + `blueprints/rss_detect_bp.py`，前端输入 URL → 显示订阅源列表（可复制/打开）。零新依赖（stdlib `html.parser`）
+
+- **公司官网查询**：三阶梯查找策略 — ① 本地 SQLite 数据库（`company_records` 表，用户确认后缓存，秒级响应）→ ② AI 大模型直接查询（DeepSeek，从训练数据中回答，8s 超时）→ ③ AI 大模型 + 实时 Web 搜索（智谱 GLM-4 + web_search 工具，适用新增企业）。支持单次查询和批量查询（≤10 条同步即时返回，>10 条异步 Celery + SSE 进度）。本地数据库支持 CSV/JSON 批量导入导出（UTF-8 BOM，兼容 Excel）。公司名自动规范化（去括号注解、去公司后缀、去城市/"中国"前缀）。前端双 Tab 布局（单次 + 批量），结果表格含来源标识（本地库/搜索引擎）、确认/修正/一键确认功能。后端 `services/company_lookup.py` + `models.py:CompanyRecord` + `blueprints/company_lookup_bp.py`，42 个 pytest 测试覆盖全部路径。
 
 ### v3.5.2 (2026-06)
 
