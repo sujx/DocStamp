@@ -11,13 +11,11 @@
           <UIcon name="i-heroicons-cloud-arrow-down" class="w-3 h-3 mr-0.5" />
           {{ $t('companyLookup.exportDb') }}
         </UButton>
-        <label class="cursor-pointer">
-          <UButton color="neutral" variant="ghost" size="2xs" as="span" :loading="importingDb">
-            <UIcon name="i-heroicons-cloud-arrow-up" class="w-3 h-3 mr-0.5" />
-            {{ $t('companyLookup.importDb') }}
-          </UButton>
-          <input type="file" accept=".csv,.json" class="hidden" @change="importDb" />
-        </label>
+        <UButton color="neutral" variant="ghost" size="2xs" :loading="importingDb" @click="triggerImport">
+          <UIcon name="i-heroicons-cloud-arrow-up" class="w-3 h-3 mr-0.5" />
+          {{ $t('companyLookup.importDb') }}
+        </UButton>
+        <input ref="importInput" type="file" accept=".csv,.json" class="hidden" @change="importDb" />
       </div>
     </div>
 
@@ -593,6 +591,11 @@ function exportCsv() {
 const exportingDb = ref(false);
 const importingDb = ref(false);
 const dbCount = ref(0);
+const importInput = ref<HTMLInputElement | null>(null);
+
+function triggerImport() {
+  importInput.value?.click();
+}
 
 async function fetchDbCount() {
   try {
@@ -622,9 +625,8 @@ async function exportDb() {
   }
 }
 
-async function importDb(e: Event) {
-  const input = e.target as HTMLInputElement;
-  const file = input.files?.[0];
+async function importDb() {
+  const file = importInput.value?.files?.[0];
   if (!file) return;
   importingDb.value = true;
   try {
@@ -644,7 +646,7 @@ async function importDb(e: Event) {
     toast.add({ title: extractError(e), color: "error" });
   } finally {
     importingDb.value = false;
-    input.value = "";
+    if (importInput.value) importInput.value.value = "";
     fetchDbCount();
   }
 }
