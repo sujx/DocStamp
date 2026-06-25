@@ -15,6 +15,10 @@
           <UIcon name="i-heroicons-cloud-arrow-up" class="w-3 h-3 mr-0.5" />
           {{ $t('companyLookup.importDb') }}
         </UButton>
+        <UButton color="neutral" variant="ghost" size="2xs" @click="downloadTemplate">
+          <UIcon name="i-heroicons-document-arrow-down" class="w-3 h-3 mr-0.5" />
+          {{ $t('companyLookup.downloadTemplate') }}
+        </UButton>
         <input ref="importInput" type="file" accept=".csv,.json" class="hidden" @change="importDb" />
       </div>
     </div>
@@ -595,6 +599,19 @@ const importInput = ref<HTMLInputElement | null>(null);
 
 function triggerImport() {
   importInput.value?.click();
+}
+
+function downloadTemplate() {
+  const csv = "name,website\n腾讯科技有限公司,https://www.tencent.com\n阿里巴巴集团控股有限公司,https://www.alibaba.com\n华为技术有限公司,https://www.huawei.com\n";
+  const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "company_import_template.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 async function fetchDbCount() {

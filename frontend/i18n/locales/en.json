@@ -429,6 +429,7 @@
     "dbCount": "{n} in local DB",
     "sampleHint": "One full company name per line, e.g.:",
     "fillSample": "Fill Samples",
+    "downloadTemplate": "Template",
     "batchProgress": "Processing {current}/{total}",
     "localHit": "{n} local hit(s), {m} need(s) web search",
   },
