@@ -476,10 +476,11 @@ async function doBatchLookup() {
   batchRunning.value = true;
 
   try {
-    const resp = await axios.post("/api/v1/company-lookup/batch", { names }, { timeout: 60000 });
-    const data = resp.data.data;
+    const resp = await axios.post("/api/v1/company-lookup/batch", { names }, { timeout: 120000 });
+    const payload = resp.data;
+    const data = payload.data || payload;
 
-    // ≤10: synchronous — results returned directly
+    // Synchronous results (all batches now go through this path)
     if (data.results) {
       batchResults.value = data.results;
       batchRunning.value = false;

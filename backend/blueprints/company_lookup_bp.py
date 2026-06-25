@@ -89,24 +89,14 @@ def company_lookup_batch():
             "requestId": getattr(g, "request_id", "-"),
         }), 400
 
-    # ≤10: synchronous (no Celery needed, instant results)
-    if len(names) <= 10:
-        from services.company_lookup import batch_lookup
-        db_path = Config().TASK_DB_PATH
-        init_db(db_path)
-        results = batch_lookup(names, db_path, fast=True)
-        return jsonify({
-            "code": 200,
-            "data": {"results": results, "total": len(names)},
-            "requestId": getattr(g, "request_id", "-"),
-        })
-
-    # >10: async via Celery with SSE progress
-    from backend.tasks.lookup import company_lookup_batch as batch_task
-    task = batch_task.delay(names)
+    # All batches are synchronous — local DB first, then single LLM call
+    from services.company_lookup import batch_lookup
+    db_path = Config().TASK_DB_PATH
+    init_db(db_path)
+    results = batch_lookup(names, db_path, fast=True)
     return jsonify({
         "code": 200,
-        "data": {"task_id": task.id, "total": len(names)},
+        "data": {"results": results, "total": len(names)},
         "requestId": getattr(g, "request_id", "-"),
     })
 
