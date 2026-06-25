@@ -1,8 +1,9 @@
 # ── Stage 1: Build Nuxt 3 frontend ──────────────────────────────────
 FROM node:22-alpine AS frontend-build
 
-# Alibaba Cloud npm mirror
-RUN npm config set registry https://registry.npmmirror.com
+# Alibaba Cloud npm mirror + upgrade npm (fixes tar@6.2.1 deprecation)
+RUN npm config set registry https://registry.npmmirror.com && \
+    npm install -g npm@latest
 
 WORKDIR /app/frontend
 # Lockfile ensures reproducible builds across machines.
