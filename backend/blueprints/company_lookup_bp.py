@@ -242,3 +242,46 @@ def company_lookup_import():
         "data": result,
         "requestId": getattr(g, "request_id", "-"),
     })
+
+
+@company_lookup_bp.route("/api/v1/company-lookup/import-text", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
+def company_lookup_import_text():
+    """Import company records from pasted CSV text (JSON body).
+
+    Uses application/json — avoids multipart/file-upload proxy issues.
+    """
+    data = request.get_json(silent=True) or {}
+    csv_text = (data.get("csv") or "").strip()
+    if not csv_text:
+        return jsonify({
+            "code": 400, "msg": "No CSV data provided",
+            "requestId": getattr(g, "request_id", "-"),
+        }), 400
+
+    records = []
+    reader = csv.DictReader(io.StringIO(csv_text))
+    for row in reader:
+        if row.get("name"):
+            records.append(row)
+
+    if not records:
+        return jsonify({
+            "code": 400, "msg": "No valid records found in CSV",
+            "requestId": getattr(g, "request_id", "-"),
+        }), 400
+
+    if len(records) > 10000:
+        return jsonify({
+            "code": 400, "msg": "Maximum 10000 records per import",
+            "requestId": getattr(g, "request_id", "-"),
+        }), 400
+
+    db = _get_company_db()
+    result = db.import_batch(records)
+
+    return jsonify({
+        "code": 200,
+        "data": result,
+        "requestId": getattr(g, "request_id", "-"),
+    })

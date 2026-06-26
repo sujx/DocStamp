@@ -15,6 +15,10 @@
           <UIcon name="i-heroicons-cloud-arrow-up" class="w-3 h-3 mr-0.5" />
           {{ $t('companyLookup.importDb') }}
         </UButton>
+        <UButton color="neutral" variant="ghost" size="2xs" :loading="importingDb" @click="showPasteImport = true">
+          <UIcon name="i-heroicons-clipboard-document" class="w-3 h-3 mr-0.5" />
+          {{ $t('companyLookup.pasteImport') }}
+        </UButton>
         <UButton color="neutral" variant="ghost" size="2xs" @click="downloadTemplate">
           <UIcon name="i-heroicons-document-arrow-down" class="w-3 h-3 mr-0.5" />
           {{ $t('companyLookup.downloadTemplate') }}
@@ -324,6 +328,20 @@
         </div>
       </div>
     </div>
+
+    <!-- Paste Import Modal -->
+    <UModal v-model="showPasteImport" :title="$t('companyLookup.pasteImport')">
+      <template #body>
+        <p class="text-xs text-tertiary mb-2">{{ $t('companyLookup.pasteHint') }}</p>
+        <UTextarea v-model="pasteCsv" :rows="8" :placeholder="'name,website\n公司A,https://a.com\n公司B,https://b.com'" />
+      </template>
+      <template #footer>
+        <UButton color="neutral" variant="ghost" @click="showPasteImport = false">Cancel</UButton>
+        <UButton color="primary" :loading="importingDb" :disabled="!pasteCsv.trim()" @click="doPasteImport">
+          {{ $t('companyLookup.importConfirm') }}
+        </UButton>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -596,9 +614,36 @@ const exportingDb = ref(false);
 const importingDb = ref(false);
 const dbCount = ref(0);
 const importInput = ref<HTMLInputElement | null>(null);
+const showPasteImport = ref(false);
+const pasteCsv = ref("");
 
 function triggerImport() {
   importInput.value?.click();
+}
+
+async function doPasteImport() {
+  const csv = pasteCsv.value.trim();
+  if (!csv) return;
+  importingDb.value = true;
+  try {
+    const resp = await axios.post("/api/v1/company-lookup/import-text", { csv });
+    const data = resp.data.data;
+    if (data.errors?.length) {
+      toast.add({
+        title: `${t("companyLookup.importSuccess", { n: data.imported })} · ${t("companyLookup.importErrors", { n: data.skipped })}`,
+        color: data.imported > 0 ? "warning" : "error",
+      });
+    } else {
+      toast.add({ title: t("companyLookup.importSuccess", { n: data.imported }), color: "success" });
+    }
+    showPasteImport.value = false;
+    pasteCsv.value = "";
+  } catch (e: any) {
+    toast.add({ title: extractError(e), color: "error" });
+  } finally {
+    importingDb.value = false;
+    fetchDbCount();
+  }
 }
 
 function downloadTemplate() {

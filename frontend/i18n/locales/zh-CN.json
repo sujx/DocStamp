@@ -430,6 +430,8 @@
     "sampleHint": "每行一个公司全称，如：",
     "fillSample": "填入示例",
     "downloadTemplate": "下载模板",
+    "pasteImport": "粘贴导入",
+    "pasteHint": "粘贴 CSV 内容，第一行为表头 (name,website)",
     "batchProgress": "查询中 {current}/{total}",
     "localHit": "本地命中 {n} 条，需联网查询 {m} 条",
   },

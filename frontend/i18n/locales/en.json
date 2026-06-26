@@ -430,6 +430,8 @@
     "sampleHint": "One full company name per line, e.g.:",
     "fillSample": "Fill Samples",
     "downloadTemplate": "Template",
+    "pasteImport": "Paste Import",
+    "pasteHint": "Paste CSV content, first row is header (name,website)",
     "batchProgress": "Processing {current}/{total}",
     "localHit": "{n} local hit(s), {m} need(s) web search",
   },
