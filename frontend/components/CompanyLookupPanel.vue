@@ -649,7 +649,10 @@ async function importDb() {
   try {
     const form = new FormData();
     form.append("file", file);
-    const resp = await axios.post("/api/v1/company-lookup/import", form);
+    // Vite dev proxy drops multipart/form-data bodies
+    // Use direct Flask URL in dev, relative path in prod (same origin)
+    const base = window.location.port === "8080" ? "http://localhost:5000" : "";
+    const resp = await axios.post(`${base}/api/v1/company-lookup/import`, form);
     const data = resp.data.data;
     if (data.errors?.length) {
       toast.add({
