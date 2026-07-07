@@ -405,7 +405,14 @@ class CompanyRecord(BaseCRUD):
             return [dict(r) for r in rows]
 
     def import_batch(self, records: list[dict]) -> dict:
-        """Batch upsert records. Returns {imported, skipped, errors}."""
+        """Batch upsert records. Returns {imported, skipped, errors}.
+
+        Auto-corrects common URL mistakes:
+        - Prepends https:// to bare domains (www.example.com → https://www.example.com)
+        - Strips leading/trailing whitespace
+        """
+        from urllib.parse import urlparse
+
         imported = 0
         skipped = 0
         errors: list[str] = []
@@ -417,10 +424,23 @@ class CompanyRecord(BaseCRUD):
                 errors.append(f"Row {i + 1}: missing name or website")
                 skipped += 1
                 continue
+
+            # Auto-prepend https:// to bare domains
             if "://" not in website:
-                errors.append(f"Row {i + 1}: invalid URL for '{name}'")
+                website = "https://" + website.lstrip("/")
+
+            # Validate the resulting URL has a valid hostname
+            try:
+                parsed = urlparse(website)
+                if not parsed.hostname or "." not in parsed.hostname:
+                    errors.append(f"Row {i + 1}: invalid domain for '{name}' — '{website}'")
+                    skipped += 1
+                    continue
+            except Exception:
+                errors.append(f"Row {i + 1}: cannot parse URL for '{name}'")
                 skipped += 1
                 continue
+
             try:
                 self.upsert(name, website, source=rec.get("source", "import"))
                 imported += 1

@@ -629,9 +629,12 @@ async function doPasteImport() {
     const resp = await axios.post("/api/v1/company-lookup/import-text", { csv });
     const data = resp.data.data;
     if (data.errors?.length) {
+      const detail = data.errors.slice(0, 3).join("; ");
       toast.add({
         title: `${t("companyLookup.importSuccess", { n: data.imported })} · ${t("companyLookup.importErrors", { n: data.skipped })}`,
+        description: detail + (data.errors.length > 3 ? "…" : ""),
         color: data.imported > 0 ? "warning" : "error",
+        timeout: 8000,
       });
     } else {
       toast.add({ title: t("companyLookup.importSuccess", { n: data.imported }), color: "success" });
@@ -700,9 +703,12 @@ async function importDb() {
     const resp = await axios.post(`${base}/api/v1/company-lookup/import`, form);
     const data = resp.data.data;
     if (data.errors?.length) {
+      const detail = data.errors.slice(0, 3).join("; ");
       toast.add({
         title: `${t("companyLookup.importSuccess", { n: data.imported })} · ${t("companyLookup.importErrors", { n: data.skipped })}`,
+        description: detail + (data.errors.length > 3 ? "…" : ""),
         color: data.imported > 0 ? "warning" : "error",
+        timeout: 8000,
       });
     } else {
       toast.add({ title: t("companyLookup.importSuccess", { n: data.imported }), color: "success" });
