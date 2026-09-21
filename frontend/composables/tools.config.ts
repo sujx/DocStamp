@@ -21,10 +21,8 @@ export const TOOLS: ToolDef[] = [
   { key: "md2docx", to: "/md-to-docx", icon: "i-heroicons-arrow-down-tray", label: "tabs.md2docx", desc: "md2docx.description", order: 2 },
   { key: "doc-to-md", to: "/doc-to-md", icon: "i-heroicons-document-arrow-down", label: "tabs.docToMd", desc: "docToMd.description", order: 3 },
   { key: "format-docx", to: "/format-docx", icon: "i-heroicons-document-check", label: "tabs.formatDocx", desc: "format.description", order: 4 },
-  { key: "watermark", to: "/watermark", icon: "i-heroicons-beaker", label: "tabs.watermarkManagement", desc: "watermark.description", order: 5 },
   { key: "video-convert", to: "/video-convert", icon: "i-heroicons-video-camera", label: "tabs.videoConvert", desc: "videoConvert.description", order: 6 },
   { key: "rss-detect", to: "/rss-detect", icon: "i-heroicons-signal", label: "tabs.rssDetect", desc: "rssDetect.description", order: 7 },
-  { key: "company-lookup", to: "/company-lookup", icon: "i-heroicons-building-office-2", label: "tabs.companyLookup", desc: "companyLookup.description", order: 8 },
 
   // ── Office 工具（展开到顶层）──
   { key: "properties", to: "/properties", icon: "i-heroicons-document-text", label: "tabs.properties", desc: "properties.description", order: 10 },

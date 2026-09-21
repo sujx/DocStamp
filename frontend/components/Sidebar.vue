@@ -24,7 +24,7 @@
   <aside
     class="sidebar-panel fixed z-40 flex flex-col transition-[width,transform] duration-200 overflow-hidden"
     :class="[
-      collapsed && !isMobile ? 'w-16' : 'w-60',
+      collapsed && !isMobile ? 'w-[72px]' : 'w-64',
       isMobile && !mobileOpen ? '-translate-x-full' : 'translate-x-0',
     ]"
   >
@@ -57,7 +57,7 @@
           <NuxtLink
             v-if="!item.children"
             :to="item.to"
-            class="nav-item group relative flex items-center min-h-[36px] rounded-lg text-[13px] font-medium transition-all duration-150 cursor-pointer"
+            class="nav-item group relative flex items-center min-h-[42px] rounded-lg text-[14px] font-medium transition-all duration-150 cursor-pointer"
             :class="[
               collapsed && !isMobile ? 'justify-center px-1.5' : 'px-2.5 gap-2.5',
               isActive(item.to)
@@ -66,7 +66,7 @@
             ]"
             @click="mobileOpen = false"
           >
-            <UIcon :name="item.icon" class="size-[18px] shrink-0" />
+            <UIcon :name="item.icon" class="size-[22px] shrink-0" />
             <span v-if="!(collapsed && !isMobile)" class="truncate">{{ item.label }}</span>
           </NuxtLink>
 
@@ -78,7 +78,7 @@
             @mouseleave="hoverGroup = null"
           >
             <button
-              class="nav-item group relative flex items-center w-full min-h-[36px] rounded-lg text-[13px] font-medium transition-all duration-150 cursor-pointer"
+              class="nav-item group relative flex items-center w-full min-h-[42px] rounded-lg text-[14px] font-medium transition-all duration-150 cursor-pointer"
               :class="[
                 collapsed && !isMobile ? 'justify-center px-1.5' : 'px-2.5 gap-2.5',
                 isGroupActive(item)
@@ -88,7 +88,7 @@
               @click="hoverGroup = hoverGroup === item.key ? null : item.key"
               :aria-label="item.label"
             >
-              <UIcon :name="item.icon" class="size-[18px] shrink-0" />
+              <UIcon :name="item.icon" class="size-[22px] shrink-0" />
               <span v-if="!(collapsed && !isMobile)" class="flex-1 text-left truncate">{{ item.label }}</span>
               <UIcon
                 v-if="!(collapsed && !isMobile)"
@@ -176,7 +176,7 @@ function toggleCollapsed() {
 
 const sidebarWidth = computed(() => {
   if (isMobile.value) return 0;
-  return collapsed.value ? 64 : 240;
+  return collapsed.value ? 72 : 256;
 });
 provide("sidebarWidth", sidebarWidth);
 

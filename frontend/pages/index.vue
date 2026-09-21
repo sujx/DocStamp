@@ -21,7 +21,7 @@
         <h2 class="text-[11px] font-semibold uppercase tracking-widest text-tertiary mb-3 px-1">
           {{ section.title }}
         </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 stagger-children">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger-children">
           <ToolCard
             v-for="tool in section.tools"
             :key="tool.to"
