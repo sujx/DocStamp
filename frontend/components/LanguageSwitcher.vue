@@ -34,7 +34,7 @@ function setLang(lang: string) {
 .lang-switcher {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   max-width: 100%;
   overflow: hidden;
 }
@@ -46,17 +46,18 @@ function setLang(lang: string) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  border: none;
-  border-radius: var(--radius-normal, 6px);
+  gap: 3px;
+  border: 1px solid transparent;
+  border-radius: 6px;
   background: transparent;
   cursor: pointer;
-  padding: 4px 5px;
+  padding: 3px 6px;
   height: 28px;
   flex: 1;
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
+  transition: all 0.2s cubic-bezier(.16, 1, .3, 1);
 }
 .lang-switcher.collapsed .lang-btn {
   width: 28px;
@@ -67,31 +68,38 @@ function setLang(lang: string) {
   padding: 0;
 }
 .lang-btn:hover {
-  background: var(--color-muted);
+  background: rgba(255, 255, 255, 0.08);
 }
 .lang-btn.active {
-  background: var(--color-brand-soft);
-  outline: 1px solid var(--color-brand-700);
-  outline-offset: -1px;
+  background: rgba(76, 125, 240, 0.22);
+  border-color: rgba(76, 125, 240, 0.40);
 }
 .flag {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   line-height: 1;
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
-  background: var(--color-muted);
-  color: var(--color-text-primary);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #8FA0C8;
+  transition: all 0.2s cubic-bezier(.16, 1, .3, 1);
+}
+.lang-btn.active .flag {
+  background: #4C7DF0;
+  color: #fff;
 }
 .label {
   font-size: 11px;
   line-height: 1;
   white-space: nowrap;
-  color: var(--color-text-primary);
+  color: #8FA0C8;
+}
+.lang-btn.active .label {
+  color: #fff;
 }
 </style>

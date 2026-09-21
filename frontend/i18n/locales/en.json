@@ -33,6 +33,14 @@
     "rssDetect": "RSS Detector",
     "companyLookup": "Company Lookup"
   },
+  "dashboard": {
+    "heroTitle": "Document Processing, Simplified",
+    "heroSubtitle": "15+ professional tools for format conversion, PDF editing, document standardization and more",
+    "sectionConvert": "Format Conversion",
+    "sectionPdf": "PDF Tools",
+    "sectionOffice": "Office Tools",
+    "sectionMore": "More Tools"
+  },
   "status": {
     "title": "Usage Statistics",
     "description": "Module call counts and website visitor analytics",

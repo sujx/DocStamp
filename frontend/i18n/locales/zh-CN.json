@@ -33,6 +33,14 @@
     "rssDetect": "RSS 探测",
     "companyLookup": "公司查询"
   },
+  "dashboard": {
+    "heroTitle": "文档处理，化繁为简",
+    "heroSubtitle": "15+ 专业工具，覆盖格式转换、PDF 编辑、文档规范化等场景",
+    "sectionConvert": "格式转换",
+    "sectionPdf": "PDF 工具",
+    "sectionOffice": "Office 工具",
+    "sectionMore": "更多工具"
+  },
   "status": {
     "title": "使用统计",
     "description": "各功能模块调用次数与网站访问情况",

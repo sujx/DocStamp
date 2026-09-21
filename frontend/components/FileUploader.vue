@@ -1,18 +1,20 @@
 <template>
   <div
-    class="border-2 border-dashed rounded-lg p-6 text-center transition-colors duration-150 cursor-pointer"
-    :style="isDragover
-      ? { borderColor: 'var(--color-brand-700)', backgroundColor: 'var(--color-brand-soft)' }
-      : { borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-surface)' }"
+    class="border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer"
+    :class="isDragover
+      ? 'border-brand-600 bg-brand-soft/60 scale-[1.01]'
+      : 'border-default bg-surface hover:border-brand-300 hover:bg-muted/30'"
     @dragover.prevent="isDragover = true"
     @dragleave.prevent="isDragover = false"
     @drop.prevent="onDrop"
   >
     <!-- Empty state -->
     <div v-if="!fileName" class="flex flex-col items-center gap-2">
-      <UIcon :name="icon" class="w-8 h-8 text-tertiary"  />
-      <p class="text-sm text-secondary" >{{ $t("common.uploadHint") }}</p>
-      <p v-if="hint" class="text-xs text-pretty text-tertiary" >{{ hint }}</p>
+      <div class="icon-badge mb-1">
+        <UIcon :name="icon" class="size-5" />
+      </div>
+      <p class="text-sm text-secondary">{{ $t("common.uploadHint") }}</p>
+      <p v-if="hint" class="text-xs text-pretty text-tertiary">{{ hint }}</p>
       <label class="cursor-pointer">
         <UButton color="primary" variant="soft" as="span">
           {{ $t("common.upload") }}
@@ -29,10 +31,12 @@
 
     <!-- File selected -->
     <div v-else class="flex items-center gap-3 text-left">
-      <UIcon :name="fileIcon" class="w-6 h-6 shrink-0 text-tertiary"  />
+      <div class="icon-badge !size-10 shrink-0">
+        <UIcon :name="fileIcon" class="size-5" />
+      </div>
       <div class="flex-1 min-w-0">
-        <span class="font-semibold text-sm block truncate text-primary" >{{ fileName }}</span>
-        <span v-if="fileSize" class="text-xs text-pretty text-tertiary" >{{ formatSize(fileSize) }}</span>
+        <span class="font-semibold text-sm block truncate text-primary">{{ fileName }}</span>
+        <span v-if="fileSize" class="text-xs text-pretty text-tertiary tabular-nums">{{ formatSize(fileSize) }}</span>
       </div>
       <UButton size="xs" variant="ghost" color="neutral" @click="reset">
         {{ $t("common.reset") }}
@@ -46,7 +50,7 @@ const props = defineProps({
   icon: { type: String, default: "i-heroicons-arrow-up-tray" },
   hint: { type: String, default: "" },
   accept: { type: String, default: "" },
-  maxSize: { type: Number, default: 0 }, // 0 = no limit, bytes
+  maxSize: { type: Number, default: 0 },
 });
 
 const emit = defineEmits<{

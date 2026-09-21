@@ -1,26 +1,22 @@
 <template>
   <NuxtLink
     :to="to"
-    class="block p-6 rounded-lg border border-transparent transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 group cursor-pointer bg-surface shadow-card"
-    @mouseenter="hover = true"
-    @mouseleave="hover = false"
+    class="card card-interactive group flex gap-4 p-4"
   >
-    <div
-      class="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-colors duration-150"
-      :style="{ backgroundColor: hover ? 'var(--color-brand-700)' : 'var(--color-brand-soft)' }"
-    >
-      <UIcon
-        :name="icon"
-        class="w-6 h-6 transition-colors duration-150"
-        :style="{ color: hover ? '#fff' : 'var(--color-brand-700)' }"
-      />
+    <div class="icon-badge shrink-0">
+      <UIcon :name="icon" class="size-5" />
     </div>
-    <h3 class="text-lg font-semibold mb-1 text-balance text-primary">{{ title }}</h3>
-    <p class="text-sm text-pretty text-secondary">{{ description }}</p>
+    <div class="min-w-0 flex-1">
+      <h3 class="text-sm font-semibold text-primary leading-tight mb-1">{{ title }}</h3>
+      <p class="text-xs text-secondary leading-relaxed line-clamp-2">{{ description }}</p>
+    </div>
+    <UIcon
+      name="i-heroicons-arrow-right"
+      class="size-4 shrink-0 self-center text-tertiary opacity-0 -translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-brand-600"
+    />
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
 defineProps<{ icon: string; title: string; description: string; to: string }>();
-const hover = ref(false);
 </script>

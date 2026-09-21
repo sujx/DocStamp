@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 withDefaults(defineProps<{
-  radius?: "sm" | "md" | "lg";
+  radius?: "sm" | "md" | "lg" | "xl";
 }>(), {
   radius: "md",
 });

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Self-hosted Plus Jakarta Sans (eliminates 4.8s CDN latency) ── */
+/* ── Self-hosted Plus Jakarta Sans ── */
 @font-face {
   font-family: "Plus Jakarta Sans";
   src: url("/fonts/jakarta-400.ttf") format("truetype");
@@ -32,7 +32,6 @@
   font-display: swap;
 }
 
-/* Respect user motion preference */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -45,64 +44,168 @@
 
 @layer components {
   .card {
-    border: 1px solid;
-    border-radius: var(--radius-md);
-    padding: 1.5rem;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-smooth), transform var(--transition-smooth), border-color var(--transition-smooth);
+  }
+
+  .card-interactive {
+    cursor: pointer;
+  }
+
+  .card-interactive:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+    border-color: var(--color-brand-200);
+  }
+
+  .gradient-brand {
+    background: linear-gradient(135deg, var(--color-brand-600), var(--color-brand-700));
+  }
+
+  .gradient-brand-soft {
+    background: linear-gradient(135deg, var(--color-brand-50), rgba(76, 125, 240, 0.06));
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-brand-600), var(--color-brand-800));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .icon-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-full);
+    background: var(--color-brand-50);
+    color: var(--color-brand-600);
+    transition: all var(--transition-smooth);
+  }
+
+  .card-interactive:hover .icon-badge {
+    background: var(--color-brand-600);
+    color: #ffffff;
+    transform: scale(1.05);
   }
 }
 
 /* ── Page transitions ── */
 .page-fade-enter-active,
 .page-fade-leave-active {
-  transition: opacity 150ms ease;
+  transition: opacity 200ms cubic-bezier(.16, 1, .3, 1);
 }
 .page-fade-enter-from,
 .page-fade-leave-to {
   opacity: 0;
 }
 
+/* ── Entrance animation (SynTime ease-out) ── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.4s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.stagger-children > * {
+  animation: fade-up 0.35s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 40ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 80ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 160ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 280ms; }
+.stagger-children > *:nth-child(9) { animation-delay: 320ms; }
+.stagger-children > *:nth-child(10) { animation-delay: 360ms; }
+.stagger-children > *:nth-child(11) { animation-delay: 400ms; }
+.stagger-children > *:nth-child(12) { animation-delay: 440ms; }
+
 @layer base {
   :root {
-    --color-brand-50: #f0fdf4;
-    --color-brand-100: #dcfce7;
-    --color-brand-200: #bbf7d0;
-    --color-brand-300: #86efac;
-    --color-brand-400: #4ade80;
-    --color-brand-500: #22c55e;
-    --color-brand-600: #16a34a;
-    --color-brand-700: #008a3d;
-    --color-brand-800: #00662b;
-    --color-brand-900: #14532d;
-    --color-brand-950: #052e16;
-    --color-brand-soft: rgba(0, 138, 61, 0.08);
+    /* ── Brand palette (SynTime Royal Blue) ── */
+    --color-brand-50: #EFF4FE;
+    --color-brand-100: #DDE8FD;
+    --color-brand-200: #BCD0FA;
+    --color-brand-300: #93B4F6;
+    --color-brand-400: #6E95F2;
+    --color-brand-500: #4C7DF0;
+    --color-brand-600: #3B63D8;
+    --color-brand-700: #2F4FB0;
+    --color-brand-800: #27408D;
+    --color-brand-900: #1F3268;
+    --color-brand-950: #14213D;
+    --color-brand-soft: rgba(76, 125, 240, 0.10);
 
-    --color-page: #f9f7e8;
+    /* ── Seal red (brand accent for "金印") ── */
+    --color-seal-red: #C0392B;
+
+    /* ── Surfaces (navy-tinted grays) ── */
+    --color-page: #EEF0F4;
     --color-surface: #ffffff;
-    --color-muted: #f4f2e4;
+    --color-muted: #F4F6FA;
+    --color-sidebar: #23337A;
 
-    --color-text-primary: #1a1a1a;
-    --color-text-secondary: #5c5c5c;
-    --color-text-tertiary: #706d60;
+    /* ── Text ── */
+    --color-text-primary: #1F2A44;
+    --color-text-secondary: #56627A;
+    --color-text-tertiary: #6E7A93;
 
-    --color-border-default: #e8e6d8;
-    --color-border-subtle: #f0efe5;
+    /* ── Borders ── */
+    --color-border-default: #E3E8F0;
+    --color-border-subtle: #EEF0F4;
 
+    /* ── Radii (SynTime scale) ── */
     --radius-sm: 6px;
-    --radius-md: 10px;
+    --radius-md: 8px;
     --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
 
-    --shadow-card: none;
-    --shadow-elevated: none;
-    --shadow-sidebar: none;
+    /* ── Shadows (navy-tinted, SynTime system) ── */
+    --shadow-xs: 0 1px 2px rgba(26, 43, 79, 0.04);
+    --shadow-sm: 0 2px 6px rgba(26, 43, 79, 0.05), 0 1px 2px rgba(26, 43, 79, 0.04);
+    --shadow-md: 0 6px 14px -2px rgba(26, 43, 79, 0.07), 0 2px 6px -2px rgba(26, 43, 79, 0.04);
+    --shadow-lg: 0 12px 22px -4px rgba(26, 43, 79, 0.08), 0 6px 10px -4px rgba(26, 43, 79, 0.04);
+    --shadow-xl: 0 22px 30px -6px rgba(26, 43, 79, 0.10), 0 10px 14px -6px rgba(26, 43, 79, 0.04);
+    --shadow-card: var(--shadow-sm);
+    --shadow-elevated: var(--shadow-md);
+    --shadow-sidebar: 0 12px 22px -4px rgba(26, 43, 79, 0.08), 0 6px 10px -4px rgba(26, 43, 79, 0.04);
+    --shadow-subtle: var(--shadow-xs);
+
+    /* ── Transitions (SynTime ease-out) ── */
+    --transition-smooth: 0.2s cubic-bezier(.16, 1, .3, 1);
+    --transition-spring: 0.3s cubic-bezier(.16, 1, .3, 1);
   }
 
-  /* ── Brand title: clean flat design, solid green ── */
+  /* ── Brand title ── */
   .brand-title {
     font-family: "Plus Jakarta Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     font-weight: 700;
     font-size: 1.375rem;
-    letter-spacing: 0.08em;
-    color: var(--color-brand-700);
+    letter-spacing: 0.06em;
+    background: linear-gradient(135deg, var(--color-brand-600), var(--color-brand-800));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     user-select: none;
   }
 
@@ -113,9 +216,8 @@
       BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   }
 
-  /* ── Focus visible: global outline for keyboard navigation ── */
   :focus-visible {
-    outline: 2px solid var(--color-brand-700);
+    outline: 2px solid var(--color-brand-500);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
   }

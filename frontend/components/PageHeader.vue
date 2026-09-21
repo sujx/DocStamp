@@ -1,11 +1,14 @@
 <template>
   <div class="mb-6">
-    <ULink :to="backTo" class="inline-flex items-center gap-1 text-sm text-secondary hover:text-brand-700 transition-colors duration-150">
-      <UIcon name="i-heroicons-arrow-left" class="w-4 h-4" />
+    <ULink
+      :to="backTo"
+      class="inline-flex items-center gap-1.5 text-xs font-medium text-tertiary hover:text-brand-600 transition-colors duration-150 mb-2"
+    >
+      <UIcon name="i-heroicons-arrow-left" class="size-3.5" />
       {{ $t("common.back") }}
     </ULink>
-    <h1 v-if="title" class="text-2xl font-bold text-primary mt-2">{{ title }}</h1>
-    <p v-if="description" class="text-sm text-secondary mt-1 text-pretty">{{ description }}</p>
+    <h1 v-if="title" class="text-xl font-bold text-primary tracking-tight">{{ title }}</h1>
+    <p v-if="description" class="text-sm text-secondary mt-1 leading-relaxed text-pretty">{{ description }}</p>
   </div>
 </template>
 
