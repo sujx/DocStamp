@@ -33,8 +33,8 @@
 import axios from "axios";
 
 const { t } = useI18n();
-const toast = useToast();
 const { showError } = useApiError();
+const { downloadBlob } = useDownload();
 
 const isDragover = ref(false);
 const selectedFile = ref<File | null>(null);
@@ -63,14 +63,7 @@ async function formatFile() {
 
     // Step 2: Download
     const dlResp = await axios.get(`/api/v1/download/${download_id}`, { responseType: "blob" });
-    const url = URL.createObjectURL(dlResp.data);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
-    toast.add({ title: t("common.success"), color: "success" });
+    downloadBlob(dlResp.data, filename, t("common.success"));
   } catch (e: any) {
     showError(e);
   } finally {

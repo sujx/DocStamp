@@ -56,6 +56,7 @@ import DOMPurify from "dompurify";
 const { t } = useI18n();
 const toast = useToast();
 const { extractError } = useApiError();
+const { downloadBlob } = useDownload();
 
 const file = ref<File | null>(null);
 const converting = ref(false);
@@ -105,11 +106,7 @@ function copyMd() {
 function downloadMd() {
   const name = (file.value?.name || "document").replace(/\.[^.]+$/, "") + ".md";
   const blob = new Blob([markdown.value], { type: "text/markdown;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = name;
-  a.click();
-  URL.revokeObjectURL(url);
+  downloadBlob(blob, name);
 }
 </script>
 

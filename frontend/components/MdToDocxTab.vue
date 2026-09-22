@@ -174,6 +174,7 @@ import DOMPurify from "dompurify";
 const { t } = useI18n();
 const toast = useToast();
 const { showError } = useApiError();
+const { downloadBlob } = useDownload();
 const { correct: aiCorrectText, classify: aiClassifyText, loading: aiCorrecting } = useAi();
 
 const aiClassified = ref(false);
@@ -372,13 +373,7 @@ async function doConvert(format: "plain" | "official") {
   try {
     const resp = await axios.post(`${API_BASE}/api/v1/convert?format=${format}`, { content: content.value });
     const dlResp = await axios.get(`${API_BASE}/api/v1/download/${resp.data.download_id}`, { responseType: "blob" });
-    const url = URL.createObjectURL(dlResp.data);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = resp.data.filename;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.add({ title: t("md2docx.success"), color: "success" });
+    downloadBlob(dlResp.data, resp.data.filename, t("md2docx.success"));
   } catch (e: any) {
     showError(e);
   } finally {

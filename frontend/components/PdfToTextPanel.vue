@@ -31,6 +31,7 @@
 import axios from "axios";
 const { t } = useI18n(); const toast = useToast();
 const { showError } = useApiError();
+const { downloadBlob } = useDownload();
 const { denoise: aiDenoiseText, loading: aiDenoising } = useAi();
 const file = ref<File | null>(null); const pagesInput = ref(""); const extracting = ref(false);
 const result = ref<{ text: string; total_pages: number; extracted_pages: number } | null>(null);
@@ -49,8 +50,7 @@ function downloadText() {
   if (!result.value) return;
   const name = (file.value?.name || "document").replace(/\.pdf$/i, "") + ".txt";
   const blob = new Blob([result.value.text], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob); const a = document.createElement("a");
-  a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url);
+  downloadBlob(blob, name);
 }
 async function copyText() { if (!result.value) return; await navigator.clipboard.writeText(result.value.text); toast.add({ title: t("pdfToText.copied"), color: "success" }); }
 async function aiDenoise() {

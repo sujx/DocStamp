@@ -90,6 +90,7 @@ import axios from "axios";
 
 const { t } = useI18n();
 const { extractError } = useApiError();
+const { downloadBlob } = useDownload();
 
 const file = ref<File | null>(null);
 const sourceUrl = ref("");
@@ -203,13 +204,7 @@ function onTaskFail(err: string) {
 
 function download() {
   if (!resultBlob.value) return;
-  const url = URL.createObjectURL(resultBlob.value);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = resultName.value;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  downloadBlob(resultBlob.value, resultName.value);
 }
 
 function resetState() {

@@ -138,7 +138,7 @@ def my_service(path: str) -> ServiceResult[dict]:
 - 表单校验：Vuelidate (`useValidation` composable)
 - 异步进度：SSE `GET /api/v1/tasks/{id}/stream`，组件内直接建 `EventSource`
 - API 错误提示：`useApiError().showError(e)` 弹 toast；需要内联展示时用 `useApiError().extractError(e)` 取消息（自动识别 JSON 与 Blob 两种错误体）；全局 401 由 `plugins/axios.client.ts` 拦截
-- 文件下载：`useDownload().downloadBlob(blob, filename, successMsg)`
+- 文件下载：统一走 `useDownload().downloadBlob(blob, filename, successMsg?)`（挂 `<a>` → click → 延迟 100ms 摘除并 revoke，禁止在组件里手写这段；不传成功文案则不弹 toast）
 
 ### 工具配置单一数据源
 

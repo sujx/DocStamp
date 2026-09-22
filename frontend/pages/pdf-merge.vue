@@ -70,8 +70,8 @@
 import axios from "axios";
 
 const { t } = useI18n();
-const toast = useToast();
 const { showError } = useApiError();
+const { downloadBlob } = useDownload();
 
 const files = ref<File[]>([]);
 const merging = ref(false);
@@ -111,14 +111,7 @@ async function merge() {
     fd.append("filename", "merged.pdf");
 
     const resp = await axios.post("/api/v1/pdf-merge", fd, { responseType: "blob" });
-    const url = URL.createObjectURL(resp.data);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "merged.pdf";
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
-    toast.add({ title: t("common.success"), color: "success" });
+    downloadBlob(resp.data, "merged.pdf", t("common.success"));
   } catch (e: any) {
     showError(e);
   } finally {

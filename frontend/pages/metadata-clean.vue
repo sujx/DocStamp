@@ -28,8 +28,8 @@
 import axios from "axios";
 
 const { t } = useI18n();
-const toast = useToast();
 const { showError } = useApiError();
+const { downloadBlob } = useDownload();
 
 const file = ref<File | null>(null);
 const cleaning = ref(false);
@@ -50,13 +50,7 @@ async function clean() {
     const resp = await axios.post("/api/v1/metadata-clean", fd, { responseType: "blob" });
     result.value = { fields_cleaned: Number(resp.headers["x-fields-cleaned"] || 0) };
 
-    const url = URL.createObjectURL(resp.data);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `cleaned_${file.value.name}`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.add({ title: t("common.success"), color: "success" });
+    downloadBlob(resp.data, `cleaned_${file.value.name}`, t("common.success"));
   } catch (e: any) {
     showError(e);
   } finally {

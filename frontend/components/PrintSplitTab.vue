@@ -55,6 +55,7 @@ import FileUploader from "./FileUploader.vue";
 
 const { t } = useI18n();
 const { showError } = useApiError();
+const { downloadBlob } = useDownload();
 
 const selectedFile = ref<File | null>(null);
 const batchSize = ref(60);
@@ -107,12 +108,7 @@ async function downloadNext() {
   const batchNo = downloaded.value + 1;
   try {
     const resp = await axios.get(`/api/v1/print-split/${task.value.task_id}/batch/${batchNo}`, { responseType: "blob" });
-    const url = URL.createObjectURL(resp.data);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `batch_${batchNo}.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(resp.data, `batch_${batchNo}.pdf`);
     downloaded.value++;
   } catch (e: any) {
     showError(e);
