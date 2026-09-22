@@ -1,6 +1,5 @@
 """Page decorator — add page numbers, headers, and footers to PDF pages."""
 
-import os
 from io import BytesIO
 
 from pypdf import PdfReader, PdfWriter

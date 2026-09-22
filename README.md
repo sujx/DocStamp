@@ -100,7 +100,7 @@ docStamp/
 │   ├── app.py                  # Flask 工厂（蓝图注册 + SPA fallback）
 │   ├── config.py               # 统一配置
 │   ├── errors.py               # ErrorCode 枚举 + ServiceResult[T] + ServiceError
-│   ├── schemas.py              # Pydantic v2 请求 DTO（15+ Schema）
+│   ├── schemas.py              # Pydantic v2 请求 DTO（JSON body 端点）
 │   ├── error_handler.py        # 全局异常拦截 + @validate_request + requestId
 │   ├── json_logging.py         # JSON 结构化日志（30 天轮转）
 │   ├── models.py               # TaskRecord + OperationLog（原始 SQL）
@@ -111,13 +111,13 @@ docStamp/
 │   ├── services/               # 业务逻辑层（纯函数，全返回 ServiceResult[T]）
 │   ├── tasks/                  # Celery 异步任务（video / maintenance）
 │   └── utils/
-│       ├── base/               # file_helpers / validators
+│       ├── base/               # file_helpers
 │       ├── file_security.py    # 三层文件校验（大小/扩展名/魔数）
 │       ├── rate_limit.py       # IP 级别 API 限流装饰器
 │       ├── retry.py            # @retry_on_failure 重试装饰器
 │       └── crypto.py           # AES-256 Fernet 字段加密
 ├── frontend/                   # Nuxt 3 SPA
-│   ├── composables/            # tools.config / useValidation / useTaskStream / useApi / useDownload / useAi
+│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useAi
 │   ├── components/ui/          # 原子组件（CardBase / SkeletonBlock）
 │   ├── pages/                  # 20 个路由页面（14 个工具 + 4 个面板子页 + 2 个半移除页面）
 │   └── i18n/locales/           # zh-CN / en

@@ -474,25 +474,3 @@ def _normalize_company_name(name: str) -> str:
     for suffix in suffixes:
         name = re.sub(suffix, "", name).strip()
     return name
-
-
-def normalize_existing_records(db_path: str) -> int:
-    """One-time migration: re-normalize all company_records names in place.
-
-    Fixes records stored before parenthetical stripping was added to
-    _normalize_company_name (e.g. '腾讯科技（深圳）' → '腾讯科技').
-    """
-    import sqlite3
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    rows = conn.execute("SELECT id, name FROM company_records").fetchall()
-    updated = 0
-    for row in rows:
-        old = row["name"]
-        new = _normalize_company_name(old)
-        if new != old:
-            conn.execute("UPDATE company_records SET name=? WHERE id=?", (new, row["id"]))
-            updated += 1
-    conn.commit()
-    conn.close()
-    return updated

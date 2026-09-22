@@ -7,7 +7,6 @@ Layer 3: Site-specific rules from rss_rules.json (like RSSHub-Radar)
 
 import json
 import os
-import re
 from html.parser import HTMLParser
 from urllib.parse import urljoin, urlparse
 

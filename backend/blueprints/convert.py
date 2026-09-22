@@ -7,11 +7,10 @@ import uuid
 
 from flask import Blueprint, jsonify, request
 from flask_babel import gettext as _
-from werkzeug.utils import secure_filename
 
 from config import Config
 from error_handler import validate_request
-from schemas import MdConvertSchema, MdPreviewSchema
+from schemas import MdPreviewSchema
 from utils.base.file_helpers import cleanup_files, save_upload
 from utils.rate_limit import rate_limit
 

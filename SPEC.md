@@ -6,7 +6,7 @@
 
 **定位**：单体工具，无用户系统，无认证，AI 功能可选（未配 Key 自动降级）——即开即用，随用随走。
 
-**i18n**：中英文双语，`locales/zh-CN.json` + `locales/en.json`，默认 `zh-CN`。
+**i18n**：中英文双语，`i18n/locales/zh-CN.json` + `i18n/locales/en.json`，默认 `zh-CN`。
 
 ---
 
@@ -126,13 +126,12 @@ backend/
 ├── app.py                  # Flask 工厂 (<70 行)
 ├── config.py               # 集中配置
 ├── errors.py               # ErrorCode 枚举 + ServiceResult + ServiceError
-├── schemas.py              # Pydantic v2 请求 DTO (15+ Schema)
+├── schemas.py              # Pydantic v2 请求 DTO（JSON body 端点）
 ├── error_handler.py        # 全局异常拦截 + @validate_request + requestId
 ├── json_logging.py         # JSON 结构化日志 (TimedRotatingFileHandler, 30 天)
 ├── models.py               # TaskRecord + OperationLog + BaseCRUD (原始 SQL)
 ├── cache.py                # Flask-Caching SimpleCache
 ├── celery_app.py           # Celery (Redis broker, 2 队列)
-├── config_validators.py    # 启动时配置校验
 ├── gunicorn.conf.py        # 生产配置
 ├── blueprints/             # HTTP 路由层（每功能一个文件，共 18 个；实际路径均带 /api/v1 前缀）
 │   ├── convert.py          # /api/convert, /api/preview, /api/stats (计数)
@@ -166,14 +165,12 @@ backend/
 │   ├── pdf_merger.py       # PDF 合并 (pypdf)
 │   ├── pdf_compressor.py   # PDF 压缩
 │   ├── metadata_cleaner.py # 元数据清理
-│   ├── format_converter.py # 格式互转 (LibreOffice/WeasyPrint)
-│   ├── page_decorator.py   # 页码页眉页脚 (reportlab)
-│   └── image_processor.py  # 图片处理 (Pillow)
+│   └── page_decorator.py   # 页码页眉页脚 (reportlab)
 ├── tasks/                  # Celery 异步任务
 │   ├── video.py            # pdf_queue: MP4 → WMV
 │   └── maintenance.py      # office_queue: Beat 定时清理
 ├── utils/
-│   ├── base/               # file_helpers / validators
+│   ├── base/               # file_helpers
 │   ├── file_security.py    # 魔数校验 + 扩展名白名单 + 大小限制
 │   ├── file_cleanup.py     # 定时文件清理
 │   ├── rate_limit.py       # IP 级别 API 限流装饰器
@@ -257,7 +254,7 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 
 ### 进度推送
 
-SSE（Server-Sent Events）：`GET /api/tasks/{id}/stream`。前端 `useTaskStream` composable 自动连接/断开，提供 `{ progress, status, message, result, error }` 响应式状态。轮询端点 `/api/tasks/{id}` 作为降级方案。
+SSE（Server-Sent Events）：`GET /api/tasks/{id}/stream`。需要的组件自行建 `EventSource` 连接并在终态关闭（视频转换、公司查询批量），轮询端点 `/api/tasks/{id}` 作为降级方案。
 
 ---
 
@@ -302,9 +299,8 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 |-----------|------|
 | `tools.config.ts` | 工具定义（ToolDef/ToolGroup）、侧栏分组、仪表盘卡片 |
 | `useValidation` | Vuelidate 封装：`v$` 状态 + `errors` 字典 + `validate()` |
-| `useTaskStream` | SSE 进度监听：`{ progress, status, message, result, error, connect, close }` |
 | `useApi` | 通用 API 封装：`{ data, loading, pagination, fetchList }` + `useCache` |
-| `useDownload` | Blob 下载封装 + 错误提取 |
+| `useDownload` | Blob 下载封装 + `showError` 错误提示 |
 | `useAi` | AI 功能封装（纠错/分类/去噪/文件名生成） |
 
 ### 原子组件 (`components/ui/`)
@@ -329,13 +325,14 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 - **Panel 去重**：`PdfToTextPanel` / `PdfCompressPanel` / `PageDecoratePanel` 是各自功能的唯一实现。独立页面（`pdf-to-text.vue` 等）和 Tab 页（`pdf-tools.vue`）共享同一 Panel 组件，消除逻辑重复。
 - **懒加载**：Panel 组件通过 `defineAsyncComponent(() => import(...))` 按需加载。
 - **已删除组件**：`AppHeader.vue`（未使用，功能由 Sidebar 覆盖）、`ButtonPrimary.vue`（由 Nuxt UI `<UButton>` 替代）、`ProgressBar.vue`（由 Nuxt UI `<UProgress>` 替代）。
+- **已删除前端模块**：`api/` + `types/`（统一 API 层与共享类型从未被组件采用）、`useTaskStream.ts`（组件改用内联 `EventSource`）、`useError.ts`（错误提示由 `useDownload().showError` 承担）。
 
 ### 命名规范
 
 | 层级 | 规范 | 示例 |
 |------|------|------|
 | 组件 | PascalCase | `DigitalClock.vue`, `ProgressBar.vue` |
-| composables | `useXxx.ts` | `useValidation.ts`, `useTaskStream.ts` |
+| composables | `useXxx.ts` | `useValidation.ts`, `useDownload.ts` |
 | pages | kebab-case 路由路径 | `md-to-docx.vue`, `file-assembly.vue` |
 
 ---
@@ -407,7 +404,7 @@ docker compose ps
 | 问题 | 原因 | 解决 |
 |------|------|------|
 | `logging.py` 模块冲突 | 文件名遮蔽 stdlib `logging` | 重命名为 `json_logging.py` |
-| `config/` 目录冲突 | `config.py` 与 `config/` 包同名 | 删除 `config/` 目录，改为 `config_validators.py` |
+| `config/` 目录冲突 | `config.py` 与 `config/` 包同名 | 删除 `config/` 目录，避免与 `config.py` 同名遮蔽 |
 | 变量名不匹配 500 | 批量替换只改定义未改引用 | 修改后 grep JSON 响应字段一致性 |
 | 中文字体不生效 | `run.font.name` 只读西文 | 读 XML `w:rFonts/w:eastAsia` |
 | Pandoc 标题蓝色 | Pandoc Heading 自带颜色 | 移除 `w:pStyle` 后重设字体 |
@@ -420,7 +417,7 @@ docker compose ps
 | Nuxt 3.21.x dev 500 | `rollupOptions.input` 空 bug | 锁死 Nuxt 3.15.4 |
 | 布局动态导入失败 | 旧 `.nuxt` 缓存 + composable 违规 | manage.sh 启动时清理缓存; `useHead` 移出条件块 |
 | `UFormField` 不存在 | Nuxt UI v4→v2 API 差异 | 全局替换为 `UFormGroup` |
-| i18n locale 404 | `@nuxtjs/i18n` v9 路径变更 | 从 `i18n/locales/` 移到 `locales/` |
+| i18n locale 404 | `@nuxtjs/i18n` v9 默认目录变更 | locale 文件统一放在 `i18n/locales/` |
 | Tailwind v4→v3 | `@import "tailwindcss"` 语法差异 | 改为 `@tailwind base/components/utilities` + `tailwind.config.ts` |
 
 ### 部署

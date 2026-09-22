@@ -61,19 +61,3 @@ def split_pdf(filepath: str, output_dir: str, batch_size: int) -> ServiceResult[
         })
 
     return ServiceResult.ok(batches)
-
-
-def get_batch_file(task_dir: str, filename: str) -> ServiceResult[str]:
-    """Get the full path to a batch file.
-
-    Args:
-        task_dir: Task output directory.
-        filename: Batch filename (e.g., "batch_001.pdf").
-
-    Returns:
-        ServiceResult with full path to the batch file.
-    """
-    path = os.path.join(task_dir, filename)
-    if not os.path.isfile(path):
-        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"Batch file not found: {filename}")
-    return ServiceResult.ok(path)

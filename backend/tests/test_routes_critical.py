@@ -3,7 +3,6 @@
 import io
 import json
 import os
-import tempfile
 from unittest.mock import patch, MagicMock
 
 import pytest

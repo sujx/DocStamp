@@ -104,9 +104,9 @@ def validate_request(
     """Decorator: validate Flask request data with Pydantic schemas.
 
     Usage:
-        @app.route("/api/convert", methods=["POST"])
-        @validate_request(body=MdConvertSchema)
-        def md_convert(body: MdConvertSchema):
+        @app.route("/api/v1/preview", methods=["POST"])
+        @validate_request(body=MdPreviewSchema)
+        def md_preview(body: MdPreviewSchema):
             ...
 
     The validated model is injected as a keyword argument matching the

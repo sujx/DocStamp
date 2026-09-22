@@ -4,8 +4,6 @@ import io
 import os
 import zipfile
 
-import pytest
-
 from services.properties import batch_modify_properties, read_properties, modify_properties
 from errors import ServiceResult
 

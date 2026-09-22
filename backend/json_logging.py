@@ -105,12 +105,3 @@ def setup_json_logging(app: Flask) -> None:
         app.logger.warning(
             "Cannot write to %s (%s), logging to stderr only", LOG_DIR, e
         )
-
-
-# ── Helper ──────────────────────────────────────────────────────────────
-
-def get_logger(name: str) -> logging.Logger:
-    """Get a child logger with the RequestIdFilter pre-configured."""
-    logger = logging.getLogger(name)
-    logger.addFilter(RequestIdFilter())
-    return logger

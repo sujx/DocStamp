@@ -7,7 +7,6 @@ Prevents:
 """
 
 import os
-import struct
 
 
 # ── Extension Whitelist ─────────────────────────────────────────────────

@@ -11,7 +11,7 @@ import os
 import time
 import zipfile
 
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request
 
 from cache import cache
 from config import Config

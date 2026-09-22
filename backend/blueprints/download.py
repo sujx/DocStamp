@@ -5,7 +5,7 @@ import mimetypes
 import os
 import time
 
-from flask import Blueprint, Response, g, jsonify, request, send_file, send_from_directory
+from flask import Blueprint, Response, g, jsonify, request, send_file
 from flask_babel import gettext as _
 from werkzeug.utils import secure_filename
 

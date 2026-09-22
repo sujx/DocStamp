@@ -4,7 +4,6 @@ Uses Pandoc for Markdown to DOCX conversion.
 All system tools are called via subprocess — none are Python dependencies.
 """
 
-import os
 import subprocess
 
 from flask_babel import lazy_gettext as _l
@@ -23,27 +22,6 @@ _OPERATION_TIMEOUTS = {
 
 class ConversionError(Exception):
     """Raised when a document conversion fails."""
-
-
-def check_tool_available(tool_name: str) -> bool:
-    """Check if a system tool is available on PATH.
-
-    Args:
-        tool_name: Name of the executable to check.
-
-    Returns:
-        True if the tool is found, False otherwise.
-    """
-    try:
-        subprocess.run(
-            [tool_name, "--version"],
-            capture_output=True,
-            timeout=5,
-            check=False,
-        )
-        return True
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        return False
 
 
 def _run_subprocess(

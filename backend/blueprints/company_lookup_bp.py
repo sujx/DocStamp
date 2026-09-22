@@ -16,7 +16,6 @@ from flask import Blueprint, g, jsonify, request, Response
 
 from config import Config
 from models import CompanyRecord, init_db
-from schemas import CompanyBatchLookupSchema, CompanyConfirmSchema, CompanyLookupSchema
 from services.company_lookup import confirm_company, lookup_company
 from utils.rate_limit import rate_limit
 

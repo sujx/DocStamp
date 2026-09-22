@@ -43,11 +43,11 @@ docStamp/
 │   ├── nuxt.config.ts          # SSG + i18n + Nuxt UI v2
 │   ├── tailwind.config.ts      # Tailwind v3 品牌色阶
 │   ├── assets/css/main.css     # CSS 变量 (SynTime Royal Blue token)
-│   ├── composables/            # tools.config / useValidation / useTaskStream / useApi / useDownload / useAi
+│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useAi / useSidebar / usePageView
 │   ├── components/             # 业务组件 + ui/ 原子组件
 │   ├── layouts/default.vue     # 侧边导航壳
 │   ├── pages/                  # 路由页面
-│   └── locales/                # zh-CN / en
+│   └── i18n/locales/           # zh-CN / en
 ├── docs/
 │   └── vibecoding-blog.md      # 开发经验分享
 ├── manage.sh                   # dev/docker 管理
@@ -134,8 +134,8 @@ def my_service(path: str) -> ServiceResult[dict]:
 - 颜色通过 CSS 变量或 Tailwind token，禁止 inline hex
 - 禁止 `transition: all`，用具体属性列表
 - 表单校验：Vuelidate (`useValidation` composable)
-- 异步进度：SSE (`useTaskStream` composable)
-- API 错误提取：统一使用 `extractError(e)` (`composables/useError.ts`)
+- 异步进度：SSE `GET /api/v1/tasks/{id}/stream`，组件内直接建 `EventSource`
+- API 错误提示：`useDownload().showError(e)`；全局 401 由 `plugins/axios.client.ts` 拦截
 
 ### 工具配置单一数据源
 
