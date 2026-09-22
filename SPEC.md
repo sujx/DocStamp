@@ -25,7 +25,11 @@ MD 转公文          → /md-to-docx
 RSS 探测          → /rss-detect      (Feed 发现)
 属性修改          → /properties      (元数据 + 清理)
 Excel 合并        → /excel-merge
-PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-tools  /pdf-merge
+文件组装          → /file-assembly
+打印分组          → /print-split
+PDF 编辑          → /pdf-editor
+调整 PDF          → /pdf-tools
+PDF 合并          → /pdf-merge
 使用统计          → /status
 ```
 
@@ -297,7 +301,7 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 
 | Composable | 功能 |
 |-----------|------|
-| `tools.config.ts` | 工具定义（ToolDef/ToolGroup）、侧栏分组（`SIDEBAR_GROUPS`） |
+| `tools.config.ts` | 工具定义（ToolDef）、侧栏条目（`SIDEBAR_ITEMS`，按 `order` 排序的扁平列表） |
 | `useValidation` | Vuelidate 封装：`v$` 状态 + `errors` 字典 + `validate()` |
 | `useApi` | 通用 API 封装：`{ data, loading, pagination, fetchList }` + `useCache` |
 | `useDownload` | Blob 下载封装（`downloadBlob`）：挂 `<a>` → click → 延迟 100ms 摘除并 revoke；`successMsg` 可选，不传则不弹 toast |
@@ -437,6 +441,7 @@ docker compose ps
 ### v3.7.2 (2026-09)
 
 - **仪表盘分区标题移除**：首页原本是 4 个带标题的栅格（格式转换 / PDF 工具 / Office 工具 / 更多工具），现改为单栅格，按原顺序（转换 → PDF → Office → 其他）铺开 12 张卡片，不再有分区文字标识。`dashboard.sectionConvert` / `sectionPdf` / `sectionOffice` / `sectionMore` 四个键从两个 locale 删除，`tools.config.ts` 的死导出 `DASHBOARD_TOOLS` 一并移除
+- **侧栏扁平化**：PDF 工具从分组子菜单（hover + click 展开的悬浮面板）拉平为一级导航项，与 Office 工具此前"展开到顶层"的处理一致，位置仍在 Excel 合并与使用统计之间。`tools.config.ts` 的 `ToolGroup` 接口、`ToolDef.group` 字段与 `SIDEBAR_GROUPS` 构造逻辑删除，改为按 `order` 排序的扁平 `SIDEBAR_ITEMS`；`tabs.pdfTools` 键从两个 locale 删除。`Sidebar.vue` 顺带修掉一处硬编码可见文案（"收起侧边栏" → `a11y.collapseSidebar`，与按钮 aria-label 同源，满足 Label in Name）。新增 `tools.config.spec.ts`（3 条：条目扁平无分组、按 `order` 升序、PDF 五项保持原有相对顺序）
 - **i18n 参考审计与死键清理**：两个 locale 各删 75 个无引用键（320 → 245），新增 `i18n/__tests__/locales.spec.ts` 双向审计（无键无引用、无引用无键、locale 对齐、禁止用模板拼接键），`tools.config.ts` 的侧栏分组标签从模板拼接改为静态字面量（拼出来的键对字面量扫描不可见）
 - **`useError` → `useApiError`**：`composables/useError.ts` 与 Nuxt 内置 `useError` 重名（构建期 `Duplicated imports` 告警，组件实际拿到的是本项目实现），重命名 composable 及 17 处调用点，并补上该 composable 的首批测试（`extractError` 的 JSON 信封 / 纯文本 / Blob / 对象四种错误体各一例）
 - **Blob 下载去重**：11 处组件内手写下载路径全部收敛到 `useDownload().downloadBlob(blob, filename, successMsg?)`。统一时序为"挂 `<a>` → click → 延迟 100ms 摘除并 revoke"——在点击的同一任务里 `revokeObjectURL` 会让部分浏览器直接取消下载，此前 8 处是同步 revoke。成功文案改为可选，原本不弹 toast 的 4 处（.md/.txt 下载、打印分组批次、视频转换）保持不变。新增 5 条时序测试；`vitest.config.ts` 增加转换插件注入 `import.meta.client`（vitest 不注入它，Vite 的 `define` 对 `import.meta.*` 也不生效），使客户端分支可在单测中验证

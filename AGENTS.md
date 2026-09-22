@@ -181,7 +181,7 @@ def my_service(path: str) -> ServiceResult[dict]:
 
 ### 侧边栏
 
-深色极光渐变面板，宽度 256px (展开) / 72px (收起)，移动端悬浮叠加模式。
+深色极光渐变面板，宽度 256px (展开) / 72px (收起)，移动端悬浮叠加模式。导航为一级扁平列表，无分组子菜单。
 
 ```css
 background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646B 80%, #4A3D20 100%);
@@ -213,7 +213,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 ### 前端
 
 - `tools.config.ts` 单一数据源，新增工具只改这一个文件
-- Sidebar 子菜单同时支持 hover + click（触摸设备兼容）
+- 侧栏是一级扁平导航（`SIDEBAR_ITEMS`），不设分组子菜单
 - `prefers-reduced-motion: reduce` 全局禁用动画
 - 触摸目标 ≥ 44px (`min-h-[44px]`)
 

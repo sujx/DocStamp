@@ -4,15 +4,7 @@ export interface ToolDef {
   icon: string
   label: string
   desc?: string
-  group?: string
   order: number
-}
-
-export interface ToolGroup {
-  key: string
-  icon: string
-  label: string
-  tools: ToolDef[]
 }
 
 export const TOOLS: ToolDef[] = [
@@ -28,50 +20,16 @@ export const TOOLS: ToolDef[] = [
   { key: "properties", to: "/properties", icon: "i-heroicons-document-text", label: "tabs.properties", desc: "properties.description", order: 10 },
   { key: "excel-merge", to: "/excel-merge", icon: "i-heroicons-table-cells", label: "tabs.excelMerge", desc: "excelMerge.description", order: 11 },
 
-  // ── PDF 工具组 ──
-  { key: "file-assembly", to: "/file-assembly", icon: "i-heroicons-arrows-right-left", label: "tabs.fileAssembly", desc: "img2pdf.description", group: "pdf", order: 20 },
-  { key: "print-split", to: "/print-split", icon: "i-heroicons-printer", label: "tabs.printSplit", desc: "printSplit.description", group: "pdf", order: 21 },
-  { key: "pdf-editor", to: "/pdf-editor", icon: "i-heroicons-document", label: "tabs.pdfEditor", desc: "pdfEditor.description", group: "pdf", order: 22 },
-  { key: "pdf-tools", to: "/pdf-tools", icon: "i-heroicons-wrench-screwdriver", label: "tabs.pdf-tools", desc: "pdf-tools.description", group: "pdf", order: 23 },
-  { key: "pdf-merge", to: "/pdf-merge", icon: "i-heroicons-plus-circle", label: "tabs.pdfMerge", desc: "pdfMerge.description", group: "pdf", order: 24 },
+  // ── PDF 工具（展开到顶层）──
+  { key: "file-assembly", to: "/file-assembly", icon: "i-heroicons-arrows-right-left", label: "tabs.fileAssembly", desc: "img2pdf.description", order: 20 },
+  { key: "print-split", to: "/print-split", icon: "i-heroicons-printer", label: "tabs.printSplit", desc: "printSplit.description", order: 21 },
+  { key: "pdf-editor", to: "/pdf-editor", icon: "i-heroicons-document", label: "tabs.pdfEditor", desc: "pdfEditor.description", order: 22 },
+  { key: "pdf-tools", to: "/pdf-tools", icon: "i-heroicons-wrench-screwdriver", label: "tabs.pdf-tools", desc: "pdf-tools.description", order: 23 },
+  { key: "pdf-merge", to: "/pdf-merge", icon: "i-heroicons-plus-circle", label: "tabs.pdfMerge", desc: "pdfMerge.description", order: 24 },
 
   // ── 顶层 ──
   { key: "status", to: "/status", icon: "i-heroicons-chart-bar", label: "tabs.status", desc: "status.description", order: 30 },
 ]
 
-export const SIDEBAR_GROUPS: (ToolDef | ToolGroup)[] = (() => {
-  const map = new Map<string, ToolDef[]>()
-  const roots: ToolDef[] = []
-
-  for (const t of TOOLS) {
-    if (t.group) {
-      if (!map.has(t.group)) map.set(t.group, [])
-      map.get(t.group)!.push(t)
-    } else {
-      roots.push(t)
-    }
-  }
-
-  const result: (ToolDef | ToolGroup)[] = []
-  const allItems = [...TOOLS].sort((a, b) => a.order - b.order)
-  const seenGroups = new Set<string>()
-
-  for (const t of allItems) {
-    if (!t.group) {
-      result.push(t)
-    } else if (!seenGroups.has(t.group)) {
-      seenGroups.add(t.group)
-      const groupTools = map.get(t.group)!
-      const firstTool = groupTools.reduce((min, tool) => tool.order < min.order ? tool : min)
-      result.push({
-        key: t.group,
-        icon: firstTool.icon,
-        // Static literal: a built-up key is invisible to the i18n dead-key audit (i18n/__tests__).
-        label: "tabs.pdfTools",
-        tools: groupTools.sort((a, b) => a.order - b.order),
-      })
-    }
-  }
-
-  return result
-})()
+// Sidebar 读这里；order 是展示顺序的唯一来源
+export const SIDEBAR_ITEMS: ToolDef[] = [...TOOLS].sort((a, b) => a.order - b.order)

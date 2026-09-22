@@ -50,78 +50,22 @@
 
       <!-- Nav items -->
       <nav class="flex-1 py-2 px-2 space-y-0.5 overflow-y-auto scrollbar-thin">
-        <template v-for="item in navItems" :key="item.key">
-          <!-- Group label (shown before group items) -->
-
-          <!-- Standalone item -->
-          <NuxtLink
-            v-if="!item.children"
-            :to="item.to"
-            class="nav-item group relative flex items-center min-h-[42px] rounded-lg text-[14px] font-medium transition-all duration-150 cursor-pointer"
-            :class="[
-              collapsed && !isMobile ? 'justify-center px-1.5' : 'px-2.5 gap-2.5',
-              isActive(item.to)
-                ? 'nav-item--active'
-                : 'text-sidebar-text hover:bg-white/[.06] hover:text-white'
-            ]"
-            @click="mobileOpen = false"
-          >
-            <UIcon :name="item.icon" class="size-[22px] shrink-0" />
-            <span v-if="!(collapsed && !isMobile)" class="truncate">{{ item.label }}</span>
-          </NuxtLink>
-
-          <!-- Grouped item (with children submenu) -->
-          <div
-            v-else
-            class="relative"
-            @mouseenter="hoverGroup = item.key"
-            @mouseleave="hoverGroup = null"
-          >
-            <button
-              class="nav-item group relative flex items-center w-full min-h-[42px] rounded-lg text-[14px] font-medium transition-all duration-150 cursor-pointer"
-              :class="[
-                collapsed && !isMobile ? 'justify-center px-1.5' : 'px-2.5 gap-2.5',
-                isGroupActive(item)
-                  ? 'nav-item--active'
-                  : 'text-sidebar-text hover:bg-white/[.06] hover:text-white'
-              ]"
-              @click="hoverGroup = hoverGroup === item.key ? null : item.key"
-              :aria-label="item.label"
-            >
-              <UIcon :name="item.icon" class="size-[22px] shrink-0" />
-              <span v-if="!(collapsed && !isMobile)" class="flex-1 text-left truncate">{{ item.label }}</span>
-              <UIcon
-                v-if="!(collapsed && !isMobile)"
-                name="i-heroicons-chevron-right"
-                class="size-3.5 shrink-0 transition-transform duration-200 text-sidebar-sub"
-                :class="hoverGroup === item.key && 'rotate-90'"
-              />
-            </button>
-
-            <!-- Submenu popup -->
-            <Transition name="submenu-fade">
-              <div
-                v-if="hoverGroup === item.key"
-                class="absolute z-50 py-1.5 rounded-xl min-w-[180px] bg-surface border border-default shadow-elevated"
-                :class="(collapsed && !isMobile) ? 'left-full top-0 ml-2' : 'left-2 right-2 top-full mt-1'"
-              >
-                <NuxtLink
-                  v-for="child in item.children"
-                  :key="child.to"
-                  :to="child.to"
-                  class="flex items-center gap-2.5 px-3 py-1.5 text-[13px] rounded-lg mx-1.5 transition-all duration-150 cursor-pointer"
-                  :class="isActive(child.to)
-                    ? 'bg-brand-50 text-brand-700 font-medium'
-                    : 'text-primary hover:bg-muted'"
-                  @click="mobileOpen = false"
-                >
-                  <UIcon :name="child.icon" class="size-4 shrink-0" />
-                  <span>{{ child.label }}</span>
-                </NuxtLink>
-              </div>
-            </Transition>
-          </div>
-        </template>
+        <NuxtLink
+          v-for="item in navItems"
+          :key="item.key"
+          :to="item.to"
+          class="nav-item group relative flex items-center min-h-[42px] rounded-lg text-[14px] font-medium transition-all duration-150 cursor-pointer"
+          :class="[
+            collapsed && !isMobile ? 'justify-center px-1.5' : 'px-2.5 gap-2.5',
+            isActive(item.to)
+              ? 'nav-item--active'
+              : 'text-sidebar-text hover:bg-white/[.06] hover:text-white'
+          ]"
+          @click="mobileOpen = false"
+        >
+          <UIcon :name="item.icon" class="size-[22px] shrink-0" />
+          <span v-if="!(collapsed && !isMobile)" class="truncate">{{ item.label }}</span>
+        </NuxtLink>
       </nav>
 
       <!-- Bottom: language + collapse -->
@@ -138,7 +82,7 @@
             :name="collapsed ? 'i-heroicons-chevron-right' : 'i-heroicons-chevron-left'"
             class="size-3.5"
           />
-          <span v-if="!(collapsed && !isMobile)" class="ml-2">收起侧边栏</span>
+          <span v-if="!(collapsed && !isMobile)" class="ml-2">{{ $t('a11y.collapseSidebar') }}</span>
         </button>
       </div>
     </div>
@@ -146,11 +90,10 @@
 </template>
 
 <script setup lang="ts">
-import { SIDEBAR_GROUPS } from "~/composables/tools.config";
+import { SIDEBAR_ITEMS } from "~/composables/tools.config";
 
 const { collapsed, isMobile, toggleCollapsed } = useSidebar();
 
-const hoverGroup = ref<string | null>(null);
 const mobileOpen = ref(false);
 const route = useRoute();
 const { t } = useI18n();
@@ -159,38 +102,18 @@ watch(() => route.path, () => {
   if (isMobile.value) mobileOpen.value = false;
 });
 
-interface NavChild {
-  to: string; icon: string; label: string;
-}
-interface NavItem {
-  key: string;
-  to?: string;
-  icon: string;
-  label: string;
-  children?: NavChild[];
-}
-
-const navItems = computed<NavItem[]>(() =>
-  SIDEBAR_GROUPS.map(item => {
-    if ("tools" in item) {
-      return {
-        key: item.key,
-        icon: item.icon,
-        label: t(item.label),
-        children: item.tools.map(tool => ({ to: tool.to, icon: tool.icon, label: t(tool.label) })),
-      }
-    }
-    return { key: item.key, to: item.to, icon: item.icon, label: t(item.label) }
-  })
+const navItems = computed(() =>
+  SIDEBAR_ITEMS.map(tool => ({
+    key: tool.key,
+    to: tool.to,
+    icon: tool.icon,
+    label: t(tool.label),
+  }))
 );
 
 function isActive(href: string): boolean {
   if (href === "/") return route.path === "/";
   return route.path.startsWith(href);
-}
-
-function isGroupActive(item: NavItem): boolean {
-  return item.children?.some(c => isActive(c.to)) ?? false;
 }
 </script>
 
@@ -250,11 +173,6 @@ function isGroupActive(item: NavItem): boolean {
 }
 
 /* ── Transitions ── */
-.submenu-fade-enter-active { transition: opacity 150ms ease-out, transform 150ms ease-out; }
-.submenu-fade-leave-active { transition: opacity 100ms ease-in, transform 100ms ease-in; }
-.submenu-fade-enter-from { opacity: 0; transform: translateY(-4px) scale(0.98); }
-.submenu-fade-leave-to { opacity: 0; transform: translateY(-4px) scale(0.98); }
-
 .backdrop-fade-enter-active { transition: opacity 200ms ease-out; }
 .backdrop-fade-leave-active { transition: opacity 150ms ease-in; }
 .backdrop-fade-enter-from,
