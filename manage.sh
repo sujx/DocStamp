@@ -3,15 +3,17 @@
 # docStamp 项目管理脚本
 #
 # Usage:
-#   ./manage.sh start     启动后端 + 前端
-#   ./manage.sh stop      停止所有服务
-#   ./manage.sh restart   重启所有服务
-#   ./manage.sh status    查看运行状态
-#   ./manage.sh backend   仅启动后端
-#   ./manage.sh frontend  仅启动前端
-#   ./manage.sh test      运行后端测试
-#   ./manage.sh test-cov  运行测试 + 覆盖率
-#   ./manage.sh prod      生产模式（单端口 :5000）
+#   ./manage.sh start       启动后端 + 前端（开发模式）
+#   ./manage.sh stop        停止所有服务
+#   ./manage.sh restart     重启所有服务
+#   ./manage.sh status      查看运行状态
+#   ./manage.sh backend     仅启动后端
+#   ./manage.sh frontend    仅启动前端
+#   ./manage.sh test        运行后端测试
+#   ./manage.sh test-cov    运行测试 + 覆盖率
+#   ./manage.sh docker-up   启动 Docker 部署（3 容器）
+#   ./manage.sh docker-down 停止 Docker 部署
+#   ./manage.sh clean-output 清理 output 目录
 # ───────────────────────────────────────────────────────────────────
 
 set -euo pipefail
@@ -86,7 +88,6 @@ _force_stop_port() {
 }
 
 _start_backend() {
-    # Clean up stale PID file
     if [[ -f "$BACKEND_PID" ]]; then
         local old_pid
         old_pid=$(cat "$BACKEND_PID" 2>/dev/null || true)
@@ -98,7 +99,6 @@ _start_backend() {
         log_warn "后端已在运行 (PID: $(cat "$BACKEND_PID"))"
         return 0
     fi
-    # Force-clean port before starting
     _force_stop_port "$BACKEND_PORT"
     log_info "启动后端 (Flask, 端口 $BACKEND_PORT)..."
     cd "$BACKEND_DIR"
@@ -132,8 +132,7 @@ _start_frontend() {
         log_warn "前端已在运行 (PID: $(cat "$FRONTEND_PID"))"
         return 0
     fi
-	# Clean stale Nuxt build cache from previous version
-	rm -rf "$FRONTEND_DIR/.nuxt"
+    rm -rf "$FRONTEND_DIR/.nuxt"
     log_info "启动前端 (Nuxt, 端口 $FRONTEND_PORT)..."
     cd "$FRONTEND_DIR"
     npm run dev > "$PID_DIR/frontend.log" 2>&1 &
@@ -208,8 +207,18 @@ case "${1:-}" in
     frontend)
         _start_frontend
         ;;
-    prod)
-        bash "$PROJECT_DIR/prod-start.sh"
+    docker-up)
+        log_info "══════ 启动 Docker 部署 ══════"
+        cd "$PROJECT_DIR"
+        docker compose up -d --build
+        docker compose ps
+        log_info "══════ Docker 部署已启动 ══════"
+        ;;
+    docker-down)
+        log_info "停止 Docker 部署..."
+        cd "$PROJECT_DIR"
+        docker compose down
+        log_info "Docker 部署已停止"
         ;;
     test)
         log_info "运行后端测试..."
@@ -228,32 +237,6 @@ case "${1:-}" in
         rm -f "$BACKEND_DIR/output/"*
         log_info "清理完成"
         ;;
-    lite)
-        log_info "══════ 启动 docStamp Lite（精简模式） ══════"
-        log_info "启动 Redis + API + Celery (all queues) + Beat..."
-        cd "$PROJECT_DIR"
-        docker compose -f docker-compose.lite.yml up -d --build
-        docker compose -f docker-compose.lite.yml ps
-        log_info "══════ Lite 模式已启动 ══════"
-        log_info "API: http://localhost:5000/api/health"
-        ;;
-    lite-stop)
-        log_info "停止 Lite 模式..."
-        cd "$PROJECT_DIR"
-        docker compose -f docker-compose.lite.yml down
-        log_info "Lite 模式已停止"
-        ;;
-    lite-status)
-        cd "$PROJECT_DIR"
-        docker compose -f docker-compose.lite.yml ps
-        ;;
-    docker-full)
-        log_info "══════ 启动 docStamp Full（全量模式） ══════"
-        cd "$PROJECT_DIR"
-        docker compose up -d --build
-        docker compose ps
-        log_info "══════ Full 模式已启动 ══════"
-        ;;
     *)
         echo ""
         echo "docStamp 项目管理脚本"
@@ -267,22 +250,13 @@ case "${1:-}" in
         echo "  status        查看运行状态"
         echo "  backend       仅启动后端"
         echo "  frontend      仅启动前端"
-        echo "  prod          生产模式（Gunicorn :5000 + 前端静态文件）"
         echo "  test          运行后端 pytest 测试"
         echo "  test-cov      运行后端测试（含覆盖率）"
         echo "  clean-output  清理 output 目录文件"
         echo ""
-        echo "Docker 命令:"
-        echo "  docker-full   Full 模式（6 容器, 4GB+ 推荐）"
-        echo "  lite          Lite 模式（3 容器, 2C2G 推荐）"
-        echo "  lite-stop     停止 Lite 模式"
-        echo "  lite-status   查看 Lite 模式状态"
-        echo ""
-        echo "Docker 部署脚本:"
-        echo "  ./docker-deploy.sh up --lite  一键启动 Lite"
-        echo "  ./docker-deploy.sh ps --lite  查看状态"
-        echo "  ./docker-deploy.sh logs api   跟踪日志"
-        echo "  ./docker-deploy.sh clean      清理数据"
+        echo "Docker 部署:"
+        echo "  docker-up     构建并启动 Docker 容器（3 容器）"
+        echo "  docker-down   停止 Docker 容器"
         echo ""
         ;;
 esac

@@ -1,5 +1,18 @@
+# ───────────────────────────────────────────────────────────────────
+# docStamp — Docker 部署（3 容器，适配 2C2G 服务器）
+#
+# 容器：Redis + Flask API (gunicorn) + Celery All-in-One (3 队列 + Beat)
+#
+# 使用：
+#   1. 复制 .env.example → .env 并填写配置
+#   2. docker compose up -d --build
+#   3. 配置 nginx 反向代理到 127.0.0.1:5000
+#
+# 资源：Redis 128MB + API 2 workers + Celery 2 concurrency → ~800MB
+# ───────────────────────────────────────────────────────────────────
+
 services:
-  # ── Shared Redis (Celery broker + result backend + cache) ──────────
+  # ── Redis ──────────────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: docstamp-redis
@@ -7,7 +20,7 @@ services:
     command: >
       redis-server
       --appendonly yes
-      --maxmemory 256mb
+      --maxmemory 128mb
       --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
@@ -18,12 +31,12 @@ services:
       retries: 5
       start_period: 5s
 
-  # ── Flask API + static files ───────────────────────────────────────
+  # ── Flask API + 前端静态文件 ──────────────────────────────────────
   api:
     build: .
     container_name: docstamp-api
     ports:
-      - "127.0.0.1:5000:5000"       # Only reachable via reverse proxy
+      - "127.0.0.1:5000:5000"
     volumes:
       - output_data:/opt/docstamp/backend/output
       - log_data:/var/log/docstamp
@@ -35,12 +48,13 @@ services:
       - AI_API_URL=${AI_API_URL:-https://api.deepseek.com/chat/completions}
       - AI_MODEL=${AI_MODEL:-deepseek-v4-flash}
       - DOCSTAMP_DEEPSEEK_API_KEY=${DOCSTAMP_DEEPSEEK_API_KEY:-}
-      - DOCSTAMP_PUBLIC_URL=${DOCSTAMP_PUBLIC_URL:-}
       - DOCSTAMP_MINERU_API_KEY=${DOCSTAMP_MINERU_API_KEY:-}
+      - DOCSTAMP_PUBLIC_URL=${DOCSTAMP_PUBLIC_URL:-}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
-      - DOCSTAMP_CORS_ORIGINS=${DOCSTAMP_CORS_ORIGINS:-http://localhost:8080}
+      - DOCSTAMP_CORS_ORIGINS=${DOCSTAMP_CORS_ORIGINS:-http://localhost:8080,https://doc.sujx.net}
       - DOCSTAMP_TASK_DB=/opt/docstamp/backend/data/tasks.db
+      - PYTHONPATH=/opt/docstamp/backend
     depends_on:
       redis:
         condition: service_healthy
@@ -51,15 +65,21 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+    command: >
+      gunicorn -c backend/gunicorn.conf.py
+      -b 0.0.0.0:5000 --workers 2
+      --pid /tmp/gunicorn.pid
+      backend.wsgi:app
 
-  # ── Celery workers (one per queue to isolate resource usage) ───────
-  celery-convert:
+  # ── Celery All-in-One（3 队列合并 + Beat 内嵌）───────────────────
+  celery:
     build: .
-    container_name: docstamp-celery-convert
+    container_name: docstamp-celery
     command: >
       celery -A backend.celery_app worker
-      -Q convert_queue --concurrency=4
-      -n convert@%h --loglevel=info
+      -Q convert_queue,pdf_queue,office_queue
+      --concurrency=2
+      -B --loglevel=info
     volumes:
       - output_data:/opt/docstamp/backend/output
       - log_data:/var/log/docstamp
@@ -81,89 +101,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 15s
-
-  celery-pdf:
-    build: .
-    container_name: docstamp-celery-pdf
-    command: >
-      celery -A backend.celery_app worker
-      -Q pdf_queue --concurrency=4
-      -n pdf@%h --loglevel=info
-    volumes:
-      - output_data:/opt/docstamp/backend/output
-      - log_data:/var/log/docstamp
-      - db_data:/opt/docstamp/backend/data
-    environment:
-      - TZ=Asia/Shanghai
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
-      - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
-      - DOCSTAMP_TASK_DB=/opt/docstamp/backend/data/tasks.db
-      - PYTHONPATH=/opt/docstamp/backend
-    depends_on:
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "celery -A backend.celery_app inspect ping -t 5 2>/dev/null || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-
-  celery-office:
-    build: .
-    container_name: docstamp-celery-office
-    command: >
-      celery -A backend.celery_app worker
-      -Q office_queue --concurrency=4
-      -n office@%h --loglevel=info
-    volumes:
-      - output_data:/opt/docstamp/backend/output
-      - log_data:/var/log/docstamp
-      - db_data:/opt/docstamp/backend/data
-    environment:
-      - TZ=Asia/Shanghai
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
-      - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
-      - DOCSTAMP_TASK_DB=/opt/docstamp/backend/data/tasks.db
-      - PYTHONPATH=/opt/docstamp/backend
-    depends_on:
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "celery -A backend.celery_app inspect ping -t 5 2>/dev/null || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-
-  celery-beat:
-    build: .
-    container_name: docstamp-celery-beat
-    command: celery -A backend.celery_app beat --loglevel=info
-    volumes:
-      - output_data:/opt/docstamp/backend/output
-      - log_data:/var/log/docstamp
-      - db_data:/opt/docstamp/backend/data
-    environment:
-      - TZ=Asia/Shanghai
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
-      - DOCSTAMP_TASK_DB=/opt/docstamp/backend/data/tasks.db
-      - PYTHONPATH=/opt/docstamp/backend
-    depends_on:
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'celery beat' >/dev/null || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+    mem_limit: 512M
 
 volumes:
   output_data:
