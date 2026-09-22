@@ -10,7 +10,9 @@ venv/
 
 # Node
 node_modules/
-frontend/dist/
+# No trailing slash: the committed artefact is a symlink, which the
+# directory-only form of the pattern would not match.
+frontend/dist
 npm-debug.log*
 
 # IDE
@@ -28,9 +30,9 @@ backend/tasks.db*
 SPEC.md
 docs/
 
-# Nuxt build artifacts
-frontend/.nuxt/
-frontend/.output/
+# Nuxt build artifacts — generated in whichever directory the build runs from
+.nuxt/
+.output/
 
 # Nuxt 4 migration leftovers (srcDir default changed to app/)
 app/
@@ -52,3 +54,6 @@ Thumbs.db
 htmlcov/
 .coverage
 .coverage.*
+
+# Tool output
+.qoder-credits/
