@@ -1,12 +1,4 @@
 {
-  "html": {
-    "title": "鹊随金印 - Document Toolbox",
-    "metaDescription": "Office doc properties, Image to PDF, Print split, PDF page editor"
-  },
-  "header": {
-    "title": "鹊随金印",
-    "subtitle": "Document Processing Toolbox"
-  },
   "tabs": {
     "dashboard": "Home",
     "properties": "Properties",
@@ -17,16 +9,13 @@
     "excelMerge": "Excel Merge",
     "md2docx": "MD to DOCX",
     "formatDocx": "Format DOCX",
-    "officeTools": "Office Tools",
     "pdfTools": "PDF Tools",
     "pdf-tools": "Adjust PDF",
     "pdfToText": "PDF to Text",
     "pdfMerge": "PDF Merge",
     "pdfCompress": "PDF Compress",
     "metadataClean": "Metadata Clean",
-    "formatConvert": "Format Convert",
     "pageDecorate": "Page Numbers",
-    "imageProcess": "Image Process",
     "status": "Usage Stats",
     "videoConvert": "Video Convert",
     "rssDetect": "RSS Detector"
@@ -57,22 +46,10 @@
     "download": "Download",
     "processing": "Processing...",
     "reset": "Reset",
-    "noFile": "No file selected",
     "back": "Back",
-    "error": "Error",
     "success": "Success",
     "fileCount": "{n} file(s)",
-    "removeFile": "Remove file",
-    "tips": "Tips",
     "currentTime": "Current time",
-    "taskPending": "Pending",
-    "taskStarted": "Started",
-    "taskProgress": "Processing",
-    "taskSuccess": "Completed",
-    "taskFailure": "Failed",
-    "taskNotFound": "Task not found",
-    "taskRetrying": "Retrying",
-    "uploadArea": "File upload area, click or drag files here",
     "langZh": "Switch to Chinese",
     "langEn": "Switch to English",
     "pageError": "Page component failed. Please refresh."
@@ -86,15 +63,13 @@
     "unifiedTime": "Unified Time (set created and modified to the same value)",
     "separateTime": "Separate Time (set created and modified independently)",
     "unifiedTimeLabel": "Unified Time",
-    "readCurrent": "Read Current Properties",
     "creator": "Creator",
     "creatorPlaceholder": "Enter author name",
     "lastModifiedBy": "Last Modified By",
     "lastModifiedByPlaceholder": "Enter last modifier name",
     "created": "Created",
     "modified": "Modified",
-    "modify": "Modify & Download",
-    "noProperties": "No property info available"
+    "modify": "Modify & Download"
   },
   "img2pdf": {
     "title": "Images to PDF",
@@ -102,52 +77,34 @@
     "pageSize": "Page Size",
     "pageSizeOriginal": "Original Size",
     "pageSizeA4": "A4",
-    "pageSizeA4Landscape": "A4 Landscape",
     "pageSizeLetter": "Letter",
-    "pageSizeLetterLandscape": "Letter Landscape",
     "merge": "Merge to PDF",
     "dragHint": "Drag images to adjust order",
     "page": "Page {n}",
-    "delete": "Delete",
-    "filename": "Output Filename",
-    "moveUp": "Move Up",
-    "moveDown": "Move Down"
+    "filename": "Output Filename"
   },
   "printSplit": {
     "title": "PDF Print Split",
     "description": "Split a multi-page PDF into batches with configurable page count and interval",
-    "totalPages": "Total Pages",
     "batchSize": "Pages per Batch",
     "interval": "Interval",
     "seconds": "sec",
     "minutes": "min",
-    "batchCount": "Number of Batches",
-    "batchTable": "Batch Preview",
-    "batchNo": "Batch",
-    "pages": "Pages",
-    "pageRange": "Page Range",
     "startSplit": "Start Split",
-    "progress": "Download Progress",
     "nextDownload": "Next Download",
     "downloaded": "Downloaded",
     "allDone": "All downloads complete",
-    "batchLabel": "Batch {n}",
     "pause": "Pause",
     "resume": "Resume",
     "stop": "Stop Split",
-    "paused": "Paused",
-    "stopped": "Split stopped",
-    "splitDone": "Split into {n} batches"
+    "paused": "Paused"
   },
   "pdfEditor": {
     "title": "PDF Page Editor",
     "description": "Delete pages, insert pages from another PDF, or reorder pages",
-    "mode": "Edit Mode",
     "modeDelete": "Delete Pages",
     "modeInsert": "Insert Pages",
     "modeReorder": "Reorder Pages",
-    "pagesToDelete": "Pages to Delete",
-    "pagesToDeleteHint": "Enter page numbers separated by commas, e.g.: 1,3,5",
     "deleteBtn": "Delete & Download",
     "insertFile": "PDF to Insert From",
     "insertPages": "Pages to Insert",
@@ -155,14 +112,10 @@
     "atPosition": "Insert Position",
     "atPositionHint": "Insert after page N (0 = at beginning)",
     "insertBtn": "Insert & Download",
-    "newOrder": "New Page Order",
-    "newOrderHint": "Enter new page order separated by commas, e.g.: 3,1,2",
     "reorderBtn": "Reorder & Download",
     "originalPages": "Original Pages",
-    "preview": "Page Preview",
     "dragToReorder": "Drag page cards to reorder",
     "clickToSelect": "Click page cards to select for deletion",
-    "currentOrder": "Current Order",
     "page": "Page",
     "selectedToDelete": "{n} page(s) selected for deletion, {m} remaining",
     "insertFileRequired": "Please select a PDF to insert from"
@@ -194,7 +147,6 @@
     "convertingProgress": "Completed {current} / {total} pages"
   },
   "md2docx": {
-    "title": "MD to DOCX",
     "description": "Convert Markdown documents to GB/T 9704-2012 compliant Chinese official documents",
     "editor": "Markdown Input",
     "upload": "Upload",
@@ -202,13 +154,10 @@
     "clear": "Clear",
     "placeholder": "Enter Markdown content here, or upload a .md file...",
     "preview": "Document Preview",
-    "emptyPreview": "Enter Markdown on the left to see live preview here",
     "convertPlain": "Plain Convert",
     "convertOfficial": "Official Convert",
     "converting": "Converting...",
-    "hint": "Plain: Markdown → DOCX | Official: GB/T 9704-2012 standard format",
     "success": "Conversion successful! Document generated",
-    "newDoc": "New Document",
     "emptyWarning": "Please enter Markdown content",
     "fileLoaded": "File loaded: {name}",
     "fileReadError": "Failed to read file",
@@ -222,7 +171,6 @@
     "gbtLink": "📄 GB/T 9704-2012 Document Format Specification"
   },
   "format": {
-    "title": "Format DOCX",
     "description": "Reformat existing DOCX files to GB/T 9704-2012 official document standards",
     "docxDragText": "Drag DOCX file here, or",
     "docxFormats": "Upload a .docx file to apply GB/T 9704-2012 formatting",
@@ -271,13 +219,6 @@
     "clean": "Clean & Download",
     "fieldsRemoved": "{n} metadata field(s) removed"
   },
-  "formatConvert": {
-    "title": "Format Convert",
-    "description": "Convert DOCX or HTML files to PDF format",
-    "sourceFormat": "Source Format",
-    "targetFormat": "Target Format",
-    "convert": "Convert & Download"
-  },
   "pageDecorate": {
     "title": "Page Numbers / Headers / Footers",
     "description": "Add page numbers, headers, or footers to PDF pages",
@@ -301,26 +242,6 @@
     "totalPages": "Total pages",
     "decorate": "Add & Download"
   },
-  "imageProcess": {
-    "title": "Image Processing",
-    "description": "Resize, crop, convert format, or compress images",
-    "action": "Action",
-    "resize": "Resize",
-    "crop": "Crop",
-    "convert": "Convert Format",
-    "compress": "Compress",
-    "width": "Width (px)",
-    "height": "Height (px)",
-    "auto": "Auto",
-    "keepAspect": "Keep Aspect Ratio",
-    "left": "Left",
-    "top": "Top",
-    "right": "Right",
-    "bottom": "Bottom",
-    "targetFormat": "Target Format",
-    "quality": "Quality",
-    "process": "Process & Download"
-  },
   "a11y": {
     "skipToContent": "Skip to main content",
     "removeFile": "Remove file",
@@ -334,9 +255,7 @@
     "denoise": "AI Denoise",
     "denoising": "Denoising...",
     "denoised": "Denoised",
-    "suggestFilename": "AI Filename",
     "unofficial": "Unofficial",
-    "official": "Official",
     "officialSuggestion": "AI suggests: Official document format"
   },
   "pdf-tools": {
@@ -358,8 +277,6 @@
     "sizeHint": "File size up to 100MB",
     "convert": "Convert to WMV",
     "converting": "Converting...",
-    "sourcePreview": "Source Video",
-    "resultPreview": "Converted Result",
     "convertAnother": "Convert Another",
     "note": "Converted files can be embedded directly in PowerPoint"
   },

@@ -1,12 +1,4 @@
 {
-  "html": {
-    "title": "鹊随金印 - 文档处理工具箱",
-    "metaDescription": "文档属性修改、图片合并PDF、打印分组、PDF页面编辑"
-  },
-  "header": {
-    "title": "鹊随金印",
-    "subtitle": "文档处理工具箱"
-  },
   "tabs": {
     "dashboard": "首页",
     "properties": "属性修改",
@@ -17,16 +9,13 @@
     "excelMerge": "Excel合并",
     "md2docx": "MD转公文",
     "formatDocx": "格式规范",
-    "officeTools": "Office 工具",
     "pdfTools": "PDF 工具",
     "pdf-tools": "调整PDF",
     "pdfToText": "PDF 转文本",
     "pdfMerge": "PDF 合并",
     "pdfCompress": "PDF 压缩",
     "metadataClean": "元数据清理",
-    "formatConvert": "格式互转",
     "pageDecorate": "页码页眉页脚",
-    "imageProcess": "图片处理",
     "status": "使用统计",
     "videoConvert": "视频转换",
     "rssDetect": "RSS 探测"
@@ -57,22 +46,10 @@
     "download": "下载",
     "processing": "处理中...",
     "reset": "重新选择",
-    "noFile": "未选择文件",
     "back": "返回",
-    "error": "错误",
     "success": "成功",
     "fileCount": "{n} 个文件",
-    "removeFile": "移除文件",
-    "tips": "操作提示",
     "currentTime": "当前时间",
-    "taskPending": "等待处理",
-    "taskStarted": "处理中",
-    "taskProgress": "处理中",
-    "taskSuccess": "处理完成",
-    "taskFailure": "处理失败",
-    "taskNotFound": "任务未找到",
-    "taskRetrying": "正在重试",
-    "uploadArea": "文件上传区域，点击或拖拽文件到此处",
     "langZh": "切换到中文",
     "langEn": "切换到英文",
     "pageError": "页面组件出错，请刷新重试"
@@ -86,15 +63,13 @@
     "unifiedTime": "统一时间（创建时间和修改时间设为相同值）",
     "separateTime": "分别设定（可以为创建时间和修改时间设置不同值）",
     "unifiedTimeLabel": "统一时间",
-    "readCurrent": "读取当前属性",
     "creator": "创建人",
     "creatorPlaceholder": "输入作者名称",
     "lastModifiedBy": "最后修改人",
     "lastModifiedByPlaceholder": "输入最后修改者名称",
     "created": "创建时间",
     "modified": "修改时间",
-    "modify": "修改并下载",
-    "noProperties": "暂无属性信息"
+    "modify": "修改并下载"
   },
   "img2pdf": {
     "title": "图片合并 PDF",
@@ -102,52 +77,34 @@
     "pageSize": "页面尺寸",
     "pageSizeOriginal": "原始尺寸",
     "pageSizeA4": "A4",
-    "pageSizeA4Landscape": "A4 横向",
     "pageSizeLetter": "Letter",
-    "pageSizeLetterLandscape": "Letter 横向",
     "merge": "合并导出 PDF",
     "dragHint": "拖拽图片调整顺序",
     "page": "第 {n} 页",
-    "delete": "删除",
-    "filename": "输出文件名",
-    "moveUp": "上移",
-    "moveDown": "下移"
+    "filename": "输出文件名"
   },
   "printSplit": {
     "title": "PDF 打印分组",
     "description": "将多页 PDF 拆分为多个批次，设定每批页数和间隔时间",
-    "totalPages": "总页数",
     "batchSize": "每批页数",
     "interval": "间隔时间",
     "seconds": "秒",
     "minutes": "分钟",
-    "batchCount": "批次数量",
-    "batchTable": "批次预览",
-    "batchNo": "批次",
-    "pages": "页数",
-    "pageRange": "页码范围",
     "startSplit": "开始拆分",
-    "progress": "下载进度",
     "nextDownload": "下次下载",
     "downloaded": "已下载",
     "allDone": "全部下载完成",
-    "batchLabel": "批次 {n}",
     "pause": "暂停下载",
     "resume": "继续下载",
     "stop": "终止拆分",
-    "paused": "已暂停",
-    "stopped": "拆分已终止",
-    "splitDone": "已拆分为 {n} 个批次"
+    "paused": "已暂停"
   },
   "pdfEditor": {
     "title": "PDF 页面编辑",
     "description": "删除指定页面、插入其他 PDF 页面、调整页面顺序",
-    "mode": "编辑模式",
     "modeDelete": "删除页面",
     "modeInsert": "插入页面",
     "modeReorder": "调整顺序",
-    "pagesToDelete": "要删除的页码",
-    "pagesToDeleteHint": "输入页码，多个用逗号分隔，如：1,3,5",
     "deleteBtn": "删除并下载",
     "insertFile": "要插入的 PDF 文件",
     "insertPages": "要插入的页面",
@@ -155,14 +112,10 @@
     "atPosition": "插入位置",
     "atPositionHint": "在第N页之后插入（0 = 最前面）",
     "insertBtn": "插入并下载",
-    "newOrder": "新页码顺序",
-    "newOrderHint": "输入新的页码顺序，用逗号分隔，如：3,1,2",
     "reorderBtn": "重排并下载",
     "originalPages": "原始页数",
-    "preview": "页面预览",
     "dragToReorder": "拖拽页面卡片调整顺序",
     "clickToSelect": "点击页面卡片选择要删除的页面",
-    "currentOrder": "当前顺序",
     "page": "页",
     "selectedToDelete": "已选择 {n} 页待删除，删除后剩余 {m} 页",
     "insertFileRequired": "请选择要插入的 PDF 文件"
@@ -194,7 +147,6 @@
     "convertingProgress": "已完成 {current} / {total} 页"
   },
   "md2docx": {
-    "title": "MD 转公文",
     "description": "将 Markdown 文档转换为符合 GB/T 9704-2012 标准的中文公文格式",
     "editor": "Markdown 输入",
     "upload": "上传",
@@ -202,13 +154,10 @@
     "clear": "清空",
     "placeholder": "在此输入 Markdown 内容，或上传 .md 文件...",
     "preview": "公文预览",
-    "emptyPreview": "在左侧输入 Markdown 内容，右侧将实时显示公文预览效果",
     "convertPlain": "普通转化",
     "convertOfficial": "公文转化",
     "converting": "正在转换...",
-    "hint": "普通转化：纯 Markdown → DOCX | 公文转化：应用 GB/T 9704-2012 标准格式",
     "success": "转换成功！公文文件已生成",
-    "newDoc": "新建文档",
     "emptyWarning": "请输入 Markdown 内容",
     "fileLoaded": "已加载文件: {name}",
     "fileReadError": "文件读取失败",
@@ -222,7 +171,6 @@
     "gbtLink": "📄 GB/T 9704-2012 公文格式规范"
   },
   "format": {
-    "title": "格式规范",
     "description": "将现有 DOCX 文件格式化为 GB/T 9704-2012 标准公文格式",
     "docxDragText": "拖拽 DOCX 文件到此处，或",
     "docxFormats": "上传 .docx 文件，应用 GB/T 9704-2012 公文格式规范",
@@ -271,13 +219,6 @@
     "clean": "清除并下载",
     "fieldsRemoved": "已清除 {n} 个元数据字段"
   },
-  "formatConvert": {
-    "title": "格式互转",
-    "description": "将 DOCX 或 HTML 文件转换为 PDF 格式",
-    "sourceFormat": "源格式",
-    "targetFormat": "目标格式",
-    "convert": "转换并下载"
-  },
   "pageDecorate": {
     "title": "页码页眉页脚",
     "description": "为 PDF 添加页码、页眉或页脚文字",
@@ -301,26 +242,6 @@
     "totalPages": "总页数",
     "decorate": "添加并下载"
   },
-  "imageProcess": {
-    "title": "图片处理",
-    "description": "调整图片尺寸、裁剪、格式转换或压缩图片",
-    "action": "操作",
-    "resize": "调整尺寸",
-    "crop": "裁剪",
-    "convert": "格式转换",
-    "compress": "压缩",
-    "width": "宽度 (px)",
-    "height": "高度 (px)",
-    "auto": "自动",
-    "keepAspect": "保持比例",
-    "left": "左",
-    "top": "上",
-    "right": "右",
-    "bottom": "下",
-    "targetFormat": "目标格式",
-    "quality": "质量",
-    "process": "处理并下载"
-  },
   "a11y": {
     "skipToContent": "跳到主内容",
     "removeFile": "移除文件",
@@ -334,9 +255,7 @@
     "denoise": "AI 去噪",
     "denoising": "去噪中...",
     "denoised": "去噪完成",
-    "suggestFilename": "AI 文件名",
     "unofficial": "非正式公文",
-    "official": "正式公文",
     "officialSuggestion": "AI 建议：使用正式公文格式"
   },
   "pdf-tools": {
@@ -358,8 +277,6 @@
     "sizeHint": "文件大小不超过 100MB",
     "convert": "转换为 WMV",
     "converting": "正在转换...",
-    "sourcePreview": "原始视频",
-    "resultPreview": "转换结果",
     "convertAnother": "转换另一个",
     "note": "转换后文件可在 PowerPoint 中直接嵌入播放"
   },

@@ -17,7 +17,7 @@ export interface ToolGroup {
 
 export const TOOLS: ToolDef[] = [
   // ── 顶层 ──
-  { key: "dashboard", to: "/", icon: "i-heroicons-home", label: "tabs.dashboard", desc: "dashboard.description", order: 1 },
+  { key: "dashboard", to: "/", icon: "i-heroicons-home", label: "tabs.dashboard", order: 1 },
   { key: "md2docx", to: "/md-to-docx", icon: "i-heroicons-arrow-down-tray", label: "tabs.md2docx", desc: "md2docx.description", order: 2 },
   { key: "doc-to-md", to: "/doc-to-md", icon: "i-heroicons-document-arrow-down", label: "tabs.docToMd", desc: "docToMd.description", order: 3 },
   { key: "format-docx", to: "/format-docx", icon: "i-heroicons-document-check", label: "tabs.formatDocx", desc: "format.description", order: 4 },
@@ -66,7 +66,8 @@ export const SIDEBAR_GROUPS: (ToolDef | ToolGroup)[] = (() => {
       result.push({
         key: t.group,
         icon: firstTool.icon,
-        label: `tabs.${t.group === 'office' ? 'officeTools' : 'pdfTools'}`,
+        // Static literal: a built-up key is invisible to the i18n dead-key audit (i18n/__tests__).
+        label: "tabs.pdfTools",
         tools: groupTools.sort((a, b) => a.order - b.order),
       })
     }

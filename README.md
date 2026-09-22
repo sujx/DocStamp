@@ -1,6 +1,6 @@
 # 鹊随金印 (docStamp) — 文档处理工具箱
 
-一站式文档处理 Web 应用，14 大功能模块。即开即用，无需注册。
+一站式文档处理 Web 应用，13 大功能模块。即开即用，无需注册。
 
 ## 功能
 
@@ -9,16 +9,16 @@
 | 1 | **MD 转公文** | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX + AI 纠错 |
 | 2 | **文档转 MD** | `/doc-to-md` | PDF/Word/PPT/图片 → Markdown（MinerU）|
 | 3 | **属性修改** | `/properties` | 元数据修改 + 清理（双 Tab） |
-| 5 | **Excel 合并** | `/excel-merge` | 合并 .xlsx/.csv（同结构） |
-| 6 | **格式规范** | `/format-docx` | DOCX 按 GB/T 9704-2012 格式化 |
-| 7 | **文件组装** | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
-| 8 | **打印分组** | `/print-split` | 按批次拆分 PDF |
-| 9 | **PDF 编辑** | `/pdf-editor` | 删除/插入/重排页面 |
-| 10 | **调整 PDF** | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚 |
-| 11 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
-| 12 | **视频转换** | `/video-convert` | MP4 → WMV（PPT 嵌入），异步 + 进度 |
-| 13 | **RSS 探测** | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
-| 14 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
+| 4 | **Excel 合并** | `/excel-merge` | 合并 .xlsx/.csv（同结构） |
+| 5 | **格式规范** | `/format-docx` | DOCX 按 GB/T 9704-2012 格式化 |
+| 6 | **文件组装** | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
+| 7 | **打印分组** | `/print-split` | 按批次拆分 PDF |
+| 8 | **PDF 编辑** | `/pdf-editor` | 删除/插入/重排页面 |
+| 9 | **调整 PDF** | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚 |
+| 10 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
+| 11 | **视频转换** | `/video-convert` | MP4 → WMV（PPT 嵌入），异步 + 进度 |
+| 12 | **RSS 探测** | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
+| 13 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
 
 ### AI 功能
 
@@ -119,7 +119,7 @@ docStamp/
 ├── frontend/                   # Nuxt 3 SPA
 │   ├── composables/            # tools.config / useValidation / useApi / useDownload / useError / useAi
 │   ├── components/ui/          # 原子组件（CardBase / SkeletonBlock）
-│   ├── pages/                  # 18 个路由页面（14 个工具 + 4 个面板子页）
+│   ├── pages/                  # 18 个路由页面（13 个工具 + 1 个仪表盘 + 4 个面板子页）
 │   └── i18n/locales/           # zh-CN / en
 ├── docker-compose.yml          # 3 容器编排（redis + api + celery）
 ├── Dockerfile                  # 多阶段构建（node:24-alpine + python:3.12-slim）
