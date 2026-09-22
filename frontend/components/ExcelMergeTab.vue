@@ -50,7 +50,8 @@
 import axios from "axios";
 
 const { t } = useI18n();
-const { downloadBlob, showError } = useDownload();
+const { downloadBlob } = useDownload();
+const { showError } = useError();
 
 let idCounter = 0;
 

@@ -12,13 +12,5 @@ export function useDownload() {
     }
   }
 
-  function showError(e: any) {
-    const msg = e.response?.data?.error || e.message || "Unknown error";
-    if (import.meta.client) {
-      const toast = useToast();
-      toast.add({ title: msg, color: "error" });
-    }
-  }
-
-  return { downloadBlob, showError };
+  return { downloadBlob };
 }

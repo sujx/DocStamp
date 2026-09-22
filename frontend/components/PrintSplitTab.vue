@@ -54,6 +54,7 @@ import axios from "axios";
 import FileUploader from "./FileUploader.vue";
 
 const { t } = useI18n();
+const { showError } = useError();
 
 const selectedFile = ref<File | null>(null);
 const batchSize = ref(60);
@@ -84,7 +85,7 @@ async function startSplit() {
     downloaded.value = 0;
     scheduleNext();
   } catch (e: any) {
-    useToast().add({ title: e.response?.data?.error || e.message, color: "error" });
+    showError(e);
   } finally { isSplitting.value = false; }
 }
 
@@ -114,7 +115,7 @@ async function downloadNext() {
     URL.revokeObjectURL(url);
     downloaded.value++;
   } catch (e: any) {
-    useToast().add({ title: e.response?.data?.error || e.message, color: "error" });
+    showError(e);
   }
   if (downloaded.value < task.value.batch_count) scheduleNext();
 }

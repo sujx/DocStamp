@@ -8,8 +8,7 @@ Multipart endpoints validate their parameters in the service layer instead
 (extension whitelist, size caps, magic-number checks).
 """
 
-from typing import Optional
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 
 # ── Markdown ────────────────────────────────────────────────────────────
@@ -29,30 +28,3 @@ class AiTextSchema(BaseModel):
 class AiDenoiseSchema(BaseModel):
     """Text payload for AI denoise endpoint (larger limit)."""
     text: str = Field(..., min_length=1, max_length=8000, description="PDF-extracted text to clean")
-
-
-# ── Company Lookup ───────────────────────────────────────────────────────
-
-class CompanyLookupSchema(BaseModel):
-    """Single company name → website lookup request."""
-    name: str = Field(..., min_length=1, max_length=200, description="Company name to look up")
-
-
-class CompanyBatchLookupSchema(BaseModel):
-    """Batch company name → website lookup request."""
-    names: list[str] = Field(..., min_length=1, max_length=100, description="Company names to look up")
-
-
-class CompanyConfirmSchema(BaseModel):
-    """Confirm and save a company lookup result to local database."""
-    name: str = Field(..., min_length=1, max_length=200, description="Company name")
-    website: str = Field(..., min_length=1, max_length=500, description="Website URL")
-    corrected_name: Optional[str] = Field(None, max_length=200, description="User-corrected company name")
-    corrected_website: Optional[str] = Field(None, max_length=500, description="User-corrected website URL")
-
-    @field_validator("website")
-    @classmethod
-    def validate_url(cls, v: str) -> str:
-        if "://" not in v:
-            raise ValueError("Website must include scheme (https://...)")
-        return v

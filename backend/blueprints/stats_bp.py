@@ -12,7 +12,7 @@ def sitemap():
     pages = [
         "",
         "/md-to-docx", "/doc-to-md", "/format-docx",
-        "/watermark", "/video-convert",
+        "/video-convert",
         "/properties", "/excel-merge",
         "/file-assembly", "/print-split", "/pdf-editor",
         "/pdf-tools", "/pdf-merge", "/status",

@@ -62,6 +62,7 @@ import axios from "axios";
 
 const { t } = useI18n();
 const toast = useToast();
+const { extractError } = useError();
 
 const url = ref("");
 const detecting = ref(false);
@@ -79,7 +80,7 @@ async function doDetect() {
     const resp = await axios.post("/api/v1/rss-detect", { url: u });
     results.value = resp.data.data.feeds;
   } catch (e: any) {
-    errorMsg.value = e.response?.data?.msg || e.message || "Detection failed";
+    errorMsg.value = await extractError(e, "Detection failed");
   } finally {
     detecting.value = false;
   }

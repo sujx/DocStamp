@@ -34,6 +34,7 @@ import axios from "axios";
 
 const { t } = useI18n();
 const toast = useToast();
+const { showError } = useError();
 
 const isDragover = ref(false);
 const selectedFile = ref<File | null>(null);
@@ -71,7 +72,7 @@ async function formatFile() {
     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
     toast.add({ title: t("common.success"), color: "success" });
   } catch (e: any) {
-    toast.add({ title: e.response?.data?.error || e.message, color: "error" });
+    showError(e);
   } finally {
     isFormatting.value = false;
   }

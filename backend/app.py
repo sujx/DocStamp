@@ -135,7 +135,6 @@ def create_app() -> Flask:
     from blueprints.img2pdf_bp import img2pdf_bp
     from blueprints.pdf2img_bp import pdf2img_bp
     from blueprints.print_split_bp import print_split_bp
-    from blueprints.watermark_bp import watermark_bp
     from blueprints.pdf_editor_bp import pdf_editor_bp
     from blueprints.excel_merge_bp import excel_merge_bp
     from blueprints.pdf_to_text_bp import pdf_to_text_bp
@@ -147,7 +146,6 @@ def create_app() -> Flask:
     app.register_blueprint(img2pdf_bp)
     app.register_blueprint(pdf2img_bp)
     app.register_blueprint(print_split_bp)
-    app.register_blueprint(watermark_bp)
     app.register_blueprint(pdf_editor_bp)
     app.register_blueprint(excel_merge_bp)
     app.register_blueprint(pdf_to_text_bp)
@@ -159,7 +157,6 @@ def create_app() -> Flask:
     from blueprints.stats_bp import stats_bp
     from blueprints.video_convert_bp import video_convert_bp
     from blueprints.rss_detect_bp import rss_detect_bp
-    from blueprints.company_lookup_bp import company_lookup_bp
     from ai import ai_bp
     from mineru_bp import mineru_bp
 
@@ -169,7 +166,6 @@ def create_app() -> Flask:
     app.register_blueprint(stats_bp)
     app.register_blueprint(video_convert_bp)
     app.register_blueprint(rss_detect_bp)
-    app.register_blueprint(company_lookup_bp)
     app.register_blueprint(ai_bp)
     app.register_blueprint(mineru_bp)
 

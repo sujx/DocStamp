@@ -1,7 +1,7 @@
 {
   "html": {
     "title": "鹊随金印 - Document Toolbox",
-    "metaDescription": "Office doc properties, Image to PDF, Print split, Watermark, PDF page editor"
+    "metaDescription": "Office doc properties, Image to PDF, Print split, PDF page editor"
   },
   "header": {
     "title": "鹊随金印",
@@ -13,7 +13,6 @@
     "fileAssembly": "File Assembly",
     "printSplit": "Print Split",
     "docToMd": "Doc to MD",
-    "watermarkManagement": "Watermark",
     "pdfEditor": "PDF Editor",
     "excelMerge": "Excel Merge",
     "md2docx": "MD to DOCX",
@@ -30,8 +29,7 @@
     "imageProcess": "Image Process",
     "status": "Usage Stats",
     "videoConvert": "Video Convert",
-    "rssDetect": "RSS Detector",
-    "companyLookup": "Company Lookup"
+    "rssDetect": "RSS Detector"
   },
   "dashboard": {
     "heroTitle": "Document Processing, Simplified",
@@ -141,32 +139,6 @@
     "stopped": "Split stopped",
     "splitDone": "Split into {n} batches"
   },
-  "watermark": {
-    "title": "Watermark",
-    "description": "Add text or image watermarks to Word (.docx) and PDF files",
-    "type": "Watermark Type",
-    "typeText": "Text Watermark",
-    "typeImage": "Image Watermark",
-    "imageSize": "Image Size (pt)",
-    "imageFile": "Watermark Image",
-    "imageRequired": "Please upload a watermark image",
-    "text": "Watermark Text",
-    "textPlaceholder": "Enter watermark text, e.g.: CONFIDENTIAL",
-    "textRequired": "Watermark text is required",
-    "font": "Font",
-    "fontSize": "Font Size (pt)",
-    "color": "Color",
-    "opacity": "Opacity",
-    "rotation": "Rotation",
-    "position": "Position",
-    "positionTile": "Tile",
-    "positionCenter": "Center",
-    "spacingX": "Horizontal Spacing (pt)",
-    "spacingY": "Vertical Spacing (pt)",
-    "add": "Add Watermark & Download",
-    "preview": "Preview",
-    "previewWatermarkText": "Watermark preview text"
-  },
   "pdfEditor": {
     "title": "PDF Page Editor",
     "description": "Delete pages, insert pages from another PDF, or reorder pages",
@@ -220,17 +192,6 @@
     "totalPages": "{n} pages total",
     "converting": "Converting...",
     "convertingProgress": "Completed {current} / {total} pages"
-  },
-  "watermarkManagement": {
-    "addWatermark": "Add Watermark",
-    "removeWatermark": "Remove Watermark"
-  },
-  "watermarkRemove": {
-    "title": "Remove Watermark",
-    "description": "Remove watermarks from Word (.docx) or PDF files",
-    "docxInfo": "DOCX removal: clears all header content reliably.",
-    "pdfInfo": "PDF removal: strips page annotations and XObject images. Effective for simple watermarks stored as annotations or external objects. Note: this will also remove document comments and embedded images.",
-    "remove": "Remove Watermark & Download"
   },
   "md2docx": {
     "title": "MD to DOCX",
@@ -401,48 +362,6 @@
     "resultPreview": "Converted Result",
     "convertAnother": "Convert Another",
     "note": "Converted files can be embedded directly in PowerPoint"
-  },
-  "companyLookup": {
-    "title": "Company Website Lookup",
-    "description": "Enter a company name to find its official website. Confirmed results are saved locally for instant future queries.",
-    "singleQuery": "Single Query",
-    "batchQuery": "Batch Query",
-    "placeholder": "e.g. Apple, Tesla",
-    "batchPlaceholder": "One company name per line",
-    "search": "Search",
-    "searching": "Searching...",
-    "notFound": "No official website found. Try a more complete company name.",
-    "foundResults": "{n} result(s) found",
-    "sourceLocal": "Local DB",
-    "sourceWeb": "Web Search",
-    "confirmed": "Verified",
-    "unconfirmed": "Pending",
-    "confirm": "Confirm",
-    "confirming": "Confirming...",
-    "confirmAll": "Confirm All",
-    "manualEdit": "Edit",
-    "editName": "Correct company name",
-    "editWebsite": "Correct website URL",
-    "saveCorrection": "Save & Confirm",
-    "copy": "Copy",
-    "open": "Open",
-    "copied": "Copied",
-    "exportCsv": "Export Results",
-    "exportDb": "Export Database",
-    "importDb": "Import Data",
-    "importPreview": "Preview ({n} records)",
-    "importConfirm": "Confirm Import",
-    "importSuccess": "Successfully imported {n} records",
-    "importErrors": "{n} failed",
-    "chooseFile": "Choose File",
-    "dbCount": "{n} in local DB",
-    "sampleHint": "One full company name per line, e.g.:",
-    "fillSample": "Fill Samples",
-    "downloadTemplate": "Template",
-    "pasteImport": "Paste Import",
-    "pasteHint": "Paste CSV content, first row is header (name,website)",
-    "batchProgress": "Processing {current}/{total}",
-    "localHit": "{n} local hit(s), {m} need(s) web search"
   },
   "rssDetect": {
     "title": "RSS Feed Detector",

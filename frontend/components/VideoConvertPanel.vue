@@ -89,6 +89,7 @@
 import axios from "axios";
 
 const { t } = useI18n();
+const { extractError } = useError();
 
 const file = ref<File | null>(null);
 const sourceUrl = ref("");
@@ -171,7 +172,7 @@ async function startConvert() {
     const resp = await axios.post("/api/v1/video-convert", fd);
     connectSSE(resp.data.task_id);
   } catch (err: any) {
-    errorMsg.value = err.response?.data?.error || err.message || "Upload failed";
+    errorMsg.value = await extractError(err, "Upload failed");
     converting.value = false;
   }
 }

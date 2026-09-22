@@ -16,7 +16,6 @@ MODULE_NAMES = {
     "img2pdf": "图片合 PDF",
     "pdf2img": "PDF 拆图",
     "print-split": "打印分组",
-    "watermark": "水印管理",
     "pdf-editor": "PDF 编辑",
     "excel-merge": "Excel 合并",
     "pdf-to-text": "PDF 转文本",

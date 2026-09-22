@@ -22,7 +22,6 @@ class Config:
     OFFICE_EXTENSIONS = {"docx", "xlsx", "pptx"}
     IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "tiff", "tif"}
     PDF_EXTENSIONS = {"pdf"}
-    WATERMARK_EXTENSIONS = {"docx", "pdf"}
     EXCEL_EXTENSIONS = {"xlsx", "csv"}
     MD_EXTENSIONS = {"md", "markdown", "txt"}
     VIDEO_EXTENSIONS = {"mp4", "wmv", "avi", "mkv", "mov"}
@@ -63,33 +62,6 @@ class Config:
         "AI_API_URL", "https://api.deepseek.com/chat/completions"
     )
     AI_MODEL = os.environ.get("AI_MODEL", "deepseek-v4-flash")
-
-    # ── Company Lookup ─────────────────────────────────────────────
-    # Tier 1: LLM direct lookup (DeepSeek by default, from training data).
-    # Falls back to AI_API_KEY / AI_API_URL / AI_MODEL if not set separately.
-    COMPANY_LOOKUP_API_KEY = os.environ.get(
-        "COMPANY_LOOKUP_API_KEY", AI_API_KEY
-    )
-    COMPANY_LOOKUP_API_URL = os.environ.get(
-        "COMPANY_LOOKUP_API_URL", AI_API_URL
-    )
-    COMPANY_LOOKUP_MODEL = os.environ.get(
-        "COMPANY_LOOKUP_MODEL", AI_MODEL
-    )
-
-    # Tier 2: LLM with web search tool (Zhipu GLM-4 by default).
-    # Used when Tier 1 returns null (e.g. new 2026 companies).
-    # Falls back to Tier 1 key if not set separately.
-    COMPANY_LOOKUP_WEB_SEARCH_KEY = os.environ.get(
-        "COMPANY_LOOKUP_WEB_SEARCH_KEY", COMPANY_LOOKUP_API_KEY
-    )
-    COMPANY_LOOKUP_WEB_SEARCH_URL = os.environ.get(
-        "COMPANY_LOOKUP_WEB_SEARCH_URL",
-        "https://open.bigmodel.cn/api/paas/v4/chat/completions",
-    )
-    COMPANY_LOOKUP_WEB_SEARCH_MODEL = os.environ.get(
-        "COMPANY_LOOKUP_WEB_SEARCH_MODEL", "glm-4-flash"
-    )
 
     # ── Frontend Static ─────────────────────────────────────────────
     STATIC_FOLDER = os.environ.get(

@@ -26,6 +26,7 @@
 <script setup lang="ts">
 import axios from "axios";
 const { t } = useI18n(); const toast = useToast();
+const { showError } = useError();
 const file = ref<File | null>(null); const quality = ref("medium"); const compressing = ref(false);
 const stats = ref<{ original_size: number; compressed_size: number; ratio: number } | null>(null);
 const qualities = computed(() => [{ key: "low", label: t("pdfCompress.low") }, { key: "medium", label: t("pdfCompress.medium") }, { key: "high", label: t("pdfCompress.high") }]);
@@ -42,7 +43,7 @@ async function compress() {
     stats.value = { original_size: Number(resp.headers["x-original-size"]), compressed_size: Number(resp.headers["x-compressed-size"]), ratio: Number(resp.headers["x-compression-ratio"]) };
     const url = URL.createObjectURL(resp.data); const a = document.createElement("a"); a.href = url; a.download = `compressed_${file.value.name}`; a.click(); URL.revokeObjectURL(url);
     toast.add({ title: t("common.success"), color: "success" });
-  } catch (e: any) { const msg = await e.response?.data?.text?.() || e.message; toast.add({ title: msg ? JSON.parse(msg).error || msg : e.message, color: "error" }); }
+  } catch (e: any) { showError(e); }
   finally { compressing.value = false; }
 }
 </script>

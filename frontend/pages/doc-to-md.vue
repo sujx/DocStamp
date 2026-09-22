@@ -55,6 +55,7 @@ import DOMPurify from "dompurify";
 
 const { t } = useI18n();
 const toast = useToast();
+const { extractError } = useError();
 
 const file = ref<File | null>(null);
 const converting = ref(false);
@@ -90,7 +91,7 @@ async function convert() {
       errorMsg.value = resp.data.msg || "Unknown error";
     }
   } catch (e: any) {
-    errorMsg.value = e.response?.data?.msg || e.message;
+    errorMsg.value = await extractError(e);
   } finally {
     converting.value = false;
   }

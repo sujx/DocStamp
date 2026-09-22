@@ -1,7 +1,7 @@
 {
   "html": {
     "title": "鹊随金印 - 文档处理工具箱",
-    "metaDescription": "文档属性修改、图片合并PDF、打印分组、水印添加、PDF页面编辑"
+    "metaDescription": "文档属性修改、图片合并PDF、打印分组、PDF页面编辑"
   },
   "header": {
     "title": "鹊随金印",
@@ -13,7 +13,6 @@
     "fileAssembly": "文件组装",
     "printSplit": "打印分组",
     "docToMd": "文档转MD",
-    "watermarkManagement": "水印管理",
     "pdfEditor": "PDF编辑",
     "excelMerge": "Excel合并",
     "md2docx": "MD转公文",
@@ -30,8 +29,7 @@
     "imageProcess": "图片处理",
     "status": "使用统计",
     "videoConvert": "视频转换",
-    "rssDetect": "RSS 探测",
-    "companyLookup": "公司查询"
+    "rssDetect": "RSS 探测"
   },
   "dashboard": {
     "heroTitle": "文档处理，化繁为简",
@@ -141,32 +139,6 @@
     "stopped": "拆分已终止",
     "splitDone": "已拆分为 {n} 个批次"
   },
-  "watermark": {
-    "title": "水印添加",
-    "description": "为 Word (.docx) 和 PDF 文件添加文字或图片水印",
-    "type": "水印类型",
-    "typeText": "文字水印",
-    "typeImage": "图片水印",
-    "imageSize": "图片大小 (pt)",
-    "imageFile": "水印图片",
-    "imageRequired": "请上传水印图片",
-    "text": "水印文字",
-    "textPlaceholder": "输入水印文字，如：机密",
-    "textRequired": "请输入水印文字",
-    "font": "字体",
-    "fontSize": "字号 (pt)",
-    "color": "颜色",
-    "opacity": "透明度",
-    "rotation": "旋转角度",
-    "position": "位置",
-    "positionTile": "平铺",
-    "positionCenter": "居中",
-    "spacingX": "水平间距 (pt)",
-    "spacingY": "垂直间距 (pt)",
-    "add": "添加水印并下载",
-    "preview": "预览效果",
-    "previewWatermarkText": "水印预览文字"
-  },
   "pdfEditor": {
     "title": "PDF 页面编辑",
     "description": "删除指定页面、插入其他 PDF 页面、调整页面顺序",
@@ -220,17 +192,6 @@
     "totalPages": "共 {n} 页",
     "converting": "正在转换...",
     "convertingProgress": "已完成 {current} / {total} 页"
-  },
-  "watermarkManagement": {
-    "addWatermark": "添加水印",
-    "removeWatermark": "去除水印"
-  },
-  "watermarkRemove": {
-    "title": "去除水印",
-    "description": "从 Word (.docx) 或 PDF 文件中移除水印",
-    "docxInfo": "DOCX 水印去除：清除所有页眉中的水印内容，效果可靠。",
-    "pdfInfo": "PDF 水印去除：移除页面注释和外部图像对象。对以注释或 XObject 形式嵌入的简单水印有效。注意：此操作也会移除文档中的批注和图片。",
-    "remove": "去除水印并下载"
   },
   "md2docx": {
     "title": "MD 转公文",
@@ -401,48 +362,6 @@
     "resultPreview": "转换结果",
     "convertAnother": "转换另一个",
     "note": "转换后文件可在 PowerPoint 中直接嵌入播放"
-  },
-  "companyLookup": {
-    "title": "公司官网查询",
-    "description": "输入公司名称，查找官方网站。已确认的结果会存入本地数据库，下次查询秒出。",
-    "singleQuery": "单次查询",
-    "batchQuery": "批量查询",
-    "placeholder": "输入公司名称，如：腾讯",
-    "batchPlaceholder": "每行输入一个公司名称",
-    "search": "查询",
-    "searching": "查询中...",
-    "notFound": "未找到官网信息，请尝试更完整的公司名称",
-    "foundResults": "共 {n} 条结果",
-    "sourceLocal": "本地数据库",
-    "sourceWeb": "搜索引擎",
-    "confirmed": "已验证",
-    "unconfirmed": "待确认",
-    "confirm": "确认正确",
-    "confirming": "确认中...",
-    "confirmAll": "一键确认全部",
-    "manualEdit": "手动修正",
-    "editName": "修正公司名称",
-    "editWebsite": "修正官网地址",
-    "saveCorrection": "保存并确认",
-    "copy": "复制",
-    "open": "打开",
-    "copied": "已复制",
-    "exportCsv": "导出当前结果",
-    "exportDb": "导出数据库",
-    "importDb": "导入数据",
-    "importPreview": "预览 ({n} 条)",
-    "importConfirm": "确认导入",
-    "importSuccess": "成功导入 {n} 条",
-    "importErrors": "{n} 条失败",
-    "chooseFile": "选择文件",
-    "dbCount": "本地已收录 {n} 家公司",
-    "sampleHint": "每行一个公司全称，如：",
-    "fillSample": "填入示例",
-    "downloadTemplate": "下载模板",
-    "pasteImport": "粘贴导入",
-    "pasteHint": "粘贴 CSV 内容，第一行为表头 (name,website)",
-    "batchProgress": "查询中 {current}/{total}",
-    "localHit": "本地命中 {n} 条，需联网查询 {m} 条"
   },
   "rssDetect": {
     "title": "RSS 订阅探测",

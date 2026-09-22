@@ -43,7 +43,7 @@ docStamp/
 │   ├── nuxt.config.ts          # SSG + i18n + Nuxt UI v2
 │   ├── tailwind.config.ts      # Tailwind v3 品牌色阶
 │   ├── assets/css/main.css     # CSS 变量 (SynTime Royal Blue token)
-│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useAi / useSidebar / usePageView
+│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useError / useAi / useSidebar / usePageView
 │   ├── components/             # 业务组件 + ui/ 原子组件
 │   ├── layouts/default.vue     # 侧边导航壳
 │   ├── pages/                  # 路由页面
@@ -135,7 +135,8 @@ def my_service(path: str) -> ServiceResult[dict]:
 - 禁止 `transition: all`，用具体属性列表
 - 表单校验：Vuelidate (`useValidation` composable)
 - 异步进度：SSE `GET /api/v1/tasks/{id}/stream`，组件内直接建 `EventSource`
-- API 错误提示：`useDownload().showError(e)`；全局 401 由 `plugins/axios.client.ts` 拦截
+- API 错误提示：`useError().showError(e)` 弹 toast；需要内联展示时用 `useError().extractError(e)` 取消息（自动识别 JSON 与 Blob 两种错误体）；全局 401 由 `plugins/axios.client.ts` 拦截
+- 文件下载：`useDownload().downloadBlob(blob, filename, successMsg)`
 
 ### 工具配置单一数据源
 
@@ -192,8 +193,8 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 
 | 层级 | 规范 | 示例 |
 |------|------|------|
-| 后端 Blueprint | `<feature>_bp.py` | `convert.py`, `watermark_bp.py` |
-| 后端 Service | 单数名词 | `converter.py`, `watermark.py` |
+| 后端 Blueprint | `<feature>_bp.py` | `pdf_merge_bp.py`, `excel_merge_bp.py` |
+| 后端 Service | 单数名词 | `converter.py`, `pdf_merger.py` |
 | 前端组件 | PascalCase | `ToolCard.vue`, `Sidebar.vue` |
 | 前端 composables | `useXxx.ts` | `useValidation.ts` |
 | 前端 pages | kebab-case | `md-to-docx.vue` |

@@ -87,7 +87,8 @@ import axios from "axios";
 import FileUploader from "./FileUploader.vue";
 
 const { t } = useI18n();
-const { downloadBlob, showError } = useDownload();
+const { downloadBlob } = useDownload();
+const { showError } = useError();
 
 const batchMode = ref(false);
 const timeMode = ref("unified");

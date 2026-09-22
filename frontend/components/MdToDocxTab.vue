@@ -173,6 +173,7 @@ import DOMPurify from "dompurify";
 
 const { t } = useI18n();
 const toast = useToast();
+const { showError } = useError();
 const { correct: aiCorrectText, classify: aiClassifyText, loading: aiCorrecting } = useAi();
 
 const aiClassified = ref(false);
@@ -379,7 +380,7 @@ async function doConvert(format: "plain" | "official") {
     URL.revokeObjectURL(url);
     toast.add({ title: t("md2docx.success"), color: "success" });
   } catch (e: any) {
-    toast.add({ title: e.response?.data?.error || e.message, color: "error" });
+    showError(e);
   } finally {
     convertingPlain.value = false;
     convertingOfficial.value = false;

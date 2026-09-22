@@ -107,7 +107,7 @@ docStamp/
 │   ├── cache.py                # Flask-Caching（限流 + 统计缓存）
 │   ├── celery_app.py           # Celery（Redis broker，2 队列）
 │   ├── gunicorn.conf.py        # Gunicorn gthread 生产配置
-│   ├── blueprints/             # HTTP 路由层（18 个，每个功能 1 文件）
+│   ├── blueprints/             # HTTP 路由层（16 个，每个功能 1 文件）
 │   ├── services/               # 业务逻辑层（纯函数，全返回 ServiceResult[T]）
 │   ├── tasks/                  # Celery 异步任务（video / maintenance）
 │   └── utils/
@@ -117,9 +117,9 @@ docStamp/
 │       ├── retry.py            # @retry_on_failure 重试装饰器
 │       └── crypto.py           # AES-256 Fernet 字段加密
 ├── frontend/                   # Nuxt 3 SPA
-│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useAi
+│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useError / useAi
 │   ├── components/ui/          # 原子组件（CardBase / SkeletonBlock）
-│   ├── pages/                  # 20 个路由页面（14 个工具 + 4 个面板子页 + 2 个半移除页面）
+│   ├── pages/                  # 18 个路由页面（14 个工具 + 4 个面板子页）
 │   └── i18n/locales/           # zh-CN / en
 ├── docker-compose.yml          # 3 容器编排（redis + api + celery）
 ├── Dockerfile                  # 多阶段构建（node:24-alpine + python:3.12-slim）

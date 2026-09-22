@@ -71,6 +71,7 @@ import axios from "axios";
 
 const { t } = useI18n();
 const toast = useToast();
+const { showError } = useError();
 
 const files = ref<File[]>([]);
 const merging = ref(false);
@@ -119,8 +120,7 @@ async function merge() {
     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
     toast.add({ title: t("common.success"), color: "success" });
   } catch (e: any) {
-    const msg = await e.response?.data?.text?.() || e.message;
-    toast.add({ title: msg ? JSON.parse(msg).error || msg : e.message, color: "error" });
+    showError(e);
   } finally {
     merging.value = false;
   }

@@ -30,6 +30,7 @@
 <script setup lang="ts">
 import axios from "axios";
 const { t } = useI18n(); const toast = useToast();
+const { showError } = useError();
 const { denoise: aiDenoiseText, loading: aiDenoising } = useAi();
 const file = ref<File | null>(null); const pagesInput = ref(""); const extracting = ref(false);
 const result = ref<{ text: string; total_pages: number; extracted_pages: number } | null>(null);
@@ -41,7 +42,7 @@ async function extract() {
     if (pagesInput.value.trim()) fd.append("pages", pagesInput.value.trim());
     const resp = await axios.post("/api/v1/pdf-to-text", fd);
     result.value = resp.data; toast.add({ title: t("pdfToText.success"), color: "success" });
-  } catch (e: any) { toast.add({ title: e.response?.data?.error || e.message, color: "error" }); }
+  } catch (e: any) { showError(e); }
   finally { extracting.value = false; }
 }
 function downloadText() {

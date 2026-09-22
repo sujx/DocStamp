@@ -133,7 +133,7 @@ backend/
 ├── cache.py                # Flask-Caching SimpleCache
 ├── celery_app.py           # Celery (Redis broker, 2 队列)
 ├── gunicorn.conf.py        # 生产配置
-├── blueprints/             # HTTP 路由层（每功能一个文件，共 18 个；实际路径均带 /api/v1 前缀）
+├── blueprints/             # HTTP 路由层（每功能一个文件，共 16 个；实际路径均带 /api/v1 前缀）
 │   ├── convert.py          # /api/convert, /api/preview, /api/stats (计数)
 │   ├── download.py         # /api/download, /api/health, /api/tasks/*
 │   ├── stats_bp.py         # /api/stats/overview, /api/stats/seed
@@ -150,8 +150,6 @@ backend/
 │   ├── page_decorate_bp.py # /api/page-decorate
 │   ├── rss_detect_bp.py    # /api/rss-detect
 │   ├── video_convert_bp.py # /api/video-convert
-│   ├── watermark_bp.py     # /api/watermark（入口已下线，仅存接口）
-│   └── company_lookup_bp.py # /api/company-lookup（入口已下线，仅存接口）
 ├── services/               # 业务逻辑层 (纯函数，零 Flask 依赖，全部返回 ServiceResult[T])
 │   ├── converter.py        # MD → DOCX (Pandoc)
 │   ├── formatter.py        # GB/T 9704-2012 格式化
@@ -254,7 +252,7 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 
 ### 进度推送
 
-SSE（Server-Sent Events）：`GET /api/tasks/{id}/stream`。需要的组件自行建 `EventSource` 连接并在终态关闭（视频转换、公司查询批量），轮询端点 `/api/tasks/{id}` 作为降级方案。
+SSE（Server-Sent Events）：`GET /api/tasks/{id}/stream`。需要的组件自行建 `EventSource` 连接并在终态关闭（视频转换），轮询端点 `/api/tasks/{id}` 作为降级方案。
 
 ---
 
@@ -300,7 +298,8 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 | `tools.config.ts` | 工具定义（ToolDef/ToolGroup）、侧栏分组、仪表盘卡片 |
 | `useValidation` | Vuelidate 封装：`v$` 状态 + `errors` 字典 + `validate()` |
 | `useApi` | 通用 API 封装：`{ data, loading, pagination, fetchList }` + `useCache` |
-| `useDownload` | Blob 下载封装 + `showError` 错误提示 |
+| `useDownload` | Blob 下载封装（`downloadBlob`） |
+| `useError` | API 错误统一处理：`showError(e)` 弹 toast、`extractError(e)` 取消息（兼容 JSON 与 Blob 错误体） |
 | `useAi` | AI 功能封装（纠错/分类/去噪/文件名生成） |
 
 ### 原子组件 (`components/ui/`)
@@ -325,7 +324,7 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 - **Panel 去重**：`PdfToTextPanel` / `PdfCompressPanel` / `PageDecoratePanel` 是各自功能的唯一实现。独立页面（`pdf-to-text.vue` 等）和 Tab 页（`pdf-tools.vue`）共享同一 Panel 组件，消除逻辑重复。
 - **懒加载**：Panel 组件通过 `defineAsyncComponent(() => import(...))` 按需加载。
 - **已删除组件**：`AppHeader.vue`（未使用，功能由 Sidebar 覆盖）、`ButtonPrimary.vue`（由 Nuxt UI `<UButton>` 替代）、`ProgressBar.vue`（由 Nuxt UI `<UProgress>` 替代）。
-- **已删除前端模块**：`api/` + `types/`（统一 API 层与共享类型从未被组件采用）、`useTaskStream.ts`（组件改用内联 `EventSource`）、`useError.ts`（错误提示由 `useDownload().showError` 承担）。
+- **已删除前端模块**：`api/` + `types/`（统一 API 层与共享类型从未被组件采用）、`useTaskStream.ts`（组件改用内联 `EventSource`）、`useError.ts`（曾被删；后因各组件内联错误提取重复，改为以统一实现重建，见 v3.7.1）。
 
 ### 命名规范
 
@@ -432,6 +431,12 @@ docker compose ps
 ---
 
 ## 十一、版本历史
+
+### v3.7.1 (2026-09)
+
+- **半下线集群彻底移除**：水印（添加/去除）与公司官网查询从"入口下线、接口保留"状态彻底删除——后端 `blueprints/watermark_bp.py` / `company_lookup_bp.py`、`services/watermark.py` / `company_lookup.py`、`models.py:CompanyRecord` + `company_records` 建表语句、`schemas.py` 3 个 Company schema、`errors.py` 5 个专用错误码、`config.py` 的 `WATERMARK_EXTENSIONS` 与 `COMPANY_LOOKUP_*` 配置，前端 2 个页面 + 4 个组件，两个 locale 的对应键，以及 53 条测试（`test_company_lookup.py` 42 / `test_watermark.py` 4 / `test_file_upload.py` 7）全部删除。`tasks.db` 内历史数据（112 条 watermark、240 条 company-lookup 操作日志，3 条 company_records）保留未动，`services/stats.py` 的 watermark 模块标签同步移除
+- **错误处理去重**：新增 `composables/useError.ts` 作为唯一错误提取实现（`extractError` 兼容 JSON 与 Blob 两种错误体，`showError` 统一 toast），替换 13 处组件内联副本；`useDownload` 收敛为只负责 `downloadBlob`
+- **死代码清理收尾**：前后端死模块/死函数/死 schema/死配置（`config_validators.py`、`utils/base/validators.py`、`frontend/api/` 与 `types/` 层、12 个未使用 schema 等）随本批次清理完毕
 
 ### v3.7 (2026-09)
 
