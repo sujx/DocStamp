@@ -22,11 +22,7 @@
   },
   "dashboard": {
     "heroTitle": "Document Processing, Simplified",
-    "heroSubtitle": "13 features for format conversion, PDF editing, document standardization and more",
-    "sectionConvert": "Format Conversion",
-    "sectionPdf": "PDF Tools",
-    "sectionOffice": "Office Tools",
-    "sectionMore": "More Tools"
+    "heroSubtitle": "13 features for format conversion, PDF editing, document standardization and more"
   },
   "status": {
     "title": "Usage Statistics",

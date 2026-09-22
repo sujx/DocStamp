@@ -116,7 +116,7 @@ Nuxt UI v2（`UFormGroup`, `UButton`, `UInput`, `USelect`, `UTabs`, `UAlert`, `U
 
 ### 仪表盘
 
-工具卡片网格按功能分组展示（转换/PDF/Office/更多），每张卡片含图标徽章 + 标题 + 描述 + 悬停箭头指示。卡片使用 `.card.card-interactive` 全局样式，悬停时上浮 + 阴影加深 + 图标徽章反色。
+顶部品牌 Hero（标题 + 一句话说明），下方单块 3 列工具卡片网格（12 张，按转换 → PDF → Office → 其他排序，带依次入场动画，不设分区标题）。每张卡片含图标徽章 + 标题 + 描述 + 悬停箭头指示。卡片使用 `.card.card-interactive` 全局样式，悬停时上浮 + 阴影加深 + 图标徽章反色。
 
 ---
 
@@ -297,10 +297,10 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 
 | Composable | 功能 |
 |-----------|------|
-| `tools.config.ts` | 工具定义（ToolDef/ToolGroup）、侧栏分组、仪表盘卡片 |
+| `tools.config.ts` | 工具定义（ToolDef/ToolGroup）、侧栏分组（`SIDEBAR_GROUPS`） |
 | `useValidation` | Vuelidate 封装：`v$` 状态 + `errors` 字典 + `validate()` |
 | `useApi` | 通用 API 封装：`{ data, loading, pagination, fetchList }` + `useCache` |
-| `useDownload` | Blob 下载封装（`downloadBlob`） |
+| `useDownload` | Blob 下载封装（`downloadBlob`）：挂 `<a>` → click → 延迟 100ms 摘除并 revoke；`successMsg` 可选，不传则不弹 toast |
 | `useApiError` | API 错误统一处理：`showError(e)` 弹 toast、`extractError(e)` 取消息（兼容 JSON 与 Blob 错误体）。命名避开 Nuxt 内置 `useError` |
 | `useAi` | AI 功能封装（纠错/分类/去噪/文件名生成） |
 
@@ -433,6 +433,14 @@ docker compose ps
 ---
 
 ## 十一、版本历史
+
+### v3.7.2 (2026-09)
+
+- **仪表盘分区标题移除**：首页原本是 4 个带标题的栅格（格式转换 / PDF 工具 / Office 工具 / 更多工具），现改为单栅格，按原顺序（转换 → PDF → Office → 其他）铺开 12 张卡片，不再有分区文字标识。`dashboard.sectionConvert` / `sectionPdf` / `sectionOffice` / `sectionMore` 四个键从两个 locale 删除，`tools.config.ts` 的死导出 `DASHBOARD_TOOLS` 一并移除
+- **i18n 参考审计与死键清理**：两个 locale 各删 75 个无引用键（320 → 245），新增 `i18n/__tests__/locales.spec.ts` 双向审计（无键无引用、无引用无键、locale 对齐、禁止用模板拼接键），`tools.config.ts` 的侧栏分组标签从模板拼接改为静态字面量（拼出来的键对字面量扫描不可见）
+- **`useError` → `useApiError`**：`composables/useError.ts` 与 Nuxt 内置 `useError` 重名（构建期 `Duplicated imports` 告警，组件实际拿到的是本项目实现），重命名 composable 及 17 处调用点，并补上该 composable 的首批测试（`extractError` 的 JSON 信封 / 纯文本 / Blob / 对象四种错误体各一例）
+- **Blob 下载去重**：11 处组件内手写下载路径全部收敛到 `useDownload().downloadBlob(blob, filename, successMsg?)`。统一时序为"挂 `<a>` → click → 延迟 100ms 摘除并 revoke"——在点击的同一任务里 `revokeObjectURL` 会让部分浏览器直接取消下载，此前 8 处是同步 revoke。成功文案改为可选，原本不弹 toast 的 4 处（.md/.txt 下载、打印分组批次、视频转换）保持不变。新增 5 条时序测试；`vitest.config.ts` 增加转换插件注入 `import.meta.client`（vitest 不注入它，Vite 的 `define` 对 `import.meta.*` 也不生效），使客户端分支可在单测中验证
+- **文案与计数口径统一**：`dashboard.heroSubtitle` 的 "15+ 专业工具" 改为 "13 项功能"；`Sidebar.vue` 4 个硬编码中文 aria-label 改为 `a11y.*` 键；AGENTS.md / SPEC.md / README 的模块计数统一为 13 个（12 工具 + 使用统计，仪表盘是导航页不计入）
 
 ### v3.7.1 (2026-09)
 

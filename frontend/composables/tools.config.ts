@@ -75,5 +75,3 @@ export const SIDEBAR_GROUPS: (ToolDef | ToolGroup)[] = (() => {
 
   return result
 })()
-
-export const DASHBOARD_TOOLS = TOOLS.filter(t => t.key !== "dashboard" && t.key !== "status")

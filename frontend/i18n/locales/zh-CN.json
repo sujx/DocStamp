@@ -22,11 +22,7 @@
   },
   "dashboard": {
     "heroTitle": "文档处理，化繁为简",
-    "heroSubtitle": "13 项功能，覆盖格式转换、PDF 编辑、文档规范化等场景",
-    "sectionConvert": "格式转换",
-    "sectionPdf": "PDF 工具",
-    "sectionOffice": "Office 工具",
-    "sectionMore": "更多工具"
+    "heroSubtitle": "13 项功能，覆盖格式转换、PDF 编辑、文档规范化等场景"
   },
   "status": {
     "title": "使用统计",
