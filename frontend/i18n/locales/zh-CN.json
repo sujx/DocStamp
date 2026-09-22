@@ -76,7 +76,8 @@
     "taskRetrying": "正在重试",
     "uploadArea": "文件上传区域，点击或拖拽文件到此处",
     "langZh": "切换到中文",
-    "langEn": "切换到英文"
+    "langEn": "切换到英文",
+    "pageError": "页面组件出错，请刷新重试"
   },
   "properties": {
     "title": "Office 文档属性修改",
@@ -441,7 +442,7 @@
     "pasteImport": "粘贴导入",
     "pasteHint": "粘贴 CSV 内容，第一行为表头 (name,website)",
     "batchProgress": "查询中 {current}/{total}",
-    "localHit": "本地命中 {n} 条，需联网查询 {m} 条",
+    "localHit": "本地命中 {n} 条，需联网查询 {m} 条"
   },
   "rssDetect": {
     "title": "RSS 订阅探测",

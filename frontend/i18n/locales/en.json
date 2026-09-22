@@ -76,7 +76,8 @@
     "taskRetrying": "Retrying",
     "uploadArea": "File upload area, click or drag files here",
     "langZh": "Switch to Chinese",
-    "langEn": "Switch to English"
+    "langEn": "Switch to English",
+    "pageError": "Page component failed. Please refresh."
   },
   "properties": {
     "title": "Office Document Properties",
@@ -441,7 +442,7 @@
     "pasteImport": "Paste Import",
     "pasteHint": "Paste CSV content, first row is header (name,website)",
     "batchProgress": "Processing {current}/{total}",
-    "localHit": "{n} local hit(s), {m} need(s) web search",
+    "localHit": "{n} local hit(s), {m} need(s) web search"
   },
   "rssDetect": {
     "title": "RSS Feed Detector",

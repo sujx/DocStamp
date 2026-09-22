@@ -6,11 +6,11 @@
     <!-- Mode toggle -->
     <div class="flex gap-4 mb-4">
       <label class="flex items-center gap-1.5 text-sm cursor-pointer text-primary" >
-        <input type="radio" v-model="batchMode" :value="false" class="accent-green-700" />
+        <input type="radio" v-model="batchMode" :value="false" class="accent-brand-700" />
         {{ $t("properties.singleUpload") }}
       </label>
       <label class="flex items-center gap-1.5 text-sm cursor-pointer text-primary" >
-        <input type="radio" v-model="batchMode" :value="true" class="accent-green-700" />
+        <input type="radio" v-model="batchMode" :value="true" class="accent-brand-700" />
         {{ $t("properties.batchUpload") }}
       </label>
     </div>
@@ -48,11 +48,11 @@
       <!-- Time mode -->
       <div class="flex gap-4 mb-4">
         <label class="flex items-center gap-1.5 text-sm cursor-pointer text-primary" >
-          <input type="radio" v-model="timeMode" value="unified" class="accent-green-700" />
+          <input type="radio" v-model="timeMode" value="unified" class="accent-brand-700" />
           {{ $t("properties.unifiedTime") }}
         </label>
         <label class="flex items-center gap-1.5 text-sm cursor-pointer text-primary" >
-          <input type="radio" v-model="timeMode" value="separate" class="accent-green-700" />
+          <input type="radio" v-model="timeMode" value="separate" class="accent-brand-700" />
           {{ $t("properties.separateTime") }}
         </label>
       </div>

@@ -6,7 +6,7 @@
     <!-- Mode selector -->
     <div class="flex gap-4 mb-4">
       <label v-for="m in modes" :key="m.value" class="flex items-center gap-1.5 text-sm cursor-pointer text-primary" >
-        <input type="radio" v-model="mode" :value="m.value" class="accent-green-700" />
+        <input type="radio" v-model="mode" :value="m.value" class="accent-brand-700" />
         {{ m.label }}
       </label>
     </div>

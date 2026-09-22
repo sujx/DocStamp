@@ -53,7 +53,7 @@
       <UButton
         :label="$t('status.seedData')"
         :loading="seeding"
-        color="green"
+        color="brand"
         size="sm"
         @click="seedData"
       />

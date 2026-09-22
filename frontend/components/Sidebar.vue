@@ -148,37 +148,16 @@
 <script setup lang="ts">
 import { SIDEBAR_GROUPS } from "~/composables/tools.config";
 
-const collapsed = ref(true);
-onMounted(() => {
-  const saved = localStorage.getItem("sidebar_collapsed");
-  collapsed.value = saved !== null ? saved !== "false" : true;
-});
+const { collapsed, isMobile, toggleCollapsed } = useSidebar();
+
 const hoverGroup = ref<string | null>(null);
 const mobileOpen = ref(false);
-const isMobile = ref(false);
 const route = useRoute();
 const { t } = useI18n();
-
-onMounted(() => {
-  const mq = window.matchMedia("(max-width: 1023px)");
-  isMobile.value = mq.matches;
-  mq.addEventListener("change", (e) => { isMobile.value = e.matches; });
-});
 
 watch(() => route.path, () => {
   if (isMobile.value) mobileOpen.value = false;
 });
-
-function toggleCollapsed() {
-  collapsed.value = !collapsed.value;
-  if (import.meta.client) localStorage.setItem("sidebar_collapsed", String(collapsed.value));
-}
-
-const sidebarWidth = computed(() => {
-  if (isMobile.value) return 0;
-  return collapsed.value ? 72 : 256;
-});
-provide("sidebarWidth", sidebarWidth);
 
 interface NavChild {
   to: string; icon: string; label: string;
