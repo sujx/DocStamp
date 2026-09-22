@@ -62,7 +62,7 @@ import axios from "axios";
 
 const { t } = useI18n();
 const toast = useToast();
-const { extractError } = useError();
+const { extractError } = useApiError();
 
 const url = ref("");
 const detecting = ref(false);

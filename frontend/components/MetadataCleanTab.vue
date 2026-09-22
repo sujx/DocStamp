@@ -25,7 +25,7 @@ import axios from "axios";
 
 const { t } = useI18n();
 const toast = useToast();
-const { showError } = useError();
+const { showError } = useApiError();
 
 const file = ref<File | null>(null);
 const cleaning = ref(false);

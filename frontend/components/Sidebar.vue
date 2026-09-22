@@ -2,7 +2,7 @@
   <!-- Hamburger toggle (mobile only) -->
   <button
     class="fixed top-4 left-4 z-50 lg:hidden flex items-center justify-center size-10 rounded-xl transition-all duration-200 cursor-pointer bg-surface shadow-elevated hover:shadow-md"
-    :aria-label="mobileOpen ? '关闭导航' : '打开导航'"
+    :aria-label="mobileOpen ? $t('a11y.closeNav') : $t('a11y.openNav')"
     @click="mobileOpen = !mobileOpen"
   >
     <UIcon
@@ -131,7 +131,7 @@
           v-if="!isMobile"
           class="flex items-center justify-center w-full min-h-[32px] rounded-lg text-[11px] font-medium text-sidebar-sub transition-all duration-150 cursor-pointer hover:bg-white/[.06] hover:text-white"
           :class="collapsed && 'px-1.5'"
-          :aria-label="collapsed ? '展开侧边栏' : '折叠侧边栏'"
+          :aria-label="collapsed ? $t('a11y.expandSidebar') : $t('a11y.collapseSidebar')"
           @click="toggleCollapsed"
         >
           <UIcon

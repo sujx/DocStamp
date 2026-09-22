@@ -10,7 +10,9 @@
 
 ---
 
-## 二、功能模块（14 个）
+## 二、功能模块（13 个）
+
+功能模块 = 12 项工具 + 使用统计，共 13 个；首页仪表盘是导航页不计入，下表按路由列出全部 14 个页面。
 
 **侧栏导航**：
 
@@ -299,7 +301,7 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 | `useValidation` | Vuelidate 封装：`v$` 状态 + `errors` 字典 + `validate()` |
 | `useApi` | 通用 API 封装：`{ data, loading, pagination, fetchList }` + `useCache` |
 | `useDownload` | Blob 下载封装（`downloadBlob`） |
-| `useError` | API 错误统一处理：`showError(e)` 弹 toast、`extractError(e)` 取消息（兼容 JSON 与 Blob 错误体） |
+| `useApiError` | API 错误统一处理：`showError(e)` 弹 toast、`extractError(e)` 取消息（兼容 JSON 与 Blob 错误体）。命名避开 Nuxt 内置 `useError` |
 | `useAi` | AI 功能封装（纠错/分类/去噪/文件名生成） |
 
 ### 原子组件 (`components/ui/`)

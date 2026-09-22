@@ -34,7 +34,7 @@ import axios from "axios";
 
 const { t } = useI18n();
 const toast = useToast();
-const { showError } = useError();
+const { showError } = useApiError();
 
 const isDragover = ref(false);
 const selectedFile = ref<File | null>(null);

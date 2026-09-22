@@ -117,7 +117,7 @@ docStamp/
 │       ├── retry.py            # @retry_on_failure 重试装饰器
 │       └── crypto.py           # AES-256 Fernet 字段加密
 ├── frontend/                   # Nuxt 3 SPA
-│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useError / useAi
+│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError / useAi
 │   ├── components/ui/          # 原子组件（CardBase / SkeletonBlock）
 │   ├── pages/                  # 18 个路由页面（13 个工具 + 1 个仪表盘 + 4 个面板子页）
 │   └── i18n/locales/           # zh-CN / en

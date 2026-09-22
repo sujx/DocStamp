@@ -1,5 +1,5 @@
 /** Canonical API error extraction and toast, shared by every tool component. */
-export function useError() {
+export function useApiError() {
   /** Pull a human-readable message out of an axios error.
    *
    * Error bodies arrive either as parsed JSON (plain requests) or as a Blob

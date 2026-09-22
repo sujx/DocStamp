@@ -43,7 +43,7 @@ docStamp/
 │   ├── nuxt.config.ts          # SSG + i18n + Nuxt UI v2
 │   ├── tailwind.config.ts      # Tailwind v3 品牌色阶
 │   ├── assets/css/main.css     # CSS 变量 (SynTime Royal Blue token)
-│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useError / useAi / useSidebar / usePageView
+│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError / useAi / useSidebar / usePageView
 │   ├── components/             # 业务组件 + ui/ 原子组件
 │   ├── layouts/default.vue     # 侧边导航壳
 │   ├── pages/                  # 路由页面
@@ -57,6 +57,8 @@ docStamp/
 ```
 
 ## 功能模块
+
+功能模块 13 个（12 项工具 + 使用统计）；下表 14 行含首页仪表盘，仪表盘是导航页不计入。
 
 | # | 模块 | 路由 | 说明 |
 |---|------|------|------|
@@ -135,7 +137,7 @@ def my_service(path: str) -> ServiceResult[dict]:
 - 禁止 `transition: all`，用具体属性列表
 - 表单校验：Vuelidate (`useValidation` composable)
 - 异步进度：SSE `GET /api/v1/tasks/{id}/stream`，组件内直接建 `EventSource`
-- API 错误提示：`useError().showError(e)` 弹 toast；需要内联展示时用 `useError().extractError(e)` 取消息（自动识别 JSON 与 Blob 两种错误体）；全局 401 由 `plugins/axios.client.ts` 拦截
+- API 错误提示：`useApiError().showError(e)` 弹 toast；需要内联展示时用 `useApiError().extractError(e)` 取消息（自动识别 JSON 与 Blob 两种错误体）；全局 401 由 `plugins/axios.client.ts` 拦截
 - 文件下载：`useDownload().downloadBlob(blob, filename, successMsg)`
 
 ### 工具配置单一数据源

@@ -22,7 +22,7 @@
   },
   "dashboard": {
     "heroTitle": "Document Processing, Simplified",
-    "heroSubtitle": "15+ professional tools for format conversion, PDF editing, document standardization and more",
+    "heroSubtitle": "13 features for format conversion, PDF editing, document standardization and more",
     "sectionConvert": "Format Conversion",
     "sectionPdf": "PDF Tools",
     "sectionOffice": "Office Tools",
@@ -246,7 +246,11 @@
     "skipToContent": "Skip to main content",
     "removeFile": "Remove file",
     "moveUp": "Move up",
-    "moveDown": "Move down"
+    "moveDown": "Move down",
+    "openNav": "Open navigation",
+    "closeNav": "Close navigation",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar"
   },
   "ai": {
     "correct": "AI Correct",

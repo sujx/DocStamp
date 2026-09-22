@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import axios from "axios";
 const { t } = useI18n(); const toast = useToast();
-const { showError } = useError();
+const { showError } = useApiError();
 const file = ref<File | null>(null); const quality = ref("medium"); const compressing = ref(false);
 const stats = ref<{ original_size: number; compressed_size: number; ratio: number } | null>(null);
 const qualities = computed(() => [{ key: "low", label: t("pdfCompress.low") }, { key: "medium", label: t("pdfCompress.medium") }, { key: "high", label: t("pdfCompress.high") }]);

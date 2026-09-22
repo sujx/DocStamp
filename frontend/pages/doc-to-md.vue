@@ -55,7 +55,7 @@ import DOMPurify from "dompurify";
 
 const { t } = useI18n();
 const toast = useToast();
-const { extractError } = useError();
+const { extractError } = useApiError();
 
 const file = ref<File | null>(null);
 const converting = ref(false);

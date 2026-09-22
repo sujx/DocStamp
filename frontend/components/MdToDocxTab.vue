@@ -173,7 +173,7 @@ import DOMPurify from "dompurify";
 
 const { t } = useI18n();
 const toast = useToast();
-const { showError } = useError();
+const { showError } = useApiError();
 const { correct: aiCorrectText, classify: aiClassifyText, loading: aiCorrecting } = useAi();
 
 const aiClassified = ref(false);

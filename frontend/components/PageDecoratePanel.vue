@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import axios from "axios";
 const { t } = useI18n(); const toast = useToast();
-const { showError } = useError();
+const { showError } = useApiError();
 const file = ref<File | null>(null); const mode = ref("page_number"); const textTemplate = ref("{n}"); const position = ref("bottom-center"); const fontSize = ref(10); const color = ref("#000000"); const startNumber = ref(1); const decorating = ref(false);
 const modeOptions = computed(() => [{ label: t("pageDecorate.pageNumber"), value: "page_number" }, { label: t("pageDecorate.header"), value: "header" }, { label: t("pageDecorate.footer"), value: "footer" }]);
 const positionOptions = computed(() => [{ label: t("pageDecorate.topLeft"), value: "top-left" }, { label: t("pageDecorate.topCenter"), value: "top-center" }, { label: t("pageDecorate.topRight"), value: "top-right" }, { label: t("pageDecorate.bottomLeft"), value: "bottom-left" }, { label: t("pageDecorate.bottomCenter"), value: "bottom-center" }, { label: t("pageDecorate.bottomRight"), value: "bottom-right" }]);

@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import axios from "axios";
 const { t } = useI18n(); const toast = useToast();
-const { showError } = useError();
+const { showError } = useApiError();
 const { denoise: aiDenoiseText, loading: aiDenoising } = useAi();
 const file = ref<File | null>(null); const pagesInput = ref(""); const extracting = ref(false);
 const result = ref<{ text: string; total_pages: number; extracted_pages: number } | null>(null);

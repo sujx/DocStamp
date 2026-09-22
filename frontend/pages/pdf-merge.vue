@@ -71,7 +71,7 @@ import axios from "axios";
 
 const { t } = useI18n();
 const toast = useToast();
-const { showError } = useError();
+const { showError } = useApiError();
 
 const files = ref<File[]>([]);
 const merging = ref(false);

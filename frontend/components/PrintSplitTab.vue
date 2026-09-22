@@ -54,7 +54,7 @@ import axios from "axios";
 import FileUploader from "./FileUploader.vue";
 
 const { t } = useI18n();
-const { showError } = useError();
+const { showError } = useApiError();
 
 const selectedFile = ref<File | null>(null);
 const batchSize = ref(60);

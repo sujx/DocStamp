@@ -51,7 +51,7 @@ import axios from "axios";
 
 const { t } = useI18n();
 const { downloadBlob } = useDownload();
-const { showError } = useError();
+const { showError } = useApiError();
 
 let idCounter = 0;
 

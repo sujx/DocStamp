@@ -100,7 +100,7 @@ import FileUploader from "./FileUploader.vue";
 
 const { t } = useI18n();
 const { downloadBlob } = useDownload();
-const { showError } = useError();
+const { showError } = useApiError();
 
 const modes = [
   { value: "delete", label: t("pdfEditor.modeDelete") },

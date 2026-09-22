@@ -89,7 +89,7 @@
 import axios from "axios";
 
 const { t } = useI18n();
-const { extractError } = useError();
+const { extractError } = useApiError();
 
 const file = ref<File | null>(null);
 const sourceUrl = ref("");

@@ -22,7 +22,7 @@
   },
   "dashboard": {
     "heroTitle": "文档处理，化繁为简",
-    "heroSubtitle": "15+ 专业工具，覆盖格式转换、PDF 编辑、文档规范化等场景",
+    "heroSubtitle": "13 项功能，覆盖格式转换、PDF 编辑、文档规范化等场景",
     "sectionConvert": "格式转换",
     "sectionPdf": "PDF 工具",
     "sectionOffice": "Office 工具",
@@ -246,7 +246,11 @@
     "skipToContent": "跳到主内容",
     "removeFile": "移除文件",
     "moveUp": "上移",
-    "moveDown": "下移"
+    "moveDown": "下移",
+    "openNav": "打开导航",
+    "closeNav": "关闭导航",
+    "expandSidebar": "展开侧边栏",
+    "collapseSidebar": "折叠侧边栏"
   },
   "ai": {
     "correct": "AI 纠错",
