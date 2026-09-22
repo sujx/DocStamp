@@ -117,14 +117,19 @@ def properties_batch_modify():
                 cleanup_files(p)
             return jsonify({"error": result.message}), 400
         results = result.data
+        succeeded = [r for r in results if r["success"]]
+        if not succeeded:
+            for p in filepaths:
+                cleanup_files(p)
+            reasons = "; ".join(f"{r['filename']}: {r.get('error', '')}" for r in results)
+            return jsonify({"error": _("No file could be modified") + f" — {reasons}"}), 400
 
         import zipfile
         zip_name = f"{uuid.uuid4().hex}.zip"
         zip_path = os.path.join(Config.UPLOAD_FOLDER, zip_name)
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-            for r in results:
-                if r["success"]:
-                    zf.write(os.path.join(output_dir, r["filename"]), r["filename"])
+            for r in succeeded:
+                zf.write(os.path.join(output_dir, r["filename"]), r["filename"])
 
         @after_this_request
         def _cleanup(response):

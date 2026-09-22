@@ -27,7 +27,12 @@ class Config:
     EXCEL_EXTENSIONS = {"xlsx", "csv"}
     MD_EXTENSIONS = {"md", "markdown", "txt"}
     VIDEO_EXTENSIONS = {"mp4", "wmv", "avi", "mkv", "mov"}
-    DOWNLOAD_EXTENSIONS = {"docx", "md", "wmv"}
+    # Also serves MinerU's source-file fetch: the cloud API downloads our own
+    # uploaded document back over /api/v1/download/<filename> before parsing it.
+    DOWNLOAD_EXTENSIONS = {
+        "docx", "md", "wmv",
+        "pdf", "doc", "ppt", "pptx", "png", "jpg", "jpeg",
+    }
 
     # ── Security ────────────────────────────────────────────────────
     FORBIDDEN_PATH_CHARS = {"..", "/", "\\"}

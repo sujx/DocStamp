@@ -9,25 +9,51 @@ Files are kept for 7 days to allow:
 
 import logging
 import os
+import shutil
 import time
 
 logger = logging.getLogger(__name__)
 
+# The upload folder doubles as the home of live state: the stats counter is
+# rewritten on every conversion, and .gitkeep keeps the directory in version
+# control.  Neither may ever be aged out.
+PRESERVED_NAMES = {".stats", ".gitkeep"}
+
+
+def _tree_stats(path: str) -> tuple[int, int]:
+    """Return (file_count, total_bytes) for a file or a directory tree."""
+    if os.path.isfile(path):
+        return 1, os.path.getsize(path)
+
+    files = 0
+    size = 0
+    for root, _dirs, names in os.walk(path):
+        for name in names:
+            try:
+                files += 1
+                size += os.path.getsize(os.path.join(root, name))
+            except OSError:
+                continue
+    return files, size
+
 
 def cleanup_temp_files(upload_folder: str, max_age_days: int = 7) -> dict:
-    """Delete temporary files older than max_age_days.
+    """Delete temporary files and directories older than max_age_days.
+
+    Per-task output directories (pdf2img_*, thumbs_*, print-split task dirs,
+    properties batch dirs) are removed recursively with their contents.
 
     Designed to be called by Celery Beat or external cron:
         celery.conf.beat_schedule = {
-            "cleanup-temp": {
-                "task": "backend.tasks.maintenance.cleanup_temp_files",
+            "cleanup-temp-files": {
+                "task": "backend.tasks.maintenance.cleanup_temp_files_task",
                 "schedule": crontab(hour=3, minute=0),
             },
         }
 
     Args:
         upload_folder: Directory containing temporary files.
-        max_age_days: Files older than this many days are deleted.
+        max_age_days: Entries older than this many days are deleted.
 
     Returns:
         dict with keys: deleted_count, freed_bytes, errors.
@@ -42,15 +68,19 @@ def cleanup_temp_files(upload_folder: str, max_age_days: int = 7) -> dict:
     error_count = 0
 
     for fname in os.listdir(upload_folder):
+        if fname in PRESERVED_NAMES:
+            continue
         fpath = os.path.join(upload_folder, fname)
         try:
-            if not os.path.isfile(fpath):
+            if os.path.getmtime(fpath) >= cutoff:
                 continue
-            if os.path.getmtime(fpath) < cutoff:
-                fsize = os.path.getsize(fpath)
+            files, size = _tree_stats(fpath)
+            if os.path.isdir(fpath):
+                shutil.rmtree(fpath)
+            else:
                 os.remove(fpath)
-                deleted += 1
-                freed += fsize
+            deleted += files or 1
+            freed += size
         except OSError as e:
             logger.warning("Failed to delete %s: %s", fpath, e)
             error_count += 1

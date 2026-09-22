@@ -28,6 +28,7 @@ for _dotenv_path in (".env", "../.env"):
 from flask import Flask, g, jsonify, request, send_from_directory
 from flask_babel import Babel
 from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from config import Config
 from json_logging import setup_json_logging
@@ -40,6 +41,11 @@ def create_app() -> Flask:
     """Create and configure the Flask application."""
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    # Trust one reverse-proxy hop (nginx) so request.remote_addr / scheme / host
+    # reflect the real client. Per-IP rate limiting silently degrades to a single
+    # shared bucket without this.
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     # i18n
     def get_locale():
@@ -82,7 +88,7 @@ def create_app() -> Flask:
 
     @app.after_request
     def _set_version_header(response):
-        response.headers["X-API-Version"] = "3.6"
+        response.headers["X-API-Version"] = "3.7"
         return response
 
     @app.after_request

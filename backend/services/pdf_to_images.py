@@ -8,6 +8,9 @@ from pypdf import PdfReader
 
 from errors import ErrorCode, ServiceResult
 
+MIN_DPI = 72
+MAX_DPI = 600
+
 
 def pdf_to_images(
     filepath: str,
@@ -22,7 +25,7 @@ def pdf_to_images(
         filepath: Path to the source PDF.
         output_dir: Directory to write image files into.
         fmt: Output format — "png" or "jpeg".
-        dpi: Output resolution in DPI (default 200).
+        dpi: Output resolution in DPI (MIN_DPI–MAX_DPI).
         pages: 1-indexed list of pages to convert (None = all pages).
 
     Returns:
@@ -31,10 +34,22 @@ def pdf_to_images(
     if not os.path.isfile(filepath):
         return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"File not found: {filepath}")
 
-    os.makedirs(output_dir, exist_ok=True)
-
     if fmt not in ("png", "jpeg"):
         return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, f"Unsupported format: {fmt}. Use 'png' or 'jpeg'.")
+
+    # pdftoppm allocates width*height*4 bytes per page, so an unbounded dpi turns
+    # a single page into a multi-gigabyte bitmap.  Reject before touching disk.
+    try:
+        dpi = int(dpi)
+    except (TypeError, ValueError):
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, f"Invalid DPI: {dpi!r}")
+    if not MIN_DPI <= dpi <= MAX_DPI:
+        return ServiceResult.fail(
+            ErrorCode.VALIDATION_ERROR,
+            f"DPI must be between {MIN_DPI} and {MAX_DPI}, got {dpi}",
+        )
+
+    os.makedirs(output_dir, exist_ok=True)
 
     try:
         reader = PdfReader(filepath)

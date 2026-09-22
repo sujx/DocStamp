@@ -16,6 +16,7 @@ from flask import Blueprint, jsonify, request, current_app
 from cache import cache
 from config import Config
 from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 
 mineru_bp = Blueprint("mineru", __name__)
 
@@ -33,6 +34,7 @@ def _file_hash(filepath: str) -> str:
 
 
 @mineru_bp.route("/api/v1/doc-to-md", methods=["POST"])
+@rate_limit(max_requests=5, window_seconds=60)
 def doc_to_md():
     """Convert document to Markdown via MinerU API."""
     if "file" not in request.files:

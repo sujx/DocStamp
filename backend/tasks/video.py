@@ -22,15 +22,20 @@ class TrackedTask(Task):
     abstract = True
 
     def on_success(self, retval, task_id, args, kwargs):
-        __record.update_progress(task_id, "success", progress=100)
+        # Task bodies that handle their own failures return an error dict rather
+        # than raising, so don't let the success hook overwrite that terminal state.
+        existing = _record.get_by_id(task_id)
+        if existing and existing["status"] == "failure":
+            return
+        _record.update_progress(task_id, "success", progress=100)
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
-        __record.update_progress(
+        _record.update_progress(
             task_id, "failure", error_code="TASK_FAILED", error_message=str(exc),
         )
 
     def on_retry(self, exc, task_id, args, kwargs, einfo):
-        __record.update_progress(
+        _record.update_progress(
             task_id, "progress", message=f"正在重试: {exc}",
         )
 

@@ -15,7 +15,54 @@ from services.pdf_editor import pdf_delete_pages, pdf_insert_pages, pdf_reorder_
 
 pdf_editor_bp = Blueprint("pdf_editor", __name__)
 
-_pdf_thumbs = {}
+
+def _pdf_edit_route(service_fn, parse_form, download_prefix):
+    """Shared handler for single-file PDF edit routes (upload → process → cleanup → send).
+
+    Args:
+        service_fn: callable(filepath, output_path, **form_data) → ServiceResult
+        parse_form: callable(request) → dict of form parameters (may raise ValueError)
+        download_prefix: prefix for download filename (e.g. "edited", "reordered")
+    """
+    cleanup_paths = []
+    try:
+        if "file" not in request.files:
+            return jsonify({"error": _("No file provided")}), 400
+        file = request.files["file"]
+        if not file.filename:
+            return jsonify({"error": _("No file selected")}), 400
+
+        filename, filepath = save_upload(file, Config.PDF_EXTENSIONS, Config.UPLOAD_FOLDER)
+        cleanup_paths.append(filepath)
+
+        form_data = parse_form(request)
+
+        output_name = f"{uuid.uuid4().hex}_{filename}"
+        output_path = os.path.join(Config.UPLOAD_FOLDER, output_name)
+        cleanup_paths.append(output_path)
+
+        result = service_fn(filepath, output_path, **form_data)
+        if not result.success:
+            cleanup_files(*cleanup_paths)
+            return jsonify({"error": result.message}), 400
+
+        @after_this_request
+        def _cleanup(response):
+            cleanup_files(*cleanup_paths)
+            return response
+
+        return send_file(
+            output_path,
+            mimetype="application/pdf",
+            as_attachment=True,
+            download_name=f"{download_prefix}_{filename}",
+        )
+    except ValueError as e:
+        cleanup_files(*cleanup_paths)
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        cleanup_files(*cleanup_paths)
+        return jsonify({"error": str(e)}), 500
 
 
 @pdf_editor_bp.route("/api/v1/pdf-editor/info", methods=["POST"])
@@ -70,12 +117,13 @@ def pdf_editor_info():
                 "thumb": f"/api/v1/pdf-editor/thumb/{os.path.basename(thumb_dir)}/{thumb_file}",
             })
 
-        _pdf_thumbs[fn] = thumb_dir
         return jsonify({"success": True, "total_pages": total, "pages": pages_info})
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    finally:
+        cleanup_files(filepath)
 
 
 @pdf_editor_bp.route("/api/v1/pdf-editor/thumb/<thumb_dir>/<filename>")
@@ -91,47 +139,19 @@ def pdf_editor_thumb(thumb_dir: str, filename: str):
 @pdf_editor_bp.route("/api/v1/pdf-editor/delete", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def pdf_editor_delete():
-    filepath = None
-    output_path = None
-    try:
-        if "file" not in request.files:
-            return jsonify({"error": _("No file provided")}), 400
-        file = request.files["file"]
-        if not file.filename:
-            return jsonify({"error": _("No file selected")}), 400
-
-        filename, filepath = save_upload(file, Config.PDF_EXTENSIONS, Config.UPLOAD_FOLDER)
-        pages = json.loads(request.form.get("pages", "[]"))
+    def parse_form(req):
+        pages = json.loads(req.form.get("pages", "[]"))
         if not pages:
-            return jsonify({"error": _("No pages specified for deletion")}), 400
+            raise ValueError(_("No pages specified for deletion"))
+        return {"pages": pages}
 
-        output_name = f"{uuid.uuid4().hex}_{filename}"
-        output_path = os.path.join(Config.UPLOAD_FOLDER, output_name)
-        result = pdf_delete_pages(filepath, output_path, pages)
-        if not result.success:
-            cleanup_files(filepath, output_path)
-            return jsonify({"error": result.message}), 400
-
-        @after_this_request
-        def _cleanup(response):
-            cleanup_files(filepath, output_path)
-            return response
-
-        return send_file(output_path, mimetype="application/pdf", as_attachment=True, download_name=f"edited_{filename}")
-    except ValueError as e:
-        cleanup_files(filepath, output_path)
-        return jsonify({"error": str(e)}), 400
-    except Exception as e:
-        cleanup_files(filepath, output_path)
-        return jsonify({"error": str(e)}), 500
+    return _pdf_edit_route(pdf_delete_pages, parse_form, "edited")
 
 
 @pdf_editor_bp.route("/api/v1/pdf-editor/insert", methods=["POST"])
 @rate_limit(max_requests=5, window_seconds=60)
 def pdf_editor_insert():
-    filepath = None
-    insert_path = None
-    output_path = None
+    cleanup_paths = []
     try:
         if "file" not in request.files:
             return jsonify({"error": _("No source file provided")}), 400
@@ -145,64 +165,41 @@ def pdf_editor_insert():
 
         filename, filepath = save_upload(file, Config.PDF_EXTENSIONS, Config.UPLOAD_FOLDER)
         _name2, insert_path = save_upload(insert_file, Config.PDF_EXTENSIONS, Config.UPLOAD_FOLDER)
+        cleanup_paths.extend([filepath, insert_path])
 
         at_position = int(request.form.get("at_position", 0))
         insert_pages = json.loads(request.form.get("insert_pages", "null"))
 
         output_name = f"{uuid.uuid4().hex}_{filename}"
         output_path = os.path.join(Config.UPLOAD_FOLDER, output_name)
+        cleanup_paths.append(output_path)
+
         result = pdf_insert_pages(filepath, insert_path, output_path, at_position, insert_pages)
         if not result.success:
-            cleanup_files(filepath, insert_path, output_path)
+            cleanup_files(*cleanup_paths)
             return jsonify({"error": result.message}), 400
 
         @after_this_request
         def _cleanup(response):
-            cleanup_files(filepath, insert_path, output_path)
+            cleanup_files(*cleanup_paths)
             return response
 
         return send_file(output_path, mimetype="application/pdf", as_attachment=True, download_name=f"merged_{filename}")
     except ValueError as e:
-        cleanup_files(filepath, insert_path, output_path)
+        cleanup_files(*cleanup_paths)
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        cleanup_files(filepath, insert_path, output_path)
+        cleanup_files(*cleanup_paths)
         return jsonify({"error": str(e)}), 500
 
 
 @pdf_editor_bp.route("/api/v1/pdf-editor/reorder", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def pdf_editor_reorder():
-    filepath = None
-    output_path = None
-    try:
-        if "file" not in request.files:
-            return jsonify({"error": _("No file provided")}), 400
-        file = request.files["file"]
-        if not file.filename:
-            return jsonify({"error": _("No file selected")}), 400
-
-        filename, filepath = save_upload(file, Config.PDF_EXTENSIONS, Config.UPLOAD_FOLDER)
-        new_order = json.loads(request.form.get("order", "[]"))
+    def parse_form(req):
+        new_order = json.loads(req.form.get("order", "[]"))
         if not new_order:
-            return jsonify({"error": _("No page order specified")}), 400
+            raise ValueError(_("No page order specified"))
+        return {"new_order": new_order}
 
-        output_name = f"{uuid.uuid4().hex}_{filename}"
-        output_path = os.path.join(Config.UPLOAD_FOLDER, output_name)
-        result = pdf_reorder_pages(filepath, output_path, new_order)
-        if not result.success:
-            cleanup_files(filepath, output_path)
-            return jsonify({"error": result.message}), 400
-
-        @after_this_request
-        def _cleanup(response):
-            cleanup_files(filepath, output_path)
-            return response
-
-        return send_file(output_path, mimetype="application/pdf", as_attachment=True, download_name=f"reordered_{filename}")
-    except ValueError as e:
-        cleanup_files(filepath, output_path)
-        return jsonify({"error": str(e)}), 400
-    except Exception as e:
-        cleanup_files(filepath, output_path)
-        return jsonify({"error": str(e)}), 500
+    return _pdf_edit_route(pdf_reorder_pages, parse_form, "reordered")

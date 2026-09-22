@@ -1,11 +1,12 @@
 """PDF compression — reduce file size via content stream compression and image downsampling."""
 
 import os
-from io import BytesIO
 
 from pypdf import PdfReader, PdfWriter
 
 from errors import ErrorCode, ServiceResult
+
+MAX_IMAGE_DIM = 1200
 
 
 def compress_pdf(filepath: str, output_path: str, quality: str = "medium") -> ServiceResult[dict]:
@@ -36,10 +37,13 @@ def compress_pdf(filepath: str, output_path: str, quality: str = "medium") -> Se
             except (AttributeError, Exception):
                 pass
 
-        if quality == "high":
-            _compress_page_images(page)
-
         writer.add_page(page)
+
+    if quality == "high":
+        # Must run on writer-owned pages — ImageFile.replace() rejects images
+        # that still belong to a PdfReader.
+        for page in writer.pages:
+            _compress_page_images(page)
 
     with open(output_path, "wb") as f:
         writer.write(f)
@@ -55,44 +59,27 @@ def compress_pdf(filepath: str, output_path: str, quality: str = "medium") -> Se
 
 
 def _compress_page_images(page) -> None:
-    """Downsample images in a PDF page to reduce file size."""
+    """Downsample oversized images in a writer-owned page and re-encode them as JPEG.
+
+    Images already within MAX_IMAGE_DIM are left untouched.
+    """
     try:
         from PIL import Image
+    except ImportError:
+        return
 
-        resources = page.get("/Resources", {})
-        if "/XObject" not in resources:
-            return
-
-        xobjects = resources["/XObject"]
-        for obj_name in list(xobjects.keys()):
-            xobj = xobjects[obj_name]
-            if xobj.get("/Subtype") != "/Image":
+    for image_file in list(page.images):
+        try:
+            img = image_file.image
+            w, h = img.size
+            if max(w, h) <= MAX_IMAGE_DIM:
                 continue
 
-            try:
-                data = xobj.get_data()
-                img = Image.open(BytesIO(data))
+            scale = MAX_IMAGE_DIM / max(w, h)
+            resized = img.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+            if resized.mode not in ("RGB", "L"):
+                resized = resized.convert("RGB")
 
-                # Downsample large images
-                w, h = img.size
-                max_dim = 1200
-                if w > max_dim or h > max_dim:
-                    scale = max_dim / max(w, h)
-                    new_size = (int(w * scale), int(h * scale))
-                    img = img.resize(new_size, Image.LANCZOS)
-
-                # Recompress as JPEG with moderate quality
-                if img.mode in ("RGBA", "LA", "P"):
-                    img = img.convert("RGB")
-
-                buf = BytesIO()
-                img.save(buf, format="JPEG", quality=60)
-                buf.seek(0)
-
-                # Replace image data
-                compressed = Image.open(buf)
-                xobj._data = buf.read()
-            except Exception:
-                pass  # Best-effort image compression
-    except ImportError:
-        pass
+            image_file.replace(resized, quality=60)
+        except Exception:
+            pass  # Best-effort image compression

@@ -1,6 +1,7 @@
 """Download, health, and task endpoints."""
 
 import json
+import mimetypes
 import os
 import time
 
@@ -72,7 +73,9 @@ def download_file(filename: str):
 
     file_size = os.path.getsize(filepath)
     range_header = request.headers.get("Range")
-    mimetype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" if ext == "docx" else "text/markdown"
+    mimetype = mimetypes.guess_type(safe_name)[0] or "application/octet-stream"
+    if ext == "md":
+        mimetype = "text/markdown; charset=utf-8"
 
     if range_header:
         start, end = _parse_range(range_header, file_size)

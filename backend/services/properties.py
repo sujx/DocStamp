@@ -38,7 +38,7 @@ def read_properties(filepath: str) -> ServiceResult[dict]:
     try:
         with zipfile.ZipFile(filepath, "r") as zf:
             if "docProps/core.xml" not in zf.namelist():
-                return props
+                return ServiceResult.ok(props)
 
             xml_data = zf.read("docProps/core.xml")
             root = ET.fromstring(xml_data)
@@ -272,8 +272,17 @@ def batch_modify_properties(
         try:
             resolved_props = _resolve_time_props(props, unify_time)
             output_path = os.path.join(output_dir, filename)
-            modify_properties(filepath, output_path, resolved_props)
-            results.append({"filename": filename, "success": True})
+            # modify_properties reports failures in its result rather than raising,
+            # so an unchecked call would silently mark every file as a success.
+            result = modify_properties(filepath, output_path, resolved_props)
+            if result.success:
+                results.append({"filename": filename, "success": True})
+            else:
+                results.append({
+                    "filename": filename,
+                    "success": False,
+                    "error": result.message,
+                })
         except Exception as e:
             results.append({"filename": filename, "success": False, "error": str(e)})
 

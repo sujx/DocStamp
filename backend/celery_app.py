@@ -43,8 +43,9 @@ celery.conf.update(
         "backend.tasks.lookup.*":   {"queue": "convert_queue"},
     },
 
-    # Result expiry — shorter for large video files, longer for office docs
-    result_expire=12 * 3600,    # Default: 12 hours
+    # Result expiry — baseline for all tasks; individual tasks override it in
+    # their @celery.task(result_expires=...) decorator.
+    result_expires=12 * 3600,   # Default: 12 hours
 
     # Worker settings
     worker_concurrency=4,       # Raised from 2 for production throughput
@@ -55,7 +56,7 @@ celery.conf.update(
     # Beat schedule
     beat_schedule={
         "cleanup-temp-files": {
-            "task": "backend.tasks.maintenance.cleanup_temp_files",
+            "task": "backend.tasks.maintenance.cleanup_temp_files_task",
             "schedule": crontab(hour=3, minute=0),
         },
     },

@@ -7,7 +7,7 @@ import tempfile
 import pytest
 
 from errors import ErrorCode, ServiceResult
-from models import CompanyRecord, init_db, _normalize_company_name
+from models import CompanyRecord, init_db, close_db, _normalize_company_name
 
 
 # ── Fixtures ──────────────────────────────────────────────────────────────
@@ -15,11 +15,19 @@ from models import CompanyRecord, init_db, _normalize_company_name
 @pytest.fixture
 def db():
     """In-memory CompanyRecord backed by a temp SQLite file."""
-    _, db_path = tempfile.mkstemp(suffix=".db")
+    fd, db_path = tempfile.mkstemp(suffix=".db")
+    os.close(fd)
     init_db(db_path)
     cr = CompanyRecord(db_path)
     yield cr
-    os.unlink(db_path)
+    # Both the mkstemp descriptor and the thread-locally cached SQLite
+    # connection hold handles that Windows refuses to unlink while open.
+    close_db(db_path)
+    for suffix in ("", "-wal", "-shm"):
+        try:
+            os.unlink(db_path + suffix)
+        except OSError:
+            pass
 
 
 @pytest.fixture

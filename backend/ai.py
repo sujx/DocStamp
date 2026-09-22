@@ -16,6 +16,7 @@ from cache import cache
 from config import Config
 from error_handler import validate_request
 from schemas import AiTextSchema, AiDenoiseSchema
+from utils.rate_limit import rate_limit
 
 ai_bp = Blueprint("ai", __name__)
 
@@ -83,6 +84,7 @@ def _parse_json(raw: str | None) -> dict:
 # ── Routes ─────────────────────────────────────────────────────────────
 
 @ai_bp.route("/api/v1/ai/correct", methods=["POST"])
+@rate_limit(max_requests=20, window_seconds=60)
 @validate_request(body=AiTextSchema)
 def ai_correct(body: AiTextSchema):
     """Correct typos and punctuation in Markdown text."""
@@ -101,6 +103,7 @@ def ai_correct(body: AiTextSchema):
 
 
 @ai_bp.route("/api/v1/ai/classify", methods=["POST"])
+@rate_limit(max_requests=30, window_seconds=60)
 @validate_request(body=AiTextSchema)
 def ai_classify(body: AiTextSchema):
     """Detect if text is an official government document."""
@@ -122,6 +125,7 @@ def ai_classify(body: AiTextSchema):
 
 
 @ai_bp.route("/api/v1/ai/suggest-filename", methods=["POST"])
+@rate_limit(max_requests=30, window_seconds=60)
 @validate_request(body=AiTextSchema)
 def ai_suggest_filename(body: AiTextSchema):
     """Suggest a Chinese filename based on document content."""
@@ -140,6 +144,7 @@ def ai_suggest_filename(body: AiTextSchema):
 
 
 @ai_bp.route("/api/v1/ai/denoise", methods=["POST"])
+@rate_limit(max_requests=20, window_seconds=60)
 @validate_request(body=AiDenoiseSchema)
 def ai_denoise(body: AiDenoiseSchema):
     """Remove header/footer/watermark noise from PDF-extracted text."""
