@@ -1,10 +1,9 @@
 """Celery application configuration for docStamp async task processing.
 
 Broker: Redis (production default) — set CELERY_BROKER_URL to override.
-Three queues with independent worker processes to prevent resource contention:
-    - convert_queue: MD → DOCX conversion, DOCX formatting
-    - pdf_queue:      Watermark, print split, PDF edit, img2pdf, pdf2img
-    - office_queue:   Properties modification, Excel merge
+Two queues, both served by the single worker container in docker-compose:
+    - pdf_queue:      video conversion (MP4 → WMV)
+    - office_queue:   scheduled maintenance (temp file cleanup)
 
 Beat schedule: daily cleanup of temp files older than 7 days.
 """
@@ -26,21 +25,13 @@ celery.conf.update(
 
     # Import task modules so Celery registers @celery.task decorated functions
     include=[
-        "backend.tasks.convert",
-        "backend.tasks.pdf",
-        "backend.tasks.office",
         "backend.tasks.video",
         "backend.tasks.maintenance",
-        "backend.tasks.lookup",
     ],
 
     # Queue routing
     task_routes={
-        "backend.tasks.convert.*":  {"queue": "convert_queue"},
-        "backend.tasks.pdf.*":      {"queue": "pdf_queue"},
-        "backend.tasks.office.*":   {"queue": "office_queue"},
         "backend.tasks.video.*":    {"queue": "pdf_queue"},
-        "backend.tasks.lookup.*":   {"queue": "convert_queue"},
     },
 
     # Result expiry — baseline for all tasks; individual tasks override it in
@@ -67,7 +58,5 @@ celery.conf.update(
 )
 
 # Worker startup commands (run from project root):
-#   celery -A backend.celery_app worker -Q convert_queue --concurrency=4 -n convert@%h
-#   celery -A backend.celery_app worker -Q pdf_queue --concurrency=4 -n pdf@%h
-#   celery -A backend.celery_app worker -Q office_queue --concurrency=4 -n office@%h
-#   celery -A backend.celery_app beat   (scheduler)
+#   celery -A backend.celery_app worker -Q pdf_queue,office_queue --concurrency=2 -B
+#   celery -A backend.celery_app beat   (scheduler, standalone)

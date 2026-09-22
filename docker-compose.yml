@@ -77,7 +77,7 @@ services:
     container_name: docstamp-celery
     command: >
       celery -A backend.celery_app worker
-      -Q convert_queue,pdf_queue,office_queue
+      -Q pdf_queue,office_queue
       --concurrency=2
       -B --loglevel=info
     volumes:

@@ -1,8 +1,9 @@
 """Async task definitions for docStamp.
 
-Sub-packages:
-    convert.py   — convert_queue: MD → DOCX, DOCX formatting
-    pdf.py       — pdf_queue: watermark, print split, PDF editor, img2pdf, pdf2img
-    office.py    — office_queue: properties modification, Excel merge
-    maintenance.py — beat tasks: temp file cleanup
+Task modules:
+    video.py       — pdf_queue: MP4 → WMV conversion
+    maintenance.py — office_queue: beat tasks, temp file cleanup
+
+Tool work (PDF editing, properties, Excel merge, …) runs synchronously in
+request handlers; only long-running jobs belong here.
 """

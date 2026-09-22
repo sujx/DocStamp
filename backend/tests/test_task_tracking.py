@@ -2,6 +2,7 @@
 
 import os
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -94,3 +95,63 @@ class TestCeleryConfig:
 
         assert celery.conf.result_expires
         assert "result_expire" not in celery.conf
+
+
+class TestTaskModuleRegistration:
+    """Every module the worker imports must be driven by something.
+
+    A task module kept in `include=` after its dispatcher disappeared keeps
+    importing stale paths and drifts out of sync with the services it calls —
+    nothing fails until a worker actually starts.
+    """
+
+    @staticmethod
+    def _driver_sources() -> str:
+        """Backend sources outside tasks/ that can dispatch or schedule work."""
+        backend = Path(__file__).resolve().parents[1]
+        skip = {"tasks", "tests"}
+        return "\n".join(
+            path.read_text(encoding="utf-8")
+            for path in backend.rglob("*.py")
+            if path.name != "celery_app.py"
+            and not (skip & set(path.relative_to(backend).parts))
+        )
+
+    def test_every_included_module_is_dispatched_or_scheduled(self):
+        from backend.celery_app import celery
+
+        drivers = self._driver_sources()
+        scheduled = " ".join(e["task"] for e in celery.conf.beat_schedule.values())
+
+        orphans = [
+            module
+            for module in celery.conf.include
+            if module not in drivers and module not in scheduled
+        ]
+        assert not orphans, f"worker imports modules nothing dispatches: {orphans}"
+
+    def test_task_routes_target_modules_the_worker_imports(self):
+        from backend.celery_app import celery
+
+        imported = set(celery.conf.include)
+        orphans = [
+            pattern
+            for pattern in celery.conf.task_routes
+            if pattern.removesuffix(".*") not in imported
+        ]
+        assert not orphans, f"routes target modules never imported: {orphans}"
+
+    def test_included_modules_import_and_register_tasks(self):
+        """A broken `include` entry only shows up when the worker container boots."""
+        import importlib
+
+        from backend.celery_app import celery
+
+        for module_path in celery.conf.include:
+            importlib.import_module(module_path)
+
+        registered = set(celery.tasks)
+        for module_path in celery.conf.include:
+            assert any(
+                name.startswith(f"{module_path}.") for name in registered
+            ), f"'{module_path}' is imported by the worker but registers no task"

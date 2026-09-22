@@ -38,7 +38,7 @@
 | 层 | 技术 |
 |------|------|
 | **后端框架** | Python Flask + Pydantic v2 + Flask-CORS + Flask-Babel + Flask-Caching |
-| **异步任务** | Celery（Redis broker）+ 3 队列 + SSE 进度推送 |
+| **异步任务** | Celery（Redis broker）+ 2 队列 + SSE 进度推送 |
 | **文档处理** | pandoc / pypdf / Pillow / reportlab / pdfminer.six / python-docx / openpyxl |
 | **AI** | DeepSeek v4 Flash + MinerU API（可选，不配 Key 自动降级） |
 | **前端框架** | Nuxt 3.15.4 (SPA) + Nuxt UI v2 + Tailwind CSS v3 + Flat Design + Plus Jakarta Sans |
@@ -105,11 +105,11 @@ docStamp/
 │   ├── json_logging.py         # JSON 结构化日志（30 天轮转）
 │   ├── models.py               # TaskRecord + OperationLog（原始 SQL）
 │   ├── cache.py                # Flask-Caching（限流 + 统计缓存）
-│   ├── celery_app.py           # Celery（Redis broker，3 队列）
+│   ├── celery_app.py           # Celery（Redis broker，2 队列）
 │   ├── gunicorn.conf.py        # Gunicorn gthread 生产配置
-│   ├── blueprints/             # HTTP 路由层（19 个，每个功能 1 文件）
+│   ├── blueprints/             # HTTP 路由层（18 个，每个功能 1 文件）
 │   ├── services/               # 业务逻辑层（纯函数，全返回 ServiceResult[T]）
-│   ├── tasks/                  # Celery 异步任务（convert / pdf / office / maintenance）
+│   ├── tasks/                  # Celery 异步任务（video / maintenance）
 │   └── utils/
 │       ├── base/               # file_helpers / validators
 │       ├── file_security.py    # 三层文件校验（大小/扩展名/魔数）
@@ -136,7 +136,7 @@ docStamp/
 - **全局异常拦截** — 所有异常 → 标准化 JSON `{code, msg, requestId}`
 - **Pydantic v2 校验** — `@validate_request` 装饰器自动校验请求参数
 - **ServiceResult[T]** — 所有 Service 函数强制 success/failure 分支处理
-- **异步任务** — Celery 3 队列 + TaskRecord 生命周期追踪 + SSE 实时进度
+- **异步任务** — Celery 2 队列 + TaskRecord 生命周期追踪 + SSE 实时进度
 - **速率限制** — 双层防御（Nginx 粗粒度 + 应用层 `@rate_limit` IP 级），上传接口按负载分级限流
 - **文件安全** — 三层校验（100MB 大小 / 扩展名白名单 / 魔数签名，视频格式跳过）+ 文件名 XSS 净化
 - **API 版本化** — 全部响应带 `X-API-Version: 3.7` 头

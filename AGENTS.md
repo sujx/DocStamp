@@ -33,11 +33,11 @@ docStamp/
 │   ├── json_logging.py         # JSON 结构化日志 (30 天轮转)
 │   ├── models.py               # TaskRecord + OperationLog + BaseCRUD (原始 SQL)
 │   ├── cache.py                # Flask-Caching SimpleCache
-│   ├── celery_app.py           # Celery (3 队列: convert/pdf/office)
+│   ├── celery_app.py           # Celery (2 队列: pdf/office)
 │   ├── gunicorn.conf.py        # 生产: bind 0.0.0.0:5000, workers=2
 │   ├── blueprints/             # HTTP 路由层 (每功能一个文件)
 │   ├── services/               # 业务逻辑层 (纯函数，零 Flask 依赖，返回 ServiceResult[T])
-│   ├── tasks/                  # Celery 异步任务
+│   ├── tasks/                  # Celery 异步任务 (video / maintenance)
 │   └── utils/                  # 通用工具 (file_security / rate_limit / retry / crypto)
 ├── frontend/
 │   ├── nuxt.config.ts          # SSG + i18n + Nuxt UI v2

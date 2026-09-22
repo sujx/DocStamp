@@ -131,10 +131,10 @@ backend/
 ├── json_logging.py         # JSON 结构化日志 (TimedRotatingFileHandler, 30 天)
 ├── models.py               # TaskRecord + OperationLog + BaseCRUD (原始 SQL)
 ├── cache.py                # Flask-Caching SimpleCache
-├── celery_app.py           # Celery (Redis/Redis broker, 3 队列)
+├── celery_app.py           # Celery (Redis broker, 2 队列)
 ├── config_validators.py    # 启动时配置校验
 ├── gunicorn.conf.py        # 生产配置
-├── blueprints/             # HTTP 路由层（每功能一个文件，共 13 个）
+├── blueprints/             # HTTP 路由层（每功能一个文件，共 18 个；实际路径均带 /api/v1 前缀）
 │   ├── convert.py          # /api/convert, /api/preview, /api/stats (计数)
 │   ├── download.py         # /api/download, /api/health, /api/tasks/*
 │   ├── stats_bp.py         # /api/stats/overview, /api/stats/seed
@@ -148,9 +148,11 @@ backend/
 │   ├── pdf_merge_bp.py     # /api/pdf-merge
 │   ├── pdf_compress_bp.py  # /api/pdf-compress
 │   ├── metadata_clean_bp.py # /api/metadata-clean
-│   ├── format_convert_bp.py # /api/convert/format
 │   ├── page_decorate_bp.py # /api/page-decorate
-│   └── image_process_bp.py # /api/image-process
+│   ├── rss_detect_bp.py    # /api/rss-detect
+│   ├── video_convert_bp.py # /api/video-convert
+│   ├── watermark_bp.py     # /api/watermark（入口已下线，仅存接口）
+│   └── company_lookup_bp.py # /api/company-lookup（入口已下线，仅存接口）
 ├── services/               # 业务逻辑层 (纯函数，零 Flask 依赖，全部返回 ServiceResult[T])
 │   ├── converter.py        # MD → DOCX (Pandoc)
 │   ├── formatter.py        # GB/T 9704-2012 格式化
@@ -168,10 +170,8 @@ backend/
 │   ├── page_decorator.py   # 页码页眉页脚 (reportlab)
 │   └── image_processor.py  # 图片处理 (Pillow)
 ├── tasks/                  # Celery 异步任务
-│   ├── convert.py          # convert_queue
-│   ├── pdf.py              # pdf_queue (8 tasks)
-│   ├── office.py           # office_queue (3 tasks)
-│   └── maintenance.py      # Beat: 定时清理
+│   ├── video.py            # pdf_queue: MP4 → WMV
+│   └── maintenance.py      # office_queue: Beat 定时清理
 ├── utils/
 │   ├── base/               # file_helpers / validators
 │   ├── file_security.py    # 魔数校验 + 扩展名白名单 + 大小限制
@@ -247,8 +247,8 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 
 - Broker: Redis（生产默认 `redis://127.0.0.1:6379/0`），`memory://` 仅开发用
 - Result backend: Redis（`redis://127.0.0.1:6379/1`）
-- 3 个队列：`convert_queue` / `pdf_queue` / `office_queue`，每队列独立 Worker 容器
-- 并发：每队列 `worker_concurrency=4`，`task_acks_late=True` 防任务丢失
+- 2 个队列：`pdf_queue`（视频转换） / `office_queue`（定时清理），由同一 Worker 容器消费
+- 并发：容器内 `--concurrency=2`（`worker_concurrency=4` 仅为无 CLI 覆盖时的默认值），`task_acks_late=True` 防任务丢失
 - Celery Beat: 每日凌晨 3 点清理 7 天前临时文件
 
 ### 任务追踪
@@ -361,7 +361,7 @@ docker compose ps
 |------|------|:---:|
 | `api` | Gunicorn gthread + 静态文件 | `127.0.0.1:5000` |
 | `redis` | Celery broker + 结果后端 + 缓存（128MB） | 内部 |
-| `celery` | 3 队列合并 + Beat 内嵌（concurrency=2） | — |
+| `celery` | 2 队列合并 + Beat 内嵌（concurrency=2） | — |
 
 ### 资源配置
 
@@ -369,7 +369,7 @@ docker compose ps
 |------|------|
 | Redis | `maxmemory 128mb`, allkeys-lru |
 | API | gunicorn `--workers 2` |
-| Celery | 3 队列合并, `--concurrency=2`, Beat 内嵌 (`-B`) |
+| Celery | 2 队列合并, `--concurrency=2`, Beat 内嵌 (`-B`) |
 | Celery 内存限制 | `mem_limit: 512M` |
 | 预估总内存 | ~800MB |
 

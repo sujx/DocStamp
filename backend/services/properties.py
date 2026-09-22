@@ -1,8 +1,9 @@
 """Office document property modification.
 
 Supports .docx, .xlsx, .pptx formats.
-Offices docs are ZIP archives with metadata in docProps/core.xml (Dublin Core).
-Uses library APIs where available, with direct XML manipulation as fallback.
+Office docs are ZIP archives with metadata in docProps/core.xml (Dublin Core),
+read directly when inspecting and written through the format's own library
+(python-docx / openpyxl / python-pptx) when modifying.
 
 Supports:
 - Single file property modification
@@ -101,56 +102,6 @@ def modify_properties(filepath: str, output_path: str, props: dict) -> ServiceRe
         return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, str(e))
 
     return ServiceResult.ok(None)
-
-
-def _modify_via_xml(filepath: str, output_path: str, props: dict) -> None:
-    """Generic property modification via direct XML manipulation.
-
-    This works for any Office Open XML format (.docx/.xlsx/.pptx).
-    """
-    # XML namespaces
-    NS = {
-        "dc": "http://purl.org/dc/elements/1.1/",
-        "dcterms": "http://purl.org/dc/terms/",
-        "cp": "http://schemas.openxmlformats.org/package/2006/metadata/core-properties",
-        "xsi": "http://www.w3.org/2001/XMLSchema-instance",
-    }
-
-    # Register namespaces for output
-    for prefix, uri in NS.items():
-        ET.register_namespace(prefix, uri)
-
-    with zipfile.ZipFile(filepath, "r") as zf_in:
-        content = {name: zf_in.read(name) for name in zf_in.namelist()}
-
-    # Modify core.xml if it exists
-    core_path = "docProps/core.xml"
-    if core_path in content:
-        root = ET.fromstring(content[core_path])
-
-        # Map property keys to XML elements
-        field_mapping = {
-            "creator": (".//dc:creator", "dc"),
-            "last_modified_by": (".//cp:lastModifiedBy", "cp"),
-            "created": (".//dcterms:created", "dcterms"),
-            "modified": (".//dcterms:modified", "dcterms"),
-        }
-
-        for key, (xpath, ns_key) in field_mapping.items():
-            if key not in props:
-                continue
-            el = root.find(xpath, NS)
-            if el is None:
-                # Create element if it doesn't exist
-                tag = f"{{{NS[ns_key]}}}{xpath.split(':')[-1]}"
-                el = ET.SubElement(root, tag)
-            el.text = str(props[key])
-
-        content[core_path] = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
-
-    with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zf_out:
-        for name, data in content.items():
-            zf_out.writestr(name, data)
 
 
 def _modify_docx(filepath: str, output_path: str, props: dict) -> None:
