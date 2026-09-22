@@ -2,7 +2,7 @@
 
 ## 一、项目概述
 
-鹊随金印是一站式文档处理工具箱。Nuxt 3 + Nuxt UI v2 + Tailwind CSS v3 前端，Flask REST API 后端。绿鹃品牌色系（`#008A3D` + `#F9F7E8`），仪表盘 + 侧边导航 + 多页面路由。
+鹊随金印是一站式文档处理工具箱。Nuxt 3 + Nuxt UI v2 + Tailwind CSS v3 前端，Flask REST API 后端。SynTime Royal Blue 品牌色系（`#4C7DF0` + `#EEF0F4`），仪表盘 + 侧边导航 + 多页面路由。
 
 **定位**：单体工具，无用户系统，无认证，AI 功能可选（未配 Key 自动降级）——即开即用，随用随走。
 
@@ -10,73 +10,74 @@
 
 ---
 
-## 二、功能模块（16 个，归为 4 组）
+## 二、功能模块（14 个）
 
 **侧栏导航**：
 
 ```
 首页              → /
-MD 转公文        → /md-to-docx
-文档转 MD        → /doc-to-md
+MD 转公文          → /md-to-docx
+文档转 MD          → /doc-to-md
 格式规范          → /format-docx
-水印管理          → /watermark       (添加/去除)
 视频转换          → /video-convert   (MP4→WMV)
 RSS 探测          → /rss-detect      (Feed 发现)
-公司查询          → /company-lookup  (官网查询)
-Office 工具 ▸     → /properties  /excel-merge  /metadata-clean
-PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-to-text  /pdf-merge  /pdf-compress  /page-decorate  /image-process
+属性修改          → /properties      (元数据 + 清理)
+Excel 合并        → /excel-merge
+PDF 工具 ▸        → /file-assembly  /print-split  /pdf-editor  /pdf-tools  /pdf-merge
 使用统计          → /status
 ```
 
 | # | 模块 | 路由 | 说明 |
 |---|------|------|------|
-| 1 | 仪表盘 | `/` | 数字时钟 + 工具卡片网格（3 列） |
+| 1 | 仪表盘 | `/` | 工具卡片网格（3 列） |
 | 2 | MD 转公文 | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX + AI 纠错 |
 | 3 | 文档转 MD | `/doc-to-md` | PDF/Word/PPT/图片 → Markdown（MinerU API） |
-| 4 | 水印管理 | `/watermark` | 添加/去除文字和图片水印 |
-| 5 | 属性修改 | `/properties` | 元数据修改 + 元数据清理（双 Tab） |
-| 6 | Excel 合并 | `/excel-merge` | .xlsx/.csv 结构相同合并 |
-| 7 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
-| 8 | 视频转换 | `/video-convert` | MP4 → WMV（PPT 嵌入） |
-| 9 | RSS 探测 | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
-| 10 | 公司查询 | `/company-lookup` | 输入公司名查官网，本地库缓存 + AI 大模型查询 + 实时搜索 |
-| 11 | 文件组装 | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
-| 12 | 打印分组 | `/print-split` | 批次拆分、暂停/继续/终止 |
-| 13 | PDF 编辑 | `/pdf-editor` | 删除/插入/重排页面 |
-| 14 | 调整 PDF | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚（三 Tab） |
-| 15 | PDF 合并 | `/pdf-merge` | 多 PDF 合并，拖拽排序 |
-| 16 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
+| 4 | 属性修改 | `/properties` | 元数据修改 + 元数据清理（双 Tab） |
+| 5 | Excel 合并 | `/excel-merge` | .xlsx/.csv 结构相同合并 |
+| 6 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
+| 7 | 视频转换 | `/video-convert` | MP4 → WMV（PPT 嵌入） |
+| 8 | RSS 探测 | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
+| 9 | 文件组装 | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
+| 10 | 打印分组 | `/print-split` | 批次拆分、暂停/继续/终止 |
+| 11 | PDF 编辑 | `/pdf-editor` | 删除/插入/重排页面 |
+| 12 | 调整 PDF | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚（三 Tab） |
+| 13 | PDF 合并 | `/pdf-merge` | 多 PDF 合并，拖拽排序 |
+| 14 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
 
 ---
 
-## 三、设计系统
+## 三、设计系统 (SynTime Royal Blue)
 
 ### 配色 Token
 
 | Token | 值 | 用途 |
 |-------|-----|------|
-| `--color-brand-700` | `#008a3d` | 品牌主色 |
-| `--color-brand-800` | `#00662b` | 悬停加深 |
-| `--color-brand-soft` | `rgba(0,138,61,0.08)` | 柔和底色（导航激活态） |
-| `--color-page` | `#f9f7e8` | 米黄页面底 |
+| `--color-brand-500` | `#4C7DF0` | 品牌主色 |
+| `--color-brand-600` | `#3B63D8` | 悬停加深 |
+| `--color-brand-700` | `#2F4FB0` | 渐变终点/深色强调 |
+| `--color-brand-800` | `#27408D` | 最深色 |
+| `--color-brand-soft` | `rgba(76,125,240,0.10)` | 柔和底色（图标徽章等） |
+| `--color-page` | `#EEF0F4` | 页面底色（navy-gray） |
 | `--color-surface` | `#ffffff` | 卡片/面板白 |
-| `--color-muted` | `#f4f2e4` | 次级区域 |
-| `--color-text-primary` | `#1a1a1a` | 正文（~16.6:1 对比度） |
-| `--color-text-secondary` | `#5c5c5c` | 辅助文字（~6.3:1） |
-| `--color-text-tertiary` | `#706d60` | 提示/脚注（4.69:1 WCAG AA） |
-| `--color-border-default` | `#e8e6d8` | 默认边框 |
-| `--color-border-subtle` | `#f0efe5` | 细分隔线 |
+| `--color-muted` | `#F4F6FA` | 次级区域 |
+| `--color-text-primary` | `#1F2A44` | 正文（~12:1 对比度） |
+| `--color-text-secondary` | `#56627A` | 辅助文字（~5.5:1） |
+| `--color-text-tertiary` | `#6E7A93` | 提示/脚注（~4.5:1 WCAG AA） |
+| `--color-border-default` | `#E3E8F0` | 默认边框 |
+| `--color-border-subtle` | `#EEF0F4` | 细分隔线 |
+| `--color-seal-red` | `#C0392B` | 印章红（品牌点缀） |
 
 ### 阴影与圆角
 
 | Token | 值 | 用途 |
 |-------|-----|------|
 | `--radius-sm` | `6px` | 按钮/标签 |
-| `--radius-md` | `10px` | 面板/卡片 |
+| `--radius-md` | `8px` | 面板/卡片 |
 | `--radius-lg` | `12px` | 模态框/弹出层 |
-| `--shadow-card` | `none` | 卡片（Flat Design: 边框替代阴影） |
-| `--shadow-elevated` | `none` | 弹出菜单/下拉 |
-| `--shadow-sidebar` | `none` | 侧边栏右边缘 |
+| `--radius-xl` | `16px` | 侧边栏/大面板 |
+| `--shadow-card` | `0 2px 6px rgba(26,43,79,0.05)` | 卡片阴影 |
+| `--shadow-elevated` | `0 6px 14px -2px rgba(26,43,79,0.07)` | 弹出菜单/悬浮卡片 |
+| `--shadow-sidebar` | `0 12px 22px -4px rgba(26,43,79,0.08)` | 侧边栏阴影 |
 
 ### 字体
 
@@ -109,11 +110,11 @@ Nuxt UI v2（`UFormGroup`, `UButton`, `UInput`, `USelect`, `UTabs`, `UAlert`, `U
 
 ### 布局
 
-桌面端：侧边导航（240px，可折叠至 64px）+ 右侧内容区。移动端（<1024px）：侧栏悬浮叠加模式（汉堡按钮 `fixed top-3 left-3 z-50` + 半透明遮罩 `bg-black/30`），点击导航项或遮罩自动关闭。仪表盘为数字时钟 + 工具卡片网格（3 列）。侧栏状态通过 `localStorage("sidebar_collapsed")` 持久化。
+桌面端：深色极光渐变侧边导航（256px 展开 / 72px 收起）+ 右侧内容区。侧边栏背景 `linear-gradient(168deg, #2A2166, #23337A, #1E4E7E, #17646B, #4A3D20)`。移动端（<1024px）：侧栏悬浮叠加模式（汉堡按钮 `fixed top-4 left-4 z-50` + 半透明遮罩 `bg-black/30`），点击导航项或遮罩自动关闭。仪表盘为工具卡片网格（3 列）。侧栏状态通过 `localStorage("sidebar_collapsed")` 持久化。
 
-### 仪表盘数字时钟
+### 仪表盘
 
-7 段数码管 LED 时钟（`DigitalClock.vue`）。响应式尺寸：`clamp(2.25rem, 5vw, 3.375rem)`，`role="timer"` + `aria-label`，暖纸主题配色。每秒更新，卸载时清除定时器。
+工具卡片网格按功能分组展示（转换/PDF/Office/更多），每张卡片含图标徽章 + 标题 + 描述 + 悬停箭头指示。卡片使用 `.card.card-interactive` 全局样式，悬停时上浮 + 阴影加深 + 图标徽章反色。
 
 ---
 
@@ -141,7 +142,6 @@ backend/
 │   ├── img2pdf_bp.py       # /api/img2pdf
 │   ├── pdf2img_bp.py       # /api/pdf2img
 │   ├── print_split_bp.py   # /api/print-split/*
-│   ├── watermark_bp.py     # /api/watermark/*
 │   ├── pdf_editor_bp.py    # /api/pdf-editor/*
 │   ├── excel_merge_bp.py   # /api/excel-merge
 │   ├── pdf_to_text_bp.py   # /api/pdf-to-text
@@ -154,7 +154,6 @@ backend/
 ├── services/               # 业务逻辑层 (纯函数，零 Flask 依赖，全部返回 ServiceResult[T])
 │   ├── converter.py        # MD → DOCX (Pandoc)
 │   ├── formatter.py        # GB/T 9704-2012 格式化
-│   ├── watermark.py        # 水印添加/去除
 │   ├── pdf_editor.py       # PDF 删除/插入/重排
 │   ├── excel_merger.py     # Excel/CSV 合并
 │   ├── img2pdf_handler.py  # 图片 → PDF
@@ -223,8 +222,6 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 | `POST` | `/api/pdf2img` | PDF 拆解为图片 |
 | `POST` | `/api/print-split` | 打印分组 |
 | `GET` | `/api/print-split/<id>/batch/<n>` | 下载批次 |
-| `POST` | `/api/watermark` | 添加水印 |
-| `POST` | `/api/watermark/remove` | 去除水印 |
 | `POST` | `/api/pdf-editor/info` | PDF 页面信息 |
 | `GET` | `/api/pdf-editor/thumb/...` | 页面缩略图 |
 | `POST` | `/api/pdf-editor/delete` | 删除页面 |
@@ -321,8 +318,11 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 
 | 类名 | 说明 |
 |------|------|
-| `.card` | 卡片容器：`border + border-radius(var(--radius-md)) + padding: 1.5rem`（定义于 `@layer components`） |
-| `.brand-title` | 品牌标题：Plus Jakarta Sans 700 + 字距 0.08em + 品牌绿实色（Flat Design，无渐变） |
+| `.card` | 卡片容器：`border + border-radius(var(--radius-lg)) + padding: 1.25rem`（定义于 `@layer components`） |
+| `.card-interactive` | 可交互卡片：悬停上浮 + 阴影加深 + 图标徽章反色 |
+| `.brand-title` | 品牌标题：Plus Jakarta Sans 700 + 字距 0.06em + 品牌蓝渐变（`brand-600`→`brand-800`） |
+| `.icon-badge` | 图标徽章：圆形品牌色底色，悬停时反色（白底→蓝底白图标） |
+| `.gradient-text` | 渐变文本：品牌蓝渐变文字 |
 
 ### 关键架构决策
 
@@ -342,97 +342,61 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 
 ## 九、部署
 
-docStamp 提供两种部署模式，按服务器配置选择：
-
-| 模式 | 命令 | 容器/进程数 | 适用 |
-|------|------|:---:|------|
-| **Full** | `docker compose up -d` | 6 容器 | 4GB+ 服务器，生产高并发 |
-| **Lite** | `docker compose -f docker-compose.lite.yml up -d` | 3 容器 | 2C2G 低配服务器 |
-| **裸机 Full** | `sudo bash scripts/install.sh install` | 1 systemd 服务 | 已有 Redis/Celery 外部部署 |
-| **裸机 Lite** | `sudo bash scripts/install.sh install --lite` | 4 systemd 服务 | 2C2G ECS 单机全包 |
-
-快捷命令：
+docStamp 使用 Docker Compose 部署，3 容器适配 2C2G 服务器：
 
 ```bash
-./docker-deploy.sh up --lite   # Docker Lite 一键启动
-./docker-deploy.sh up          # Docker Full 一键启动
-./docker-deploy.sh ps --lite   # 查看状态
-./docker-deploy.sh logs api    # 跟踪 API 日志
-./manage.sh prod               # 裸机 Gunicorn 单端口
+# 1. 配置环境变量
+cp .env.example .env
+
+# 2. 构建并启动
+docker compose up -d --build
+
+# 3. 查看状态
+docker compose ps
 ```
 
-### Local 模式（本地构建，3 容器，无需 ACR）
+### 容器清单
 
-```bash
-docker compose -f docker-compose.local.yml up -d   # 3 容器: redis + api + celery(all)
-```
-
-适合自建服务器和无镜像仓库环境。`build: .` 直接从本地 Dockerfile 构建。
-
-### Full 模式（Docker Compose，6 容器）
-
-```bash
-docker compose up -d   # 6 容器: api + redis + 3×celery + beat
-```
-
-容器清单：
 | 容器 | 职责 | 端口 |
 |------|------|:---:|
 | `api` | Gunicorn gthread + 静态文件 | `127.0.0.1:5000` |
-| `redis` | Celery broker + 结果后端 + 缓存 | 内部 |
-| `celery-convert` | MD→DOCX, 格式化, 格式互转 | — |
-| `celery-pdf` | 水印, 打印拆分, PDF 编辑, 图片处理 | — |
-| `celery-office` | 属性修改, Excel 合并 | — |
-| `celery-beat` | 定时清理临时文件 | — |
+| `redis` | Celery broker + 结果后端 + 缓存（128MB） | 内部 |
+| `celery` | 3 队列合并 + Beat 内嵌（concurrency=2） | — |
 
-### Lite 模式（Docker Compose，3 容器）
+### 资源配置
 
-```bash
-docker compose -f docker-compose.lite.yml up -d   # 3 容器: api + redis + celery
-```
+| 组件 | 配置 |
+|------|------|
+| Redis | `maxmemory 128mb`, allkeys-lru |
+| API | gunicorn `--workers 2` |
+| Celery | 3 队列合并, `--concurrency=2`, Beat 内嵌 (`-B`) |
+| Celery 内存限制 | `mem_limit: 512M` |
+| 预估总内存 | ~800MB |
 
-| 与 Full 的差异 | Lite | Full |
-|---|---|---|
-| Celery 队列 | 1 Worker 合并处理 3 队列 | 3 Worker 各管一队列 |
-| Beat 调度 | 内嵌在 Worker 中（`-B`） | 独立容器 |
-| Worker 并发 | `--concurrency=2` | `--concurrency=4` |
-| API Workers | `--workers 2` | `workers=min(8, cpu*2+1)` |
-| Redis 内存 | `maxmemory 128mb` | `maxmemory 256mb` |
-| 预估内存 | ~800MB | ~2.5GB |
+### 健康检查
 
-所有容器均配置健康检查：Redis `redis-cli ping` → API `curl /api/health` → Celery `celery inspect ping` / Beat `pgrep`，通过 `condition: service_healthy` 确保依赖就绪后再启动。容器以非 root 用户 `docstamp` 运行，entrypoint 脚本处理 Docker volume 权限。
+所有容器均配置健康检查：Redis `redis-cli ping` → API `curl /api/health` → Celery `celery inspect ping`，通过 `condition: service_healthy` 确保依赖就绪后再启动。容器以非 root 用户 `docstamp` 运行，entrypoint 脚本处理 Docker volume 权限。
 
-### 裸机 Systemd 部署
+### 管理脚本
 
 ```bash
-# Lite 模式（2C2G 推荐）— Redis + API + Celery + Beat
-sudo bash scripts/install.sh install --lite
-
-# Full 模式 — 仅 API，Celery 需额外部署
-sudo bash scripts/install.sh install
+./manage.sh docker-up     # 构建并启动
+./manage.sh docker-down   # 停止
+./manage.sh start         # 本地开发模式（Flask + Nuxt）
+./manage.sh stop          # 停止开发服务
 ```
-
-Lite 模式 systemd 服务清单：
-| 服务 | 内存限制 | 职责 |
-|------|:---:|------|
-| `redis` | — | 消息代理（`maxmemory 128mb`） |
-| `docstamp.service` | 512M | Gunicorn API + 静态文件 |
-| `docstamp-celery.service` | 512M | Celery Worker（3 队列合并, concurrency=2） |
-| `docstamp-beat.service` | 128M | 定时清理调度 |
-
-环境变量通过 `/etc/docstamp/env.conf` 注入（模板见 `deploy/env.conf`）。
 
 ### Gunicorn 配置
 
-`gunicorn.conf.py`: `bind 127.0.0.1:5000`, `worker_class=gthread`, `threads=4`, `workers=min(8, cpu*2+1)`, `timeout=120`, `max_requests=1000`（防内存泄漏）。日志输出到 `/var/log/docstamp/`。
+`gunicorn.conf.py`: `bind 0.0.0.0:5000`, `worker_class=gthread`, `threads=4`, `workers=2`, `timeout=120`, `max_requests=1000`（防内存泄漏）。日志输出到 `/var/log/docstamp/`。
+
+### Nginx 反向代理
+
+配置 nginx 将请求转发到 `127.0.0.1:5000`。注意 `/_nuxt/` 静态资源 location 需保留 `proxy_pass http://127.0.0.1:5000`（前端静态文件由 gunicorn 提供），同时设置 `expires 1y` + `Cache-Control: public, immutable`。
 
 ### 速率限制
 
 双层防御：nginx 层粗粒度限流 + 应用层 `@rate_limit` 装饰器（IP 级别，基于 Flask-Caching）。上传接口按负载分级：轻量 20/min、标准 10/min、重量 5/min。超限返回 429。
-
-### Systemd 安全加固 (`deploy/docstamp.service`)
-
-`NoNewPrivileges=yes`, `ProtectSystem=strict`, `PrivateTmp=yes`, `PrivateDevices=yes`, `CapabilityBoundingSet=`, `SystemCallFilter`, `MemoryMax=2G`。
 
 ---
 
@@ -471,6 +435,12 @@ Lite 模式 systemd 服务清单：
 ---
 
 ## 十一、版本历史
+
+### v3.7 (2026-09)
+
+- **SynTime Royal Blue 品牌重塑**：全站配色从绿鹃品牌绿（`#008A3D`）迁移至 SynTime Royal Blue（`#4C7DF0`）。深色极光渐变侧边导航（`#2A2166`→`#4A3D20`），navy-gray 页面底色（`#EEF0F4`），印章红点缀（`#C0392B`）。侧栏尺寸调整为 256px 展开 / 72px 收起。完整设计 Token 体系见第三节
+- **功能入口精简**：水印与公司官网查询两个工具从 16 个入口精简至 14 个——移除 `tools.config.ts` 注册、仪表盘卡片与侧栏入口。**未删除**的部分：后端蓝图/服务（`watermark_bp.py` / `watermark.py` / `company_lookup_bp.py` / `company_lookup.py`）仍在 `app.py` 注册并可调用，前端页面 `/watermark`、`/company-lookup` 仍会被 SSG 预渲染并可直链访问，i18n 键与 `test_company_lookup.py` 也保留。彻底清理见后续版本
+- **文档标准化**：`CLAUDE.md` 迁移至 Qoder 标准的 `AGENTS.md`，冗余文档（`CODE_STANDARDS_ANALYSIS.md` / `IMPLEMENTATION_GUIDE.md`）归档，`SPEC.md` 全面更新为当前设计系统
 
 ### v3.6 (2026-06)
 
@@ -517,7 +487,7 @@ Lite 模式 systemd 服务清单：
 - **AI 功能（DeepSeek v4 Flash）**：文本纠错（MD 转公文前自动纠正错别字和标点）、格式意图识别（自动检测正式公文并建议 GB/T 格式）、智能文件名生成、PDF 文本去噪（自动去除页眉页脚/水印残留）。Prompt 级缓存（SHA256, 1h TTL），未配 Key 时静默降级返回原文。
 - **文档转 MD（MinerU API）**：新增「文档转MD」功能，支持 PDF/DOC/DOCX/PPT/PPTX/PNG/JPG → Markdown（vlm 模型 + OCR + 公式/表格识别），200MB/200 页限制。异步轮询 + ZIP 提取 + 24h 缓存。`DOCSTAMP_PUBLIC_URL` 配置公网文件访问地址。
 - **功能重组**：元数据清理合并到属性修改（Tab 切换），PDF 转文本/压缩/页码合并为「调整PDF」三合一页面，图片处理功能删除，Office 工具组展开到侧栏顶层。
-- **品牌定名**：鹊随金印，金绿渐变标题（`#c9a84c`→`#008a3d`）印章浮雕质感。
+- **品牌定名**：鹊随金印，品牌蓝渐变标题（`#4C7DF0`→`#2F4FB0`）印章浮雕质感。
 - **多厂商 AI 支持**：`AI_API_URL` + `AI_MODEL` 环境变量配置，支持 OpenAI / DeepSeek / Ollama 等任意兼容厂商。
 - **Full/Lite 双模式**：Lite（3 容器/4 systemd 服务，~800MB）适配 2C2G ECS；Full（6 容器）高并发。统一部署脚本 `docker-deploy.sh`。
 - **Valkey 支持**：RHEL 10 / RockyLinux 10 已用 Valkey 替代 Redis。`install.sh` 自动检测发行版选择对应包名（apt→redis，dnf→valkey），systemd 单元同时兼容两种服务名。
@@ -532,7 +502,7 @@ Lite 模式 systemd 服务清单：
 - **关键修复**：Celery worker 任务注册缺失（`include` 配置 → 14 个任务正确注册），`PYTHONPATH` 导入解析（`from config import Config` 在 Gunicorn `backend.app:app` 模式下失效）
 - **构建优化**：pip `--root-user-action=ignore` 消除警告，`procps` 支持健康检查，`.dockerignore` 递归排除 `backend/output`
 - **Full/Lite 双模式部署**：Lite 模式（3 容器/4 systemd 服务）适配 2C2G 低配 ECS，Celery 3 队列合并 + concurrency=2 + Beat 内嵌，预估内存 ~800MB；Full 模式（6 容器）保持独立队列隔离，适用于 4GB+ 生产环境。统一部署脚本 `docker-deploy.sh`（build/up/down/ps/logs/clean）
-- **品牌定名**：产品名定为「鹊随金印」，全站标题/侧栏/页头/页脚统一应用，`.brand-title` CSS 金绿渐变（`#c9a84c`→`#008a3d`）印章浮雕质感
+- **品牌定名**：产品名定为「鹊随金印」，全站标题/侧栏/页头/页脚统一应用，`.brand-title` CSS 品牌蓝渐变（`#4C7DF0`→`#2F4FB0`）印章浮雕质感
 - **UI/UX 审查 (UI/UX Pro Max)**：侧栏子菜单增加点击切换（修复触摸设备不可达），ToolCard `transition: all`→`transition-[box-shadow,transform]`，`--color-text-tertiary` #757265→#706d60（对比度 3.9:1→4.69:1 WCAG AA）
 - **移动端适配**：侧栏 <1024px 悬浮叠加模式（汉堡按钮 + 遮罩 + 点击关闭），导航项 h-10→min-h-[44px] 触摸目标
 - **无障碍增强**：skip-to-content 键盘跳转链接，`prefers-reduced-motion: reduce` 全局禁用动画，所有交互元素 `cursor-pointer`
