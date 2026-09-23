@@ -4,7 +4,7 @@
 
 鹊随金印是一站式文档处理工具箱。Nuxt 3 + Nuxt UI v2 + Tailwind CSS v3 前端，Flask REST API 后端。SynTime Royal Blue 品牌色系（`#4C7DF0` + `#EEF0F4`），仪表盘 + 侧边导航 + 多页面路由。
 
-**定位**：单体工具，无用户系统，无认证，AI 功能可选（未配 Key 自动降级）——即开即用，随用随走。
+**定位**：单体工具，无用户系统，无认证——即开即用，随用随走。
 
 **i18n**：中英文双语，`i18n/locales/zh-CN.json` + `i18n/locales/en.json`，默认 `zh-CN`。
 
@@ -34,7 +34,7 @@ PDF 合并          → /pdf-merge
 | # | 模块 | 路由 | 说明 |
 |---|------|------|------|
 | 1 | 仪表盘 | `/` | 工具卡片网格（3 列） |
-| 2 | MD 转公文 | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX + AI 纠错 |
+| 2 | MD 转公文 | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX |
 | 3 | 属性修改 | `/properties` | 元数据修改 + 元数据清理（双 Tab） |
 | 4 | Excel 合并 | `/excel-merge` | .xlsx/.csv 结构相同合并 |
 | 5 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
@@ -134,7 +134,6 @@ backend/
 ├── models.py               # OperationLog + BaseCRUD (原始 SQL)
 ├── cache.py                # Flask-Caching SimpleCache
 ├── gunicorn.conf.py        # 生产配置（on_starting 启动每日清理守护线程）
-├── ai.py                   # AI 代理蓝图（纠错/识别/文件名/去噪）
 ├── blueprints/             # HTTP 路由层（每功能一个文件，共 15 个；实际路径均带 /api/v1 前缀）
 │   ├── convert.py          # /api/convert, /api/preview, /api/stats (计数)
 │   ├── download.py         # /api/download, /api/health
@@ -228,7 +227,6 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 | `POST` | `/api/page-decorate` | 添加页码/页眉/页脚 |
 | `POST` | `/api/image-process` | 图片处理 (缩放/裁剪/转换/压缩) |
 | `POST` | `/api/rss-detect` | RSS/Atom 订阅探测 |
-| `POST` | `/api/ai/*` | AI 代理（纠错/格式识别/文件名/去噪） |
 
 ---
 
@@ -284,7 +282,6 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 | `useApi` | 通用 API 封装：`{ data, loading, pagination, fetchList }` + `useCache` |
 | `useDownload` | Blob 下载封装（`downloadBlob`）：挂 `<a>` → click → 延迟 100ms 摘除并 revoke；`successMsg` 可选，不传则不弹 toast |
 | `useApiError` | API 错误统一处理：`showError(e)` 弹 toast、`extractError(e)` 取消息（兼容 JSON 与 Blob 错误体）。命名避开 Nuxt 内置 `useError` |
-| `useAi` | AI 功能封装（纠错/分类/去噪/文件名生成） |
 
 ### 原子组件 (`components/ui/`)
 
@@ -412,6 +409,14 @@ API 容器健康检查 `curl /api/v1/health`。容器以非 root 用户 `docstam
 ---
 
 ## 十一、版本历史
+
+### v3.7.6 (2026-09)
+
+- **移除 AI 功能**：删除文本纠错、格式意图识别、智能文件名生成、PDF 文本去噪四项 AI 能力及其全部设施，全站不再有对外部大模型的调用
+- **后端**：删除 `ai.py`（4 个 `POST /api/ai/*` 端点 + DeepSeek 客户端 + SHA256 prompt 缓存）；`app.py` 去掉 `ai_bp` 注册；`schemas.py` 删 `AiTextSchema` / `AiDenoiseSchema`；`config.py` 删 `AI_API_KEY` / `AI_API_URL` / `AI_MODEL`。`requests` 依赖保留（`services/rss_detector.py` 仍在用）
+- **前端**：删除 `composables/useAi.ts`；`MdToDocxTab.vue` 去掉「AI 纠错」工具按钮、AI 格式提示徽章、`aiCorrect()` 与 2s 防抖分类 `watch`；`PdfToTextPanel.vue` 去掉「AI 去噪」按钮与 `aiDenoise()`；两个 locale 删 `ai` 命名空间（各 8 键）
+- **部署**：compose 去掉 `AI_API_URL` / `AI_MODEL` / `DOCSTAMP_DEEPSEEK_API_KEY` 三行注入；`.env.example` 删去 AI 配置块
+- **验证**：pytest 79 passed；vitest 36 passed；`npm run build` 通过
 
 ### v3.7.5 (2026-09)
 

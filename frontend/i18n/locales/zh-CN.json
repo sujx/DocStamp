@@ -245,16 +245,6 @@
     "expandSidebar": "展开侧边栏",
     "collapseSidebar": "折叠侧边栏"
   },
-  "ai": {
-    "correct": "AI 纠错",
-    "correcting": "纠错中...",
-    "corrected": "已纠正 {n} 处",
-    "denoise": "AI 去噪",
-    "denoising": "去噪中...",
-    "denoised": "去噪完成",
-    "unofficial": "非正式公文",
-    "officialSuggestion": "AI 建议：使用正式公文格式"
-  },
   "pdf-tools": {
     "title": "调整PDF",
     "description": "PDF 转文本、压缩、添加页码页眉页脚"

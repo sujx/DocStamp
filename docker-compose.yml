@@ -27,9 +27,6 @@ services:
       - TZ=Asia/Shanghai
       - DOCSTAMP_STATIC=/opt/docstamp/frontend/.output/public
       - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
-      - AI_API_URL=${AI_API_URL:-https://api.deepseek.com/chat/completions}
-      - AI_MODEL=${AI_MODEL:-deepseek-v4-flash}
-      - DOCSTAMP_DEEPSEEK_API_KEY=${DOCSTAMP_DEEPSEEK_API_KEY:-}
       - DOCSTAMP_CORS_ORIGINS=${DOCSTAMP_CORS_ORIGINS:-http://localhost:8080,https://doc.sujx.net}
       - DOCSTAMP_TASK_DB=/opt/docstamp/backend/data/tasks.db
       - PYTHONPATH=/opt/docstamp/backend

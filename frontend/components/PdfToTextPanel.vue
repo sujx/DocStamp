@@ -15,10 +15,6 @@
       <UButton v-if="result" variant="ghost" color="neutral" @click="copyText">
         <UIcon name="i-heroicons-clipboard" class="w-4 h-4 mr-1.5" /> {{ $t("pdfToText.copy") }}
       </UButton>
-      <UButton v-if="result" color="primary" variant="outline" :loading="aiDenoising" @click="aiDenoise">
-        <UIcon name="i-heroicons-sparkles" class="w-4 h-4 mr-1.5" />
-        {{ aiDenoising ? $t("ai.denoising") : $t("ai.denoise") }}
-      </UButton>
     </div>
     <div v-if="result" class="mt-6">
       <div class="text-xs mb-2 text-secondary">{{ $t("pdfToText.pageInfo", { total: result.total_pages, extracted: result.extracted_pages }) }}</div>
@@ -32,7 +28,6 @@ import axios from "axios";
 const { t } = useI18n(); const toast = useToast();
 const { showError } = useApiError();
 const { downloadBlob } = useDownload();
-const { denoise: aiDenoiseText, loading: aiDenoising } = useAi();
 const file = ref<File | null>(null); const pagesInput = ref(""); const extracting = ref(false);
 const result = ref<{ text: string; total_pages: number; extracted_pages: number } | null>(null);
 function onFileSelected(f: File) { file.value = f; result.value = null; }
@@ -53,10 +48,6 @@ function downloadText() {
   downloadBlob(blob, name);
 }
 async function copyText() { if (!result.value) return; await navigator.clipboard.writeText(result.value.text); toast.add({ title: t("pdfToText.copied"), color: "success" }); }
-async function aiDenoise() {
-  if (!result.value) return;
-  try { const r = await aiDenoiseText(result.value.text); if (r.text !== result.value.text) { result.value.text = r.text; toast.add({ title: t("ai.denoised"), color: "success" }); } } catch { /* silent */ }
-}
 </script>
 
 <style scoped>

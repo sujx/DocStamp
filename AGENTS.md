@@ -4,7 +4,7 @@
 
 鹊随金印是一站式文档处理工具箱。Nuxt 3 + Nuxt UI v2 + Tailwind CSS v3 前端，Flask REST API 后端。SynTime Royal Blue 品牌色系，仪表盘 + 侧边导航 + 多页面路由，中英文双语。
 
-**定位**：单体工具，无用户系统，无认证，AI 可选（未配 Key 自动降级）——即开即用，随用随走。
+**定位**：单体工具，无用户系统，无认证——即开即用，随用随走。
 
 ## 技术栈
 
@@ -41,7 +41,7 @@ docStamp/
 │   ├── nuxt.config.ts          # SSG + i18n + Nuxt UI v2
 │   ├── tailwind.config.ts      # Tailwind v3 品牌色阶
 │   ├── assets/css/main.css     # CSS 变量 (SynTime Royal Blue token)
-│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError / useAi / useSidebar / usePageView
+│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError / useSidebar / usePageView
 │   ├── components/             # 业务组件 + ui/ 原子组件
 │   ├── layouts/default.vue     # 侧边导航壳
 │   ├── pages/                  # 路由页面
@@ -61,7 +61,7 @@ docStamp/
 | # | 模块 | 路由 | 说明 |
 |---|------|------|------|
 | 1 | 仪表盘 | `/` | 工具卡片网格 |
-| 2 | MD 转公文 | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX + AI 纠错 |
+| 2 | MD 转公文 | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX |
 | 3 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
 | 4 | RSS 探测 | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅 |
 | 5 | 属性修改 | `/properties` | 元数据修改 + 清理 (双 Tab) |

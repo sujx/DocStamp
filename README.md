@@ -8,7 +8,7 @@
 
 | # | 功能 | 路由 | 说明 |
 |---|------|------|------|
-| 1 | **MD 转公文** | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX + AI 纠错 |
+| 1 | **MD 转公文** | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX |
 | 2 | **格式规范** | `/format-docx` | DOCX 按 GB/T 9704-2012 格式化 |
 | 3 | **RSS 探测** | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
 | 4 | **属性修改** | `/properties` | 元数据修改 + 清理（双 Tab） |
@@ -22,20 +22,6 @@
 
 另有 4 个面板子页（page-decorate / pdf-compress / pdf-to-text / metadata-clean）被对应工具页内嵌引用。
 
-### AI 功能（可选）
-
-AI 请求全部由后端代理（`backend/ai.py`），API Key 只落在服务端 `.env`，前端不经手。未配置 Key 时对应 AI 功能不可用，其余工具不受影响。
-
-| 功能 | 说明 | 接入方式 |
-|------|------|------|
-| 文本纠错 | MD 转公文前自动纠正错别字和标点 | DeepSeek v4 Flash |
-| 格式识别 | 自动检测正式公文，建议 GB/T 格式 | DeepSeek v4 Flash |
-| 智能文件名 | 根据文档内容生成中文文件名 | DeepSeek v4 Flash |
-| PDF 去噪 | 自动去除页眉页脚、水印残留 | DeepSeek v4 Flash |
-
-配置 `DOCSTAMP_DEEPSEEK_API_KEY` 即可启用。
-DeepSeek 可替换为任何 OpenAI 兼容 API（`AI_API_URL` + `AI_MODEL`）。
-
 ## 技术栈
 
 | 层 | 技术 |
@@ -43,7 +29,6 @@ DeepSeek 可替换为任何 OpenAI 兼容 API（`AI_API_URL` + `AI_MODEL`）。
 | **后端框架** | Python 3.12 + Flask 3 + Pydantic v2 |
 | **后端依赖** | Flask-CORS / Flask-Babel / Flask-Caching / python-docx / openpyxl / python-pptx / img2pdf / pypdf / Pillow / reportlab / WeasyPrint / markdown / bleach / pdfminer.six / requests / python-dotenv / cryptography |
 | **文档工具链** | pandoc / poppler-utils（容器内已安装） |
-| **AI** | DeepSeek v4 Flash（可选，OpenAI 兼容） |
 | **前端框架** | Nuxt 3.15.4 (SPA) + Nuxt UI v2 + Tailwind CSS v3 |
 | **国际化** | @nuxtjs/i18n v9（zh-CN / en） |
 | **部署** | Docker Compose（单容器）+ Gunicorn gthread + Nginx 反代 |
@@ -109,7 +94,6 @@ docStamp/
 │   ├── models.py               # OperationLog 审计/统计（原始 SQL）
 │   ├── cache.py                # Flask-Caching（限流 + 统计缓存）
 │   ├── gunicorn.conf.py        # Gunicorn gthread 生产配置（含每日清理 on_starting）
-│   ├── ai.py                   # AI 代理蓝图（纠错/识别/文件名/去噪）
 │   ├── blueprints/             # HTTP 路由层（16 个，每个功能 1 文件）
 │   ├── services/               # 业务逻辑层（纯函数，全返回 ServiceResult[T]）
 │   └── utils/
@@ -120,7 +104,7 @@ docStamp/
 │       ├── retry.py            # @retry_on_failure 重试装饰器
 │       └── crypto.py           # AES-256 Fernet 字段加密
 ├── frontend/                   # Nuxt 3 SPA
-│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError / useAi
+│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError
 │   ├── components/             # 业务组件 + ui/ 原子组件
 │   ├── pages/                  # 16 个路由页面
 │   └── i18n/locales/           # zh-CN / en

@@ -16,15 +16,3 @@ from pydantic import BaseModel, Field
 class MdPreviewSchema(BaseModel):
     """Markdown → HTML preview request."""
     content: str = Field(..., min_length=1, description="Markdown content to preview")
-
-
-# ── AI endpoints ─────────────────────────────────────────────────────────
-
-class AiTextSchema(BaseModel):
-    """Text payload for AI correction / classify / filename endpoints."""
-    text: str = Field(..., min_length=1, max_length=8000, description="Input text")
-
-
-class AiDenoiseSchema(BaseModel):
-    """Text payload for AI denoise endpoint (larger limit)."""
-    text: str = Field(..., min_length=1, max_length=8000, description="PDF-extracted text to clean")

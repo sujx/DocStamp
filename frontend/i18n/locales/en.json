@@ -245,16 +245,6 @@
     "expandSidebar": "Expand sidebar",
     "collapseSidebar": "Collapse sidebar"
   },
-  "ai": {
-    "correct": "AI Correct",
-    "correcting": "Correcting...",
-    "corrected": "Corrected {n}",
-    "denoise": "AI Denoise",
-    "denoising": "Denoising...",
-    "denoised": "Denoised",
-    "unofficial": "Unofficial",
-    "officialSuggestion": "AI suggests: Official document format"
-  },
   "pdf-tools": {
     "title": "Adjust PDF",
     "description": "PDF to text, compress, add page numbers headers footers"
