@@ -222,8 +222,49 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 
 统计数据存储在 `backend/tasks.db` (SQLite)，独立于代码文件。`init_db()` 使用 `CREATE TABLE IF NOT EXISTS`（幂等），无重置逻辑。`.gitignore` 已排除 `backend/tasks.db*`。代码更新不影响历史数据。
 
+## 待办与已知遗留项
+
+只收录**已知但刻意未做**的事项，每条注明「为什么没做」——避免下一轮把同一件事重新调研一遍。已完成的变更不在这里，见 `SPEC.md` 版本历史。条目勾掉时，把它的背景一并删掉。
+
+### Docker / 部署
+
+| 事项 | 为何未做 |
+|------|----------|
+| 服务器切到单容器新镜像 | 已定「服务器上先不动，后期更新 docker 镜像来解决」。本机镜像已验收（健康检查 200、SPA 217KB、`X-API-Version: 3.7`、pandoc 2.17.1.1 / pdftoppm 22.12.0、`.cleanup-stamp` 与 tasks.db(WAL) 正常落盘），但生产切换未经实证 |
+| 服务器运维 `.env` 删掉 AI / DeepSeek 残留行 | 仓库与开发机均无 `.env`（gitignored）；compose 已不再注入该变量，这行现在是惰性的，但 key 已吊销 |
+| `Dockerfile` 的 `CMD` 补 `--workers` | compose 传了 `--workers 2`，裸 `docker run` 会落到 `gunicorn.conf.py` 的 `min(8, cpu*2+1)`（2 核 = 5 个 worker）。生产走 compose 故被兜住 |
+| 删掉 `backend/gunicorn.conf.py` 的 `pidfile` | `"/var/run/docstamp.pid"` 恒被 `Dockerfile` 与 compose 的 `--pid /tmp/gunicorn.pid` 覆盖，且 `docstamp` 用户对 `/var/run` 无写权，属死配置 |
+| `.dockerignore` / `.gitattributes` 钉 `eol=lf` | 现状只让 `git add` 警告「下次 touch 转 CRLF」；实测无碍（Go 行扫描剥 `\r`，git 属性解析也容忍 `\r`），故按「先证明再修」留着 |
+
+### 整站级
+
+| 事项 | 为何未做 |
+|------|----------|
+| 上传路径校验错误文案仍是英文 | `save_upload` / `file_security` 抛的 `ValueError` 被全站工具共享，一条文案影响所有上传入口，属整站后端 i18n 决策，不做单点修补 |
+| `manage.sh` 调 `python3` | 本机是 Windows Store 残桩，起不来后端（只能直接调 `/c/Program Files/Python312/python`）。涉及 `start` / `test` / `test-cov` |
+| 开发模式没有清理线程 | 每日清理只挂在 gunicorn `on_starting`，`python app.py` 不起它，dev 机器只能 `./manage.sh clean-output` 手动清 |
+
+### 测试与数据
+
+- **测试会往真实 `backend/tasks.db` 写流水** —— `backend/tests/conftest.py` 的 `app` fixture 只覆盖 `UPLOAD_FOLDER`、**不覆盖 `TASK_DB_PATH`**，而 `create_app()` 会 `init_db()` 打开真实库；早年隔离 DB 的 fixture 已随异步链路拆除，现在没有任何用例隔离它。证据：2026-09-23 当天 522 行 `operation_logs` 的 `ip_address` 全部是 `127.0.0.1`，即本机 pytest / dev 产生。修法：`app` fixture 把 `TASK_DB_PATH` 指向 `tmp_path`。
+  **⚠ 不要去删那些已写入的测试行**：上次 `tasks.db` 索引损坏（幽灵索引条目、`count(*)` 多报 12 行）正是历史删行造成的，删行会重演。
+- **`backend/tasks.db.bak-20260923`（含 `-shm` / `-wal`）留在磁盘** —— 索引修复前的安全网，已确认 `integrity_check` ok，可择日删除。
+- **`backend/tests/__pycache__/` 残留 5 个已删模块的 `.pyc`**（`company_lookup` / `task_tracking` / `video_converter` / `watermark` / `worker`）—— 纯本机杂物，`.dockerignore` 已挡住不进镜像，可直接删该目录。
+
+### 其他
+
+| 事项 | 为何未做 |
+|------|----------|
+| Gitee 上的旧仓库未删除 | 已弃用 Gitee，GitHub（public）为唯一远端；要清理需自行去 Gitee 删 |
+| `edffc8c` 的 commit message 含已吊销的 DeepSeek key | 无可达 blob（不在任何文件内容里），已披露，**刻意不改写历史** |
+| `docs/` 被整目录 gitignore，但 `docs/vibecoding-blog.md` 已跟踪 | 新加到 `docs/` 的文件不会进仓库（`docs/plans/` 即未跟踪）。有意为之可忽略，否则需调 `.gitignore` 或用 `git add -f` |
+
+### 刻意不动的历史产物（别再当「过期」去改）
+
+- `docs/vibecoding-blog.md` —— 2026-06-19 已发布文章原文，模块数 / 页面数等计数已过期，但改它就是错的。
+- `SPEC.md` 版本历史 —— `v3.7.6` 记删 AI、`v3.6` 起提到 Celery / SSE / worker / `useError.ts` 的条目是当时的发布记录，不随现状删改。
+
 ## 详细文档
 
 - `SPEC.md` — 完整设计规范、API 端点全集、版本历史
-- `TODO.md` — 已知遗留项与运维待办（刻意未做项都记在这里，别再重新调研）
 - `docs/vibecoding-blog.md` — 开发经验分享博客
