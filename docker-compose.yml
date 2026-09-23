@@ -1,14 +1,15 @@
 # ───────────────────────────────────────────────────────────────────
-# docStamp — Docker 部署（2 容器，适配 2C2G 服务器）
+# docStamp — Docker 部署（单容器，适配 2C2G 服务器）
 #
-# 容器：Flask API (gunicorn) + Worker (SQLite 队列 + 每日清理)
+# 容器：Flask API (gunicorn)，每日临时文件清理由 gunicorn on_starting
+# 启动的守护线程负责（见 backend/gunicorn.conf.py）
 #
 # 使用：
 #   1. 复制 .env.example → .env 并填写配置
 #   2. docker compose up -d --build
 #   3. 配置 nginx 反向代理到 127.0.0.1:5000
 #
-# 资源：API 2 workers + Worker（ffmpeg 转换，mem_limit 512M）→ ~670MB
+# 资源：API 2 workers → ~200MB
 # ───────────────────────────────────────────────────────────────────
 
 services:
@@ -29,14 +30,12 @@ services:
       - AI_API_URL=${AI_API_URL:-https://api.deepseek.com/chat/completions}
       - AI_MODEL=${AI_MODEL:-deepseek-v4-flash}
       - DOCSTAMP_DEEPSEEK_API_KEY=${DOCSTAMP_DEEPSEEK_API_KEY:-}
-      - DOCSTAMP_MINERU_API_KEY=${DOCSTAMP_MINERU_API_KEY:-}
-      - DOCSTAMP_PUBLIC_URL=${DOCSTAMP_PUBLIC_URL:-}
       - DOCSTAMP_CORS_ORIGINS=${DOCSTAMP_CORS_ORIGINS:-http://localhost:8080,https://doc.sujx.net}
       - DOCSTAMP_TASK_DB=/opt/docstamp/backend/data/tasks.db
       - PYTHONPATH=/opt/docstamp/backend
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:5000/api/health"]
+      test: ["CMD", "curl", "-sf", "http://localhost:5000/api/v1/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -46,30 +45,6 @@ services:
       -b 0.0.0.0:5000 --workers 2
       --pid /tmp/gunicorn.pid
       backend.wsgi:app
-
-  # ── Worker：轮询 SQLite 队列跑视频转换 + 每日清理临时文件 ─────────
-  worker:
-    build: .
-    container_name: docstamp-worker
-    # 括号写法避免 pgrep 匹配到 healthcheck 自己的 sh -c 命令行
-    command: python -m backend.worker
-    volumes:
-      - output_data:/opt/docstamp/backend/output
-      - log_data:/var/log/docstamp
-      - db_data:/opt/docstamp/backend/data
-    environment:
-      - TZ=Asia/Shanghai
-      - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
-      - DOCSTAMP_TASK_DB=/opt/docstamp/backend/data/tasks.db
-      - PYTHONPATH=/opt/docstamp/backend
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'backend[.]worker' || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-    mem_limit: 512M
 
 volumes:
   output_data:

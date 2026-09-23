@@ -3,16 +3,15 @@
 # docStamp 项目管理脚本
 #
 # Usage:
-#   ./manage.sh start       启动后端 + worker + 前端（开发模式）
+#   ./manage.sh start       启动后端 + 前端（开发模式）
 #   ./manage.sh stop        停止所有服务
 #   ./manage.sh restart     重启所有服务
 #   ./manage.sh status      查看运行状态
 #   ./manage.sh backend     仅启动后端
-#   ./manage.sh worker      仅启动任务 worker（视频转换 + 每日清理）
 #   ./manage.sh frontend    仅启动前端
 #   ./manage.sh test        运行后端测试
 #   ./manage.sh test-cov    运行测试 + 覆盖率
-#   ./manage.sh docker-up   启动 Docker 部署（2 容器）
+#   ./manage.sh docker-up   启动 Docker 部署（单容器）
 #   ./manage.sh docker-down 停止 Docker 部署
 #   ./manage.sh clean-output 清理 output 目录
 # ───────────────────────────────────────────────────────────────────
@@ -24,7 +23,6 @@ BACKEND_DIR="$PROJECT_DIR/backend"
 FRONTEND_DIR="$PROJECT_DIR/frontend"
 PID_DIR="$PROJECT_DIR/.pids"
 BACKEND_PID="$PID_DIR/backend.pid"
-WORKER_PID="$PID_DIR/worker.pid"
 FRONTEND_PID="$PID_DIR/frontend.pid"
 
 BACKEND_PORT=5000
@@ -112,7 +110,7 @@ _start_backend() {
 
     local waited=0
     while [[ $waited -lt 15 ]]; do
-        if curl -s -o /dev/null "http://localhost:$BACKEND_PORT/api/health" 2>/dev/null; then
+        if curl -s -o /dev/null "http://localhost:$BACKEND_PORT/api/v1/health" 2>/dev/null; then
             log_info "后端就绪 → http://localhost:$BACKEND_PORT"
             return 0
         fi
@@ -120,34 +118,6 @@ _start_backend() {
         waited=$((waited + 1))
     done
     log_warn "后端启动超时，请查看日志: $PID_DIR/backend.log"
-}
-
-_start_worker() {
-    if [[ -f "$WORKER_PID" ]]; then
-        local old_pid
-        old_pid=$(cat "$WORKER_PID" 2>/dev/null || true)
-        if [[ -n "$old_pid" ]] && ! kill -0 "$old_pid" 2>/dev/null; then
-            rm -f "$WORKER_PID"
-        fi
-    fi
-    if _is_running "$WORKER_PID"; then
-        log_warn "worker 已在运行 (PID: $(cat "$WORKER_PID"))"
-        return 0
-    fi
-    log_info "启动任务 worker (SQLite 队列)..."
-    cd "$PROJECT_DIR"
-    python3 -m backend.worker > "$PID_DIR/worker.log" 2>&1 &
-    local pid=$!
-    echo "$pid" > "$WORKER_PID"
-
-    # No port to probe — just confirm it survived its own imports.
-    sleep 1
-    if ! kill -0 "$pid" 2>/dev/null; then
-        rm -f "$WORKER_PID"
-        log_warn "worker 启动失败，请查看日志: $PID_DIR/worker.log"
-        return 0
-    fi
-    log_info "worker 就绪 (PID: $pid)"
 }
 
 _start_frontend() {
@@ -183,7 +153,6 @@ _start_frontend() {
 
 _stop_all() {
     _stop_by_pid "$FRONTEND_PID" "前端"
-    _stop_by_pid "$WORKER_PID" "worker"
     _stop_by_pid "$BACKEND_PID" "后端"
     _force_stop_port "$BACKEND_PORT"
 }
@@ -196,11 +165,6 @@ _show_status() {
         echo -e "  后端  (Flask)      ${GREEN}● 运行中${NC}  PID: $(cat "$BACKEND_PID")  :$BACKEND_PORT"
     else
         echo -e "  后端  (Flask)      ○ 已停止"
-    fi
-    if _is_running "$WORKER_PID"; then
-        echo -e "  worker (队列)      ${GREEN}● 运行中${NC}  PID: $(cat "$WORKER_PID")"
-    else
-        echo -e "  worker (队列)      ○ 已停止"
     fi
     if _is_running "$FRONTEND_PID"; then
         echo -e "  前端  (Nuxt)     ${GREEN}● 运行中${NC}  PID: $(cat "$FRONTEND_PID")  :$FRONTEND_PORT"
@@ -216,7 +180,6 @@ case "${1:-}" in
     start)
         log_info "══════ 启动 docStamp 服务 ══════"
         _start_backend
-        _start_worker
         _start_frontend
         log_info "══════ 全部启动完成 ══════"
         _show_status
@@ -231,7 +194,6 @@ case "${1:-}" in
         _stop_all
         sleep 1
         _start_backend
-        _start_worker
         _start_frontend
         log_info "══════ 重启完成 ══════"
         _show_status
@@ -241,9 +203,6 @@ case "${1:-}" in
         ;;
     backend)
         _start_backend
-        ;;
-    worker)
-        _start_worker
         ;;
     frontend)
         _start_frontend
@@ -285,19 +244,18 @@ case "${1:-}" in
         echo "用法: $0 <command>"
         echo ""
         echo "开发命令:"
-        echo "  start         启动后端 + worker + 前端（开发模式）"
+        echo "  start         启动后端 + 前端（开发模式）"
         echo "  stop          停止所有服务"
         echo "  restart       重启所有服务"
         echo "  status        查看运行状态"
         echo "  backend       仅启动后端"
-        echo "  worker        仅启动任务 worker（视频转换 + 每日清理）"
         echo "  frontend      仅启动前端"
         echo "  test          运行后端 pytest 测试"
         echo "  test-cov      运行后端测试（含覆盖率）"
         echo "  clean-output  清理 output 目录文件"
         echo ""
         echo "Docker 部署:"
-        echo "  docker-up     构建并启动 Docker 容器（2 容器）"
+        echo "  docker-up     构建并启动 Docker 容器（单容器）"
         echo "  docker-down   停止 Docker 容器"
         echo ""
         ;;

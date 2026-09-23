@@ -10,18 +10,16 @@
 
 ---
 
-## 二、功能模块（13 个）
+## 二、功能模块（11 个）
 
-功能模块 = 12 项工具 + 使用统计，共 13 个；首页仪表盘是导航页不计入，下表按路由列出全部 14 个页面。
+功能模块 = 10 项工具 + 使用统计，共 11 个；首页仪表盘是导航页不计入，下表按路由列出全部 12 个页面。
 
 **侧栏导航**：
 
 ```
 首页              → /
 MD 转公文          → /md-to-docx
-文档转 MD          → /doc-to-md
 格式规范          → /format-docx
-视频转换          → /video-convert   (MP4→WMV)
 RSS 探测          → /rss-detect      (Feed 发现)
 属性修改          → /properties      (元数据 + 清理)
 Excel 合并        → /excel-merge
@@ -37,18 +35,16 @@ PDF 合并          → /pdf-merge
 |---|------|------|------|
 | 1 | 仪表盘 | `/` | 工具卡片网格（3 列） |
 | 2 | MD 转公文 | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX + AI 纠错 |
-| 3 | 文档转 MD | `/doc-to-md` | PDF/Word/PPT/图片 → Markdown（MinerU API） |
-| 4 | 属性修改 | `/properties` | 元数据修改 + 元数据清理（双 Tab） |
-| 5 | Excel 合并 | `/excel-merge` | .xlsx/.csv 结构相同合并 |
-| 6 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
-| 7 | 视频转换 | `/video-convert` | MP4 → WMV（PPT 嵌入） |
-| 8 | RSS 探测 | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
-| 9 | 文件组装 | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
-| 10 | 打印分组 | `/print-split` | 批次拆分、暂停/继续/终止 |
-| 11 | PDF 编辑 | `/pdf-editor` | 删除/插入/重排页面 |
-| 12 | 调整 PDF | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚（三 Tab） |
-| 13 | PDF 合并 | `/pdf-merge` | 多 PDF 合并，拖拽排序 |
-| 14 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
+| 3 | 属性修改 | `/properties` | 元数据修改 + 元数据清理（双 Tab） |
+| 4 | Excel 合并 | `/excel-merge` | .xlsx/.csv 结构相同合并 |
+| 5 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
+| 6 | RSS 探测 | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
+| 7 | 文件组装 | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
+| 8 | 打印分组 | `/print-split` | 批次拆分、暂停/继续/终止 |
+| 9 | PDF 编辑 | `/pdf-editor` | 删除/插入/重排页面 |
+| 10 | 调整 PDF | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚（三 Tab） |
+| 11 | PDF 合并 | `/pdf-merge` | 多 PDF 合并，拖拽排序 |
+| 12 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
 
 ---
 
@@ -135,13 +131,13 @@ backend/
 ├── schemas.py              # Pydantic v2 请求 DTO（JSON body 端点）
 ├── error_handler.py        # 全局异常拦截 + @validate_request + requestId
 ├── json_logging.py         # JSON 结构化日志 (TimedRotatingFileHandler, 30 天)
-├── models.py               # TaskRecord（含队列查询）+ OperationLog + BaseCRUD (原始 SQL)
+├── models.py               # OperationLog + BaseCRUD (原始 SQL)
 ├── cache.py                # Flask-Caching SimpleCache
-├── worker.py               # 任务 worker：轮询 SQLite 队列 + 每日清理
-├── gunicorn.conf.py        # 生产配置
-├── blueprints/             # HTTP 路由层（每功能一个文件，共 16 个；实际路径均带 /api/v1 前缀）
+├── gunicorn.conf.py        # 生产配置（on_starting 启动每日清理守护线程）
+├── ai.py                   # AI 代理蓝图（纠错/识别/文件名/去噪）
+├── blueprints/             # HTTP 路由层（每功能一个文件，共 15 个；实际路径均带 /api/v1 前缀）
 │   ├── convert.py          # /api/convert, /api/preview, /api/stats (计数)
-│   ├── download.py         # /api/download, /api/health, /api/tasks/*
+│   ├── download.py         # /api/download, /api/health
 │   ├── stats_bp.py         # /api/stats/overview, /api/stats/seed
 │   ├── properties_bp.py    # /api/properties/*
 │   ├── img2pdf_bp.py       # /api/img2pdf
@@ -154,8 +150,7 @@ backend/
 │   ├── pdf_compress_bp.py  # /api/pdf-compress
 │   ├── metadata_clean_bp.py # /api/metadata-clean
 │   ├── page_decorate_bp.py # /api/page-decorate
-│   ├── rss_detect_bp.py    # /api/rss-detect
-│   ├── video_convert_bp.py # /api/video-convert
+│   └── rss_detect_bp.py    # /api/rss-detect
 ├── services/               # 业务逻辑层 (纯函数，零 Flask 依赖，全部返回 ServiceResult[T])
 │   ├── converter.py        # MD → DOCX (Pandoc)
 │   ├── formatter.py        # GB/T 9704-2012 格式化
@@ -173,7 +168,7 @@ backend/
 ├── utils/
 │   ├── base/               # file_helpers
 │   ├── file_security.py    # 魔数校验 + 扩展名白名单 + 大小限制
-│   ├── file_cleanup.py     # 定时文件清理
+│   ├── file_cleanup.py     # 每日临时文件清理（gunicorn on_starting 守护线程）
 │   ├── rate_limit.py       # IP 级别 API 限流装饰器
 │   ├── retry.py            # @retry_on_failure
 │   └── crypto.py           # AES-256 Fernet
@@ -187,7 +182,6 @@ backend/
 | **Blueprint** | HTTP 请求/响应 | 不包含业务逻辑，函数不超过 20 行 |
 | **Service** | 业务逻辑 | 零 Flask 依赖，纯输入→输出函数 |
 | **Utils** | 通用工具 | 可被任意层引用 |
-| **Worker** | 异步任务执行 | 轮询 `task_records` 队列，原子认领后更新 TaskRecord 进度 |
 
 ### Service 层规范
 
@@ -233,34 +227,16 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 | `POST` | `/api/convert/format` | 格式互转 (DOCX/HTML→PDF) |
 | `POST` | `/api/page-decorate` | 添加页码/页眉/页脚 |
 | `POST` | `/api/image-process` | 图片处理 (缩放/裁剪/转换/压缩) |
-| `POST` | `/api/video-convert` | 视频转换 MP4→WMV |
-| `GET` | `/api/tasks/<id>` | 任务状态轮询 |
-| `GET` | `/api/tasks/<id>/stream` | 任务进度 SSE |
+| `POST` | `/api/rss-detect` | RSS/Atom 订阅探测 |
+| `POST` | `/api/ai/*` | AI 代理（纠错/格式识别/文件名/去噪） |
 
 ---
 
-## 六、异步任务框架
+## 六、数据模型与审计
 
-### SQLite 表即队列
+`operation_logs` 表（SQLite，WAL 模式）记录操作审计：操作类型、资源 ID/类型、文件大小、IP、UA、状态、错误码、耗时，聚合后供使用统计仪表盘（按模块/按日/独立访客 IP）查询。
 
-无 broker。`task_records` 表同时充当任务记录与工作队列，由独立进程 `backend/worker.py` 消费（Docker 内 `python -m backend.worker`，开发模式 `./manage.sh worker`）。
-
-- **入队**：`POST /api/video-convert` 存盘后调 `TaskRecord.create_task(task_id, "video_convert", "pdf_queue", result_data=...)` 建 pending 行，直接把 `task_id` 返回前端
-- **载荷**：表无载荷列且 schema 冻结，故复用 `result_data` 存 `{input, output}` 两个 basename；api 与 worker 共享上传卷，各自用 `Config.UPLOAD_FOLDER` 解析。前端只在 `status === "success"` 时解析该字段，pending 期间不会误读；任务完成时被真实结果覆盖
-- **认领**：`UPDATE ... SET status='started' WHERE id=? AND status='pending'`，以 `rowcount == 1` 为锁——单 worker 部署下足够，多 worker 也不会重复执行
-- **轮询**：每 1 秒扫一次 pending 行并排空
-- **陈旧回收**：worker 启动时把 `started` / `progress` 行判 `failure`（`error_code=TASK_INTERRUPTED`），避免进程崩溃后前端永久转圈
-- **不重试**：失败多为确定性原因（文件损坏、ffmpeg 报错），与原 Celery 配置一致
-- **每日清理**：worker 内 daemon 线程替代 Celery Beat，每小时检查一次距上次执行是否超 24h，上次时间落在 `DOCSTAMP_TASK_DB` 同目录的 `.cleanup-stamp`
-- **用户可见文案 i18n 约定**：worker 进程无请求上下文拿不到 locale，故 `progress_message` 只写语言中立的阶段码（`preparing` / `converting` / `finalizing`），`error_code` 用稳定枚举值（`TASK_FAILED` / `TASK_INTERRUPTED` / `CONVERSION_FAILED` / `TOOL_NOT_AVAILABLE` / `FILE_NOT_FOUND`）；前端 `VideoConvertPanel.vue` 用静态映射表查 `videoConvert.progress.*` / `videoConvert.errors.*`，未知码回退显示原始 `error_message`（英文技术细节）
-
-### 任务追踪
-
-`task_records` 表（SQLite）记录任务完整生命周期：`pending → started → progress → success/failure`。`operation_logs` 表记录操作审计（操作类型、资源 ID、文件大小、IP、耗时）。
-
-### 进度推送
-
-SSE（Server-Sent Events）：`GET /api/tasks/{id}/stream`。需要的组件自行建 `EventSource` 连接并在终态关闭（视频转换），轮询端点 `/api/tasks/{id}` 作为降级方案。
+已下线功能的表（`task_records`、`company_records`）仍留在磁盘上不动——历史统计数据不可再生；`init_db()` 只建 `operation_logs`，代码里不再有对应模型。
 
 ---
 
@@ -268,13 +244,13 @@ SSE（Server-Sent Events）：`GET /api/tasks/{id}/stream`。需要的组件自�
 
 ### 三层校验
 
-1. **大小限制**：单文件 ≤ 50MB（`file_security.MAX_FILE_SIZE`），Flask 层 `MAX_CONTENT_LENGTH=110MB` 兜底
+1. **大小限制**：单文件 ≤ 100MB（`file_security.MAX_FILE_SIZE`），Flask 层 `MAX_CONTENT_LENGTH=110MB` 兜底
 2. **扩展名白名单**：`pdf/docx/xlsx/pptx/png/jpg/jpeg/tiff/tif/webp/csv/html/htm/md/markdown/txt`
 3. **魔数签名**：校验文件头字节与扩展名匹配（防改扩展名攻击）；无签名的扩展名（webp/html/htm/csv/md/txt）跳过魔数校验
 
 ### 定时清理
 
-替代原有的 `@after_this_request` 即时删除模式。worker 的清理线程每日清理超过 7 天的临时文件。文件保留 7 天便于调试和重试下载。
+替代原有的 `@after_this_request` 即时删除模式。gunicorn `on_starting` hook 在 master 进程启动清理守护线程（`utils/file_cleanup.start_cleanup_daemon`），每小时检查一次距上次执行是否超 24h；上次时间落在 `DOCSTAMP_TASK_DB` 同目录的 `.cleanup-stamp`。每日清理超过 7 天的临时文件，文件保留 7 天便于调试和重试下载。开发模式（`python app.py`）不经过 gunicorn，无清理线程。
 
 ### 加密
 
@@ -346,7 +322,7 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 
 ## 九、部署
 
-docStamp 使用 Docker Compose 部署，2 容器适配 2C2G 服务器：
+docStamp 使用 Docker Compose 部署，单容器适配 2C2G 服务器：
 
 ```bash
 # 1. 配置环境变量
@@ -363,37 +339,33 @@ docker compose ps
 
 | 容器 | 职责 | 端口 |
 |------|------|:---:|
-| `api` | Gunicorn gthread + 静态文件 | `127.0.0.1:5000` |
-| `worker` | 轮询 SQLite 队列跑视频转换 + 每日清理线程 | — |
+| `api` | Gunicorn gthread + 静态文件 + 每日清理守护线程（`on_starting`） | `127.0.0.1:5000` |
 
-两个容器共用同一镜像，靠 `command:` 区分角色；`output_data`（上传与产物）与 `db_data`（tasks.db）两个卷双方共享，是队列能跨进程工作的前提。
+`output_data`（上传与产物）与 `db_data`（tasks.db）两个卷挂载给唯一容器。
 
 ### 资源配置
 
 | 组件 | 配置 |
 |------|------|
 | API | gunicorn `--workers 2` |
-| Worker | 单进程轮询（1 秒间隔），串行执行转换 |
-| Worker 内存限制 | `mem_limit: 512M`（ffmpeg 转码峰值，OOM 不连坐 API） |
-| 预估总内存 | ~670MB |
+| 预估总内存 | ~200MB |
 
 ### 健康检查
 
-两个容器均配置健康检查：API `curl /api/health` → Worker `pgrep -f 'backend[.]worker'`（括号写法避免匹配到 healthcheck 自身的 `sh -c` 命令行）。容器以非 root 用户 `docstamp` 运行，entrypoint 脚本处理 Docker volume 权限。
+API 容器健康检查 `curl /api/v1/health`。容器以非 root 用户 `docstamp` 运行，entrypoint 脚本处理 Docker volume 权限。
 
 ### 管理脚本
 
 ```bash
 ./manage.sh docker-up     # 构建并启动
 ./manage.sh docker-down   # 停止
-./manage.sh start         # 本地开发模式（Flask + worker + Nuxt）
-./manage.sh worker        # 仅启动任务 worker
+./manage.sh start         # 本地开发模式（Flask + Nuxt）
 ./manage.sh stop          # 停止开发服务
 ```
 
 ### Gunicorn 配置
 
-`gunicorn.conf.py`: `bind 0.0.0.0:5000`, `worker_class=gthread`, `threads=4`, `workers=2`, `timeout=120`, `max_requests=1000`（防内存泄漏）。日志输出到 `/var/log/docstamp/`。
+`gunicorn.conf.py`: `bind 0.0.0.0:5000`, `worker_class=gthread`, `threads=4`, `workers=2`, `timeout=120`, `max_requests=1000`（防内存泄漏），`on_starting` hook 在 master 进程启动每日清理守护线程。日志输出到 `/var/log/docstamp/`。
 
 ### Nginx 反向代理
 
@@ -440,6 +412,16 @@ docker compose ps
 ---
 
 ## 十一、版本历史
+
+### v3.7.5 (2026-09)
+
+- **移除视频转换与文档转 MD**：两个功能是异步链路仅有的消费者，随功能一并拆除全部孤儿基础设施，回归纯同步单体
+- **后端**：删除 `worker.py`、`video_convert_bp.py`、`services/video_converter.py`、`mineru_bp.py` 与对应测试；`models.py` 删 `TaskRecord`（含 `next_pending`/`claim`/`list_stale` 队列原语）与 `task_records` 建表 DDL、`BaseCRUD` 死方法（`get_by_id`/`list_by_conditions`/`update_by_id`），仅剩 `OperationLog`；`download.py` 删 `GET /api/tasks/<id>` 与 SSE `GET /api/tasks/<id>/stream`，health 探测去掉 ffmpeg；`config.py` 删 `VIDEO_EXTENSIONS`/`MINERU_API_KEY`，`DOWNLOAD_EXTENSIONS` 收窄为 `{docx, md}`（现存下载端点只服务 md-to-docx / format-docx 产物）；`file_security.py` 白名单去 5 个视频扩展名
+- **每日清理去向**：worker 内嵌清理线程迁至 `utils/file_cleanup.py`（新增 `cleanup_due`/`run_cleanup`/`start_cleanup_daemon`），由 gunicorn `on_starting` hook 在 master 进程启动——天然单实例、无多 worker 竞态，`app.py` 保持零副作用。开发模式（`python app.py`）不经过 gunicorn，无清理线程。调度判定测试（6 条）从 `test_worker.py` 移植到 `test_temp_cleanup.py`
+- **前端**：删 `pages/video-convert.vue`、`pages/doc-to-md.vue`、`components/VideoConvertPanel.vue`；`tools.config.ts`、两个 locale（`tabs.docToMd`/`tabs.videoConvert` + 两个命名空间）、sitemap、stats 模块标签同步收窄；`dashboard.heroSubtitle` 13 → 11
+- **部署**：2 容器 → 单容器（删 worker 服务、`DOCSTAMP_MINERU_API_KEY`/`DOCSTAMP_PUBLIC_URL` 注入），Dockerfile 去 ffmpeg + libopenh264-7，`manage.sh` 删 worker 子命令与全部 PID 管理（开发 3 进程 → 2 进程）。顺带修正两处陈旧健康检查 URL：compose `curl /api/health` 与 manage.sh 就绪探测均改打真实端点 `/api/v1/health`（此前靠 SPA fallback 兜底误判通过）
+- **数据**：`tasks.db` 内历史数据（video-convert / doc-to-md 操作日志与 task_records 表）保留未动；`errors.py` 的 `TASK_INTERRUPTED` 枚举随链路无引用但刻意保留（错误码是持久化契约，历史行可能携带）
+- **验证**：pytest 79 passed；vitest 36 passed；`npm run build` 通过。Docker 镜像重建未跑（本机无 Docker 环境）
 
 ### v3.7.4 (2026-09)
 

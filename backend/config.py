@@ -24,13 +24,9 @@ class Config:
     PDF_EXTENSIONS = {"pdf"}
     EXCEL_EXTENSIONS = {"xlsx", "csv"}
     MD_EXTENSIONS = {"md", "markdown", "txt"}
-    VIDEO_EXTENSIONS = {"mp4", "wmv", "avi", "mkv", "mov"}
-    # Also serves MinerU's source-file fetch: the cloud API downloads our own
-    # uploaded document back over /api/v1/download/<filename> before parsing it.
-    DOWNLOAD_EXTENSIONS = {
-        "docx", "md", "wmv",
-        "pdf", "doc", "ppt", "pptx", "png", "jpg", "jpeg",
-    }
+    # Files served back over /api/v1/download/<filename>: generated documents
+    # from md-to-docx / format-docx land in the upload folder under these names.
+    DOWNLOAD_EXTENSIONS = {"docx", "md"}
 
     # ── Security ────────────────────────────────────────────────────
     FORBIDDEN_PATH_CHARS = {"..", "/", "\\"}
@@ -51,7 +47,6 @@ class Config:
 
     # ── AI ──────────────────────────────────────────────────────────
     AI_API_KEY = os.environ.get("DOCSTAMP_DEEPSEEK_API_KEY", "")
-    MINERU_API_KEY = os.environ.get("DOCSTAMP_MINERU_API_KEY", "")
     AI_API_URL = os.environ.get(
         "AI_API_URL", "https://api.deepseek.com/chat/completions"
     )

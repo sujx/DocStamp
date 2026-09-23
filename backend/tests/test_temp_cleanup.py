@@ -9,10 +9,11 @@ those two files.
 
 import os
 import time
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from utils.file_cleanup import cleanup_temp_files
+from utils.file_cleanup import cleanup_due, cleanup_temp_files, run_cleanup
 
 OLD_AGE_DAYS = 30
 
@@ -160,3 +161,58 @@ class TestLiveDataProtection:
         cleanup_temp_files(upload, max_age_days=7)
 
         assert os.path.isfile(gitkeep)
+
+
+class TestCleanupScheduling:
+    """The daily cadence: gunicorn's master starts a daemon thread that runs
+    cleanup when the stamp file says the last run is over 24h ago."""
+
+    def test_due_when_never_run(self, tmp_path):
+        assert cleanup_due(tmp_path / "stamp", datetime.now(timezone.utc)) is True
+
+    def test_not_due_when_just_run(self, tmp_path):
+        stamp = tmp_path / "stamp"
+        run_cleanup(str(tmp_path), stamp, now=datetime.now(timezone.utc))
+
+        assert cleanup_due(stamp, datetime.now(timezone.utc)) is False
+
+    def test_due_when_last_run_over_a_day_ago(self, tmp_path):
+        stamp = tmp_path / "stamp"
+        run_cleanup(str(tmp_path), stamp,
+                    now=datetime.now(timezone.utc) - timedelta(hours=25))
+
+        assert cleanup_due(stamp, datetime.now(timezone.utc)) is True
+
+    def test_due_when_stamp_is_corrupt(self, tmp_path):
+        stamp = tmp_path / "stamp"
+        stamp.write_text("garbage", encoding="utf-8")
+
+        assert cleanup_due(stamp, datetime.now(timezone.utc)) is True
+
+    def test_run_cleanup_deletes_aged_files_and_stamps(self, tmp_path, monkeypatch):
+        calls = {}
+
+        def fake_cleanup(folder, max_age_days=7):
+            calls["args"] = (folder, max_age_days)
+            return {"deleted_count": 2, "freed_bytes": 99, "errors": 0}
+
+        import utils.file_cleanup as fc
+        monkeypatch.setattr(fc, "cleanup_temp_files", fake_cleanup)
+
+        stamp = tmp_path / "stamp"
+        now = datetime.now(timezone.utc)
+
+        fc.run_cleanup(str(tmp_path), stamp, now=now)
+
+        assert calls["args"] == (str(tmp_path), 7)
+        assert fc.cleanup_due(stamp, now) is False
+
+    def test_run_cleanup_skips_a_missing_folder(self, tmp_path, monkeypatch):
+        called = []
+        import utils.file_cleanup as fc
+        monkeypatch.setattr(fc, "cleanup_temp_files",
+                            lambda *a, **k: called.append(a) or {})
+
+        fc.run_cleanup(str(tmp_path / "nope"), tmp_path / "stamp")
+
+        assert called == []

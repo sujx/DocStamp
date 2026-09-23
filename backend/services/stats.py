@@ -23,9 +23,7 @@ MODULE_NAMES = {
     "pdf-compress": "PDF 压缩",
     "metadata-clean": "清理元数据",
     "page-decorate": "页码页眉",
-    "doc-to-md": "文档转MD",
     "format-docx": "格式规范",
-    "video-convert": "视频转换",
     "pageview": "页面浏览",
 }
 

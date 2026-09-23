@@ -8,7 +8,7 @@ set -e
 mkdir -p /var/log/docstamp /opt/docstamp/backend/output /opt/docstamp/backend/data
 
 # Verify critical binaries exist before starting
-for bin in gunicorn ffmpeg pandoc; do
+for bin in gunicorn pandoc; do
     if ! command -v "$bin" >/dev/null 2>&1; then
         echo "WARNING: $bin not found — some features may be unavailable" >&2
     fi

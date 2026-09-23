@@ -1,9 +1,8 @@
-"""Critical path route tests: health, preview, convert, download, tasks."""
+"""Critical path route tests: health, preview, convert, download."""
 
 import io
-import json
 import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import pytest
 
@@ -19,7 +18,6 @@ class TestHealthEndpoint:
         data = resp.get_json()
         assert data["status"] == "ok"
         assert "deps" in data
-        assert "ffmpeg" in data["deps"]
         assert "pandoc" in data["deps"]
 
 
@@ -219,64 +217,29 @@ class TestDownloadEndpoint:
         assert resp.status_code == 206
         assert resp.data == content
 
-    @pytest.mark.parametrize(
-        "ext", ["pdf", "doc", "docx", "ppt", "pptx", "png", "jpg", "jpeg"]
-    )
-    def test_download_allows_mineru_source_formats(self, client, app, ext):
-        """MinerU fetches our own uploaded files back over this endpoint."""
+    @pytest.mark.parametrize("ext", ["pdf", "exe", "mp4"])
+    def test_download_rejects_non_document_extensions(self, client, app, ext):
+        """The whitelist only covers files this app generates (docx, md)."""
         upload_dir = app.config["UPLOAD_FOLDER"]
         test_file = os.path.join(upload_dir, f"source.{ext}")
-        content = b"source bytes"
         with open(test_file, "wb") as f:
-            f.write(content)
+            f.write(b"source bytes")
 
         resp = client.get(f"/api/v1/download/source.{ext}")
 
-        assert resp.status_code == 200, resp.get_data(as_text=True)
+        assert resp.status_code == 400
 
     def test_download_reports_binary_mimetype(self, client, app):
         upload_dir = app.config["UPLOAD_FOLDER"]
-        test_file = os.path.join(upload_dir, "source.pdf")
+        test_file = os.path.join(upload_dir, "source.docx")
         with open(test_file, "wb") as f:
-            f.write(b"%PDF-1.4\n")
+            f.write(b"PK\x03\x04docx bytes")
 
-        resp = client.get("/api/v1/download/source.pdf")
+        resp = client.get("/api/v1/download/source.docx")
 
-        assert resp.mimetype == "application/pdf"
-
-
-class TestTaskStatusEndpoint:
-    """GET /api/v1/tasks/<task_id> — task status lookup."""
-
-    @patch("blueprints.download._get_models")
-    def test_task_not_found_returns_404(self, mock_get_models, client):
-        mock_record = MagicMock()
-        mock_record.get_by_id.return_value = None
-        mock_get_models.return_value = (mock_record, MagicMock())
-
-        resp = client.get("/api/v1/tasks/nonexistent-task-id")
-        assert resp.status_code == 404
-        data = resp.get_json()
-        assert data["code"] == 404
-        assert "未找到" in data["msg"]
-
-    @patch("blueprints.download._get_models")
-    def test_task_found_returns_200(self, mock_get_models, client):
-        mock_record = MagicMock()
-        mock_record.get_by_id.return_value = {
-            "id": "test-task-123",
-            "status": "success",
-            "progress": 100,
-            "updated_at": "2026-09-21T10:00:00",
-        }
-        mock_get_models.return_value = (mock_record, MagicMock())
-
-        resp = client.get("/api/v1/tasks/test-task-123")
-        assert resp.status_code == 200
-        data = resp.get_json()
-        assert data["code"] == 200
-        assert data["data"]["id"] == "test-task-123"
-        assert data["data"]["status"] == "success"
+        assert resp.mimetype == (
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
 
 
 class TestStatsEndpoint:

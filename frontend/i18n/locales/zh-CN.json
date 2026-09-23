@@ -4,7 +4,6 @@
     "properties": "属性修改",
     "fileAssembly": "文件组装",
     "printSplit": "打印分组",
-    "docToMd": "文档转MD",
     "pdfEditor": "PDF编辑",
     "excelMerge": "Excel合并",
     "md2docx": "MD转公文",
@@ -16,12 +15,11 @@
     "metadataClean": "元数据清理",
     "pageDecorate": "页码页眉页脚",
     "status": "使用统计",
-    "videoConvert": "视频转换",
     "rssDetect": "RSS 探测"
   },
   "dashboard": {
     "heroTitle": "文档处理，化繁为简",
-    "heroSubtitle": "13 项功能，覆盖格式转换、PDF 编辑、文档规范化等场景"
+    "heroSubtitle": "11 项功能，覆盖格式转换、PDF 编辑、文档规范化等场景"
   },
   "status": {
     "title": "使用统计",
@@ -260,38 +258,6 @@
   "pdf-tools": {
     "title": "调整PDF",
     "description": "PDF 转文本、压缩、添加页码页眉页脚"
-  },
-  "docToMd": {
-    "title": "文档转 Markdown",
-    "description": "将 PDF / Word / PPT / 图片精准转换为 Markdown 格式（MinerU API）",
-    "uploadLabel": "上传文档（PDF/DOC/DOCX/PPT/PPTX/PNG/JPG）",
-    "limits": "支持 200MB 以内，200 页以内的文档",
-    "convert": "开始转换",
-    "result": "转换结果"
-  },
-  "videoConvert": {
-    "title": "视频转换",
-    "description": "将 MP4 视频转换为 WMV 格式，解决 PowerPoint 无法嵌入 MP4 的问题",
-    "uploadLabel": "上传视频（MP4/MOV/AVI/MKV）",
-    "sizeHint": "文件大小不超过 100MB",
-    "convert": "转换为 WMV",
-    "converting": "正在转换...",
-    "convertAnother": "转换另一个",
-    "note": "转换后文件可在 PowerPoint 中直接嵌入播放",
-    "fileTooLarge": "文件超过 {size} 大小限制",
-    "uploadFailed": "上传失败",
-    "progress": {
-      "preparing": "正在准备视频...",
-      "converting": "正在使用 ffmpeg 转换...",
-      "finalizing": "正在完成收尾..."
-    },
-    "errors": {
-      "TASK_FAILED": "任务执行失败，请重新提交",
-      "TASK_INTERRUPTED": "服务重启导致任务中断，请重新提交",
-      "CONVERSION_FAILED": "转换失败",
-      "TOOL_NOT_AVAILABLE": "服务器未安装 ffmpeg，暂时无法转换",
-      "FILE_NOT_FOUND": "源文件已过期或不存在，请重新上传"
-    }
   },
   "rssDetect": {
     "title": "RSS 订阅探测",

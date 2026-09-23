@@ -11,8 +11,7 @@ stats_bp = Blueprint("stats", __name__)
 def sitemap():
     pages = [
         "",
-        "/md-to-docx", "/doc-to-md", "/format-docx",
-        "/video-convert",
+        "/md-to-docx", "/format-docx",
         "/properties", "/excel-merge",
         "/file-assembly", "/print-split", "/pdf-editor",
         "/pdf-tools", "/pdf-merge", "/status",

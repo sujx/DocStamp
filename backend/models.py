@@ -1,7 +1,9 @@
-"""Data models for task tracking and operation auditing.
+"""Data models for operation auditing.
 
 Uses raw SQL with parameterized queries — no ORM dependency.
-Two tables: task_records (task lifecycle + work queue) and operation_logs (audit trail).
+One table: operation_logs (audit trail + usage stats). Tables of retired
+features (task_records, company_records) may still exist on disk with their
+historical rows; new deployments simply no longer create them.
 
 Lightweight SQLite backend with WAL mode, thread-local connections,
 and atexit cleanup to prevent connection leaks on shutdown.
@@ -10,8 +12,6 @@ and atexit cleanup to prevent connection leaks on shutdown.
 import atexit
 import sqlite3
 import threading
-from datetime import datetime, timezone
-from typing import Optional
 
 # ── Database Connection ─────────────────────────────────────────────────
 
@@ -49,20 +49,6 @@ CREATE TABLE IF NOT EXISTS schema_version (
     applied_at TEXT DEFAULT (datetime('now'))
 );
 
-CREATE TABLE IF NOT EXISTS task_records (
-    id TEXT PRIMARY KEY,
-    task_type TEXT NOT NULL,
-    queue TEXT NOT NULL,
-    status TEXT DEFAULT 'pending',
-    progress INTEGER DEFAULT 0,
-    progress_message TEXT,
-    result_data TEXT,
-    error_code TEXT,
-    error_message TEXT,
-    created_at TEXT DEFAULT (datetime('now')),
-    updated_at TEXT DEFAULT (datetime('now'))
-);
-
 CREATE TABLE IF NOT EXISTS operation_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session_id TEXT NOT NULL,
@@ -78,8 +64,6 @@ CREATE TABLE IF NOT EXISTS operation_logs (
     created_at TEXT DEFAULT (datetime('now'))
 );
 
-CREATE INDEX IF NOT EXISTS idx_task_records_status ON task_records(status);
-CREATE INDEX IF NOT EXISTS idx_task_records_created ON task_records(created_at);
 CREATE INDEX IF NOT EXISTS idx_operation_logs_created ON operation_logs(created_at);
 CREATE INDEX IF NOT EXISTS idx_operation_logs_type ON operation_logs(operation_type);
 """
@@ -125,38 +109,6 @@ class BaseCRUD:
     def _conn(self) -> sqlite3.Connection:
         return _get_db(self.db_path)
 
-    def get_by_id(self, id_value) -> Optional[dict]:
-        """Get a single row by primary key."""
-        with self._conn() as db:
-            row = db.execute(
-                f"SELECT * FROM {self.table} WHERE id=?", (id_value,)
-            ).fetchone()
-            return dict(row) if row else None
-
-    def list_by_conditions(
-        self, conditions: dict, page: int = 1, size: int = 20
-    ) -> list[dict]:
-        """List rows matching conditions with pagination."""
-        where = " AND ".join(f"{k}=?" for k in conditions)
-        sql = f"SELECT * FROM {self.table} WHERE {where} ORDER BY created_at DESC LIMIT ? OFFSET ?"
-        with self._conn() as db:
-            rows = db.execute(
-                sql, (*conditions.values(), size, (page - 1) * size)
-            ).fetchall()
-            return [dict(r) for r in rows]
-
-    def update_by_id(self, id_value, data: dict) -> None:
-        """Update a row by primary key."""
-        if not data:
-            return
-        data["updated_at"] = datetime.now(timezone.utc).isoformat()
-        sets = ", ".join(f"{k}=?" for k in data)
-        with self._conn() as db:
-            db.execute(
-                f"UPDATE {self.table} SET {sets} WHERE id=?",
-                (*data.values(), id_value),
-            )
-
     def insert(self, data: dict) -> str:
         """Insert a row and return the row ID."""
         columns = ", ".join(data.keys())
@@ -167,99 +119,6 @@ class BaseCRUD:
                 tuple(data.values()),
             )
             return str(cursor.lastrowid)
-
-
-# ── TaskRecord Model ────────────────────────────────────────────────────
-
-class TaskRecord(BaseCRUD):
-    """Track task lifecycle: pending → started → progress → success/failure.
-
-    Doubles as the work queue the video worker polls — see next_pending/claim.
-    """
-
-    VALID_STATUSES = {"pending", "started", "progress", "success", "failure"}
-    # Rows a dead worker left behind mid-flight; recovered on worker startup.
-    STALE_STATUSES = ("started", "progress")
-
-    def __init__(self, db_path: str):
-        super().__init__("task_records", db_path)
-
-    def create_task(
-        self, task_id: str, task_type: str, queue: str, result_data: str = ""
-    ) -> dict:
-        """Create a new task record with status='pending'.
-
-        result_data carries the job payload until the worker overwrites it with
-        the real result — the table has no payload column and the schema is frozen.
-        """
-        data = {
-            "id": task_id,
-            "task_type": task_type,
-            "queue": queue,
-            "status": "pending",
-            "progress": 0,
-        }
-        if result_data:
-            data["result_data"] = result_data
-        self.insert(data)
-        return self.get_by_id(task_id)
-
-    def update_progress(
-        self, task_id: str, status: str, progress: int = 0,
-        message: str = "", result_data: str = "",
-        error_code: str = "", error_message: str = "",
-    ) -> None:
-        """Update task status and progress atomically."""
-        if status not in self.VALID_STATUSES:
-            raise ValueError(f"Invalid task status: {status}")
-        data = {"status": status, "progress": progress}
-        if message:
-            data["progress_message"] = message
-        if result_data:
-            data["result_data"] = result_data
-        if error_code:
-            data["error_code"] = error_code
-        if error_message:
-            data["error_message"] = error_message
-        self.update_by_id(task_id, data)
-
-    # ── Queue primitives (polled by backend/worker.py) ─────────────
-
-    def next_pending(self, task_type: str = "video_convert") -> Optional[dict]:
-        """Oldest claimable row of the given type, or None when the queue is idle."""
-        with self._conn() as db:
-            row = db.execute(
-                """SELECT * FROM task_records
-                   WHERE status='pending' AND task_type=?
-                   ORDER BY created_at, rowid LIMIT 1""",
-                (task_type,),
-            ).fetchone()
-            return dict(row) if row else None
-
-    def claim(self, task_id: str) -> bool:
-        """Atomically move a pending row to 'started'.
-
-        The rowcount is the lock: exactly one caller sees 1, everyone else 0.
-        """
-        now = datetime.now(timezone.utc).isoformat()
-        with self._conn() as db:
-            cursor = db.execute(
-                """UPDATE task_records
-                   SET status='started', progress=0, updated_at=?
-                   WHERE id=? AND status='pending'""",
-                (now, task_id),
-            )
-            return cursor.rowcount == 1
-
-    def list_stale(self) -> list[dict]:
-        """Rows left in-flight by a worker that died mid-task."""
-        placeholders = ", ".join("?" for _ in self.STALE_STATUSES)
-        with self._conn() as db:
-            rows = db.execute(
-                f"SELECT * FROM task_records WHERE status IN ({placeholders})",
-                self.STALE_STATUSES,
-            ).fetchall()
-            return [dict(r) for r in rows]
 
 
 # ── OperationLog Model ──────────────────────────────────────────────────

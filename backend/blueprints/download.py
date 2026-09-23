@@ -1,31 +1,16 @@
-"""Download, health, and task endpoints."""
+"""Download and health endpoints."""
 
-import json
 import mimetypes
 import os
-import time
 
-from flask import Blueprint, Response, g, jsonify, request, send_file
+from flask import Blueprint, Response, jsonify, request, send_file
 from flask_babel import gettext as _
 from werkzeug.utils import secure_filename
 
 from config import Config
 from utils.base.file_helpers import safe_download_name
-from backend.models import OperationLog, TaskRecord
 
 download_bp = Blueprint("download", __name__)
-
-_task_record = None
-_op_log = None
-
-
-def _get_models():
-    global _task_record, _op_log
-    if _task_record is None:
-        _task_record = TaskRecord(Config.TASK_DB_PATH)
-    if _op_log is None:
-        _op_log = OperationLog(Config.TASK_DB_PATH)
-    return _task_record, _op_log
 
 
 # ── Helpers ─────────────────────────────────────────────────────────
@@ -51,7 +36,6 @@ def _parse_range(range_header: str, file_size: int) -> tuple:
 def health():
     import shutil
     deps = {
-        "ffmpeg": shutil.which("ffmpeg") is not None,
         "pandoc": shutil.which("pandoc") is not None,
     }
     return jsonify({"status": "ok", "deps": deps})
@@ -92,37 +76,3 @@ def download_file(filename: str):
         response.headers["Accept-Ranges"] = "bytes"
         response.headers["Content-Length"] = str(file_size)
     return response
-
-
-@download_bp.route("/api/v1/tasks/<task_id>")
-def task_status(task_id: str):
-    record, _ = _get_models()
-    r = record.get_by_id(task_id)
-    if not r:
-        return jsonify({"code": 404, "msg": "任务未找到", "requestId": getattr(g, "request_id", "-")}), 404
-    return jsonify({"code": 200, "data": r, "requestId": getattr(g, "request_id", "-")})
-
-
-@download_bp.route("/api/v1/tasks/<task_id>/stream")
-def task_stream(task_id: str):
-    record, _ = _get_models()
-
-    def generate():
-        r = record.get_by_id(task_id)
-        if not r:
-            yield f"event: error\ndata: {json.dumps({'error': 'TASK_NOT_FOUND'})}\n\n"
-            return
-        last_updated = None
-        while True:
-            r = record.get_by_id(task_id)
-            if r is None:
-                break
-            if r["updated_at"] != last_updated:
-                last_updated = r["updated_at"]
-                yield f"data: {json.dumps({k: r[k] for k in r.keys()}, default=str)}\n\n"
-            if r["status"] in ("success", "failure"):
-                return
-            time.sleep(1)
-
-    return Response(generate(), mimetype="text/event-stream",
-                    headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no", "Connection": "keep-alive"})
