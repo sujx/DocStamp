@@ -1,26 +1,32 @@
 # 鹊随金印 (docStamp) — 文档处理工具箱
 
-一站式文档处理 Web 应用，13 大功能模块。即开即用，无需注册。
+一站式文档处理 Web 应用：12 项文档工具 + 1 个使用统计页，中英双语，即开即用，无需注册。
 
 ## 功能
+
+仪表盘（`/`）之外共 13 个页面，按下表顺序排列（与侧边导航一致）：
 
 | # | 功能 | 路由 | 说明 |
 |---|------|------|------|
 | 1 | **MD 转公文** | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX + AI 纠错 |
-| 2 | **文档转 MD** | `/doc-to-md` | PDF/Word/PPT/图片 → Markdown（MinerU）|
-| 3 | **属性修改** | `/properties` | 元数据修改 + 清理（双 Tab） |
-| 4 | **Excel 合并** | `/excel-merge` | 合并 .xlsx/.csv（同结构） |
-| 5 | **格式规范** | `/format-docx` | DOCX 按 GB/T 9704-2012 格式化 |
-| 6 | **文件组装** | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
-| 7 | **打印分组** | `/print-split` | 按批次拆分 PDF |
-| 8 | **PDF 编辑** | `/pdf-editor` | 删除/插入/重排页面 |
-| 9 | **调整 PDF** | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚 |
-| 10 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
-| 11 | **视频转换** | `/video-convert` | MP4 → WMV（PPT 嵌入），异步 + 进度 |
-| 12 | **RSS 探测** | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
+| 2 | **文档转 MD** | `/doc-to-md` | PDF/Word/PPT/图片 → Markdown（MinerU） |
+| 3 | **格式规范** | `/format-docx` | DOCX 按 GB/T 9704-2012 格式化 |
+| 4 | **视频转换** | `/video-convert` | MP4 → WMV（PPT 嵌入），异步 + SSE 进度 |
+| 5 | **RSS 探测** | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
+| 6 | **属性修改** | `/properties` | 元数据修改 + 清理（双 Tab） |
+| 7 | **Excel 合并** | `/excel-merge` | 合并 .xlsx/.csv（同结构） |
+| 8 | **文件组装** | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
+| 9 | **打印分组** | `/print-split` | 按批次拆分 PDF |
+| 10 | **PDF 编辑** | `/pdf-editor` | 删除/插入/重排页面 |
+| 11 | **调整 PDF** | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚 |
+| 12 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
 | 13 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
 
-### AI 功能
+另有 4 个面板子页（page-decorate / pdf-compress / pdf-to-text / metadata-clean）被对应工具页内嵌引用。
+
+### AI 功能（可选）
+
+AI 请求全部由后端代理（`backend/ai.py` + `backend/mineru_bp.py`），API Key 只落在服务端 `.env`，前端不经手。未配置 Key 时对应 AI 功能不可用，其余工具不受影响。
 
 | 功能 | 说明 | 接入方式 |
 |------|------|------|
@@ -31,30 +37,31 @@
 | 文档转 MD | PDF/Word/PPT → Markdown | MinerU API |
 
 配置 `DOCSTAMP_DEEPSEEK_API_KEY` + `DOCSTAMP_MINERU_API_KEY` 即可启用。
-支持 OpenAI / Ollama / 硅基流动等任何兼容 API（`AI_API_URL` + `AI_MODEL`）。
+DeepSeek 可替换为任何 OpenAI 兼容 API（`AI_API_URL` + `AI_MODEL`）。
 
 ## 技术栈
 
 | 层 | 技术 |
 |------|------|
-| **后端框架** | Python Flask + Pydantic v2 + Flask-CORS + Flask-Babel + Flask-Caching |
+| **后端框架** | Python 3.12 + Flask 3 + Pydantic v2 |
+| **后端依赖** | Flask-CORS / Flask-Babel / Flask-Caching / python-docx / openpyxl / python-pptx / img2pdf / pypdf / Pillow / reportlab / WeasyPrint / markdown / bleach / pdfminer.six / requests / python-dotenv / cryptography |
+| **文档工具链** | pandoc / poppler-utils / ffmpeg（容器内已安装） |
 | **异步任务** | SQLite 表即队列 + 独立 worker 进程 + SSE 进度推送 |
-| **文档处理** | pandoc / pypdf / Pillow / reportlab / pdfminer.six / python-docx / openpyxl |
-| **AI** | DeepSeek v4 Flash + MinerU API（可选，不配 Key 自动降级） |
-| **前端框架** | Nuxt 3.15.4 (SPA) + Nuxt UI v2 + Tailwind CSS v3 + Flat Design + Plus Jakarta Sans |
+| **AI** | DeepSeek v4 Flash + MinerU API（可选） |
+| **前端框架** | Nuxt 3.15.4 (SPA) + Nuxt UI v2 + Tailwind CSS v3 |
 | **国际化** | @nuxtjs/i18n v9（zh-CN / en） |
-| **部署** | Docker Compose（2 容器）+ Gunicorn gthread + Nginx |
+| **部署** | Docker Compose（2 容器）+ Gunicorn gthread + Nginx 反代 |
 
 ## 快速开始
 
 ### 本地开发
 
 ```bash
-# 安装后端依赖
+# 安装后端依赖（或用 poetry install）
 cd backend && pip3 install --break-system-packages flask flask-cors flask-babel \
-    flask-caching python-docx openpyxl python-pptx markdown bleach img2pdf \
-    pypdf Pillow reportlab gunicorn pydantic cryptography \
-    pdfminer.six
+    flask-caching python-docx openpyxl python-pptx img2pdf pypdf Pillow reportlab \
+    gunicorn pydantic cryptography weasyprint markdown bleach pdfminer.six \
+    requests python-dotenv
 
 # 安装前端依赖
 cd ../frontend && npm install
@@ -109,6 +116,8 @@ docStamp/
 │   ├── cache.py                # Flask-Caching（限流 + 统计缓存）
 │   ├── worker.py               # 任务 worker：轮询 SQLite 队列 + 每日清理
 │   ├── gunicorn.conf.py        # Gunicorn gthread 生产配置
+│   ├── ai.py                   # AI 代理蓝图（纠错/识别/文件名/去噪）
+│   ├── mineru_bp.py            # MinerU 文档转 MD 代理
 │   ├── blueprints/             # HTTP 路由层（16 个，每个功能 1 文件）
 │   ├── services/               # 业务逻辑层（纯函数，全返回 ServiceResult[T]）
 │   └── utils/
@@ -119,11 +128,11 @@ docStamp/
 │       └── crypto.py           # AES-256 Fernet 字段加密
 ├── frontend/                   # Nuxt 3 SPA
 │   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError / useAi
-│   ├── components/ui/          # 原子组件（CardBase / SkeletonBlock）
-│   ├── pages/                  # 18 个路由页面（13 个工具 + 1 个仪表盘 + 4 个面板子页）
+│   ├── components/             # 业务组件 + ui/ 原子组件
+│   ├── pages/                  # 18 个路由页面
 │   └── i18n/locales/           # zh-CN / en
 ├── docker-compose.yml          # 2 容器编排（api + worker）
-├── Dockerfile                  # 多阶段构建（node:24-alpine + python:3.12-slim）
+├── Dockerfile                  # 多阶段构建（node:22-alpine + python:3.12-slim）
 ├── docker-entrypoint.sh        # Docker 入口（运行时目录 + volume 权限）
 ├── manage.sh                   # 开发/部署管理脚本
 ├── publish.sh                  # ACR 镜像发布
@@ -137,10 +146,10 @@ docStamp/
 - **全局异常拦截** — 所有异常 → 标准化 JSON `{code, msg, requestId}`
 - **Pydantic v2 校验** — `@validate_request` 装饰器自动校验请求参数
 - **ServiceResult[T]** — 所有 Service 函数强制 success/failure 分支处理
-- **异步任务** — SQLite 表即队列（原子认领）+ 独立 worker 进程 + TaskRecord 生命周期追踪 + SSE 实时进度
+- **异步任务** — SQLite 表即队列（原子认领）+ 独立 worker 进程 + TaskRecord 生命周期追踪 + SSE 实时进度；用户可见文案由后端出稳定 code（阶段码 / 错误码枚举），前端查 i18n 翻译
 - **速率限制** — 双层防御（Nginx 粗粒度 + 应用层 `@rate_limit` IP 级），上传接口按负载分级限流
 - **文件安全** — 三层校验（100MB 大小 / 扩展名白名单 / 魔数签名，视频格式跳过）+ 文件名 XSS 净化
-- **API 版本化** — 全部响应带 `X-API-Version: 3.7` 头
+- **API 版本化** — 全部响应带 `X-API-Version` 头
 - **安全加固** — Docker 非 root 用户运行 + 容器健康检查 + 资源限制
 - **操作审计** — TaskRecord + OperationLog 全量记录
 - **JSON 日志** — 结构化日志 + 每日轮转 + 30 天保留
@@ -158,5 +167,5 @@ docStamp/
 |------|:---:|
 | 内存 | 2GB+ |
 | CPU | 2 核 |
-| Docker | 需要 |
-| pandoc / poppler-utils / ffmpeg | Dockerfile 内已安装 |
+| Docker | 容器部署需要 |
+| pandoc / poppler-utils / ffmpeg | Dockerfile 内已安装；本地开发需自装（视频转换才需要 ffmpeg） |

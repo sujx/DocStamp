@@ -209,6 +209,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 - 中文 prompt 用单引号字符串（避免中文引号冲突）
 - 异步任务走 `task_records` 表当队列，由 `backend/worker.py` 轮询认领，不引入 broker
 - 新增异步任务类型时，`TaskRecord.next_pending(task_type=...)` 与 worker 的分发都要跟上
+- worker 写入的用户可见字段只放稳定 code（`progress_message` 阶段码 / `error_code` 枚举值），文案翻译在前端查 i18n（worker 无请求上下文拿不到 locale）
 
 ### 前端
 

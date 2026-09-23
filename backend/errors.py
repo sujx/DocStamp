@@ -43,6 +43,7 @@ class ErrorCode(Enum):
     # Async tasks
     TASK_NOT_FOUND = "TASK_NOT_FOUND"
     TASK_FAILED = "TASK_FAILED"
+    TASK_INTERRUPTED = "TASK_INTERRUPTED"
 
     # Internal
     INTERNAL_ERROR = "INTERNAL_ERROR"

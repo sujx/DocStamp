@@ -277,7 +277,21 @@
     "convert": "Convert to WMV",
     "converting": "Converting...",
     "convertAnother": "Convert Another",
-    "note": "Converted files can be embedded directly in PowerPoint"
+    "note": "Converted files can be embedded directly in PowerPoint",
+    "fileTooLarge": "File exceeds the {size} size limit",
+    "uploadFailed": "Upload failed",
+    "progress": {
+      "preparing": "Preparing video...",
+      "converting": "Converting with ffmpeg...",
+      "finalizing": "Finalizing..."
+    },
+    "errors": {
+      "TASK_FAILED": "Task failed — please submit again",
+      "TASK_INTERRUPTED": "Task interrupted by a service restart — please submit again",
+      "CONVERSION_FAILED": "Conversion failed",
+      "TOOL_NOT_AVAILABLE": "ffmpeg is not installed on this server",
+      "FILE_NOT_FOUND": "Source file no longer exists — please upload again"
+    }
   },
   "rssDetect": {
     "title": "RSS Feed Detector",

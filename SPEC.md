@@ -249,9 +249,10 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 - **载荷**：表无载荷列且 schema 冻结，故复用 `result_data` 存 `{input, output}` 两个 basename；api 与 worker 共享上传卷，各自用 `Config.UPLOAD_FOLDER` 解析。前端只在 `status === "success"` 时解析该字段，pending 期间不会误读；任务完成时被真实结果覆盖
 - **认领**：`UPDATE ... SET status='started' WHERE id=? AND status='pending'`，以 `rowcount == 1` 为锁——单 worker 部署下足够，多 worker 也不会重复执行
 - **轮询**：每 1 秒扫一次 pending 行并排空
-- **陈旧回收**：worker 启动时把 `started` / `progress` 行判 `failure`（`error_code=TASK_FAILED`），避免进程崩溃后前端永久转圈
+- **陈旧回收**：worker 启动时把 `started` / `progress` 行判 `failure`（`error_code=TASK_INTERRUPTED`），避免进程崩溃后前端永久转圈
 - **不重试**：失败多为确定性原因（文件损坏、ffmpeg 报错），与原 Celery 配置一致
 - **每日清理**：worker 内 daemon 线程替代 Celery Beat，每小时检查一次距上次执行是否超 24h，上次时间落在 `DOCSTAMP_TASK_DB` 同目录的 `.cleanup-stamp`
+- **用户可见文案 i18n 约定**：worker 进程无请求上下文拿不到 locale，故 `progress_message` 只写语言中立的阶段码（`preparing` / `converting` / `finalizing`），`error_code` 用稳定枚举值（`TASK_FAILED` / `TASK_INTERRUPTED` / `CONVERSION_FAILED` / `TOOL_NOT_AVAILABLE` / `FILE_NOT_FOUND`）；前端 `VideoConvertPanel.vue` 用静态映射表查 `videoConvert.progress.*` / `videoConvert.errors.*`，未知码回退显示原始 `error_message`（英文技术细节）
 
 ### 任务追踪
 
@@ -439,6 +440,13 @@ docker compose ps
 ---
 
 ## 十一、版本历史
+
+### v3.7.4 (2026-09)
+
+- **视频转换链路 i18n**：worker 写入的用户可见字段从英文字符串改为稳定 code——`progress_message` 用阶段码（`preparing` / `converting` / `finalizing`），`error_code` 细分为 `TASK_FAILED` / `TASK_INTERRUPTED`（新枚举，陈旧回收专用）/ `CONVERSION_FAILED` / `TOOL_NOT_AVAILABLE` / `FILE_NOT_FOUND`（源文件过期）。修掉 worker 丢弃 `ServiceResult.error` 硬编码 `CONVERSION_FAILED` 的问题，`TOOL_NOT_AVAILABLE` 得以透传。前端 `VideoConvertPanel.vue` 用静态映射表查 `videoConvert.progress.*` / `videoConvert.errors.*`（全字面量键，满足 locales 审计禁模板拼接），未知码回退原始 `error_message`，`CONVERSION_FAILED` 保留 ffmpeg stderr 诊断细节；组件内 3 处硬编码英文（超限提示 / 上传失败 / 转换失败）一并入 i18n。上传路径 `save_upload`/`file_security` 抛的英文 `ValueError` 文案系全站共享设施，刻意不在本批处理
+- **metadata-clean 页去重**：`pages/metadata-clean.vue` 原样内联了 `components/MetadataCleanTab.vue` 的模板与逻辑，改为与 page-decorate / pdf-compress / pdf-to-text 一致的包装页（PageHeader + 引组件）
+- **tasks.db 索引修复**：`idx_operation_logs_type` / `idx_operation_logs_created` 因历史删行残留幽灵条目而损坏（`count(*)` 走坏索引多报 12 行，真实 1510 行）。备份至 `backend/tasks.db.bak-20260923` 后 `REINDEX` 两个索引，`integrity_check` 恢复 ok，零数据丢失
+- **README 重写**：以代码库实际为准——功能表顺序对齐 `tools.config.ts`、Dockerfile 基础镜像修正为 `node:22-alpine`、后端依赖表补 `weasyprint` / `markdown` / `bleach` / `requests` / `python-dotenv`
 
 ### v3.7.3 (2026-09)
 

@@ -148,13 +148,13 @@ class TestListStale:
 class TestRecoverStaleTasks:
     def test_marks_in_flight_rows_failed(self, record):
         _enqueue(record, "t1")
-        record.update_progress("t1", "progress", progress=20, message="Converting with ffmpeg...")
+        record.update_progress("t1", "progress", progress=20, message="converting")
 
         assert worker.recover_stale_tasks(record) == 1
 
         row = record.get_by_id("t1")
         assert row["status"] == "failure"
-        assert row["error_code"] == "TASK_FAILED"
+        assert row["error_code"] == "TASK_INTERRUPTED"
         assert row["error_message"]
 
     def test_leaves_pending_rows_for_the_next_claim(self, record):
@@ -204,24 +204,31 @@ class TestExecuteTask:
         ]
 
     def test_reports_progress_while_converting(self, record, upload_dir, monkeypatch):
-        """The SSE stream is the only progress UI — these states must be written."""
-        observed = {}
+        """The SSE stream is the only progress UI — these states must be written.
 
-        def stub(input_path, output_path):
-            observed.update(record.get_by_id("t1"))
-            with open(output_path, "wb") as f:
-                f.write(b"x")
-            return ServiceResult.ok({})
+        progress_message carries locale-neutral stage codes; the frontend maps
+        them to i18n keys (videoConvert.progress.*).
+        """
+        writes = []
+        original = record.update_progress
 
-        monkeypatch.setattr(worker, "mp4_to_wmv", stub)
+        def spy(task_id, status, **kwargs):
+            writes.append((status, kwargs.get("progress"), kwargs.get("message")))
+            return original(task_id, status, **kwargs)
+
+        monkeypatch.setattr(record, "update_progress", spy)
+        monkeypatch.setattr(worker, "mp4_to_wmv", _fake_ffmpeg())
         _enqueue(record, "t1", upload_dir=upload_dir)
         record.claim("t1")
 
         worker.execute_task(record, "t1", upload_dir)
 
-        assert observed["status"] == "progress"
-        assert observed["progress"] == 20
-        assert observed["progress_message"] == "Converting with ffmpeg..."
+        assert writes == [
+            ("started", 0, "preparing"),
+            ("progress", 20, "converting"),
+            ("progress", 90, "finalizing"),
+            ("success", 100, None),
+        ]
 
     def test_service_failure_records_conversion_failed(self, record, upload_dir, monkeypatch):
         monkeypatch.setattr(
@@ -263,7 +270,23 @@ class TestExecuteTask:
 
         row = record.get_by_id("t1")
         assert row["status"] == "failure"
-        assert row["error_code"] == "CONVERSION_FAILED"
+        assert row["error_code"] == "FILE_NOT_FOUND"
+
+    def test_service_error_code_is_propagated(self, record, upload_dir, monkeypatch):
+        """The frontend translates error codes — the service's own code must
+        survive, not collapse to a generic CONVERSION_FAILED."""
+        monkeypatch.setattr(
+            worker, "mp4_to_wmv",
+            lambda i, o: ServiceResult.fail(ErrorCode.TOOL_NOT_AVAILABLE, "no ffmpeg"),
+        )
+        _enqueue(record, "t1", upload_dir=upload_dir)
+        record.claim("t1")
+
+        worker.execute_task(record, "t1", upload_dir)
+
+        row = record.get_by_id("t1")
+        assert row["status"] == "failure"
+        assert row["error_code"] == "TOOL_NOT_AVAILABLE"
 
     def test_unparsable_payload_does_not_raise(self, record, upload_dir, monkeypatch):
         """A poison row must terminate, not wedge the poll loop."""

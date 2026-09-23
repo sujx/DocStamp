@@ -277,7 +277,21 @@
     "convert": "转换为 WMV",
     "converting": "正在转换...",
     "convertAnother": "转换另一个",
-    "note": "转换后文件可在 PowerPoint 中直接嵌入播放"
+    "note": "转换后文件可在 PowerPoint 中直接嵌入播放",
+    "fileTooLarge": "文件超过 {size} 大小限制",
+    "uploadFailed": "上传失败",
+    "progress": {
+      "preparing": "正在准备视频...",
+      "converting": "正在使用 ffmpeg 转换...",
+      "finalizing": "正在完成收尾..."
+    },
+    "errors": {
+      "TASK_FAILED": "任务执行失败，请重新提交",
+      "TASK_INTERRUPTED": "服务重启导致任务中断，请重新提交",
+      "CONVERSION_FAILED": "转换失败",
+      "TOOL_NOT_AVAILABLE": "服务器未安装 ffmpeg，暂时无法转换",
+      "FILE_NOT_FOUND": "源文件已过期或不存在，请重新上传"
+    }
   },
   "rssDetect": {
     "title": "RSS 订阅探测",

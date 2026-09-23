@@ -105,6 +105,36 @@ const progressMessage = ref("");
 
 let eventSource: EventSource | null = null;
 
+// Static full-key literals: the i18n audit scans for these, and dynamic key
+// construction (template literals) is banned by design.
+const PROGRESS_KEYS: Record<string, string> = {
+  preparing: "videoConvert.progress.preparing",
+  converting: "videoConvert.progress.converting",
+  finalizing: "videoConvert.progress.finalizing",
+};
+
+const ERROR_KEYS: Record<string, string> = {
+  TASK_FAILED: "videoConvert.errors.TASK_FAILED",
+  TASK_INTERRUPTED: "videoConvert.errors.TASK_INTERRUPTED",
+  CONVERSION_FAILED: "videoConvert.errors.CONVERSION_FAILED",
+  TOOL_NOT_AVAILABLE: "videoConvert.errors.TOOL_NOT_AVAILABLE",
+  FILE_NOT_FOUND: "videoConvert.errors.FILE_NOT_FOUND",
+};
+
+function progressText(raw: string): string {
+  const key = PROGRESS_KEYS[raw];
+  return key ? t(key) : raw;
+}
+
+function errorText(code: string | undefined, message: string): string {
+  const key = code ? ERROR_KEYS[code] : undefined;
+  if (!key) return message || t("videoConvert.errors.TASK_FAILED");
+  const base = t(key);
+  // ffmpeg stderr detail is diagnostic gold — keep it after the translated prefix.
+  if (code === "CONVERSION_FAILED" && message) return `${base} — ${message}`;
+  return base;
+}
+
 function connectSSE(taskId: string) {
   closeSSE();
   eventSource = new EventSource(`/api/v1/tasks/${encodeURIComponent(taskId)}/stream`);
@@ -115,9 +145,9 @@ function connectSSE(taskId: string) {
       if (data.progress !== undefined) progress.value = data.progress;
       if (data.status) {
         if (data.status === "success") onTaskSuccess(data.result_data ? JSON.parse(data.result_data) : null);
-        else if (data.status === "failure") onTaskFail(data.error_message || "Conversion failed");
+        else if (data.status === "failure") onTaskFail(data.error_code, data.error_message || "");
       }
-      if (data.progress_message) progressMessage.value = data.progress_message;
+      if (data.progress_message) progressMessage.value = progressText(data.progress_message);
     } catch { /* ignore parse errors */ }
   };
 
@@ -152,7 +182,7 @@ const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100 MB
 
 function setFile(f: File) {
   if (f.size > MAX_VIDEO_SIZE) {
-    errorMsg.value = `File exceeds ${fmtSize(MAX_VIDEO_SIZE)} limit`;
+    errorMsg.value = t("videoConvert.fileTooLarge", { size: fmtSize(MAX_VIDEO_SIZE) });
     return;
   }
   resetState();
@@ -173,7 +203,7 @@ async function startConvert() {
     const resp = await axios.post("/api/v1/video-convert", fd);
     connectSSE(resp.data.task_id);
   } catch (err: any) {
-    errorMsg.value = await extractError(err, "Upload failed");
+    errorMsg.value = await extractError(err, t("videoConvert.uploadFailed"));
     converting.value = false;
   }
 }
@@ -196,10 +226,10 @@ async function onTaskSuccess(result: Record<string, unknown> | null) {
   done.value = true;
 }
 
-function onTaskFail(err: string) {
+function onTaskFail(code: string | undefined, message: string) {
   closeSSE();
   converting.value = false;
-  errorMsg.value = err || "Conversion failed";
+  errorMsg.value = errorText(code, message);
 }
 
 function download() {

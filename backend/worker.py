@@ -26,6 +26,7 @@ for _path in (_backend_dir, _project_root):
         sys.path.insert(0, _path)
 
 from config import Config  # noqa: E402
+from errors import ErrorCode  # noqa: E402
 from models import TaskRecord, init_db  # noqa: E402
 from services.video_converter import mp4_to_wmv  # noqa: E402
 from utils.file_cleanup import cleanup_temp_files  # noqa: E402
@@ -93,7 +94,7 @@ def recover_stale_tasks(record: TaskRecord) -> int:
     stale = record.list_stale()
     for row in stale:
         record.update_progress(
-            row["id"], "failure", error_code="TASK_FAILED",
+            row["id"], "failure", error_code="TASK_INTERRUPTED",
             error_message="Worker restarted, task interrupted — please submit again",
         )
     return len(stale)
@@ -122,28 +123,32 @@ def execute_task(record: TaskRecord, task_id: str, upload_folder: str) -> None:
 
     if not os.path.isfile(input_path):
         record.update_progress(
-            task_id, "failure", error_code="CONVERSION_FAILED",
+            task_id, "failure", error_code="FILE_NOT_FOUND",
             error_message="Source file no longer exists — please upload again",
         )
         return
 
     try:
+        # progress_message carries locale-neutral stage codes; the frontend
+        # maps them to videoConvert.progress.* i18n keys.
         record.update_progress(task_id, "started", progress=0,
-                               message="Preparing video...")
+                               message="preparing")
         record.update_progress(task_id, "progress", progress=20,
-                               message="Converting with ffmpeg...")
+                               message="converting")
 
         result = mp4_to_wmv(input_path, output_path)
 
         if not result.success:
             record.update_progress(
                 task_id, "failure", progress=0,
-                error_code="CONVERSION_FAILED", error_message=result.message,
+                error_code=result.error.value if result.error
+                else ErrorCode.CONVERSION_FAILED.value,
+                error_message=result.message,
             )
             return
 
         record.update_progress(task_id, "progress", progress=90,
-                               message="Finalizing...")
+                               message="finalizing")
 
         base = input_name.rsplit(".", 1)[0] if "." in input_name else input_name
         record.update_progress(
