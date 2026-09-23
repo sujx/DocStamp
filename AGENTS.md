@@ -225,4 +225,5 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 ## 详细文档
 
 - `SPEC.md` — 完整设计规范、API 端点全集、版本历史
+- `TODO.md` — 已知遗留项与运维待办（刻意未做项都记在这里，别再重新调研）
 - `docs/vibecoding-blog.md` — 开发经验分享博客
