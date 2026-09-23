@@ -73,13 +73,6 @@ docker compose ps
 ./manage.sh docker-down   # 停止
 ```
 
-### ACR 发布（可选）
-
-```bash
-./publish.sh          # 推送到阿里云 ACR
-./publish.sh v3.6     # 指定版本号
-```
-
 ## 项目结构
 
 ```
@@ -112,7 +105,6 @@ docStamp/
 ├── Dockerfile                  # 多阶段构建（node:22-alpine + python:3.12-slim）
 ├── docker-entrypoint.sh        # Docker 入口（运行时目录 + volume 权限）
 ├── manage.sh                   # 开发/部署管理脚本
-├── publish.sh                  # ACR 镜像发布
 ├── SPEC.md                     # 详细设计规范
 └── AGENTS.md                   # AI 助手指令（Qoder 标准）
 ```
