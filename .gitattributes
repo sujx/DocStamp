@@ -1,0 +1,5 @@
+# Shell scripts must be checked out with LF even when core.autocrlf=true.
+# A CRLF shebang becomes "#!/bin/bash\r", which Docker's COPY bakes into the
+# image verbatim — the Linux kernel then fails with "no such file or directory"
+# and the container never starts.
+*.sh text eol=lf

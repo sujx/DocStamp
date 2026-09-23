@@ -42,7 +42,9 @@ app/
 poetry.lock
 
 # Docker
-.dockerignore
+# .dockerignore is tracked on purpose: without it the build context includes
+# backend/tasks.db (the only copy of the usage stats) and every image built
+# locally would bake it in — and publish.sh ships those images to ACR.
 
 # Environment — contains real API keys, NEVER commit
 .env

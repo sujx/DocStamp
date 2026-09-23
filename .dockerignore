@@ -1,0 +1,28 @@
+# Keep the build context to source only. Without this file the entire working
+# tree is uploaded to the daemon and COPY-ed into the image, which baked the
+# real backend/tasks.db (the only copy of the usage stats) and its backups
+# into every image built here — images that publish.sh pushes to ACR.
+
+# ── VCS & tooling ────────────────────────────────────────────────────
+.git
+.gitignore
+.gitattributes
+.venv/
+venv/
+
+# ── Frontend deps & build output (rebuilt inside the image) ──────────
+frontend/node_modules/
+frontend/.output/
+frontend/.nuxt/
+
+# ── Runtime data — never bake stats or user uploads into an image ────
+backend/tasks.db*
+backend/data/
+backend/output/*
+
+# ── Python caches & test scaffolding ─────────────────────────────────
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+backend/tests/
+backend/.nuxt/
