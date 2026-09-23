@@ -1,7 +1,7 @@
 # Keep the build context to source only. Without this file the entire working
 # tree is uploaded to the daemon and COPY-ed into the image, which baked the
 # real backend/tasks.db (the only copy of the usage stats) and its backups
-# into every image built here — images that publish.sh pushes to ACR.
+# into every image built here — and those images get pushed to ACR.
 
 # ── VCS & tooling ────────────────────────────────────────────────────
 .git

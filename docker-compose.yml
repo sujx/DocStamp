@@ -16,8 +16,8 @@ services:
   # ── Flask API + 前端静态文件 ──────────────────────────────────────
   api:
     build: .
-    # build 供本地从源码起（./manage.sh docker-up）；image 是发布用的名字 ——
-    # publish.sh 推的就是它，ECS 上只需 docker compose pull 就能更新。
+    # build 供本地从源码起（./manage.sh docker-up）；image 是 ACR 上的发布名 ——
+    # 镜像推上去后，ECS 上只需 docker compose pull 就能更新。
     image: registry.cn-wulanchabu.aliyuncs.com/grepsu/docstamp:latest
     container_name: docstamp-api
     ports:

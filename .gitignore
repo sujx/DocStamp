@@ -44,7 +44,7 @@ poetry.lock
 # Docker
 # .dockerignore is tracked on purpose: without it the build context includes
 # backend/tasks.db (the only copy of the usage stats) and every image built
-# locally would bake it in — and publish.sh ships those images to ACR.
+# locally would bake it in — and those images get shipped to ACR.
 
 # Release script — local only. It hardcodes the ACR registry, namespace and
 # username plus the ECS deploy steps. The password itself lives in .env, but
