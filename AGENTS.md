@@ -245,6 +245,13 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 | `manage.sh` 调 `python3` | 本机是 Windows Store 残桩，起不来后端（只能直接调 `/c/Program Files/Python312/python`）。涉及 `start` / `test` / `test-cov` |
 | 开发模式没有清理线程 | 每日清理只挂在 gunicorn `on_starting`，`python app.py` 不起它，dev 机器只能 `./manage.sh clean-output` 手动清 |
 
+### 前端组件
+
+| 事项 | 为何未做 |
+|------|----------|
+| `FileUploader` 的 `max-size` 单位错 + `file-rejected` 无人监听 | prop 按**字节**比较（`f.size > props.maxSize`），但 5 个调用点都传 `:max-size="100"` 想表达 100 MB，于是 >100 字节的文件全被挡下；而 `emit("file-rejected", …)` 在全仓库**没有任何监听者**（`grep -rn file-rejected frontend/` 只命中组件自身），用户看到的是「选完文件页面毫无反应」的静默失效。受影响：`MetadataCleanTab.vue`、`PdfCompressPanel.vue`、`PageDecoratePanel.vue`、`PdfToTextPanel.vue`、`pages/pdf-merge.vue`。修法要同时定组件契约（改 MB 还是改字节语义）+ 接上错误提示 + 改 5 个调用点，属独立一批；新加的 `pages/webp-to-jpeg.vue` 刻意不传该 prop 以绕开 |
+| `pages/pdf-merge.vue` 监听 `@files-selected` | 组件实际 emit 的是 `file-selected`（无 s），故该页 `onFilesSelected` 永不触发，是与上一条同源的静默失效。合在同一批里修 |
+
 ### 测试与数据
 
 - **测试会往真实 `backend/tasks.db` 写流水** —— `backend/tests/conftest.py` 的 `app` fixture 只覆盖 `UPLOAD_FOLDER`、**不覆盖 `TASK_DB_PATH`**，而 `create_app()` 会 `init_db()` 打开真实库；早年隔离 DB 的 fixture 已随异步链路拆除，现在没有任何用例隔离它。证据：2026-09-23 当天 522 行 `operation_logs` 的 `ip_address` 全部是 `127.0.0.1`，即本机 pytest / dev 产生。修法：`app` fixture 把 `TASK_DB_PATH` 指向 `tmp_path`。
