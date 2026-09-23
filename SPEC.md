@@ -135,9 +135,9 @@ backend/
 ├── schemas.py              # Pydantic v2 请求 DTO（JSON body 端点）
 ├── error_handler.py        # 全局异常拦截 + @validate_request + requestId
 ├── json_logging.py         # JSON 结构化日志 (TimedRotatingFileHandler, 30 天)
-├── models.py               # TaskRecord + OperationLog + BaseCRUD (原始 SQL)
+├── models.py               # TaskRecord（含队列查询）+ OperationLog + BaseCRUD (原始 SQL)
 ├── cache.py                # Flask-Caching SimpleCache
-├── celery_app.py           # Celery (Redis broker, 2 队列)
+├── worker.py               # 任务 worker：轮询 SQLite 队列 + 每日清理
 ├── gunicorn.conf.py        # 生产配置
 ├── blueprints/             # HTTP 路由层（每功能一个文件，共 16 个；实际路径均带 /api/v1 前缀）
 │   ├── convert.py          # /api/convert, /api/preview, /api/stats (计数)
@@ -170,9 +170,6 @@ backend/
 │   ├── pdf_compressor.py   # PDF 压缩
 │   ├── metadata_cleaner.py # 元数据清理
 │   └── page_decorator.py   # 页码页眉页脚 (reportlab)
-├── tasks/                  # Celery 异步任务
-│   ├── video.py            # pdf_queue: MP4 → WMV
-│   └── maintenance.py      # office_queue: Beat 定时清理
 ├── utils/
 │   ├── base/               # file_helpers
 │   ├── file_security.py    # 魔数校验 + 扩展名白名单 + 大小限制
@@ -190,7 +187,7 @@ backend/
 | **Blueprint** | HTTP 请求/响应 | 不包含业务逻辑，函数不超过 20 行 |
 | **Service** | 业务逻辑 | 零 Flask 依赖，纯输入→输出函数 |
 | **Utils** | 通用工具 | 可被任意层引用 |
-| **Tasks** | 异步任务 | Celery task，更新 TaskRecord 进度 |
+| **Worker** | 异步任务执行 | 轮询 `task_records` 队列，原子认领后更新 TaskRecord 进度 |
 
 ### Service 层规范
 
@@ -244,13 +241,17 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 
 ## 六、异步任务框架
 
-### Celery 配置
+### SQLite 表即队列
 
-- Broker: Redis（生产默认 `redis://127.0.0.1:6379/0`），`memory://` 仅开发用
-- Result backend: Redis（`redis://127.0.0.1:6379/1`）
-- 2 个队列：`pdf_queue`（视频转换） / `office_queue`（定时清理），由同一 Worker 容器消费
-- 并发：容器内 `--concurrency=2`（`worker_concurrency=4` 仅为无 CLI 覆盖时的默认值），`task_acks_late=True` 防任务丢失
-- Celery Beat: 每日凌晨 3 点清理 7 天前临时文件
+无 broker。`task_records` 表同时充当任务记录与工作队列，由独立进程 `backend/worker.py` 消费（Docker 内 `python -m backend.worker`，开发模式 `./manage.sh worker`）。
+
+- **入队**：`POST /api/video-convert` 存盘后调 `TaskRecord.create_task(task_id, "video_convert", "pdf_queue", result_data=...)` 建 pending 行，直接把 `task_id` 返回前端
+- **载荷**：表无载荷列且 schema 冻结，故复用 `result_data` 存 `{input, output}` 两个 basename；api 与 worker 共享上传卷，各自用 `Config.UPLOAD_FOLDER` 解析。前端只在 `status === "success"` 时解析该字段，pending 期间不会误读；任务完成时被真实结果覆盖
+- **认领**：`UPDATE ... SET status='started' WHERE id=? AND status='pending'`，以 `rowcount == 1` 为锁——单 worker 部署下足够，多 worker 也不会重复执行
+- **轮询**：每 1 秒扫一次 pending 行并排空
+- **陈旧回收**：worker 启动时把 `started` / `progress` 行判 `failure`（`error_code=TASK_FAILED`），避免进程崩溃后前端永久转圈
+- **不重试**：失败多为确定性原因（文件损坏、ffmpeg 报错），与原 Celery 配置一致
+- **每日清理**：worker 内 daemon 线程替代 Celery Beat，每小时检查一次距上次执行是否超 24h，上次时间落在 `DOCSTAMP_TASK_DB` 同目录的 `.cleanup-stamp`
 
 ### 任务追踪
 
@@ -272,7 +273,7 @@ SSE（Server-Sent Events）：`GET /api/tasks/{id}/stream`。需要的组件自�
 
 ### 定时清理
 
-替代原有的 `@after_this_request` 即时删除模式。Celery Beat 每日清理超过 7 天的临时文件。文件保留 7 天便于调试和重试下载。
+替代原有的 `@after_this_request` 即时删除模式。worker 的清理线程每日清理超过 7 天的临时文件。文件保留 7 天便于调试和重试下载。
 
 ### 加密
 
@@ -344,7 +345,7 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 
 ## 九、部署
 
-docStamp 使用 Docker Compose 部署，3 容器适配 2C2G 服务器：
+docStamp 使用 Docker Compose 部署，2 容器适配 2C2G 服务器：
 
 ```bash
 # 1. 配置环境变量
@@ -362,29 +363,30 @@ docker compose ps
 | 容器 | 职责 | 端口 |
 |------|------|:---:|
 | `api` | Gunicorn gthread + 静态文件 | `127.0.0.1:5000` |
-| `redis` | Celery broker + 结果后端 + 缓存（128MB） | 内部 |
-| `celery` | 2 队列合并 + Beat 内嵌（concurrency=2） | — |
+| `worker` | 轮询 SQLite 队列跑视频转换 + 每日清理线程 | — |
+
+两个容器共用同一镜像，靠 `command:` 区分角色；`output_data`（上传与产物）与 `db_data`（tasks.db）两个卷双方共享，是队列能跨进程工作的前提。
 
 ### 资源配置
 
 | 组件 | 配置 |
 |------|------|
-| Redis | `maxmemory 128mb`, allkeys-lru |
 | API | gunicorn `--workers 2` |
-| Celery | 2 队列合并, `--concurrency=2`, Beat 内嵌 (`-B`) |
-| Celery 内存限制 | `mem_limit: 512M` |
-| 预估总内存 | ~800MB |
+| Worker | 单进程轮询（1 秒间隔），串行执行转换 |
+| Worker 内存限制 | `mem_limit: 512M`（ffmpeg 转码峰值，OOM 不连坐 API） |
+| 预估总内存 | ~670MB |
 
 ### 健康检查
 
-所有容器均配置健康检查：Redis `redis-cli ping` → API `curl /api/health` → Celery `celery inspect ping`，通过 `condition: service_healthy` 确保依赖就绪后再启动。容器以非 root 用户 `docstamp` 运行，entrypoint 脚本处理 Docker volume 权限。
+两个容器均配置健康检查：API `curl /api/health` → Worker `pgrep -f 'backend[.]worker'`（括号写法避免匹配到 healthcheck 自身的 `sh -c` 命令行）。容器以非 root 用户 `docstamp` 运行，entrypoint 脚本处理 Docker volume 权限。
 
 ### 管理脚本
 
 ```bash
 ./manage.sh docker-up     # 构建并启动
 ./manage.sh docker-down   # 停止
-./manage.sh start         # 本地开发模式（Flask + Nuxt）
+./manage.sh start         # 本地开发模式（Flask + worker + Nuxt）
+./manage.sh worker        # 仅启动任务 worker
 ./manage.sh stop          # 停止开发服务
 ```
 
@@ -437,6 +439,14 @@ docker compose ps
 ---
 
 ## 十一、版本历史
+
+### v3.7.3 (2026-09)
+
+- **去 Redis / Celery**：异步链路从「Redis broker + Celery worker + Beat」改为「`task_records` 表即队列 + 独立 worker 进程」。删除 `celery_app.py`、`tasks/video.py`、`tasks/maintenance.py`，新增 `backend/worker.py`（轮询 → 原子认领 → 执行 → 陈旧回收 + 每日清理线程）；`models.py:TaskRecord` 补 `next_pending()` / `claim()` / `list_stale()`，`create_task()` 增加可选 `result_data` 承载任务载荷；`config.py` 删 `CELERY_BROKER_URL` / `CELERY_RESULT_BACKEND`；`pyproject.toml` 与 Dockerfile 去掉 `celery` / `redis` 两个依赖
+- **动机**：Redis 在本系统里只服务视频转换一个异步任务与每日清理，Celery 的 result backend 全仓无人读取（进度与结果都走 SQLite + SSE）。去掉它消除了一整类故障——实测无 broker 时 `.delay()` 挂 64 秒后才抛 `RuntimeError`，对应 HTTP 请求 60 秒不返回、前端无限转圈；同时本地开发模式此前**永远**跑不通视频转换（`manage.sh start` 不含 Redis/worker），现在只要 host 装了 ffmpeg 即可
+- **部署**：3 容器 → 2 容器（删 `redis` 服务与 `redis_data` 卷，`celery` 服务改名 `worker`），预估内存 ~800MB → ~670MB。worker healthcheck 用 `pgrep -f 'backend[.]worker'`；ffmpeg 仍被 `mem_limit: 512M` 关在 worker 里，OOM 不连坐 API
+- **零改动面**：前端 `VideoConvertPanel.vue`、SSE 端点 `download.py`、转换逻辑 `services/video_converter.py`、清理逻辑 `utils/file_cleanup.py` 全部未动；`task_records` schema 未变（`queue` 列继续写 `"pdf_queue"`），无需数据迁移
+- **新增测试**：`tests/test_worker.py` 34 条（认领原子性与竞争失败、跳过非 pending 与其他 task_type、同秒入队按插入序 FIFO、陈旧行回收且回收后不可再认领、成功/服务失败/异常/载荷损坏/源文件缺失五种终态、进度序列、清理调度判定，以及 API→worker 载荷交接的端到端 3 条）。原 `tests/test_task_tracking.py`（Celery hook 与 beat 配置断言）中仍有价值的断言已移植，其余随 Celery 一并删除
 
 ### v3.7.2 (2026-09)
 

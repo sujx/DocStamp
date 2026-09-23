@@ -38,12 +38,12 @@
 | 层 | 技术 |
 |------|------|
 | **后端框架** | Python Flask + Pydantic v2 + Flask-CORS + Flask-Babel + Flask-Caching |
-| **异步任务** | Celery（Redis broker）+ 2 队列 + SSE 进度推送 |
+| **异步任务** | SQLite 表即队列 + 独立 worker 进程 + SSE 进度推送 |
 | **文档处理** | pandoc / pypdf / Pillow / reportlab / pdfminer.six / python-docx / openpyxl |
 | **AI** | DeepSeek v4 Flash + MinerU API（可选，不配 Key 自动降级） |
 | **前端框架** | Nuxt 3.15.4 (SPA) + Nuxt UI v2 + Tailwind CSS v3 + Flat Design + Plus Jakarta Sans |
 | **国际化** | @nuxtjs/i18n v9（zh-CN / en） |
-| **部署** | Docker Compose（3 容器）+ Gunicorn gthread + Nginx |
+| **部署** | Docker Compose（2 容器）+ Gunicorn gthread + Nginx |
 
 ## 快速开始
 
@@ -53,17 +53,19 @@
 # 安装后端依赖
 cd backend && pip3 install --break-system-packages flask flask-cors flask-babel \
     flask-caching python-docx openpyxl python-pptx markdown bleach img2pdf \
-    pypdf Pillow reportlab gunicorn pydantic celery redis cryptography \
+    pypdf Pillow reportlab gunicorn pydantic cryptography \
     pdfminer.six
 
 # 安装前端依赖
 cd ../frontend && npm install
 
-# 启动开发模式（Flask :5000 + Nuxt :8080 HMR）
+# 启动开发模式（Flask :5000 + worker + Nuxt :8080 HMR）
 cd .. && ./manage.sh start
 ```
 
-### Docker 部署（3 容器，2C2G 推荐）
+视频转换需要本机装有 `ffmpeg`；缺失时其余工具不受影响。
+
+### Docker 部署（2 容器，2C2G 推荐）
 
 ```bash
 # 1. 复制环境变量并填写配置
@@ -103,13 +105,12 @@ docStamp/
 │   ├── schemas.py              # Pydantic v2 请求 DTO（JSON body 端点）
 │   ├── error_handler.py        # 全局异常拦截 + @validate_request + requestId
 │   ├── json_logging.py         # JSON 结构化日志（30 天轮转）
-│   ├── models.py               # TaskRecord + OperationLog（原始 SQL）
+│   ├── models.py               # TaskRecord（含队列查询）+ OperationLog（原始 SQL）
 │   ├── cache.py                # Flask-Caching（限流 + 统计缓存）
-│   ├── celery_app.py           # Celery（Redis broker，2 队列）
+│   ├── worker.py               # 任务 worker：轮询 SQLite 队列 + 每日清理
 │   ├── gunicorn.conf.py        # Gunicorn gthread 生产配置
 │   ├── blueprints/             # HTTP 路由层（16 个，每个功能 1 文件）
 │   ├── services/               # 业务逻辑层（纯函数，全返回 ServiceResult[T]）
-│   ├── tasks/                  # Celery 异步任务（video / maintenance）
 │   └── utils/
 │       ├── base/               # file_helpers
 │       ├── file_security.py    # 三层文件校验（大小/扩展名/魔数）
@@ -121,7 +122,7 @@ docStamp/
 │   ├── components/ui/          # 原子组件（CardBase / SkeletonBlock）
 │   ├── pages/                  # 18 个路由页面（13 个工具 + 1 个仪表盘 + 4 个面板子页）
 │   └── i18n/locales/           # zh-CN / en
-├── docker-compose.yml          # 3 容器编排（redis + api + celery）
+├── docker-compose.yml          # 2 容器编排（api + worker）
 ├── Dockerfile                  # 多阶段构建（node:24-alpine + python:3.12-slim）
 ├── docker-entrypoint.sh        # Docker 入口（运行时目录 + volume 权限）
 ├── manage.sh                   # 开发/部署管理脚本
@@ -136,7 +137,7 @@ docStamp/
 - **全局异常拦截** — 所有异常 → 标准化 JSON `{code, msg, requestId}`
 - **Pydantic v2 校验** — `@validate_request` 装饰器自动校验请求参数
 - **ServiceResult[T]** — 所有 Service 函数强制 success/failure 分支处理
-- **异步任务** — Celery 2 队列 + TaskRecord 生命周期追踪 + SSE 实时进度
+- **异步任务** — SQLite 表即队列（原子认领）+ 独立 worker 进程 + TaskRecord 生命周期追踪 + SSE 实时进度
 - **速率限制** — 双层防御（Nginx 粗粒度 + 应用层 `@rate_limit` IP 级），上传接口按负载分级限流
 - **文件安全** — 三层校验（100MB 大小 / 扩展名白名单 / 魔数签名，视频格式跳过）+ 文件名 XSS 净化
 - **API 版本化** — 全部响应带 `X-API-Version: 3.7` 头
@@ -148,8 +149,8 @@ docStamp/
 
 | 模式 | 命令 | 容器/进程 | 推荐配置 |
 |------|------|:---:|:---:|
-| 开发 | `./manage.sh start` | 2 进程 | 本地开发 |
-| Docker | `docker compose up -d` | 3 容器 | 2C2G 服务器 |
+| 开发 | `./manage.sh start` | 3 进程 | 本地开发 |
+| Docker | `docker compose up -d` | 2 容器 | 2C2G 服务器 |
 
 ## 系统要求
 
@@ -158,5 +159,4 @@ docStamp/
 | 内存 | 2GB+ |
 | CPU | 2 核 |
 | Docker | 需要 |
-| Redis | 容器内自带 |
-| pandoc / poppler-utils | Dockerfile 内已安装 |
+| pandoc / poppler-utils / ffmpeg | Dockerfile 内已安装 |

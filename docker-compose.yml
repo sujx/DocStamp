@@ -1,36 +1,17 @@
 # ───────────────────────────────────────────────────────────────────
-# docStamp — Docker 部署（3 容器，适配 2C2G 服务器）
+# docStamp — Docker 部署（2 容器，适配 2C2G 服务器）
 #
-# 容器：Redis + Flask API (gunicorn) + Celery All-in-One (3 队列 + Beat)
+# 容器：Flask API (gunicorn) + Worker (SQLite 队列 + 每日清理)
 #
 # 使用：
 #   1. 复制 .env.example → .env 并填写配置
 #   2. docker compose up -d --build
 #   3. 配置 nginx 反向代理到 127.0.0.1:5000
 #
-# 资源：Redis 128MB + API 2 workers + Celery 2 concurrency → ~800MB
+# 资源：API 2 workers + Worker（ffmpeg 转换，mem_limit 512M）→ ~670MB
 # ───────────────────────────────────────────────────────────────────
 
 services:
-  # ── Redis ──────────────────────────────────────────────────────────
-  redis:
-    image: redis:7-alpine
-    container_name: docstamp-redis
-    restart: unless-stopped
-    command: >
-      redis-server
-      --appendonly yes
-      --maxmemory 128mb
-      --maxmemory-policy allkeys-lru
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-      start_period: 5s
-
   # ── Flask API + 前端静态文件 ──────────────────────────────────────
   api:
     build: .
@@ -50,14 +31,9 @@ services:
       - DOCSTAMP_DEEPSEEK_API_KEY=${DOCSTAMP_DEEPSEEK_API_KEY:-}
       - DOCSTAMP_MINERU_API_KEY=${DOCSTAMP_MINERU_API_KEY:-}
       - DOCSTAMP_PUBLIC_URL=${DOCSTAMP_PUBLIC_URL:-}
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - DOCSTAMP_CORS_ORIGINS=${DOCSTAMP_CORS_ORIGINS:-http://localhost:8080,https://doc.sujx.net}
       - DOCSTAMP_TASK_DB=/opt/docstamp/backend/data/tasks.db
       - PYTHONPATH=/opt/docstamp/backend
-    depends_on:
-      redis:
-        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:5000/api/health"]
@@ -71,32 +47,24 @@ services:
       --pid /tmp/gunicorn.pid
       backend.wsgi:app
 
-  # ── Celery All-in-One（3 队列合并 + Beat 内嵌）───────────────────
-  celery:
+  # ── Worker：轮询 SQLite 队列跑视频转换 + 每日清理临时文件 ─────────
+  worker:
     build: .
-    container_name: docstamp-celery
-    command: >
-      celery -A backend.celery_app worker
-      -Q pdf_queue,office_queue
-      --concurrency=2
-      -B --loglevel=info
+    container_name: docstamp-worker
+    # 括号写法避免 pgrep 匹配到 healthcheck 自己的 sh -c 命令行
+    command: python -m backend.worker
     volumes:
       - output_data:/opt/docstamp/backend/output
       - log_data:/var/log/docstamp
       - db_data:/opt/docstamp/backend/data
     environment:
       - TZ=Asia/Shanghai
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - DOCSTAMP_ENCRYPTION_KEY=${DOCSTAMP_ENCRYPTION_KEY:-}
       - DOCSTAMP_TASK_DB=/opt/docstamp/backend/data/tasks.db
       - PYTHONPATH=/opt/docstamp/backend
-    depends_on:
-      redis:
-        condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "celery -A backend.celery_app inspect ping -t 5 2>/dev/null || exit 1"]
+      test: ["CMD-SHELL", "pgrep -f 'backend[.]worker' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -106,5 +74,4 @@ services:
 volumes:
   output_data:
   log_data:
-  redis_data:
   db_data:

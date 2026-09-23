@@ -36,12 +36,6 @@ class Config:
     FORBIDDEN_PATH_CHARS = {"..", "/", "\\"}
     SECRET_KEY = os.environ.get("DOCSTAMP_SECRET_KEY", "dev-secret-change-in-production")
 
-    # ── Celery ──────────────────────────────────────────────────────
-    CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
-    CELERY_RESULT_BACKEND = os.environ.get(
-        "CELERY_RESULT_BACKEND", "db+sqlite:///tasks.db"
-    )
-
     # ── Task DB ─────────────────────────────────────────────────────
     TASK_DB_PATH = os.environ.get(
         "DOCSTAMP_TASK_DB",

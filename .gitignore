@@ -24,6 +24,7 @@ npm-debug.log*
 backend/output/*
 !backend/output/.gitkeep
 backend/tasks.db*
+backend/.cleanup-stamp
 .plan/
 .codegraph/
 .claude/

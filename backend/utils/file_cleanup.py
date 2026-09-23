@@ -43,13 +43,8 @@ def cleanup_temp_files(upload_folder: str, max_age_days: int = 7) -> dict:
     Per-task output directories (pdf2img_*, thumbs_*, print-split task dirs,
     properties batch dirs) are removed recursively with their contents.
 
-    Designed to be called by Celery Beat or external cron:
-        celery.conf.beat_schedule = {
-            "cleanup-temp-files": {
-                "task": "backend.tasks.maintenance.cleanup_temp_files_task",
-                "schedule": crontab(hour=3, minute=0),
-            },
-        }
+    Designed to be called by the worker's daily cleanup thread (see
+    backend/worker.py) or by an external cron job.
 
     Args:
         upload_folder: Directory containing temporary files.

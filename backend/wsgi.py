@@ -9,8 +9,8 @@ SQLite connection, and blueprint registration as a side effect).
 
 The project root is added to sys.path so that `from backend.xxx`
 imports work regardless of the working directory (Gunicorn is
-started from backend/, but Celery tasks and some blueprints use
-absolute `backend.` prefix imports).
+started from backend/, but some blueprints use absolute `backend.`
+prefix imports).
 """
 
 import os

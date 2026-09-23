@@ -16,9 +16,9 @@
 | i18n | @nuxtjs/i18n v9 | zh-CN / en |
 | 后端框架 | Flask | ^3.1 |
 | 参数校验 | Pydantic v2 | ^2.13 |
-| 异步任务 | Celery | ^5.6 (dev: memory://) |
+| 异步任务 | SQLite 表即队列 + worker 进程 | backend/worker.py |
 | 数据库 | SQLite (WAL) | tasks.db |
-| 部署 | Docker Compose | 3 容器 |
+| 部署 | Docker Compose | 2 容器 |
 
 ## 项目结构
 
@@ -31,13 +31,12 @@ docStamp/
 │   ├── schemas.py              # Pydantic v2 请求 DTO
 │   ├── error_handler.py        # 全局异常拦截 + @validate_request + requestId
 │   ├── json_logging.py         # JSON 结构化日志 (30 天轮转)
-│   ├── models.py               # TaskRecord + OperationLog + BaseCRUD (原始 SQL)
+│   ├── models.py               # TaskRecord (含队列查询) + OperationLog + BaseCRUD (原始 SQL)
 │   ├── cache.py                # Flask-Caching SimpleCache
-│   ├── celery_app.py           # Celery (2 队列: pdf/office)
+│   ├── worker.py               # 任务 worker: 轮询队列 + 每日清理
 │   ├── gunicorn.conf.py        # 生产: bind 0.0.0.0:5000, workers=2
 │   ├── blueprints/             # HTTP 路由层 (每功能一个文件)
 │   ├── services/               # 业务逻辑层 (纯函数，零 Flask 依赖，返回 ServiceResult[T])
-│   ├── tasks/                  # Celery 异步任务 (video / maintenance)
 │   └── utils/                  # 通用工具 (file_security / rate_limit / retry / crypto)
 ├── frontend/
 │   ├── nuxt.config.ts          # SSG + i18n + Nuxt UI v2
@@ -103,7 +102,7 @@ docStamp/
 | Blueprint | HTTP 请求/响应 | ≤ 20 行，只做参数提取 → 调 service → 返回响应 |
 | Service | 业务逻辑 | 零 Flask 依赖，全部返回 `ServiceResult[T]` |
 | Utils | 通用工具 | 可被任意层引用 |
-| Tasks | Celery 异步任务 | 更新 TaskRecord 进度 + SSE 推送 |
+| Worker | 异步任务执行 | 轮询 `task_records` 队列，更新 TaskRecord 进度供 SSE 推送 |
 
 ### Service 层
 
@@ -208,7 +207,8 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 - 第三方包函数内延迟导入（裸机部署兼容）
 - 环境变量从 `Config` 类读，不模块级 `os.environ`
 - 中文 prompt 用单引号字符串（避免中文引号冲突）
-- Celery broker 生产默认 Redis，不用 `memory://`
+- 异步任务走 `task_records` 表当队列，由 `backend/worker.py` 轮询认领，不引入 broker
+- 新增异步任务类型时，`TaskRecord.next_pending(task_type=...)` 与 worker 的分发都要跟上
 
 ### 前端
 
