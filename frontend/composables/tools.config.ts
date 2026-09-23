@@ -25,6 +25,9 @@ export const TOOLS: ToolDef[] = [
   { key: "pdf-tools", to: "/pdf-tools", icon: "i-heroicons-wrench-screwdriver", label: "tabs.pdf-tools", desc: "pdf-tools.description", order: 23 },
   { key: "pdf-merge", to: "/pdf-merge", icon: "i-heroicons-plus-circle", label: "tabs.pdfMerge", desc: "pdfMerge.description", order: 24 },
 
+  // ── 图片工具（展开到顶层）──
+  { key: "webp-to-jpeg", to: "/webp-to-jpeg", icon: "i-heroicons-photo", label: "tabs.webpToJpeg", desc: "webpToJpeg.description", order: 25 },
+
   // ── 顶层 ──
   { key: "status", to: "/status", icon: "i-heroicons-chart-bar", label: "tabs.status", desc: "status.description", order: 30 },
 ]

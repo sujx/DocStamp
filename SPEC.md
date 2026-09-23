@@ -10,9 +10,9 @@
 
 ---
 
-## 二、功能模块（11 个）
+## 二、功能模块（12 个）
 
-功能模块 = 10 项工具 + 使用统计，共 11 个；首页仪表盘是导航页不计入，下表按路由列出全部 12 个页面。
+功能模块 = 11 项工具 + 使用统计，共 12 个；首页仪表盘是导航页不计入，下表按路由列出全部 13 个页面。
 
 **侧栏导航**：
 
@@ -28,6 +28,7 @@ Excel 合并        → /excel-merge
 PDF 编辑          → /pdf-editor
 调整 PDF          → /pdf-tools
 PDF 合并          → /pdf-merge
+WebP 转 JPEG      → /webp-to-jpeg
 使用统计          → /status
 ```
 
@@ -44,7 +45,8 @@ PDF 合并          → /pdf-merge
 | 9 | PDF 编辑 | `/pdf-editor` | 删除/插入/重排页面 |
 | 10 | 调整 PDF | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚（三 Tab） |
 | 11 | PDF 合并 | `/pdf-merge` | 多 PDF 合并，拖拽排序 |
-| 12 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
+| 12 | WebP 转 JPEG | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
+| 13 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
 
 ---
 
@@ -226,6 +228,7 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 | `POST` | `/api/convert/format` | 格式互转 (DOCX/HTML→PDF) |
 | `POST` | `/api/page-decorate` | 添加页码/页眉/页脚 |
 | `POST` | `/api/image-process` | 图片处理 (缩放/裁剪/转换/压缩) |
+| `POST` | `/api/v1/webp-to-jpeg` | WebP → JPEG（透明填白底） |
 | `POST` | `/api/rss-detect` | RSS/Atom 订阅探测 |
 
 ---
@@ -409,6 +412,15 @@ API 容器健康检查 `curl /api/v1/health`。容器以非 root 用户 `docstam
 ---
 
 ## 十一、版本历史
+
+### v3.8 (2026-09)
+
+- **新增 WebP 转 JPEG**：单文件上传即转，Pillow 解码 → 透明区域合成白底 → JPEG quality 90 输出，动图只取首帧；不做批量，无质量/背景旋钮
+- **后端**：新增 `services/webp_to_jpeg.py`（零 Flask 依赖、返回 `ServiceResult[T]`）与 `blueprints/webp_to_jpeg_bp.py`（`POST /api/v1/webp-to-jpeg`，表单字段 `file`，`save_upload` → service → `send_file` + `@after_this_request` 清理，与 img2pdf / pdf2img 同形）；`app.py` 注册蓝图；`services/stats.py` 的 `MODULE_NAMES` 增 `webp-to-jpeg`；`stats_bp.py` sitemap 补 `/webp-to-jpeg`。`utils/file_security.py` 未改 —— `MAGIC_SIGNATURES` 仍无 webp 条目（RIFF/WEBP 签名非前缀匹配），扩展名白名单原本已含 webp，解码器是内容闸门
+- **前端**：新增 `pages/webp-to-jpeg.vue`（单文件页，无 Tab 壳）；`tools.config.ts` 增 `webp-to-jpeg`（order 25）；`FileUploader.vue` 图标映射补 `webp`；两个 locale 增 `tabs.webpToJpeg` + `webpToJpeg` 命名空间；`dashboard.heroSubtitle` 11 → 12
+- **文档**：AGENTS.md / SPEC.md / README.md 的功能模块表与计数同步为 12 个（11 项工具 + 使用统计，13 个页面）；SPEC 的 API 表增该端点（该表其余行仍写作 `/api/...`，本次未顺带改用 `/api/v1` 前缀）
+- **测试**：新增 `tests/test_webp_to_jpeg.py` 11 条（JPEG 产物、alpha 合成白底、动图取首帧、quality 影响体积、损坏与缺失文件、端点 200 / 400×3、stats 注册）+ conftest 三个 Pillow 内存 fixture
+- **验证**：pytest 90 passed；vitest 36 passed；`nuxt generate` 通过并预渲染 `/webp-to-jpeg`；Docker 镜像重建后容器内实转真 webp 得 240×160 RGB JPEG（源透明角 → `(255,255,255)`），损坏 / 非 webp / 缺文件三条均 400 且临时目录无残留，`/status` 出现「WebP 转 JPEG」
 
 ### v3.7.6 (2026-09)
 

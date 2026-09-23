@@ -15,11 +15,12 @@
     "metadataClean": "元数据清理",
     "pageDecorate": "页码页眉页脚",
     "status": "使用统计",
-    "rssDetect": "RSS 探测"
+    "rssDetect": "RSS 探测",
+    "webpToJpeg": "WebP 转 JPEG"
   },
   "dashboard": {
     "heroTitle": "文档处理，化繁为简",
-    "heroSubtitle": "11 项功能，覆盖格式转换、PDF 编辑、文档规范化等场景"
+    "heroSubtitle": "12 项功能，覆盖格式转换、PDF 编辑、文档规范化等场景"
   },
   "status": {
     "title": "使用统计",
@@ -260,5 +261,11 @@
     "copy": "复制",
     "copied": "已复制",
     "open": "打开"
+  },
+  "webpToJpeg": {
+    "title": "WebP 转 JPEG",
+    "description": "将 WebP 图片转换为 JPEG；透明区域填充为白底，动图只取第一帧",
+    "hint": "支持 .webp，单文件，最大 100 MB",
+    "convert": "转换并下载"
   }
 }

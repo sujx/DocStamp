@@ -15,11 +15,12 @@
     "metadataClean": "Metadata Clean",
     "pageDecorate": "Page Numbers",
     "status": "Usage Stats",
-    "rssDetect": "RSS Detector"
+    "rssDetect": "RSS Detector",
+    "webpToJpeg": "WebP to JPEG"
   },
   "dashboard": {
     "heroTitle": "Document Processing, Simplified",
-    "heroSubtitle": "11 features for format conversion, PDF editing, document standardization and more"
+    "heroSubtitle": "12 features for format conversion, PDF editing, document standardization and more"
   },
   "status": {
     "title": "Usage Statistics",
@@ -260,5 +261,11 @@
     "copy": "Copy",
     "copied": "Copied",
     "open": "Open"
+  },
+  "webpToJpeg": {
+    "title": "WebP to JPEG",
+    "description": "Convert a WebP image to JPEG; transparency is filled with white and animations keep only the first frame",
+    "hint": "Supports .webp, single file, up to 100 MB",
+    "convert": "Convert & Download"
   }
 }

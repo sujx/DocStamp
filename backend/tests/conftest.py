@@ -81,6 +81,38 @@ def sample_pdf_file(sample_pdf_bytes):
 
 
 @pytest.fixture
+def sample_webp_bytes():
+    """2×2 opaque WebP, generated in memory."""
+    from PIL import Image
+    buf = io.BytesIO()
+    Image.new("RGB", (2, 2), (200, 30, 40)).save(buf, format="WEBP")
+    buf.seek(0)
+    return buf.read()
+
+
+@pytest.fixture
+def sample_webp_rgba_bytes():
+    """2×2 WebP with an alpha channel — exercises the white-composite path."""
+    from PIL import Image
+    buf = io.BytesIO()
+    Image.new("RGBA", (2, 2), (0, 0, 255, 128)).save(buf, format="WEBP")
+    buf.seek(0)
+    return buf.read()
+
+
+@pytest.fixture
+def sample_animated_webp_bytes():
+    """3-frame WebP: red, green, blue — first frame must be the one converted."""
+    from PIL import Image
+    frames = [Image.new("RGB", (8, 8), c) for c in ((255, 0, 0), (0, 255, 0), (0, 0, 255))]
+    buf = io.BytesIO()
+    frames[0].save(buf, format="WEBP", save_all=True, append_images=frames[1:],
+                   duration=100, loop=0)
+    buf.seek(0)
+    return buf.read()
+
+
+@pytest.fixture
 def sample_docx_bytes():
     """Minimal valid DOCX bytes (empty document)."""
     from docx import Document

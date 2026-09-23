@@ -1,10 +1,10 @@
 # 鹊随金印 (docStamp) — 文档处理工具箱
 
-一站式文档处理 Web 应用：10 项文档工具 + 1 个使用统计页，中英双语，即开即用，无需注册。
+一站式文档处理 Web 应用：11 项文档工具 + 1 个使用统计页，中英双语，即开即用，无需注册。
 
 ## 功能
 
-仪表盘（`/`）之外共 11 个页面，按下表顺序排列（与侧边导航一致）：
+仪表盘（`/`）之外共 12 个页面，按下表顺序排列（与侧边导航一致）：
 
 | # | 功能 | 路由 | 说明 |
 |---|------|------|------|
@@ -18,7 +18,8 @@
 | 8 | **PDF 编辑** | `/pdf-editor` | 删除/插入/重排页面 |
 | 9 | **调整 PDF** | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚 |
 | 10 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
-| 11 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
+| 11 | **WebP 转 JPEG** | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
+| 12 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
 
 另有 4 个面板子页（page-decorate / pdf-compress / pdf-to-text / metadata-clean）被对应工具页内嵌引用。
 
@@ -87,7 +88,7 @@ docStamp/
 │   ├── models.py               # OperationLog 审计/统计（原始 SQL）
 │   ├── cache.py                # Flask-Caching（限流 + 统计缓存）
 │   ├── gunicorn.conf.py        # Gunicorn gthread 生产配置（含每日清理 on_starting）
-│   ├── blueprints/             # HTTP 路由层（16 个，每个功能 1 文件）
+│   ├── blueprints/             # HTTP 路由层（17 个，每个功能 1 文件）
 │   ├── services/               # 业务逻辑层（纯函数，全返回 ServiceResult[T]）
 │   └── utils/
 │       ├── base/               # file_helpers
@@ -99,7 +100,7 @@ docStamp/
 ├── frontend/                   # Nuxt 3 SPA
 │   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError
 │   ├── components/             # 业务组件 + ui/ 原子组件
-│   ├── pages/                  # 16 个路由页面
+│   ├── pages/                  # 17 个路由页面
 │   └── i18n/locales/           # zh-CN / en
 ├── docker-compose.yml          # 单容器编排（api）
 ├── Dockerfile                  # 多阶段构建（node:22-alpine + python:3.12-slim）

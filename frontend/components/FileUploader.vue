@@ -76,6 +76,7 @@ const fileIcon = computed(() => {
     jpeg: "i-heroicons-photo",
     tiff: "i-heroicons-photo",
     tif: "i-heroicons-photo",
+    webp: "i-heroicons-photo",
     csv: "i-heroicons-table-cells",
   };
   return map[ext] || "i-heroicons-document";
