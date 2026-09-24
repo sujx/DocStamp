@@ -428,8 +428,8 @@ API 容器健康检查 `curl /api/v1/health`。容器以非 root 用户 `docstam
 - **前端**：新增 `pages/pdf-redact.vue` + `components/PdfRedactTab.vue`（上传/工作区编排、撤销快照、报告）/ `PdfRedactCanvas.vue`（拖拽建框、8 向把手缩放、平移、删除）/ `PdfRedactMarkList.vue`（标记列表、模板搜索、清空）；`composables/usePdfRedactMarks.ts` 纯几何与撤销栈（28 条单测）；`tools.config.ts` 增 `pdf-redact`（order 25，webp 顺延 26）；两个 locale 增 `tabs.pdfRedact` + `pdfRedact` 命名空间。标记一律只存「页面归一化左上角分数」x/y/w/h ∈ [0,1]，缩放 / DPR / 页面旋转都不进模型
 - **图标**：`nuxt.config.ts` 增 `icon.clientBundle.scan: true` 并点名 Nuxt UI 内部用到的三个图标（`chevron-down-20-solid` / `arrow-path-20-solid` / `x-mark-20-solid`）。生产只发 `.output/public`，Nitro 的 `/api/_nuxt_icon` 路由不存在，交互后才出现的图标此前会静默丢字形
 - **文档**：AGENTS.md / SPEC.md 的功能模块表与计数同步为 13 个（12 项工具 + 使用统计，14 个页面）；`stats_bp.py` sitemap 补 `/pdf-redact`；本机 `nuxt generate` 失败、Windows 删会话、`/apply` 不限 marks 数三项记入 AGENTS.md 待办
-- **测试**：`tests/test_pdf_redact.py` 40 条（坐标映射、马赛克、区域文字、旋转页、加密拒收、关键词/正则命中与截断、无文字层页面点名）、`test_redact_session.py` 21 条、`test_pdf_redact_bp.py` 44 条；另有 conftest 六个内存 fixture
-- **验证**：pytest 195 passed；vitest 64 passed；Docker 镜像重建后容器内跑端到端（文字版 PDF 删字留字复检通过并下载 5696 B、扫描版按图片页处理、下载后重复下载 404、非 .pdf 400、伪 sid 404、容器内 PyMuPDF 1.28.2、`/status` 出现「PDF 脱敏」）；`/pdf-redact` 200；图标集合已进客户端包
+- **测试**：`tests/test_pdf_redact.py` 40 条（坐标映射、马赛克、区域文字、旋转页、加密拒收、关键词/正则命中与截断、无文字层页面点名）、`test_redact_session.py` 19 条、`test_pdf_redact_bp.py` 44 条；另有 conftest 六个内存 fixture
+- **验证**：pytest 193 passed；vitest 64 passed；Docker 镜像重建后容器内跑端到端（文字版 PDF 删字留字复检通过并下载 5696 B、扫描版按图片页处理、下载后重复下载 404、非 .pdf 400、伪 sid 404、容器内 PyMuPDF 1.28.2、`/status` 出现「PDF 脱敏」）；`/pdf-redact` 200；图标集合已进客户端包
 
 ### v3.8 (2026-09)
 
