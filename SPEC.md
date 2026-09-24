@@ -421,6 +421,11 @@ API 容器健康检查 `curl /api/v1/health`。容器以非 root 用户 `docstam
 
 ## 十一、版本历史
 
+### v3.9.1 (2026-09)
+
+- **entrypoint 可写性守卫补强**：守卫原先只测「卷目录里能否新建文件」，测不出「目录可写但已存在的 `error.log` / `access.log` 属 root」的形态——2026-09-25 生产切换新镜像后正是踩中它：卷是老镜像以 root 运行时期创建的，目录属主无恙，旧日志文件仍是 root:root/644，gunicorn 启动前检查打不开 `errorlog` 即退出，`restart: unless-stopped` 循环重启，反代 502。现对三个挂载卷各补一条 `find -maxdepth 1 -type f ! -writable` 检查，失败时列出具体文件并打印同一份保留数据的 chown 指引（消息主体提为 `chown_hint` 复用）
+- **验证**：本机以 disposable 卷 + `--entrypoint bash` 挂载脚本，三分支实测：目录可写但 `error.log` 属 root → 新报错 exit 1；chown 后放行并 `exec "$@"`；目录本身属 root → 原报错不变。生产侧救援为宿主机 `docker run --rm -v docstamp_log_data:/d alpine chown -R 1000:1000 /d` + 重启容器，卷不删
+
 ### v3.9 (2026-09)
 
 - **新增 PDF 脱敏**：上传 PDF → 网页预览 → 鼠标框选和/或关键词（内置手机号 / 身份证号 / 银行卡模板，支持正则）批量定位敏感区 → 执行马赛克脱敏 → 下载带复检报告的新 PDF。原文件全程只读
