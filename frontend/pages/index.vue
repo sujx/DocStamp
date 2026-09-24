@@ -35,7 +35,7 @@ import { TOOLS } from "~/composables/tools.config";
 const { t } = useI18n();
 
 const CONVERT_KEYS = ["md2docx", "format-docx"];
-const PDF_KEYS = ["file-assembly", "print-split", "pdf-editor", "pdf-tools", "pdf-merge"];
+const PDF_KEYS = ["file-assembly", "print-split", "pdf-editor", "pdf-tools", "pdf-merge", "pdf-redact"];
 const OFFICE_KEYS = ["properties", "excel-merge"];
 
 function mapTool(key: string) {
