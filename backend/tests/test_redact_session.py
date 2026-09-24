@@ -13,9 +13,7 @@ from utils.redact_session import (
     delete_session,
     is_valid_sid,
     load_meta,
-    output_path,
     session_dir,
-    write_output,
 )
 
 
@@ -71,21 +69,6 @@ class TestLookup:
 
     def test_session_dir_is_none_for_a_bad_sid(self, root):
         assert session_dir(root, "../../etc") is None
-
-
-class TestOutput:
-    def test_writes_the_redacted_copy_inside_the_session(self, root):
-        sid = create_session(root, "a.pdf", b"%PDF-1.4 a", {"page_count": 1})
-
-        path = write_output(root, sid, b"%PDF-1.4 redacted")
-
-        assert os.path.dirname(path) == session_dir(root, sid)
-        assert open(path, "rb").read() == b"%PDF-1.4 redacted"
-        assert path == output_path(root, sid)
-
-    def test_writing_to_an_unknown_session_raises(self, root):
-        with pytest.raises(ValueError):
-            write_output(root, "0" * 32, b"%PDF-1.4 x")
 
 
 class TestDelete:

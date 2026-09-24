@@ -95,25 +95,6 @@ def output_path(upload_folder: str, sid) -> str | None:
     return os.path.join(directory, OUTPUT_NAME) if directory else None
 
 
-def write_output(upload_folder: str, sid, data) -> str:
-    """Store the redacted PDF in the session directory.
-
-    Raises:
-        ValueError: If the session does not exist.
-    """
-    directory = session_dir(upload_folder, sid)
-    if not directory or not os.path.isdir(directory):
-        raise ValueError("Unknown redaction session")
-
-    path = os.path.join(directory, OUTPUT_NAME)
-    with open(path, "wb") as f:
-        if isinstance(data, (bytes, bytearray)):
-            f.write(data)
-        else:
-            shutil.copyfileobj(data, f, 1024 * 1024)
-    return path
-
-
 def delete_session(upload_folder: str, sid) -> None:
     """Remove a session directory and everything in it. Safe to call twice."""
     directory = session_dir(upload_folder, sid)
