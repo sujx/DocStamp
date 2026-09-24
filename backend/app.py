@@ -140,6 +140,7 @@ def create_app() -> Flask:
     from blueprints.pdf_to_text_bp import pdf_to_text_bp
     from blueprints.pdf_merge_bp import pdf_merge_bp
     from blueprints.webp_to_jpeg_bp import webp_to_jpeg_bp
+    from blueprints.pdf_redact_bp import pdf_redact_bp
 
     app.register_blueprint(convert_bp)
     app.register_blueprint(download_bp)
@@ -152,6 +153,7 @@ def create_app() -> Flask:
     app.register_blueprint(pdf_to_text_bp)
     app.register_blueprint(pdf_merge_bp)
     app.register_blueprint(webp_to_jpeg_bp)
+    app.register_blueprint(pdf_redact_bp)
 
     from blueprints.pdf_compress_bp import pdf_compress_bp
     from blueprints.metadata_clean_bp import metadata_clean_bp

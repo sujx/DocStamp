@@ -11,6 +11,20 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css"],
 
+  // 生产是纯静态产物（Flask 托管 .output/public），Nitro 的 /api/_nuxt_icon 路由不存在：
+  // 只靠 SSR 内联的图标 CSS，交互后才出现的图标（工具面板、标记列表、按钮内图标）会静默丢字形。
+  // 扫源码把用到的图标打进客户端包；Nuxt UI 组件自带的图标不在项目源码里，扫描扫不到，点名带上。
+  icon: {
+    clientBundle: {
+      scan: true,
+      icons: [
+        "heroicons:chevron-down-20-solid", // USelect 的下拉箭头
+        "heroicons:arrow-path-20-solid", // UButton 的 loading 转圈
+        "heroicons:x-mark-20-solid", // UNotification 的关闭按钮
+      ],
+    },
+  },
+
 
   devServer: {
     port: 8080,

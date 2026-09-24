@@ -25,6 +25,7 @@ MODULE_NAMES = {
     "page-decorate": "页码页眉",
     "format-docx": "格式规范",
     "webp-to-jpeg": "WebP 转 JPEG",
+    "pdf-redact": "PDF 脱敏",
     "pageview": "页面浏览",
 }
 

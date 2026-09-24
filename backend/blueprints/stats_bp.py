@@ -14,7 +14,7 @@ def sitemap():
         "/md-to-docx", "/format-docx",
         "/properties", "/excel-merge",
         "/file-assembly", "/print-split", "/pdf-editor",
-        "/pdf-tools", "/pdf-merge", "/webp-to-jpeg", "/status",
+        "/pdf-tools", "/pdf-merge", "/webp-to-jpeg", "/pdf-redact", "/status",
     ]
     base = request.host_url.rstrip("/")
     items = "\n".join(

@@ -1,10 +1,10 @@
 # 鹊随金印 (docStamp) — 文档处理工具箱
 
-一站式文档处理 Web 应用：11 项文档工具 + 1 个使用统计页，中英双语，即开即用，无需注册。
+一站式文档处理 Web 应用：12 项文档工具 + 1 个使用统计页，中英双语，即开即用，无需注册。
 
 ## 功能
 
-仪表盘（`/`）之外共 12 个页面，按下表顺序排列（与侧边导航一致）：
+仪表盘（`/`）之外共 13 个页面，按下表顺序排列（与侧边导航一致）：
 
 | # | 功能 | 路由 | 说明 |
 |---|------|------|------|
@@ -18,8 +18,9 @@
 | 8 | **PDF 编辑** | `/pdf-editor` | 删除/插入/重排页面 |
 | 9 | **调整 PDF** | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚 |
 | 10 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
-| 11 | **WebP 转 JPEG** | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
-| 12 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
+| 11 | **PDF 脱敏** | `/pdf-redact` | 框选/关键词标记敏感区，生成带马赛克的新 PDF |
+| 12 | **WebP 转 JPEG** | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
+| 13 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
 
 另有 4 个面板子页（page-decorate / pdf-compress / pdf-to-text / metadata-clean）被对应工具页内嵌引用。
 
@@ -28,7 +29,7 @@
 | 层 | 技术 |
 |------|------|
 | **后端框架** | Python 3.12 + Flask 3 + Pydantic v2 |
-| **后端依赖** | Flask-CORS / Flask-Babel / Flask-Caching / python-docx / openpyxl / python-pptx / img2pdf / pypdf / Pillow / reportlab / WeasyPrint / markdown / bleach / pdfminer.six / requests / python-dotenv / cryptography |
+| **后端依赖** | Flask-CORS / Flask-Babel / Flask-Caching / python-docx / openpyxl / python-pptx / img2pdf / pypdf / Pillow / reportlab / WeasyPrint / markdown / bleach / pdfminer.six / PyMuPDF / requests / python-dotenv / cryptography |
 | **文档工具链** | pandoc / poppler-utils（容器内已安装） |
 | **前端框架** | Nuxt 3.15.4 (SPA) + Nuxt UI v2 + Tailwind CSS v3 |
 | **国际化** | @nuxtjs/i18n v9（zh-CN / en） |
@@ -43,7 +44,7 @@
 cd backend && pip3 install --break-system-packages flask flask-cors flask-babel \
     flask-caching python-docx openpyxl python-pptx img2pdf pypdf Pillow reportlab \
     gunicorn pydantic cryptography weasyprint markdown bleach pdfminer.six \
-    requests python-dotenv
+    PyMuPDF requests python-dotenv
 
 # 安装前端依赖
 cd ../frontend && npm install
@@ -88,17 +89,18 @@ docStamp/
 │   ├── models.py               # OperationLog 审计/统计（原始 SQL）
 │   ├── cache.py                # Flask-Caching（限流 + 统计缓存）
 │   ├── gunicorn.conf.py        # Gunicorn gthread 生产配置（含每日清理 on_starting）
-│   ├── blueprints/             # HTTP 路由层（17 个，每个功能 1 文件）
+│   ├── blueprints/             # HTTP 路由层（18 个，每个功能 1 文件）
 │   ├── services/               # 业务逻辑层（纯函数，全返回 ServiceResult[T]）
 │   └── utils/
 │       ├── base/               # file_helpers
 │       ├── file_security.py    # 三层文件校验（大小/扩展名/魔数）
 │       ├── file_cleanup.py     # 每日临时文件清理（gunicorn 启动的守护线程）
 │       ├── rate_limit.py       # IP 级别 API 限流装饰器
+│       ├── redact_session.py   # PDF 脱敏会话目录（TTL 3600 s，惰性清扫）
 │       ├── retry.py            # @retry_on_failure 重试装饰器
 │       └── crypto.py           # AES-256 Fernet 字段加密
 ├── frontend/                   # Nuxt 3 SPA
-│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError
+│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError / usePdfRedactMarks
 │   ├── components/             # 业务组件 + ui/ 原子组件
 │   ├── pages/                  # 17 个路由页面
 │   └── i18n/locales/           # zh-CN / en

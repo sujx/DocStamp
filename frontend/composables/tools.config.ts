@@ -24,9 +24,10 @@ export const TOOLS: ToolDef[] = [
   { key: "pdf-editor", to: "/pdf-editor", icon: "i-heroicons-document", label: "tabs.pdfEditor", desc: "pdfEditor.description", order: 22 },
   { key: "pdf-tools", to: "/pdf-tools", icon: "i-heroicons-wrench-screwdriver", label: "tabs.pdf-tools", desc: "pdf-tools.description", order: 23 },
   { key: "pdf-merge", to: "/pdf-merge", icon: "i-heroicons-plus-circle", label: "tabs.pdfMerge", desc: "pdfMerge.description", order: 24 },
+  { key: "pdf-redact", to: "/pdf-redact", icon: "i-heroicons-eye-slash", label: "tabs.pdfRedact", desc: "pdfRedact.description", order: 25 },
 
   // ── 图片工具（展开到顶层）──
-  { key: "webp-to-jpeg", to: "/webp-to-jpeg", icon: "i-heroicons-photo", label: "tabs.webpToJpeg", desc: "webpToJpeg.description", order: 25 },
+  { key: "webp-to-jpeg", to: "/webp-to-jpeg", icon: "i-heroicons-photo", label: "tabs.webpToJpeg", desc: "webpToJpeg.description", order: 26 },
 
   // ── 顶层 ──
   { key: "status", to: "/status", icon: "i-heroicons-chart-bar", label: "tabs.status", desc: "status.description", order: 30 },

@@ -26,6 +26,7 @@ weasyprint = "^63.0"
 markdown = "^3.7"
 bleach = "^6.0"
 pdfminer-six = "^20240706"
+PyMuPDF = "^1.24"  # AGPL-3.0 — used by the PDF redaction tool; source is public, owner approved
 requests = "^2.32"
 python-dotenv = "^1.0"
 

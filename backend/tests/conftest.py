@@ -122,3 +122,140 @@ def sample_docx_bytes():
     doc.save(buf)
     buf.seek(0)
     return buf.read()
+
+
+# ── PDF redaction fixtures ──────────────────────────────────────────────
+
+@pytest.fixture
+def secret_pdf_bytes():
+    """1-page A4, bottom-up: keeper line, secret line, keeper line."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.pdfgen import canvas
+
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=A4)
+    _w, h = A4
+    c.setFont("Helvetica", 14)
+    c.drawString(72, h - 100, "KEEP THIS LINE")
+    c.drawString(72, h - 130, "SECRET-ID-1234")
+    c.drawString(72, h - 160, "KEEP THIS TOO")
+    c.save()
+    buf.seek(0)
+    return buf.read()
+
+
+@pytest.fixture
+def multipage_pdf_bytes():
+    """3-page A4, one secret line per page."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.pdfgen import canvas
+
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=A4)
+    _w, h = A4
+    for i in range(3):
+        c.setFont("Helvetica", 14)
+        c.drawString(72, h - 100, f"PAGE {i + 1} KEEPER")
+        c.drawString(72, h - 130, f"SECRET-{i + 1}-9999")
+        c.showPage()
+    c.save()
+    buf.seek(0)
+    return buf.read()
+
+
+@pytest.fixture
+def scan_pdf_bytes():
+    """1-page PDF whose visible content is a bitmap, plus an invisible OCR text layer.
+
+    Stands in for a scanned document: no visible text objects, but an OCR layer
+    that must not survive redaction.
+    """
+    import random
+
+    from PIL import Image
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.utils import ImageReader
+    from reportlab.pdfgen import canvas
+
+    random.seed(7)
+    img = Image.new("RGB", (600, 600))
+    img.putdata([(random.randrange(120, 200),) * 3 for _ in range(600 * 600)])
+    ibuf = io.BytesIO()
+    img.save(ibuf, format="PNG")
+    ibuf.seek(0)
+
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=A4)
+    _w, h = A4
+    c.drawImage(ImageReader(ibuf), 72, h - 672, width=451, height=564)
+    ocr = c.beginText(100, h - 300)
+    ocr.setFont("Helvetica", 14)
+    ocr.setTextRenderMode(3)  # invisible — an OCR layer, not visible text
+    ocr.textLine("OCR-SECRET-5678")
+    c.drawText(ocr)
+    c.save()
+    buf.seek(0)
+    return buf.read()
+
+
+@pytest.fixture
+def image_only_pdf_bytes():
+    """1-page PDF that is nothing but a bitmap — no text objects of any kind.
+
+    The scan fixture above still carries an extractable OCR layer; this one is
+    what keyword search genuinely cannot help with.
+    """
+    from PIL import Image
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.utils import ImageReader
+    from reportlab.pdfgen import canvas
+
+    img = Image.new("RGB", (600, 600), (180, 180, 180))
+    ibuf = io.BytesIO()
+    img.save(ibuf, format="PNG")
+    ibuf.seek(0)
+
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=A4)
+    _w, h = A4
+    c.drawImage(ImageReader(ibuf), 72, h - 672, width=451, height=564)
+    c.save()
+    buf.seek(0)
+    return buf.read()
+
+
+@pytest.fixture
+def rotated_pdf_bytes(secret_pdf_bytes):
+    """The secret PDF with every page rotated 90° — marks must still land right."""
+    import io as _io
+
+    from pypdf import PdfReader, PdfWriter
+
+    reader = PdfReader(_io.BytesIO(secret_pdf_bytes))
+    writer = PdfWriter()
+    for page in reader.pages:
+        page.rotate(90)
+        writer.add_page(page)
+    buf = _io.BytesIO()
+    writer.write(buf)
+    buf.seek(0)
+    return buf.read()
+
+
+@pytest.fixture
+def encrypted_pdf_bytes(secret_pdf_bytes):
+    """The secret PDF behind a user password."""
+    import io as _io
+
+    from pypdf import PdfReader, PdfWriter
+
+    reader = PdfReader(_io.BytesIO(secret_pdf_bytes))
+    writer = PdfWriter()
+    for page in reader.pages:
+        writer.add_page(page)
+    writer.encrypt("hunter2")
+    buf = _io.BytesIO()
+    writer.write(buf)
+    buf.seek(0)
+    return buf.read()
+

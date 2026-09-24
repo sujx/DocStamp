@@ -7,7 +7,7 @@
 import { describe, it, expect } from "vitest";
 import { TOOLS, SIDEBAR_ITEMS } from "../tools.config";
 
-const PDF_KEYS = ["file-assembly", "print-split", "pdf-editor", "pdf-tools", "pdf-merge"];
+const PDF_KEYS = ["file-assembly", "print-split", "pdf-editor", "pdf-tools", "pdf-merge", "pdf-redact"];
 
 describe("tools.config", () => {
   it("侧栏条目是扁平的工具列表，不含分组对象", () => {
@@ -23,7 +23,7 @@ describe("tools.config", () => {
     expect(orders).toEqual([...orders].sort((a, b) => a - b));
   });
 
-  it("五个 PDF 工具拉平后保持原有相对顺序", () => {
+  it("六个 PDF 工具拉平后保持原有相对顺序", () => {
     const keys = SIDEBAR_ITEMS.map((item) => item.key);
     expect(keys.filter((key) => PDF_KEYS.includes(key))).toEqual(PDF_KEYS);
   });

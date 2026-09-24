@@ -51,11 +51,13 @@ RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ \
         python-docx openpyxl python-pptx \
         markdown bleach img2pdf pypdf Pillow reportlab \
         gunicorn pydantic cryptography pdfminer.six requests python-dotenv \
+        PyMuPDF \
     || pip install --break-system-packages --no-cache-dir --root-user-action=ignore \
         flask flask-cors flask-babel flask-caching \
         python-docx openpyxl python-pptx \
         markdown bleach img2pdf pypdf Pillow reportlab \
         gunicorn pydantic cryptography pdfminer.six requests python-dotenv \
+        PyMuPDF \
     && gunicorn --version \
     && rm -rf /usr/local/lib/python3.12/site-packages/pip \
     && rm -rf /usr/local/lib/python3.12/site-packages/setuptools \

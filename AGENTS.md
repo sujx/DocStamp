@@ -41,7 +41,7 @@ docStamp/
 │   ├── nuxt.config.ts          # SSG + i18n + Nuxt UI v2
 │   ├── tailwind.config.ts      # Tailwind v3 品牌色阶
 │   ├── assets/css/main.css     # CSS 变量 (SynTime Royal Blue token)
-│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError / useSidebar / usePageView
+│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError / useSidebar / usePageView / usePdfRedactMarks
 │   ├── components/             # 业务组件 + ui/ 原子组件
 │   ├── layouts/default.vue     # 侧边导航壳
 │   ├── pages/                  # 路由页面
@@ -56,7 +56,7 @@ docStamp/
 
 ## 功能模块
 
-功能模块 12 个（11 项工具 + 使用统计）；下表 13 行含首页仪表盘，仪表盘是导航页不计入。
+功能模块 13 个（12 项工具 + 使用统计）；下表 14 行含首页仪表盘，仪表盘是导航页不计入。
 
 | # | 模块 | 路由 | 说明 |
 |---|------|------|------|
@@ -71,8 +71,9 @@ docStamp/
 | 9 | PDF 编辑 | `/pdf-editor` | 删除/插入/重排页面 |
 | 10 | 调整 PDF | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚 |
 | 11 | PDF 合并 | `/pdf-merge` | 多 PDF 合并，拖拽排序 |
-| 12 | WebP 转 JPEG | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
-| 13 | 使用统计 | `/status` | 模块调用量 + 访客统计 (ECharts) |
+| 12 | PDF 脱敏 | `/pdf-redact` | 框选/关键词标记敏感区，生成带马赛克的新 PDF |
+| 13 | WebP 转 JPEG | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
+| 14 | 使用统计 | `/status` | 模块调用量 + 访客统计 (ECharts) |
 
 ## 开发环境
 
@@ -251,6 +252,15 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 |------|----------|
 | `FileUploader` 的 `max-size` 单位错 + `file-rejected` 无人监听 | prop 按**字节**比较（`f.size > props.maxSize`），但 5 个调用点都传 `:max-size="100"` 想表达 100 MB，于是 >100 字节的文件全被挡下；而 `emit("file-rejected", …)` 在全仓库**没有任何监听者**（`grep -rn file-rejected frontend/` 只命中组件自身），用户看到的是「选完文件页面毫无反应」的静默失效。受影响：`MetadataCleanTab.vue`、`PdfCompressPanel.vue`、`PageDecoratePanel.vue`、`PdfToTextPanel.vue`、`pages/pdf-merge.vue`。修法要同时定组件契约（改 MB 还是改字节语义）+ 接上错误提示 + 改 5 个调用点，属独立一批；新加的 `pages/webp-to-jpeg.vue` 刻意不传该 prop 以绕开 |
 | `pages/pdf-merge.vue` 监听 `@files-selected` | 组件实际 emit 的是 `file-selected`（无 s），故该页 `onFilesSelected` 永不触发，是与上一条同源的静默失效。合在同一批里修 |
+| 全站 `color="neutral"` 无效 + `neutral-*` 类名惰性 | Nuxt UI v2 的灰阶值拼法是 `gray`（`neutral` 是 v3 拼法），故 `color="neutral"` 触发 `[Vue warn] Invalid prop`，组件退回默认灰阶；又因 `neutral` 是 Tailwind 内置色而未被 `safelistColors` 收录，`text-neutral-500` 一类 `neutral-*` 类名不在产物 CSS 里（实测该元素 `color` 为空、随父级）。存量问题、非本批引入，属独立一批 |
+
+### PDF 脱敏模块
+
+| 事项 | 为何未做 |
+|------|----------|
+| 会话目录在 Windows 上删不掉 | 下载后的清理靠 POSIX unlink「删已打开的文件」语义；Windows 上 `send_file` 仍持有句柄，`shutil.rmtree(ignore_errors=True)` 静默失败，会话要等 1 小时 TTL 才消失。生产是 Linux 容器，故不改；「下载即删」只在容器里被实证 |
+| `/apply` 不限制单次 marks 数量 | `rate_limit` 限的是请求数（20/分钟），不限一次提交多少框；每个框都要渲染一张 200 DPI 位图，理论上可被单请求拖垮。关键词侧已有 `MAX_MATCHES=500` 挡住批量场景，内网 12 人规模下按「先证明再修」留着 |
+| 本机 `nuxt generate` 预渲染必失败 | Windows + Node 24 下 `@nuxt/icon` 生成的 `createRequire(globalThis._importMeta_.url)` 收到 `file:///_entry.js`，Node 拒收空 host 的 file URL 并抛错，`.output/public` 空产出。已用 HEAD 版 `nuxt.config.ts` 复现，且失败点在「Initializing prerenderer」——模块加载期，早于任何页面预渲染，与本模块改动无关；推测是本机 Node 由 24.18 升到 24.19 后收紧校验（v3.8 那批 `nuxt generate` 还是通的）。真实构建路径是 `Dockerfile` stage 1 的 node:22-alpine，镜像已验证，故不动 |
 
 ### 测试与数据
 

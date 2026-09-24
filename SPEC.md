@@ -10,9 +10,9 @@
 
 ---
 
-## 二、功能模块（12 个）
+## 二、功能模块（13 个）
 
-功能模块 = 11 项工具 + 使用统计，共 12 个；首页仪表盘是导航页不计入，下表按路由列出全部 13 个页面。
+功能模块 = 12 项工具 + 使用统计，共 13 个；首页仪表盘是导航页不计入，下表按路由列出全部 14 个页面。
 
 **侧栏导航**：
 
@@ -28,6 +28,7 @@ Excel 合并        → /excel-merge
 PDF 编辑          → /pdf-editor
 调整 PDF          → /pdf-tools
 PDF 合并          → /pdf-merge
+PDF 脱敏          → /pdf-redact
 WebP 转 JPEG      → /webp-to-jpeg
 使用统计          → /status
 ```
@@ -45,8 +46,9 @@ WebP 转 JPEG      → /webp-to-jpeg
 | 9 | PDF 编辑 | `/pdf-editor` | 删除/插入/重排页面 |
 | 10 | 调整 PDF | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚（三 Tab） |
 | 11 | PDF 合并 | `/pdf-merge` | 多 PDF 合并，拖拽排序 |
-| 12 | WebP 转 JPEG | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
-| 13 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
+| 12 | PDF 脱敏 | `/pdf-redact` | 框选/关键词标记敏感区，生成带马赛克的新 PDF |
+| 13 | WebP 转 JPEG | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
+| 14 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
 
 ---
 
@@ -229,6 +231,12 @@ Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueEr
 | `POST` | `/api/page-decorate` | 添加页码/页眉/页脚 |
 | `POST` | `/api/image-process` | 图片处理 (缩放/裁剪/转换/压缩) |
 | `POST` | `/api/v1/webp-to-jpeg` | WebP → JPEG（透明填白底） |
+| `POST` | `/api/v1/pdf-redact/open` | 上传 PDF，开脱敏会话（返回 sid） |
+| `GET` | `/api/v1/pdf-redact/page/<sid>/<n>` | 渲染某页预览图（`?dpi=` 40–200） |
+| `POST` | `/api/v1/pdf-redact/search` | 关键词/正则定位敏感区，返回归一化坐标 |
+| `POST` | `/api/v1/pdf-redact/apply` | 执行脱敏，返回复检报告 |
+| `GET` | `/api/v1/pdf-redact/download/<sid>` | 下载脱敏 PDF（交付后清理会话） |
+| `POST` | `/api/v1/pdf-redact/close` | 主动释放会话 |
 | `POST` | `/api/rss-detect` | RSS/Atom 订阅探测 |
 
 ---
@@ -412,6 +420,16 @@ API 容器健康检查 `curl /api/v1/health`。容器以非 root 用户 `docstam
 ---
 
 ## 十一、版本历史
+
+### v3.9 (2026-09)
+
+- **新增 PDF 脱敏**：上传 PDF → 网页预览 → 鼠标框选和/或关键词（内置手机号 / 身份证号 / 银行卡模板，支持正则）批量定位敏感区 → 执行马赛克脱敏 → 下载带复检报告的新 PDF。原文件全程只读
+- **后端**：新增 `services/pdf_redact.py`（`inspect_pdf` / `find_text_matches` / `redact_pdf` / `pixelate` / `mark_to_page_rect` / `region_text`，零 Flask 依赖、返回 `ServiceResult[T]`）与 `blueprints/pdf_redact_bp.py`（6 个端点，见 §五）、`utils/redact_session.py`（会话目录 TTL 3600 s，`cleanup_expired` 在 open 时顺带清扫）。脱敏按「每个标记局部处理」实现：`get_pixmap(clip=rect, dpi=200)` 渲染 → Pillow NEAREST 降采样成马赛克 → `add_redact_annot` + `apply_redactions(images=PDF_REDACT_IMAGE_NONE)` 删掉区域下的文字（含不可见 OCR 层）而不动整页图片 → 把马赛克贴回。收尾 `purge_document_residue`（删附件 + 清元数据 + `scrub()`），`save(garbage=4, deflate=True)` 另存。`_leftovers` 重新打开产物逐框复检，仍有可取文字的框会在报告里点名。依赖 PyMuPDF（AGPL-3.0，已获批准）
+- **前端**：新增 `pages/pdf-redact.vue` + `components/PdfRedactTab.vue`（上传/工作区编排、撤销快照、报告）/ `PdfRedactCanvas.vue`（拖拽建框、8 向把手缩放、平移、删除）/ `PdfRedactMarkList.vue`（标记列表、模板搜索、清空）；`composables/usePdfRedactMarks.ts` 纯几何与撤销栈（28 条单测）；`tools.config.ts` 增 `pdf-redact`（order 25，webp 顺延 26）；两个 locale 增 `tabs.pdfRedact` + `pdfRedact` 命名空间。标记一律只存「页面归一化左上角分数」x/y/w/h ∈ [0,1]，缩放 / DPR / 页面旋转都不进模型
+- **图标**：`nuxt.config.ts` 增 `icon.clientBundle.scan: true` 并点名 Nuxt UI 内部用到的三个图标（`chevron-down-20-solid` / `arrow-path-20-solid` / `x-mark-20-solid`）。生产只发 `.output/public`，Nitro 的 `/api/_nuxt_icon` 路由不存在，交互后才出现的图标此前会静默丢字形
+- **文档**：AGENTS.md / SPEC.md 的功能模块表与计数同步为 13 个（12 项工具 + 使用统计，14 个页面）；`stats_bp.py` sitemap 补 `/pdf-redact`；本机 `nuxt generate` 失败、Windows 删会话、`/apply` 不限 marks 数三项记入 AGENTS.md 待办
+- **测试**：`tests/test_pdf_redact.py` 40 条（坐标映射、马赛克、区域文字、旋转页、加密拒收、关键词/正则命中与截断、无文字层页面点名）、`test_redact_session.py` 21 条、`test_pdf_redact_bp.py` 44 条；另有 conftest 六个内存 fixture
+- **验证**：pytest 195 passed；vitest 64 passed；Docker 镜像重建后容器内跑端到端（文字版 PDF 删字留字复检通过并下载 5696 B、扫描版按图片页处理、下载后重复下载 404、非 .pdf 400、伪 sid 404、容器内 PyMuPDF 1.28.2、`/status` 出现「PDF 脱敏」）；`/pdf-redact` 200；图标集合已进客户端包
 
 ### v3.8 (2026-09)
 
