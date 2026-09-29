@@ -6,7 +6,7 @@
 
 **定位**：单体工具，无用户系统，无认证——即开即用，随用随走。
 
-**i18n**：中英文双语，`i18n/locales/zh-CN.json` + `i18n/locales/en.json`，默认 `zh-CN`。
+**i18n**：中英文双语。前端 `i18n/locales/zh-CN.json` + `i18n/locales/en.json`，默认 `zh-CN`；后端错误消息由 Flask-Babel 按请求 `Accept-Language` 渲染（msgid 为英文，中文目录在 `backend/translations/zh_Hans_CN/`），详见「四、后端架构 · 错误消息国际化」。
 
 ---
 
@@ -168,6 +168,9 @@ backend/
 │   ├── pdf_compressor.py   # PDF 压缩
 │   ├── metadata_cleaner.py # 元数据清理
 │   └── page_decorator.py   # 页码页眉页脚 (reportlab)
+├── babel.cfg               # pybabel 提取配置（[python: **.py]，ignore test_*/conftest.py）
+├── fill_zh_po.py           # 把 TRANSLATIONS 表写入 zh_Hans_CN 的 messages.po
+├── translations/           # messages.pot + zh_Hans_CN/LC_MESSAGES/messages.{po,mo}
 ├── utils/
 │   ├── base/               # file_helpers
 │   ├── file_security.py    # 魔数校验 + 扩展名白名单 + 大小限制
@@ -195,6 +198,32 @@ backend/
 所有异常 → 标准化响应 `{code: <int>, msg: "<string>", requestId: "<hex>"}`。每个请求通过 `@app.before_request` 注入 `g.request_id`，响应头 `X-Request-Id` 回传，日志中贯穿。
 
 Pydantic `ValidationError` → 422，`ServiceError` → 指定 status，`ValueError` → 400，`Exception` → 500（生产环境隐藏详情）。
+
+### 错误消息国际化
+
+**协商**：`create_app()` 里 `Babel(app, default_locale="en", locale_selector=…)`，selector 用 `request.accept_languages.best_match(["en", "zh_CN"])`。浏览器自动带 `Accept-Language`，前端无需传 cookie——`zh` / `zh-CN` / `zh_CN` 全部归一到 `zh_Hans_CN`，`zh-TW` / `en` / 缺失回落 `en`。
+
+**msgid 约定**：源语言是英文。
+
+- 静态消息（Blueprint 里）：`from flask_babel import gettext as _` → `_("No file provided")`
+- 服务层 / 工具层（含动态参数）：`from flask_babel import lazy_gettext as _l` → `_l("File extension .%(ext)s is not allowed", ext=ext)`，一律用 `%(...)s` 命名插值，不用位置 `%s`、不用 f-string 直出
+- 模块级常量消息：`_ENCRYPTED_MESSAGE = _l("…")`（lazy 代理在请求上下文里才渲染，可安全存为常量）
+
+`ValueError` / `ServiceResult.fail` 的消息在**源头**翻译：blueprint 出口仍是 `str(e)` / `result.message`，取到即已是当前 locale。
+
+**目录**：`backend/translations/zh_Hans_CN/LC_MESSAGES/messages.{po,mo}`。目录名必须是 `zh_Hans_CN`——Babel 会把 `zh_CN` 规范化成带 script 的 `Locale`，`Translations.load` 按标识符精确匹配目录，`zh_CN` 目录会静默查不到（回退英文 msgid）。`en` 无需目录，msgid 即英文。`.mo` 与 `.po` 一并入库，`Dockerfile` 的 `COPY backend/` 直接带上。
+
+**工作流**（在 WSL clone 的 `backend/`，venv 激活）：
+
+```bash
+pybabel extract -k "_:1" -k "gettext:1" -k "_l:1" -F babel.cfg \
+    --ignore-dirs=.venv --ignore-dirs=__pycache__ --ignore-dirs=tests \
+    --copyright-holder=docStamp --project=docStamp -o translations/messages.pot .
+python fill_zh_po.py       # 新 msgid 会列在 stdout，补进 TRANSLATIONS 后重跑
+pybabel compile -D messages -d translations --statistics
+```
+
+`_l` 不是 Babel 默认关键字，`-k _l:1` 必须显式传（babel.cfg 的 `keywords=` 行在本版本不生效）。回归见 `tests/test_error_i18n.py`：zh 客户端拿到中文、en 客户端拿到英文、目录已加载哨兵。
 
 ---
 
@@ -420,6 +449,14 @@ API 容器健康检查 `curl /api/v1/health`。容器以非 root 用户 `docstam
 ---
 
 ## 十一、版本历史
+
+### v3.9.3 (2026-09)
+
+- **后端错误消息国际化（整站级）**：挂账项「上传路径校验错误文案仍是英文」落地。Flask-Babel 此前只接好线（`Babel(app)` + `Accept-Language` 协商）而无目录，74 处 `_()` 全部原样吐 msgid；本批补齐目录并把裸英文补齐。改造面：`utils/file_security.py`（6 条）与 `utils/base/file_helpers.py`（4 条）的 `ValueError` 改 `_l(...)`；`services/*` 74 处 `ServiceResult.fail` 字面量与 f-string 全部包成 `_l("… %(...)s", kw=…)`（AST 脚本一次性改写，复杂表达式如 `{dpi!r}`、`os.path.basename(…)`、`index + 1` 手工提升为命名插值参数）；`error_handler.py` 的 404/405/413 与 500 兜底、`utils/rate_limit.py` 的 429、`rss_detect_bp.py` 的「URL is required」入目录。blueprint 出口不动（`str(e)` / `result.message` 取到即已译）。新增 `babel.cfg`、`fill_zh_po.py`、`translations/`（104 条 msgid，zh_Hans_CN 100% 翻译，`.po`/`.mo` 入库），工作方式写入「四、后端架构 · 错误消息国际化」。**关键坑**：目录必须叫 `zh_Hans_CN`（Babel 规范化后 `Translations.load` 精确匹配），`_l` 需显式 `-k _l:1` 才被提取
+- **FileUploader 静默失效一批**：`maxSize` prop 明确为 **MB**（原先按字节比较，`:max-size="100"` 会把 >100 字节的文件全挡下），超限 emit `file-rejected` 带 `{name, size, maxSizeMb}`；`MetadataCleanTab` / `PageDecoratePanel` / `PdfCompressPanel` / `PdfToTextPanel` / `pages/pdf-merge` 五个调用点接上该事件并弹 toast（新增 `common.fileTooLarge` 中英文案）；`pages/pdf-merge.vue` 监听的 `@files-selected` 纠正为组件实际 emit 的 `@file-selected`，并移除从不生效的 `:multiple="true"`。新增 `components/__tests__/FileUploader.spec.ts`（超限拒收 / 100 MB 边界 / `maxSize=0` 不限 / 小文件放行）
+- **Toast 容器缺失（本批浏览器验收时才暴露）**：`layouts/default.vue` 从来没有挂 `<UNotifications />`，而 Nuxt UI v2 的 `useToast()` 只往 `useState("notifications")` 里追加数据、没有任何自动注入（`node_modules/@nuxt/ui/dist/runtime/composables/useToast.js` 可见，模块只带 `colors`/`modals`/`slideovers` 三个插件）。结果是**全站 toast 一直是静默的**——API 报错、下载成功、401、以及本批新增的超限拒收全都弹不出来。本批在 default layout 末尾挂上容器（全站页面都用 default layout，无 `definePageMeta({layout})` 覆盖），浏览器实测恢复：`<Notification>` 出现在 `<Notifications>` → `<Default>` 组件链里，DOM 落点 `role="region"`，右下角白卡 `w-full sm:w-96`
+- **`X-API-Version` 跟上版本**：`app.py` 的响应头长期停在 `3.7`，随本批 bump 到 `3.9.3`，让「打一次 curl 即可确认线上镜像」重新成立
+- **验证**：后端 pytest 199 passed + 1 failed，`tests/test_error_i18n.py` 7 条全绿；唯一失败 `test_download_reports_binary_mimetype` 是 WSL AlmaLinux 缺 `/etc/mime.types` 的环境差异（`mimetypes.guess_type("a.docx")` → None），非本批引入，生产 Debian 镜像有该表。前端 vitest 68 passed（含 `FileUploader.spec.ts` 4 条）、WSL `nuxt generate` 38 条路由通过。实链 curl 验证：`Accept-Language: zh-CN` → 「不允许的文件扩展名 .exe」，`en` → 英文原文。浏览器真窗验收（`/pdf-tools` 与 `/pdf-redact`）：101 MB 文件 → 「big.pdf」超过 100 MB 上限 toast 出现且文件未被选中、1.0 MB 真 PDF → 选中并「文本提取成功」、伪造 xref 的小 PDF → 后端中文错误 `读取 PDF 失败：startxref not found` 经 toast 展示（证明 i18n 目录在真实协商链路上生效）
 
 ### v3.9.2 (2026-09)
 

@@ -33,6 +33,9 @@ docStamp/
 │   ├── json_logging.py         # JSON 结构化日志 (30 天轮转)
 │   ├── models.py               # OperationLog + BaseCRUD (原始 SQL)
 │   ├── cache.py                # Flask-Caching SimpleCache
+│   ├── babel.cfg               # pybabel 提取配置
+│   ├── fill_zh_po.py         # 中文消息表 → translations/zh_Hans_CN/…/messages.po
+│   ├── translations/           # messages.pot + zh_Hans_CN/LC_MESSAGES/messages.{po,mo}
 │   ├── gunicorn.conf.py        # 生产: bind 0.0.0.0:5000, workers=2, on_starting 启动每日清理
 │   ├── blueprints/             # HTTP 路由层 (每功能一个文件)
 │   ├── services/               # 业务逻辑层 (纯函数，零 Flask 依赖，返回 ServiceResult[T])
@@ -49,6 +52,7 @@ docStamp/
 ├── docs/
 │   └── vibecoding-blog.md      # 开发经验分享
 ├── manage.sh                   # dev/docker 管理
+├── sync-from-windows.sh        # Windows 编辑 → WSL 构建：拷文件并转 LF
 ├── Dockerfile
 ├── SPEC.md                     # 详细设计规范
 └── AGENTS.md                   # 本文件
@@ -76,6 +80,20 @@ docStamp/
 | 14 | 使用统计 | `/status` | 模块调用量 + 访客统计 (ECharts) |
 
 ## 开发环境
+
+代码在 **Windows 侧编辑**（`D:\Workdir\DocStamp`，`core.autocrlf=true` 工作树是 CRLF），在 **WSL（AlmaLinux-10）** 里构建与测试（仓库位于 `/root/Project/DocStamp`）。两边靠 `sync-from-windows.sh` 打通：它把指定目录从 `/mnt/d/...` 覆盖到 WSL clone 并统一转成 LF（直接 `cp` 会把 CRLF 带进去，git 会显示整文件重写）：
+
+```bash
+bash /root/sync-from-windows.sh backend        # 也可传 frontend/i18n 等；默认 backend + 相关前端目录
+```
+
+后端依赖装在 `backend/.venv`，`manage.sh` 调裸 `python3`，**每个新会话必须先激活 venv**：
+
+```bash
+source backend/.venv/bin/activate   # 不加这一步 ./manage.sh start 会报 ModuleNotFoundError: flask
+```
+
+**WSL 已知环境差异**：AlmaLinux 无 `/etc/mime.types`，`mimetypes.guess_type("x.docx")` 返回 `None`，故 `tests/test_routes_critical.py::test_download_reports_binary_mimetype` 在 WSL 必失败（生产 Debian 镜像有该表，非代码缺陷）；其余 199 条用例为准。
 
 ```bash
 # 开发模式 (Flask :5000 + Nuxt :8080)
@@ -134,6 +152,7 @@ def my_service(path: str) -> ServiceResult[dict]:
 - 禁止 `transition: all`，用具体属性列表
 - 表单校验：Vuelidate (`useValidation` composable)
 - API 错误提示：`useApiError().showError(e)` 弹 toast；需要内联展示时用 `useApiError().extractError(e)` 取消息（自动识别 JSON 与 Blob 两种错误体）；全局 401 由 `plugins/axios.client.ts` 拦截
+- Toast：`useToast().add({...})` 只往 `useState("notifications")` 里塞数据，**页面上必须有 `<UNotifications />` 容器才会渲染**——容器统一挂在 `layouts/default.vue`（全站页面都用 default layout），新增独立 layout 时要一起带上，否则该页所有 toast 静默失效（v2 无自动注入，实测删掉容器后 `toast.add` 调用成功但 DOM 零节点）
 - 文件下载：统一走 `useDownload().downloadBlob(blob, filename, successMsg?)`（挂 `<a>` → click → 延迟 100ms 摘除并 revoke，禁止在组件里手写这段；不传成功文案则不弹 toast）
 
 ### 工具配置单一数据源
@@ -205,6 +224,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 - 环境变量从 `Config` 类读，不模块级 `os.environ`
 - 中文 prompt 用单引号字符串（避免中文引号冲突）
 - 每日临时文件清理：gunicorn `on_starting` 在 master 进程调 `utils/file_cleanup.start_cleanup_daemon`，无独立 worker
+- 错误消息在**源头**翻译：服务层 / 工具层用 `lazy_gettext as _l` + `%(...)s` 命名插值，蓝图静态文案用 `gettext as _`，蓝图出口仍是 `str(e)` / `result.message`；新增用户可见消息必须走 msgid，不许拼 f-string 直出。目录名固定 `translations/zh_Hans_CN/`（`zh_CN` 会静默失配），提取要显式 `-k _l:1`。完整约定见 `SPEC.md`「四、后端架构 · 错误消息国际化」
 
 ### 前端
 
@@ -236,23 +256,20 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 | 服务器运维 `.env` 删掉 AI / DeepSeek 残留行 | 仓库与开发机均无 `.env`（gitignored）；compose 已不再注入该变量，这行现在是惰性的，但 key 已吊销 |
 | `Dockerfile` 的 `CMD` 补 `--workers` | compose 传了 `--workers 2`，裸 `docker run` 会落到 `gunicorn.conf.py` 的 `min(8, cpu*2+1)`（2 核 = 5 个 worker）。生产走 compose 故被兜住 |
 | 删掉 `backend/gunicorn.conf.py` 的 `pidfile` | `"/var/run/docstamp.pid"` 恒被 `Dockerfile` 与 compose 的 `--pid /tmp/gunicorn.pid` 覆盖，且 `docstamp` 用户对 `/var/run` 无写权，属死配置 |
-| `.dockerignore` / `.gitattributes` 钉 `eol=lf` | 现状只让 `git add` 警告「下次 touch 转 CRLF」；实测无碍（Go 行扫描剥 `\r`，git 属性解析也容忍 `\r`），故按「先证明再修」留着 |
+| `.dockerignore` / `.gitattributes` 钉 `eol=lf` | 现状只让 `git add` 警告「下次 touch 转 CRLF」；实测无碍（Go 行扫描剥 `\r`，git 属性解析也容忍 `\r`），故按「先证明再修」留着。v3.9.3 起 `backend/translations/*.po`/`.pot` 也进了仓库，每次 Windows 检出都是 CRLF，构建在 WSL clone（LF）里跑故未受影响 |
 
 ### 整站级
 
 | 事项 | 为何未做 |
 |------|----------|
-| 上传路径校验错误文案仍是英文 | `save_upload` / `file_security` 抛的 `ValueError` 被全站工具共享，一条文案影响所有上传入口，属整站后端 i18n 决策，不做单点修补 |
-| `manage.sh` 调 `python3` | 本机是 Windows Store 残桩，起不来后端（只能直接调 `/c/Program Files/Python312/python`）。涉及 `start` / `test` / `test-cov` |
 | 开发模式没有清理线程 | 每日清理只挂在 gunicorn `on_starting`，`python app.py` 不起它，dev 机器只能 `./manage.sh clean-output` 手动清 |
 
 ### 前端组件
 
 | 事项 | 为何未做 |
 |------|----------|
-| `FileUploader` 的 `max-size` 单位错 + `file-rejected` 无人监听 | prop 按**字节**比较（`f.size > props.maxSize`），但 5 个调用点都传 `:max-size="100"` 想表达 100 MB，于是 >100 字节的文件全被挡下；而 `emit("file-rejected", …)` 在全仓库**没有任何监听者**（`grep -rn file-rejected frontend/` 只命中组件自身），用户看到的是「选完文件页面毫无反应」的静默失效。受影响：`MetadataCleanTab.vue`、`PdfCompressPanel.vue`、`PageDecoratePanel.vue`、`PdfToTextPanel.vue`、`pages/pdf-merge.vue`。修法要同时定组件契约（改 MB 还是改字节语义）+ 接上错误提示 + 改 5 个调用点，属独立一批；新加的 `pages/webp-to-jpeg.vue` 刻意不传该 prop 以绕开 |
-| `pages/pdf-merge.vue` 监听 `@files-selected` | 组件实际 emit 的是 `file-selected`（无 s），故该页 `onFilesSelected` 永不触发，是与上一条同源的静默失效。合在同一批里修 |
 | 全站 `color="neutral"` 无效 + `neutral-*` 类名惰性 | Nuxt UI v2 的灰阶值拼法是 `gray`（`neutral` 是 v3 拼法），故 `color="neutral"` 触发 `[Vue warn] Invalid prop`，组件退回默认灰阶；又因 `neutral` 是 Tailwind 内置色而未被 `safelistColors` 收录，`text-neutral-500` 一类 `neutral-*` 类名不在产物 CSS 里（实测该元素 `color` 为空、随父级）。存量问题、非本批引入，属独立一批 |
+| Toast 的 `color: "warning"/"success"/"error"` 全部无效（20 处） | `UNotification` 的 `color` 校验是 `["gray", ...appConfig.ui.colors]`，本项目 `appConfig.ui.colors` 只有 Tailwind 色板名 + `brand`/`primary`，**没有** `warning`/`success`/`error` 这类语义名；实测控制台 `[Vue warn]: Invalid prop ... at <Notification>`，且渲染出的进度条类名 `bg-warning-500` 在产物 CSS 里不存在（`bg-warning-500` 计算样式 = `rgba(0,0,0,0)`），只有白卡生效。以前 toast 根本不挂载（缺 `<UNotifications />`），所以这条一直没人看见；v3.9.3 挂上容器后暴露。修法属一批：语义色要么进 `tailwind.config.ts` 色板 + `safelistColors`，要么 20 处改成 `amber`/`green`/`red` |
 
 ### PDF 脱敏模块
 
