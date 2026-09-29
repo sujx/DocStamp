@@ -6,26 +6,36 @@ set -euo pipefail
 
 WIN=/mnt/d/Workdir/DocStamp
 WSL=/root/Project/DocStamp
-DEFAULT='backend frontend/i18n frontend/components frontend/pages frontend/layouts'
-PATHS="${*:-$DEFAULT}"
+# Everything the repository tracks, so repo-root files (AGENTS.md, SPEC.md,
+# manage.sh, Dockerfile) don't rot in the clone; pass pathspecs to narrow it.
+PATHS="${*:-.}"
 
-# Drive the copy off `git ls-files`: only what the repository tracks crosses
+# Drive the copy off `git ls-files -s`: only what the repository tracks crosses
 # over. Untracked runtime state on the Windows side (tasks.db and its backups,
 # backend/output/, __pycache__, .pytest_cache) is stale relative to the WSL
 # clone, and copying it once clobbered the local stats DB.
+#
+# Modes come from the index, not from a guess: /mnt/d reports every file as
+# 0777 and the Windows checkout cannot carry exec bits, so a blanket chmod
+# (0644 everywhere, or 0755 for *.sh) disagrees with HEAD on one half of the
+# files either way. Mirroring the recorded mode keeps the clone's status clean.
 cd "$WIN"
-git ls-files -z -- $PATHS |
-    while IFS= read -r -d '' f; do
+git ls-files -s -z -- $PATHS |
+    while IFS=$'\t' read -r -d '' meta f; do
+        case "${meta%% *}" in
+            100755) perm=0755 ;;
+            *) perm=0644 ;;
+        esac
         mkdir -p "$WSL/$(dirname "$f")"
         cp "$WIN/$f" "$WSL/$f"
-        # /mnt/d reports everything as 0777; without this git sees a mode change
-        # on every copied file and the clone looks permanently dirty.
-        chmod 0644 "$WSL/$f"
+        chmod "$perm" "$WSL/$f"
         case "$f" in
-            *.sh) chmod 0755 "$WSL/$f" ;;
-            # Binaries (.mo, images) must not be touched by sed.
-            *.py|*.cfg|*.ini|*.txt|*.md|*.po|*.pot|*.vue|*.ts|*.js|*.mjs|*.json|*.yaml|*.yml|*.toml|*.sh)
-                sed -i 's/\r$//' "$WSL/$f" ;;
+            # Binaries must never be touched by sed. Everything else is text
+            # stored LF in the repository and checked out CRLF here, so
+            # stripping CR restores what git recorded. A CRLF Dockerfile or
+            # *.sh baked into the image breaks the build or the entrypoint.
+            *.mo|*.db|*.pdf|*.png|*.jpg|*.jpeg|*.gif|*.webp|*.ico|*.woff|*.woff2|*.ttf|*.eot) ;;
+            *) sed -i 's/\r$//' "$WSL/$f" ;;
         esac
     done
 
