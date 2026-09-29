@@ -3,6 +3,7 @@
 from pypdf import PdfReader, PdfWriter
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 
 def pdf_delete_pages(input_path: str, output_path: str, pages_to_delete: list) -> ServiceResult[dict]:
@@ -17,20 +18,20 @@ def pdf_delete_pages(input_path: str, output_path: str, pages_to_delete: list) -
         ServiceResult with dict: original_pages, deleted_pages, remaining_pages.
     """
     if not pages_to_delete:
-        return ServiceResult.fail(ErrorCode.PDF_NO_PAGES_SPECIFIED, "No pages specified for deletion")
+        return ServiceResult.fail(ErrorCode.PDF_NO_PAGES_SPECIFIED, _l("No pages specified for deletion"))
 
     try:
         reader = PdfReader(input_path)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))
 
     total = len(reader.pages)
     if total == 0:
-        return ServiceResult.fail(ErrorCode.PDF_EMPTY, "PDF has no pages")
+        return ServiceResult.fail(ErrorCode.PDF_EMPTY, _l("PDF has no pages"))
 
     for p in pages_to_delete:
         if p < 1 or p > total:
-            return ServiceResult.fail(ErrorCode.PDF_PAGE_OUT_OF_RANGE, f"Page number {p} out of range (1-{total})")
+            return ServiceResult.fail(ErrorCode.PDF_PAGE_OUT_OF_RANGE, _l("Page number %(p)s out of range (1-%(total)s)", p=p, total=total))
 
     delete_set = set(pages_to_delete)
     writer = PdfWriter()
@@ -75,20 +76,20 @@ def pdf_insert_pages(
         reader = PdfReader(input_path)
         insert_reader = PdfReader(insert_path)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))
 
     total = len(reader.pages)
     insert_total = len(insert_reader.pages)
 
     if insert_total == 0:
-        return ServiceResult.fail(ErrorCode.PDF_EMPTY, "Insert PDF has no pages")
+        return ServiceResult.fail(ErrorCode.PDF_EMPTY, _l("Insert PDF has no pages"))
 
     if at_position < 0:
         at_position = total
     if at_position > total:
         return ServiceResult.fail(
             ErrorCode.PDF_PAGE_OUT_OF_RANGE,
-            f"Insert position {at_position} out of range (0-{total})",
+            _l("Insert position %(at_position)s out of range (0-%(total)s)", at_position=at_position, total=total),
         )
 
     if pages_to_insert is None:
@@ -98,7 +99,7 @@ def pdf_insert_pages(
         if p < 1 or p > insert_total:
             return ServiceResult.fail(
                 ErrorCode.PDF_PAGE_OUT_OF_RANGE,
-                f"Insert page {p} out of range (1-{insert_total})",
+                _l("Insert page %(p)s out of range (1-%(insert_total)s)", p=p, insert_total=insert_total),
             )
 
     writer = PdfWriter()
@@ -136,16 +137,16 @@ def pdf_reorder_pages(input_path: str, output_path: str, new_order: list) -> Ser
     try:
         reader = PdfReader(input_path)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))
 
     total = len(reader.pages)
     if total == 0:
-        return ServiceResult.fail(ErrorCode.PDF_EMPTY, "PDF has no pages")
+        return ServiceResult.fail(ErrorCode.PDF_EMPTY, _l("PDF has no pages"))
 
     if sorted(new_order) != list(range(1, total + 1)):
         return ServiceResult.fail(
             ErrorCode.VALIDATION_ERROR,
-            f"Order must contain all pages 1-{total} exactly once",
+            _l("Order must contain all pages 1-%(total)s exactly once", total=total),
         )
 
     writer = PdfWriter()

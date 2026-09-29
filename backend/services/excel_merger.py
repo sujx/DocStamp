@@ -7,6 +7,7 @@ from typing import List
 from openpyxl import Workbook, load_workbook
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 
 def _is_csv(filepath: str) -> bool:
@@ -63,22 +64,24 @@ def merge_excel_files(
         ServiceResult with dict: total_rows, file_count, columns, per_file_rows.
     """
     if len(filepaths) < 2:
-        return ServiceResult.fail(ErrorCode.EXCEL_INSUFFICIENT_FILES, "At least 2 files are required for merging")
+        return ServiceResult.fail(ErrorCode.EXCEL_INSUFFICIENT_FILES, _l("At least 2 files are required for merging"))
 
     for fp in filepaths:
         if not os.path.isfile(fp):
-            return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"File not found: {fp}")
+            return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, _l("File not found: %(fp)s", fp=fp))
 
     ref_headers = _get_headers(filepaths[0])
     if not ref_headers:
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, f"No headers found in '{os.path.basename(filepaths[0])}'")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR,
+                                 _l("No headers found in '%(name)s'", name=os.path.basename(filepaths[0])))
 
     for fp in filepaths[1:]:
         headers = _get_headers(fp)
         if headers != ref_headers:
             return ServiceResult.fail(
                 ErrorCode.EXCEL_STRUCTURE_MISMATCH,
-                f"Structure mismatch in '{os.path.basename(fp)}': expected {ref_headers}, got {headers}",
+                _l("Structure mismatch in '%(name)s': expected %(expected)s, got %(got)s",
+                   name=os.path.basename(fp), expected=ref_headers, got=headers),
             )
 
     # Create a new workbook and write the header row

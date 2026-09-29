@@ -1,0 +1,503 @@
+# Translations template for docStamp.
+# Copyright (C) 2026 docStamp
+# This file is distributed under the same license as the docStamp project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: docStamp VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-09-29 16:46+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: error_handler.py:79
+msgid "Resource not found"
+msgstr ""
+
+#: error_handler.py:83
+msgid "Method not allowed"
+msgstr ""
+
+#: error_handler.py:87
+msgid "Request entity too large"
+msgstr ""
+
+#: error_handler.py:93
+msgid "系统异常"
+msgstr ""
+
+#: blueprints/convert.py:110
+msgid "File too large"
+msgstr ""
+
+#: blueprints/convert.py:116
+msgid "No content provided"
+msgstr ""
+
+#: blueprints/convert.py:119
+msgid "Content is empty"
+msgstr ""
+
+#: blueprints/convert.py:164 blueprints/metadata_clean_bp.py:27
+#: blueprints/page_decorate_bp.py:26 blueprints/pdf2img_bp.py:25
+#: blueprints/pdf_compress_bp.py:25 blueprints/pdf_editor_bp.py:30
+#: blueprints/pdf_editor_bp.py:74 blueprints/pdf_redact_bp.py:62
+#: blueprints/pdf_to_text_bp.py:21 blueprints/print_split_bp.py:25
+#: blueprints/properties_bp.py:23 blueprints/properties_bp.py:47
+#: blueprints/webp_to_jpeg_bp.py:27
+msgid "No file provided"
+msgstr ""
+
+#: blueprints/convert.py:167 blueprints/metadata_clean_bp.py:30
+#: blueprints/page_decorate_bp.py:29 blueprints/pdf2img_bp.py:28
+#: blueprints/pdf_compress_bp.py:28 blueprints/pdf_editor_bp.py:33
+#: blueprints/pdf_editor_bp.py:77 blueprints/pdf_editor_bp.py:164
+#: blueprints/pdf_to_text_bp.py:24 blueprints/print_split_bp.py:28
+#: blueprints/properties_bp.py:26 blueprints/properties_bp.py:50
+msgid "No file selected"
+msgstr ""
+
+#: blueprints/download.py:49
+msgid "Invalid filename"
+msgstr ""
+
+#: blueprints/download.py:52
+msgid "File type not allowed for download"
+msgstr ""
+
+#: blueprints/download.py:56
+msgid "File not found"
+msgstr ""
+
+#: blueprints/excel_merge_bp.py:24 blueprints/img2pdf_bp.py:25
+#: blueprints/pdf_merge_bp.py:26 blueprints/properties_bp.py:92
+msgid "No files provided"
+msgstr ""
+
+#: blueprints/excel_merge_bp.py:27 blueprints/img2pdf_bp.py:28
+#: blueprints/pdf_merge_bp.py:29 blueprints/properties_bp.py:95
+msgid "No files selected"
+msgstr ""
+
+#: blueprints/excel_merge_bp.py:29 services/excel_merger.py:67
+msgid "At least 2 files are required for merging"
+msgstr ""
+
+#: blueprints/excel_merge_bp.py:36
+msgid "At least 2 valid Excel files are required"
+msgstr ""
+
+#: blueprints/img2pdf_bp.py:35
+msgid "No valid images uploaded"
+msgstr ""
+
+#: blueprints/pdf_editor_bp.py:135
+msgid "Thumbnail not found"
+msgstr ""
+
+#: blueprints/pdf_editor_bp.py:145 services/pdf_editor.py:21
+msgid "No pages specified for deletion"
+msgstr ""
+
+#: blueprints/pdf_editor_bp.py:157
+msgid "No source file provided"
+msgstr ""
+
+#: blueprints/pdf_editor_bp.py:159
+msgid "No insert file provided"
+msgstr ""
+
+#: blueprints/pdf_editor_bp.py:202
+msgid "No page order specified"
+msgstr ""
+
+#: blueprints/pdf_merge_bp.py:31
+msgid "At least 2 PDF files are required"
+msgstr ""
+
+#: blueprints/pdf_merge_bp.py:38
+msgid "At least 2 valid PDF files are required"
+msgstr ""
+
+#: blueprints/pdf_redact_bp.py:102 blueprints/pdf_redact_bp.py:149
+#: blueprints/pdf_redact_bp.py:176 blueprints/pdf_redact_bp.py:218
+msgid "Session not found"
+msgstr ""
+
+#: blueprints/pdf_redact_bp.py:107
+msgid "Invalid DPI for page rendering"
+msgstr ""
+
+#: blueprints/pdf_redact_bp.py:111
+#, python-format
+msgid "DPI must be between %(lo)s and %(hi)s"
+msgstr ""
+
+#: blueprints/pdf_redact_bp.py:126
+msgid "Page out of range"
+msgstr ""
+
+#: blueprints/pdf_redact_bp.py:145 blueprints/pdf_redact_bp.py:172
+#: blueprints/pdf_redact_bp.py:249
+msgid "Request body must be valid JSON"
+msgstr ""
+
+#: blueprints/pdf_redact_bp.py:153
+msgid "Pages must be a list of page numbers"
+msgstr ""
+
+#: blueprints/pdf_redact_bp.py:180 services/pdf_redact.py:307
+msgid "No regions were marked"
+msgstr ""
+
+#: blueprints/pdf_redact_bp.py:186
+msgid "Mosaic block size must be a whole number"
+msgstr ""
+
+#: blueprints/pdf_redact_bp.py:190
+#, python-format
+msgid "Mosaic block size must be between %(lo)s and %(hi)s"
+msgstr ""
+
+#: blueprints/pdf_redact_bp.py:223
+msgid "Nothing to download for this session"
+msgstr ""
+
+#: blueprints/pdf_redact_bp.py:253
+msgid "Invalid session id"
+msgstr ""
+
+#: blueprints/print_split_bp.py:35 services/print_split.py:28
+msgid "Batch size must be at least 1"
+msgstr ""
+
+#: blueprints/print_split_bp.py:37
+msgid "Interval must be non-negative"
+msgstr ""
+
+#: blueprints/print_split_bp.py:69
+msgid "Task not found"
+msgstr ""
+
+#: blueprints/print_split_bp.py:73
+msgid "Invalid batch number"
+msgstr ""
+
+#: blueprints/print_split_bp.py:77
+msgid "Batch file not found"
+msgstr ""
+
+#: blueprints/properties_bp.py:58 blueprints/properties_bp.py:109
+msgid "No properties to modify"
+msgstr ""
+
+#: blueprints/properties_bp.py:102
+msgid "No valid files uploaded"
+msgstr ""
+
+#: blueprints/properties_bp.py:125
+msgid "No file could be modified"
+msgstr ""
+
+#: blueprints/rss_detect_bp.py:21
+msgid "URL is required"
+msgstr ""
+
+#: services/converter.py:58
+#, python-format
+msgid "%(description)s failed (exit code %(code)s): %(stderr)s"
+msgstr ""
+
+#: services/converter.py:68
+#, python-format
+msgid "%(description)s timed out after %(timeout)ss"
+msgstr ""
+
+#: services/converter.py:74
+#, python-format
+msgid ""
+"%(description)s failed: command '%(cmd)s' not found. Please ensure it is "
+"installed."
+msgstr ""
+
+#: services/excel_merger.py:71
+#, python-format
+msgid "File not found: %(fp)s"
+msgstr ""
+
+#: services/excel_merger.py:76
+#, python-format
+msgid "No headers found in '%(name)s'"
+msgstr ""
+
+#: services/excel_merger.py:83
+#, python-format
+msgid "Structure mismatch in '%(name)s': expected %(expected)s, got %(got)s"
+msgstr ""
+
+#: services/img2pdf_handler.py:42
+msgid "No images provided"
+msgstr ""
+
+#: services/img2pdf_handler.py:47
+#, python-format
+msgid "Image not found: %(path)s"
+msgstr ""
+
+#: services/img2pdf_handler.py:52
+#, python-format
+msgid "Invalid or corrupt image: %(path)s (%(e)s)"
+msgstr ""
+
+#: services/img2pdf_handler.py:91 services/img2pdf_handler.py:101
+#, python-format
+msgid "Image to PDF conversion failed: %(e)s"
+msgstr ""
+
+#: services/img2pdf_handler.py:151
+#, python-format
+msgid "Failed to create PDF: %(e)s"
+msgstr ""
+
+#: services/metadata_cleaner.py:31 services/properties.py:101
+#, python-format
+msgid "Unsupported file format: %(ext)s"
+msgstr ""
+
+#: services/metadata_cleaner.py:33 services/pdf_compressor.py:16
+msgid "Input file not found"
+msgstr ""
+
+#: services/metadata_cleaner.py:109 services/page_decorator.py:61
+#: services/pdf_compressor.py:25 services/pdf_editor.py:26
+#: services/pdf_editor.py:79 services/pdf_editor.py:140
+#: services/pdf_merger.py:28 services/pdf_redact.py:119
+#: services/pdf_redact.py:195 services/pdf_redact.py:315
+#: services/pdf_to_images.py:58 services/pdf_to_text.py:50
+#: services/print_split.py:33
+#, python-format
+msgid "Failed to read PDF: %(e)s"
+msgstr ""
+
+#: services/page_decorator.py:36
+msgid "Mode must be 'page_number', 'header', or 'footer'"
+msgstr ""
+
+#: services/page_decorator.py:40
+msgid "Text template is required"
+msgstr ""
+
+#: services/page_decorator.py:46
+#, python-format
+msgid "Invalid position: %(position)s"
+msgstr ""
+
+#: services/page_decorator.py:65 services/pdf_editor.py:30
+#: services/pdf_editor.py:144 services/print_split.py:37
+msgid "PDF has no pages"
+msgstr ""
+
+#: services/pdf_compressor.py:18
+msgid "Quality must be 'low', 'medium', or 'high'"
+msgstr ""
+
+#: services/pdf_editor.py:34
+#, python-format
+msgid "Page number %(p)s out of range (1-%(total)s)"
+msgstr ""
+
+#: services/pdf_editor.py:85
+msgid "Insert PDF has no pages"
+msgstr ""
+
+#: services/pdf_editor.py:92
+#, python-format
+msgid "Insert position %(at_position)s out of range (0-%(total)s)"
+msgstr ""
+
+#: services/pdf_editor.py:102
+#, python-format
+msgid "Insert page %(p)s out of range (1-%(insert_total)s)"
+msgstr ""
+
+#: services/pdf_editor.py:149
+#, python-format
+msgid "Order must contain all pages 1-%(total)s exactly once"
+msgstr ""
+
+#: services/pdf_merger.py:20
+msgid "At least one PDF file is required"
+msgstr ""
+
+#: services/pdf_redact.py:91
+msgid "This PDF is encrypted — decrypt it first, then upload it again"
+msgstr ""
+
+#: services/pdf_redact.py:112 services/pdf_redact.py:171
+#: services/pdf_redact.py:305 services/pdf_to_images.py:36
+#: services/webp_to_jpeg.py:35
+#, python-format
+msgid "File not found: %(filepath)s"
+msgstr ""
+
+#: services/pdf_redact.py:128
+msgid "The PDF has no pages"
+msgstr ""
+
+#: services/pdf_redact.py:132
+#, python-format
+msgid "The PDF has %(page_count)s pages; this tool accepts up to %(max_pages)s"
+msgstr ""
+
+#: services/pdf_redact.py:175
+msgid "Enter a keyword or pattern to search for"
+msgstr ""
+
+#: services/pdf_redact.py:180
+#, python-format
+msgid "The pattern is too long (limit %(MAX_PATTERN_LENGTH)s characters)"
+msgstr ""
+
+#: services/pdf_redact.py:188
+#, python-format
+msgid "Invalid regular expression: %(e)s"
+msgstr ""
+
+#: services/pdf_redact.py:208
+#, python-format
+msgid "Page %(p)s out of range (1-%(page_count)s)"
+msgstr ""
+
+#: services/pdf_redact.py:238
+#, python-format
+msgid "Failed to search the PDF: %(e)s"
+msgstr ""
+
+#: services/pdf_redact.py:329
+#, python-format
+msgid "Mark %(mark)s: invalid page number"
+msgstr ""
+
+#: services/pdf_redact.py:334
+#, python-format
+msgid "Mark %(mark)s: page %(page)s is out of range (1-%(total)s)"
+msgstr ""
+
+#: services/pdf_redact.py:364
+#, python-format
+msgid "Failed to redact PDF: %(e)s"
+msgstr ""
+
+#: services/pdf_to_images.py:39
+#, python-format
+msgid "Unsupported format: %(fmt)s. Use 'png' or 'jpeg'."
+msgstr ""
+
+#: services/pdf_to_images.py:46
+#, python-format
+msgid "Invalid DPI: %(dpi)s"
+msgstr ""
+
+#: services/pdf_to_images.py:50
+#, python-format
+msgid "DPI must be between %(MIN_DPI)s and %(MAX_DPI)s, got %(dpi)s"
+msgstr ""
+
+#: services/pdf_to_images.py:68
+#, python-format
+msgid "Page %(p)s out of range (1-%(total_pages)s)"
+msgstr ""
+
+#: services/pdf_to_images.py:93
+#, python-format
+msgid "pdftoppm failed: %(stderr)s"
+msgstr ""
+
+#: services/pdf_to_images.py:98
+msgid "pdftoppm not found. Install poppler-utils: apt install poppler-utils"
+msgstr ""
+
+#: services/pdf_to_text.py:37
+#, python-format
+msgid "PDF text extraction failed: %(e)s"
+msgstr ""
+
+#: services/pdf_to_text.py:40
+msgid "No extractable text found in this PDF"
+msgstr ""
+
+#: services/properties.py:74
+#, python-format
+msgid "Failed to read properties: %(e)s"
+msgstr ""
+
+#: services/properties.py:197
+#, python-format
+msgid "Cannot parse datetime: %(value)s"
+msgstr ""
+
+#: services/properties.py:218
+msgid "No files provided for batch processing"
+msgstr ""
+
+#: services/rss_detector.py:68
+msgid "Invalid URL format"
+msgstr ""
+
+#: services/webp_to_jpeg.py:52
+#, python-format
+msgid "Failed to convert WebP: %(e)s"
+msgstr ""
+
+#: utils/file_security.py:90
+#, python-format
+msgid "Cannot read file: %(err)s"
+msgstr ""
+
+#: utils/file_security.py:93
+#, python-format
+msgid "File size %(size)s exceeds limit of %(limit)s"
+msgstr ""
+
+#: utils/file_security.py:101
+msgid "File has no extension"
+msgstr ""
+
+#: utils/base/file_helpers.py:39 utils/file_security.py:103
+#, python-format
+msgid "File extension .%(ext)s is not allowed"
+msgstr ""
+
+#: utils/file_security.py:116
+#, python-format
+msgid "Cannot read file for magic check: %(err)s"
+msgstr ""
+
+#: utils/file_security.py:120
+#, python-format
+msgid "File content does not match .%(ext)s format; upload rejected"
+msgstr ""
+
+#: utils/rate_limit.py:49
+msgid "Too many requests. Please try again later."
+msgstr ""
+
+#: utils/base/file_helpers.py:33
+msgid "No filename provided"
+msgstr ""
+
+#: utils/base/file_helpers.py:36
+msgid "Invalid characters in filename"
+msgstr ""
+
+#: utils/base/file_helpers.py:42
+msgid "Invalid filename after sanitization"
+msgstr ""
+

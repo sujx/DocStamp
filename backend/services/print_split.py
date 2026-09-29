@@ -8,6 +8,7 @@ import os
 from pypdf import PdfReader, PdfWriter
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 
 def split_pdf(filepath: str, output_dir: str, batch_size: int) -> ServiceResult[list]:
@@ -24,16 +25,16 @@ def split_pdf(filepath: str, output_dir: str, batch_size: int) -> ServiceResult[
           "page_range": "1-60"}, ...]
     """
     if batch_size < 1:
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Batch size must be at least 1")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("Batch size must be at least 1"))
 
     try:
         reader = PdfReader(filepath)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))
 
     total_pages = len(reader.pages)
     if total_pages == 0:
-        return ServiceResult.fail(ErrorCode.PDF_EMPTY, "PDF has no pages")
+        return ServiceResult.fail(ErrorCode.PDF_EMPTY, _l("PDF has no pages"))
 
     batch_count = (total_pages + batch_size - 1) // batch_size
     batches = []

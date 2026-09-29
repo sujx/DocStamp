@@ -14,6 +14,7 @@ import uuid
 from typing import Type
 
 from flask import Flask, g, jsonify, request
+from flask_babel import gettext as _
 from pydantic import BaseModel, ValidationError
 
 from errors import ErrorCode, ServiceError
@@ -75,21 +76,21 @@ def register_error_handlers(app: Flask) -> None:
 
     @app.errorhandler(404)
     def handle_not_found(e):
-        return _format_error(404, "Resource not found")
+        return _format_error(404, _("Resource not found"))
 
     @app.errorhandler(405)
     def handle_method_not_allowed(e):
-        return _format_error(405, "Method not allowed")
+        return _format_error(405, _("Method not allowed"))
 
     @app.errorhandler(413)
     def handle_request_too_large(e):
-        return _format_error(413, "Request entity too large")
+        return _format_error(413, _("Request entity too large"))
 
     @app.errorhandler(Exception)
     def handle_unexpected_error(e: Exception):
         """Catch-all for unhandled exceptions."""
         is_debug = app.config.get("DEBUG", False)
-        msg = str(e) if is_debug else "系统异常"
+        msg = str(e) if is_debug else _("系统异常")
         app.logger.exception("Unhandled exception: %s", e)
         return _format_error(500, msg, e.__class__.__name__)
 

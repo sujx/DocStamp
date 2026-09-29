@@ -15,6 +15,7 @@ import os
 import re
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 DEFAULT_MOSAIC_BLOCK = 8
 
@@ -87,7 +88,7 @@ def _normalize_rect(rect, page_rect) -> dict | None:
     return {"x": left, "y": top, "w": right - left, "h": bottom - top}
 
 
-_ENCRYPTED_MESSAGE = "This PDF is encrypted — decrypt it first, then upload it again"
+_ENCRYPTED_MESSAGE = _l("This PDF is encrypted — decrypt it first, then upload it again")
 
 
 def _encrypted_error(doc) -> ServiceResult | None:
@@ -108,14 +109,14 @@ def inspect_pdf(filepath: str, max_pages: int = MAX_PAGES) -> ServiceResult[dict
         ServiceResult with dict keys: page_count, pages[{page_no,width,height}].
     """
     if not os.path.isfile(filepath):
-        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"File not found: {filepath}")
+        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, _l("File not found: %(filepath)s", filepath=filepath))
 
     import pymupdf
 
     try:
         doc = pymupdf.open(filepath)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))
 
     try:
         encrypted = _encrypted_error(doc)
@@ -124,11 +125,11 @@ def inspect_pdf(filepath: str, max_pages: int = MAX_PAGES) -> ServiceResult[dict
 
         page_count = doc.page_count
         if page_count == 0:
-            return ServiceResult.fail(ErrorCode.PDF_EMPTY, "The PDF has no pages")
+            return ServiceResult.fail(ErrorCode.PDF_EMPTY, _l("The PDF has no pages"))
         if page_count > max_pages:
             return ServiceResult.fail(
                 ErrorCode.VALIDATION_ERROR,
-                f"The PDF has {page_count} pages; this tool accepts up to {max_pages}",
+                _l("The PDF has %(page_count)s pages; this tool accepts up to %(max_pages)s", page_count=page_count, max_pages=max_pages),
             )
 
         pages = [
@@ -167,16 +168,16 @@ def find_text_matches(
         normalized top-left fractions.
     """
     if not os.path.isfile(filepath):
-        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"File not found: {filepath}")
+        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, _l("File not found: %(filepath)s", filepath=filepath))
 
     if not isinstance(pattern, str) or not pattern.strip():
         return ServiceResult.fail(
-            ErrorCode.VALIDATION_ERROR, "Enter a keyword or pattern to search for"
+            ErrorCode.VALIDATION_ERROR, _l("Enter a keyword or pattern to search for")
         )
     if len(pattern) > MAX_PATTERN_LENGTH:
         return ServiceResult.fail(
             ErrorCode.VALIDATION_ERROR,
-            f"The pattern is too long (limit {MAX_PATTERN_LENGTH} characters)",
+            _l("The pattern is too long (limit %(MAX_PATTERN_LENGTH)s characters)", MAX_PATTERN_LENGTH=MAX_PATTERN_LENGTH),
         )
 
     compiled = None
@@ -184,14 +185,14 @@ def find_text_matches(
         try:
             compiled = re.compile(pattern)
         except re.error as e:
-            return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, f"Invalid regular expression: {e}")
+            return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("Invalid regular expression: %(e)s", e=e))
 
     import pymupdf
 
     try:
         doc = pymupdf.open(filepath)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))
 
     try:
         encrypted = _encrypted_error(doc)
@@ -204,7 +205,7 @@ def find_text_matches(
                 if not 1 <= int(p) <= page_count:
                     return ServiceResult.fail(
                         ErrorCode.PDF_PAGE_OUT_OF_RANGE,
-                        f"Page {p} out of range (1-{page_count})",
+                        _l("Page %(p)s out of range (1-%(page_count)s)", p=p, page_count=page_count),
                     )
             targets = [int(p) for p in pages]
         else:
@@ -234,7 +235,7 @@ def find_text_matches(
             if truncated:
                 break
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to search the PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to search the PDF: %(e)s", e=e))
     finally:
         doc.close()
 
@@ -301,9 +302,9 @@ def redact_pdf(
         image_marks, leftover_regions[{mark,page}].
     """
     if not os.path.isfile(filepath):
-        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"File not found: {filepath}")
+        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, _l("File not found: %(filepath)s", filepath=filepath))
     if not marks:
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "No regions were marked")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("No regions were marked"))
 
     import pymupdf
     from PIL import Image
@@ -311,7 +312,7 @@ def redact_pdf(
     try:
         doc = pymupdf.open(filepath)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))
 
     try:
         encrypted = _encrypted_error(doc)
@@ -324,12 +325,14 @@ def redact_pdf(
                 page_no = int(mark["page"])
             except (KeyError, TypeError, ValueError):
                 return ServiceResult.fail(
-                    ErrorCode.VALIDATION_ERROR, f"Mark {index + 1}: invalid page number"
+                    ErrorCode.VALIDATION_ERROR,
+                    _l("Mark %(mark)s: invalid page number", mark=index + 1)
                 )
             if not 1 <= page_no <= page_count:
                 return ServiceResult.fail(
                     ErrorCode.VALIDATION_ERROR,
-                    f"Mark {index + 1}: page {page_no} is out of range (1-{page_count})",
+                    _l("Mark %(mark)s: page %(page)s is out of range (1-%(total)s)",
+                       mark=index + 1, page=page_no, total=page_count),
                 )
 
         # Recorded before anything is written: the mosaic patches we insert are
@@ -358,7 +361,7 @@ def redact_pdf(
         purge_document_residue(doc)
         doc.save(output_path, garbage=4, deflate=True)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, f"Failed to redact PDF: {e}")
+        return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, _l("Failed to redact PDF: %(e)s", e=e))
     finally:
         doc.close()
 

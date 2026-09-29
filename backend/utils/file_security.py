@@ -8,6 +8,8 @@ Prevents:
 
 import os
 
+from flask_babel import lazy_gettext as _l
+
 
 # ── Extension Whitelist ─────────────────────────────────────────────────
 
@@ -85,19 +87,20 @@ def _validate_size(filepath: str) -> None:
     try:
         size = os.path.getsize(filepath)
     except OSError as e:
-        raise ValueError(f"Cannot read file: {e}")
+        raise ValueError(_l("Cannot read file: %(err)s", err=e)) from e
     if size > MAX_FILE_SIZE:
         raise ValueError(
-            f"File size {_format_size(size)} exceeds limit of {_format_size(MAX_FILE_SIZE)}"
+            _l("File size %(size)s exceeds limit of %(limit)s",
+               size=_format_size(size), limit=_format_size(MAX_FILE_SIZE))
         )
 
 
 def _validate_extension(ext: str) -> None:
     """Check file extension is in the whitelist."""
     if not ext:
-        raise ValueError("File has no extension")
+        raise ValueError(_l("File has no extension"))
     if ext not in ALLOWED_EXTENSIONS:
-        raise ValueError(f"File extension .{ext} is not allowed")
+        raise ValueError(_l("File extension .%(ext)s is not allowed", ext=ext))
 
 
 def _validate_magic(filepath: str, ext: str) -> None:
@@ -110,11 +113,11 @@ def _validate_magic(filepath: str, ext: str) -> None:
         with open(filepath, "rb") as f:
             header = f.read(len(magic))
     except OSError as e:
-        raise ValueError(f"Cannot read file for magic check: {e}")
+        raise ValueError(_l("Cannot read file for magic check: %(err)s", err=e)) from e
 
     if header != magic:
         raise ValueError(
-            f"File content does not match .{ext} format; upload rejected"
+            _l("File content does not match .%(ext)s format; upload rejected", ext=ext)
         )
 
 

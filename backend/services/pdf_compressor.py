@@ -5,6 +5,7 @@ import os
 from pypdf import PdfReader, PdfWriter
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 MAX_IMAGE_DIM = 1200
 
@@ -12,16 +13,16 @@ MAX_IMAGE_DIM = 1200
 def compress_pdf(filepath: str, output_path: str, quality: str = "medium") -> ServiceResult[dict]:
     """Compress a PDF file (low/medium/high)."""
     if not os.path.isfile(filepath):
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Input file not found")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("Input file not found"))
     if quality not in ("low", "medium", "high"):
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Quality must be 'low', 'medium', or 'high'")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("Quality must be 'low', 'medium', or 'high'"))
 
     original_size = os.path.getsize(filepath)
 
     try:
         reader = PdfReader(filepath)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))
 
     writer = PdfWriter()
 

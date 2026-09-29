@@ -7,6 +7,7 @@ from typing import Optional
 from pypdf import PdfReader
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 MIN_DPI = 72
 MAX_DPI = 600
@@ -32,21 +33,21 @@ def pdf_to_images(
         ServiceResult with dict keys: total_pages, converted, files, dpi, format.
     """
     if not os.path.isfile(filepath):
-        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"File not found: {filepath}")
+        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, _l("File not found: %(filepath)s", filepath=filepath))
 
     if fmt not in ("png", "jpeg"):
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, f"Unsupported format: {fmt}. Use 'png' or 'jpeg'.")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("Unsupported format: %(fmt)s. Use 'png' or 'jpeg'.", fmt=fmt))
 
     # pdftoppm allocates width*height*4 bytes per page, so an unbounded dpi turns
     # a single page into a multi-gigabyte bitmap.  Reject before touching disk.
     try:
         dpi = int(dpi)
     except (TypeError, ValueError):
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, f"Invalid DPI: {dpi!r}")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("Invalid DPI: %(dpi)s", dpi=repr(dpi)))
     if not MIN_DPI <= dpi <= MAX_DPI:
         return ServiceResult.fail(
             ErrorCode.VALIDATION_ERROR,
-            f"DPI must be between {MIN_DPI} and {MAX_DPI}, got {dpi}",
+            _l("DPI must be between %(MIN_DPI)s and %(MAX_DPI)s, got %(dpi)s", MIN_DPI=MIN_DPI, MAX_DPI=MAX_DPI, dpi=dpi),
         )
 
     os.makedirs(output_dir, exist_ok=True)
@@ -54,7 +55,7 @@ def pdf_to_images(
     try:
         reader = PdfReader(filepath)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))
 
     total_pages = len(reader.pages)
 
@@ -64,7 +65,7 @@ def pdf_to_images(
             if p < 1 or p > total_pages:
                 return ServiceResult.fail(
                     ErrorCode.PDF_PAGE_OUT_OF_RANGE,
-                    f"Page {p} out of range (1-{total_pages})",
+                    _l("Page %(p)s out of range (1-%(total_pages)s)", p=p, total_pages=total_pages),
                 )
         first_page = min(pages)
         last_page = max(pages)
@@ -89,12 +90,12 @@ def pdf_to_images(
     except subprocess.CalledProcessError as e:
         return ServiceResult.fail(
             ErrorCode.CONVERSION_FAILED,
-            f"pdftoppm failed: {e.stderr.decode('utf-8', errors='replace')}",
+            _l("pdftoppm failed: %(stderr)s", stderr=e.stderr.decode("utf-8", errors="replace")),
         )
     except FileNotFoundError:
         return ServiceResult.fail(
             ErrorCode.TOOL_NOT_AVAILABLE,
-            "pdftoppm not found. Install poppler-utils: apt install poppler-utils",
+            _l("pdftoppm not found. Install poppler-utils: apt install poppler-utils"),
         )
 
     # Collect output files

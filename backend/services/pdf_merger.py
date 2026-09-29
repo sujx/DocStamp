@@ -3,6 +3,7 @@
 from pypdf import PdfReader, PdfWriter
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 
 def merge_pdfs(filepaths: list[str], output_path: str) -> ServiceResult[int]:
@@ -16,7 +17,7 @@ def merge_pdfs(filepaths: list[str], output_path: str) -> ServiceResult[int]:
         ServiceResult with total page count on success.
     """
     if not filepaths:
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "At least one PDF file is required")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("At least one PDF file is required"))
 
     writer = PdfWriter()
 
@@ -24,7 +25,7 @@ def merge_pdfs(filepaths: list[str], output_path: str) -> ServiceResult[int]:
         try:
             reader = PdfReader(fp)
         except Exception as e:
-            return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+            return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))
 
         for page in reader.pages:
             writer.add_page(page)

@@ -1,0 +1,504 @@
+# Chinese (Simplified, China) translations for docStamp.
+# Copyright (C) 2026 docStamp
+# This file is distributed under the same license as the docStamp project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: docStamp VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-09-29 16:46+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: error_handler.py:79
+msgid "Resource not found"
+msgstr "资源不存在"
+
+#: error_handler.py:83
+msgid "Method not allowed"
+msgstr "请求方法不允许"
+
+#: error_handler.py:87
+msgid "Request entity too large"
+msgstr "请求体过大"
+
+#: error_handler.py:93
+msgid "系统异常"
+msgstr "系统异常"
+
+#: blueprints/convert.py:110
+msgid "File too large"
+msgstr "文件过大"
+
+#: blueprints/convert.py:116
+msgid "No content provided"
+msgstr "未提供内容"
+
+#: blueprints/convert.py:119
+msgid "Content is empty"
+msgstr "内容为空"
+
+#: blueprints/convert.py:164 blueprints/metadata_clean_bp.py:27
+#: blueprints/page_decorate_bp.py:26 blueprints/pdf2img_bp.py:25
+#: blueprints/pdf_compress_bp.py:25 blueprints/pdf_editor_bp.py:30
+#: blueprints/pdf_editor_bp.py:74 blueprints/pdf_redact_bp.py:62
+#: blueprints/pdf_to_text_bp.py:21 blueprints/print_split_bp.py:25
+#: blueprints/properties_bp.py:23 blueprints/properties_bp.py:47
+#: blueprints/webp_to_jpeg_bp.py:27
+msgid "No file provided"
+msgstr "未提供文件"
+
+#: blueprints/convert.py:167 blueprints/metadata_clean_bp.py:30
+#: blueprints/page_decorate_bp.py:29 blueprints/pdf2img_bp.py:28
+#: blueprints/pdf_compress_bp.py:28 blueprints/pdf_editor_bp.py:33
+#: blueprints/pdf_editor_bp.py:77 blueprints/pdf_editor_bp.py:164
+#: blueprints/pdf_to_text_bp.py:24 blueprints/print_split_bp.py:28
+#: blueprints/properties_bp.py:26 blueprints/properties_bp.py:50
+msgid "No file selected"
+msgstr "未选择文件"
+
+#: blueprints/download.py:49
+msgid "Invalid filename"
+msgstr "文件名无效"
+
+#: blueprints/download.py:52
+msgid "File type not allowed for download"
+msgstr "不允许下载该文件类型"
+
+#: blueprints/download.py:56
+msgid "File not found"
+msgstr "文件不存在"
+
+#: blueprints/excel_merge_bp.py:24 blueprints/img2pdf_bp.py:25
+#: blueprints/pdf_merge_bp.py:26 blueprints/properties_bp.py:92
+msgid "No files provided"
+msgstr "未提供文件"
+
+#: blueprints/excel_merge_bp.py:27 blueprints/img2pdf_bp.py:28
+#: blueprints/pdf_merge_bp.py:29 blueprints/properties_bp.py:95
+msgid "No files selected"
+msgstr "未选择文件"
+
+#: blueprints/excel_merge_bp.py:29 services/excel_merger.py:67
+msgid "At least 2 files are required for merging"
+msgstr "合并至少需要 2 个文件"
+
+#: blueprints/excel_merge_bp.py:36
+msgid "At least 2 valid Excel files are required"
+msgstr "至少需要 2 个有效的 Excel 文件"
+
+#: blueprints/img2pdf_bp.py:35
+msgid "No valid images uploaded"
+msgstr "没有上传有效的图片"
+
+#: blueprints/pdf_editor_bp.py:135
+msgid "Thumbnail not found"
+msgstr "缩略图不存在"
+
+#: blueprints/pdf_editor_bp.py:145 services/pdf_editor.py:21
+msgid "No pages specified for deletion"
+msgstr "未指定要删除的页面"
+
+#: blueprints/pdf_editor_bp.py:157
+msgid "No source file provided"
+msgstr "未提供源文件"
+
+#: blueprints/pdf_editor_bp.py:159
+msgid "No insert file provided"
+msgstr "未提供插入文件"
+
+#: blueprints/pdf_editor_bp.py:202
+msgid "No page order specified"
+msgstr "未指定页面顺序"
+
+#: blueprints/pdf_merge_bp.py:31
+msgid "At least 2 PDF files are required"
+msgstr "至少需要 2 个 PDF 文件"
+
+#: blueprints/pdf_merge_bp.py:38
+msgid "At least 2 valid PDF files are required"
+msgstr "至少需要 2 个有效的 PDF 文件"
+
+#: blueprints/pdf_redact_bp.py:102 blueprints/pdf_redact_bp.py:149
+#: blueprints/pdf_redact_bp.py:176 blueprints/pdf_redact_bp.py:218
+msgid "Session not found"
+msgstr "会话不存在"
+
+#: blueprints/pdf_redact_bp.py:107
+msgid "Invalid DPI for page rendering"
+msgstr "页面渲染的 DPI 无效"
+
+#: blueprints/pdf_redact_bp.py:111
+#, python-format
+msgid "DPI must be between %(lo)s and %(hi)s"
+msgstr "DPI 必须在 %(lo)s 到 %(hi)s 之间"
+
+#: blueprints/pdf_redact_bp.py:126
+msgid "Page out of range"
+msgstr "页码超出范围"
+
+#: blueprints/pdf_redact_bp.py:145 blueprints/pdf_redact_bp.py:172
+#: blueprints/pdf_redact_bp.py:249
+msgid "Request body must be valid JSON"
+msgstr "请求体必须是合法的 JSON"
+
+#: blueprints/pdf_redact_bp.py:153
+msgid "Pages must be a list of page numbers"
+msgstr "页码必须是页码数字列表"
+
+#: blueprints/pdf_redact_bp.py:180 services/pdf_redact.py:307
+msgid "No regions were marked"
+msgstr "没有标记任何区域"
+
+#: blueprints/pdf_redact_bp.py:186
+msgid "Mosaic block size must be a whole number"
+msgstr "马赛克块大小必须是整数"
+
+#: blueprints/pdf_redact_bp.py:190
+#, python-format
+msgid "Mosaic block size must be between %(lo)s and %(hi)s"
+msgstr "马赛克块大小必须在 %(lo)s 到 %(hi)s 之间"
+
+#: blueprints/pdf_redact_bp.py:223
+msgid "Nothing to download for this session"
+msgstr "该会话没有可下载的内容"
+
+#: blueprints/pdf_redact_bp.py:253
+msgid "Invalid session id"
+msgstr "会话 ID 无效"
+
+#: blueprints/print_split_bp.py:35 services/print_split.py:28
+msgid "Batch size must be at least 1"
+msgstr "批次大小至少为 1"
+
+#: blueprints/print_split_bp.py:37
+msgid "Interval must be non-negative"
+msgstr "分组间隔必须为非负数"
+
+#: blueprints/print_split_bp.py:69
+msgid "Task not found"
+msgstr "任务不存在"
+
+#: blueprints/print_split_bp.py:73
+msgid "Invalid batch number"
+msgstr "批次号无效"
+
+#: blueprints/print_split_bp.py:77
+msgid "Batch file not found"
+msgstr "批次文件不存在"
+
+#: blueprints/properties_bp.py:58 blueprints/properties_bp.py:109
+msgid "No properties to modify"
+msgstr "没有需要修改的属性"
+
+#: blueprints/properties_bp.py:102
+msgid "No valid files uploaded"
+msgstr "没有上传有效的文件"
+
+#: blueprints/properties_bp.py:125
+msgid "No file could be modified"
+msgstr "没有文件被成功修改"
+
+#: blueprints/rss_detect_bp.py:21
+msgid "URL is required"
+msgstr "请输入 URL"
+
+#: services/converter.py:58
+#, python-format
+msgid "%(description)s failed (exit code %(code)s): %(stderr)s"
+msgstr "%(description)s失败（退出码 %(code)s）：%(stderr)s"
+
+#: services/converter.py:68
+#, python-format
+msgid "%(description)s timed out after %(timeout)ss"
+msgstr "%(description)s超时（%(timeout)s 秒）"
+
+#: services/converter.py:74
+#, python-format
+msgid ""
+"%(description)s failed: command '%(cmd)s' not found. Please ensure it is "
+"installed."
+msgstr "%(description)s失败：未找到命令“%(cmd)s”，请确认已安装。"
+
+#: services/excel_merger.py:71
+#, python-format
+msgid "File not found: %(fp)s"
+msgstr "文件不存在：%(fp)s"
+
+#: services/excel_merger.py:76
+#, python-format
+msgid "No headers found in '%(name)s'"
+msgstr "“%(name)s”中未找到表头"
+
+#: services/excel_merger.py:83
+#, python-format
+msgid "Structure mismatch in '%(name)s': expected %(expected)s, got %(got)s"
+msgstr "“%(name)s”结构不一致：期望 %(expected)s，实际 %(got)s"
+
+#: services/img2pdf_handler.py:42
+msgid "No images provided"
+msgstr "未提供图片"
+
+#: services/img2pdf_handler.py:47
+#, python-format
+msgid "Image not found: %(path)s"
+msgstr "图片不存在：%(path)s"
+
+#: services/img2pdf_handler.py:52
+#, python-format
+msgid "Invalid or corrupt image: %(path)s (%(e)s)"
+msgstr "图片无效或已损坏：%(path)s（%(e)s）"
+
+#: services/img2pdf_handler.py:91 services/img2pdf_handler.py:101
+#, python-format
+msgid "Image to PDF conversion failed: %(e)s"
+msgstr "图片转 PDF 失败：%(e)s"
+
+#: services/img2pdf_handler.py:151
+#, python-format
+msgid "Failed to create PDF: %(e)s"
+msgstr "创建 PDF 失败：%(e)s"
+
+#: services/metadata_cleaner.py:31 services/properties.py:101
+#, python-format
+msgid "Unsupported file format: %(ext)s"
+msgstr "不支持的文件格式：%(ext)s"
+
+#: services/metadata_cleaner.py:33 services/pdf_compressor.py:16
+msgid "Input file not found"
+msgstr "输入文件不存在"
+
+#: services/metadata_cleaner.py:109 services/page_decorator.py:61
+#: services/pdf_compressor.py:25 services/pdf_editor.py:26
+#: services/pdf_editor.py:79 services/pdf_editor.py:140
+#: services/pdf_merger.py:28 services/pdf_redact.py:119
+#: services/pdf_redact.py:195 services/pdf_redact.py:315
+#: services/pdf_to_images.py:58 services/pdf_to_text.py:50
+#: services/print_split.py:33
+#, python-format
+msgid "Failed to read PDF: %(e)s"
+msgstr "读取 PDF 失败：%(e)s"
+
+#: services/page_decorator.py:36
+msgid "Mode must be 'page_number', 'header', or 'footer'"
+msgstr "模式必须是“page_number”、“header”或“footer”"
+
+#: services/page_decorator.py:40
+msgid "Text template is required"
+msgstr "必须提供文本模板"
+
+#: services/page_decorator.py:46
+#, python-format
+msgid "Invalid position: %(position)s"
+msgstr "位置无效：%(position)s"
+
+#: services/page_decorator.py:65 services/pdf_editor.py:30
+#: services/pdf_editor.py:144 services/print_split.py:37
+msgid "PDF has no pages"
+msgstr "PDF 没有页面"
+
+#: services/pdf_compressor.py:18
+msgid "Quality must be 'low', 'medium', or 'high'"
+msgstr "质量必须是“low”、“medium”或“high”"
+
+#: services/pdf_editor.py:34
+#, python-format
+msgid "Page number %(p)s out of range (1-%(total)s)"
+msgstr "页码 %(p)s 超出范围（1-%(total)s）"
+
+#: services/pdf_editor.py:85
+msgid "Insert PDF has no pages"
+msgstr "待插入的 PDF 没有页面"
+
+#: services/pdf_editor.py:92
+#, python-format
+msgid "Insert position %(at_position)s out of range (0-%(total)s)"
+msgstr "插入位置 %(at_position)s 超出范围（0-%(total)s）"
+
+#: services/pdf_editor.py:102
+#, python-format
+msgid "Insert page %(p)s out of range (1-%(insert_total)s)"
+msgstr "插入页 %(p)s 超出范围（1-%(insert_total)s）"
+
+#: services/pdf_editor.py:149
+#, python-format
+msgid "Order must contain all pages 1-%(total)s exactly once"
+msgstr "顺序必须恰好包含 1-%(total)s 的每一页一次"
+
+#: services/pdf_merger.py:20
+msgid "At least one PDF file is required"
+msgstr "至少需要 1 个 PDF 文件"
+
+#: services/pdf_redact.py:91
+msgid "This PDF is encrypted — decrypt it first, then upload it again"
+msgstr "该 PDF 已加密——请先解密，再重新上传"
+
+#: services/pdf_redact.py:112 services/pdf_redact.py:171
+#: services/pdf_redact.py:305 services/pdf_to_images.py:36
+#: services/webp_to_jpeg.py:35
+#, python-format
+msgid "File not found: %(filepath)s"
+msgstr "文件不存在：%(filepath)s"
+
+#: services/pdf_redact.py:128
+msgid "The PDF has no pages"
+msgstr "该 PDF 没有页面"
+
+#: services/pdf_redact.py:132
+#, python-format
+msgid "The PDF has %(page_count)s pages; this tool accepts up to %(max_pages)s"
+msgstr "该 PDF 有 %(page_count)s 页，本工具最多支持 %(max_pages)s 页"
+
+#: services/pdf_redact.py:175
+msgid "Enter a keyword or pattern to search for"
+msgstr "请输入要搜索的关键词或正则"
+
+#: services/pdf_redact.py:180
+#, python-format
+msgid "The pattern is too long (limit %(MAX_PATTERN_LENGTH)s characters)"
+msgstr "正则表达式过长（上限 %(MAX_PATTERN_LENGTH)s 个字符）"
+
+#: services/pdf_redact.py:188
+#, python-format
+msgid "Invalid regular expression: %(e)s"
+msgstr "正则表达式无效：%(e)s"
+
+#: services/pdf_redact.py:208
+#, python-format
+msgid "Page %(p)s out of range (1-%(page_count)s)"
+msgstr "第 %(p)s 页超出范围（1-%(page_count)s）"
+
+#: services/pdf_redact.py:238
+#, python-format
+msgid "Failed to search the PDF: %(e)s"
+msgstr "搜索 PDF 失败：%(e)s"
+
+#: services/pdf_redact.py:329
+#, python-format
+msgid "Mark %(mark)s: invalid page number"
+msgstr "第 %(mark)s 个标记：页码无效"
+
+#: services/pdf_redact.py:334
+#, python-format
+msgid "Mark %(mark)s: page %(page)s is out of range (1-%(total)s)"
+msgstr "第 %(mark)s 个标记：第 %(page)s 页超出范围（1-%(total)s）"
+
+#: services/pdf_redact.py:364
+#, python-format
+msgid "Failed to redact PDF: %(e)s"
+msgstr "PDF 脱敏失败：%(e)s"
+
+#: services/pdf_to_images.py:39
+#, python-format
+msgid "Unsupported format: %(fmt)s. Use 'png' or 'jpeg'."
+msgstr "不支持的格式：%(fmt)s，请使用 png 或 jpeg。"
+
+#: services/pdf_to_images.py:46
+#, python-format
+msgid "Invalid DPI: %(dpi)s"
+msgstr "无效的 DPI：%(dpi)s"
+
+#: services/pdf_to_images.py:50
+#, python-format
+msgid "DPI must be between %(MIN_DPI)s and %(MAX_DPI)s, got %(dpi)s"
+msgstr "DPI 必须在 %(MIN_DPI)s 到 %(MAX_DPI)s 之间，当前为 %(dpi)s"
+
+#: services/pdf_to_images.py:68
+#, python-format
+msgid "Page %(p)s out of range (1-%(total_pages)s)"
+msgstr "第 %(p)s 页超出范围（1-%(total_pages)s）"
+
+#: services/pdf_to_images.py:93
+#, python-format
+msgid "pdftoppm failed: %(stderr)s"
+msgstr "pdftoppm 执行失败：%(stderr)s"
+
+#: services/pdf_to_images.py:98
+msgid "pdftoppm not found. Install poppler-utils: apt install poppler-utils"
+msgstr "未找到 pdftoppm，请安装 poppler-utils：apt install poppler-utils"
+
+#: services/pdf_to_text.py:37
+#, python-format
+msgid "PDF text extraction failed: %(e)s"
+msgstr "PDF 文本提取失败：%(e)s"
+
+#: services/pdf_to_text.py:40
+msgid "No extractable text found in this PDF"
+msgstr "该 PDF 中没有可提取的文本"
+
+#: services/properties.py:74
+#, python-format
+msgid "Failed to read properties: %(e)s"
+msgstr "读取属性失败：%(e)s"
+
+#: services/properties.py:197
+#, python-format
+msgid "Cannot parse datetime: %(value)s"
+msgstr "无法解析日期时间：%(value)s"
+
+#: services/properties.py:218
+msgid "No files provided for batch processing"
+msgstr "未提供批量处理的文件"
+
+#: services/rss_detector.py:68
+msgid "Invalid URL format"
+msgstr "URL 格式无效"
+
+#: services/webp_to_jpeg.py:52
+#, python-format
+msgid "Failed to convert WebP: %(e)s"
+msgstr "WebP 转换失败：%(e)s"
+
+#: utils/file_security.py:90
+#, python-format
+msgid "Cannot read file: %(err)s"
+msgstr "无法读取文件：%(err)s"
+
+#: utils/file_security.py:93
+#, python-format
+msgid "File size %(size)s exceeds limit of %(limit)s"
+msgstr "文件大小 %(size)s 超过上限 %(limit)s"
+
+#: utils/file_security.py:101
+msgid "File has no extension"
+msgstr "文件没有扩展名"
+
+#: utils/base/file_helpers.py:39 utils/file_security.py:103
+#, python-format
+msgid "File extension .%(ext)s is not allowed"
+msgstr "不允许的文件扩展名 .%(ext)s"
+
+#: utils/file_security.py:116
+#, python-format
+msgid "Cannot read file for magic check: %(err)s"
+msgstr "无法读取文件进行魔数校验：%(err)s"
+
+#: utils/file_security.py:120
+#, python-format
+msgid "File content does not match .%(ext)s format; upload rejected"
+msgstr "文件内容与 .%(ext)s 格式不符，已拒绝上传"
+
+#: utils/rate_limit.py:49
+msgid "Too many requests. Please try again later."
+msgstr "请求过于频繁，请稍后再试。"
+
+#: utils/base/file_helpers.py:33
+msgid "No filename provided"
+msgstr "未提供文件名"
+
+#: utils/base/file_helpers.py:36
+msgid "Invalid characters in filename"
+msgstr "文件名包含非法字符"
+
+#: utils/base/file_helpers.py:42
+msgid "Invalid filename after sanitization"
+msgstr "文件名清洗后无效"
+

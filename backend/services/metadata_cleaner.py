@@ -3,6 +3,7 @@
 import os
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 
 def clean_metadata(filepath: str, output_path: str) -> ServiceResult[dict]:
@@ -27,9 +28,9 @@ def clean_metadata(filepath: str, output_path: str) -> ServiceResult[dict]:
         elif ext == ".pdf":
             return _clean_pdf(filepath, output_path)
         else:
-            return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, f"Unsupported file format: {ext}")
+            return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, _l("Unsupported file format: %(ext)s", ext=ext))
     except FileNotFoundError:
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Input file not found")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("Input file not found"))
 
 
 def _clean_docx(filepath: str, output_path: str) -> ServiceResult[dict]:
@@ -105,7 +106,7 @@ def _clean_pdf(filepath: str, output_path: str) -> ServiceResult[dict]:
     try:
         reader = PdfReader(filepath)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))
 
     writer = PdfWriter()
     fields_cleaned = 0

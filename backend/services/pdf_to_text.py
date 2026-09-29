@@ -8,6 +8,7 @@ from pdfminer.layout import LAParams
 from pypdf import PdfReader
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 
 def extract_pdf_text(filepath: str, page_numbers: list[int] | None = None) -> ServiceResult[str]:
@@ -33,10 +34,10 @@ def extract_pdf_text(filepath: str, page_numbers: list[int] | None = None) -> Se
     try:
         text = extract_text(filepath, laparams=laparams, page_numbers=page_numbers)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"PDF text extraction failed: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("PDF text extraction failed: %(e)s", e=e))
 
     if not text or not text.strip():
-        return ServiceResult.fail(ErrorCode.PDF_EMPTY, "No extractable text found in this PDF")
+        return ServiceResult.fail(ErrorCode.PDF_EMPTY, _l("No extractable text found in this PDF"))
 
     return ServiceResult.ok(text)
 
@@ -46,4 +47,4 @@ def get_pdf_page_count(filepath: str) -> ServiceResult[int]:
     try:
         return ServiceResult.ok(len(PdfReader(filepath).pages))
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))

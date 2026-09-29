@@ -13,6 +13,7 @@ from urllib.parse import urljoin, urlparse
 import requests
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 # ── Common paths to probe ────────────────────────────────────────────────
 COMMON_FEED_PATHS = [
@@ -64,7 +65,7 @@ def detect_feeds(url: str) -> ServiceResult[list[dict]]:
     """
     url = _normalize_url(url)
     if not url:
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Invalid URL format")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("Invalid URL format"))
 
     seen = set()
     feeds: list[dict] = []

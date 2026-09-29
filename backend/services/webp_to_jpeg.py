@@ -7,6 +7,7 @@ layer is skipped for .webp uploads — Pillow's decoder is the only content gate
 import os
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 DEFAULT_QUALITY = 90
 
@@ -31,7 +32,7 @@ def webp_to_jpeg(
         ServiceResult with dict keys: output, width, height.
     """
     if not os.path.isfile(filepath):
-        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"File not found: {filepath}")
+        return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, _l("File not found: %(filepath)s", filepath=filepath))
 
     from PIL import Image
 
@@ -48,6 +49,6 @@ def webp_to_jpeg(
             width, height = rgb.size
             rgb.save(output_path, format="JPEG", quality=quality)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, f"Failed to convert WebP: {e}")
+        return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, _l("Failed to convert WebP: %(e)s", e=e))
 
     return ServiceResult.ok({"output": output_path, "width": width, "height": height})

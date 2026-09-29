@@ -18,6 +18,7 @@ from datetime import datetime
 from xml.etree import ElementTree as ET
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 
 def read_properties(filepath: str) -> ServiceResult[dict]:
@@ -70,7 +71,7 @@ def read_properties(filepath: str) -> ServiceResult[dict]:
                 props["last_modified_by"] = last_mod_el.text or ""
 
     except (FileNotFoundError, zipfile.BadZipFile, ET.ParseError, KeyError) as e:
-        return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, f"Failed to read properties: {e}")
+        return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, _l("Failed to read properties: %(e)s", e=e))
 
     return ServiceResult.ok(props)
 
@@ -97,7 +98,7 @@ def modify_properties(filepath: str, output_path: str, props: dict) -> ServiceRe
         elif ext == ".pptx":
             _modify_pptx(filepath, output_path, props)
         else:
-            return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, f"Unsupported file format: {ext}")
+            return ServiceResult.fail(ErrorCode.UNSUPPORTED_FORMAT, _l("Unsupported file format: %(ext)s", ext=ext))
     except Exception as e:
         return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, str(e))
 
@@ -193,7 +194,7 @@ def _parse_datetime(value) -> datetime:
         except ValueError:
             continue
 
-    raise ValueError(f"Cannot parse datetime: {value}")
+    raise ValueError(_l("Cannot parse datetime: %(value)s", value=value))
 
 
 def batch_modify_properties(
@@ -214,7 +215,7 @@ def batch_modify_properties(
         ServiceResult with list of dicts: [{"filename": "a.docx", "success": True}, ...]
     """
     if not filepaths:
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "No files provided for batch processing")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("No files provided for batch processing"))
 
     results = []
 

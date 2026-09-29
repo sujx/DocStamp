@@ -10,6 +10,7 @@ import img2pdf
 from PIL import Image
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 
 # Page size definitions in points (1 point = 1/72 inch)
@@ -38,17 +39,17 @@ def images_to_pdf(
         ServiceResult with dict containing page_count and file_count.
     """
     if not image_paths:
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "No images provided")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("No images provided"))
 
     # Validate all images exist and are readable
     for path in image_paths:
         if not os.path.isfile(path):
-            return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, f"Image not found: {path}")
+            return ServiceResult.fail(ErrorCode.FILE_NOT_FOUND, _l("Image not found: %(path)s", path=path))
         try:
             with Image.open(path) as img:
                 img.verify()
         except Exception as e:
-            return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, f"Invalid or corrupt image: {path} ({e})")
+            return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("Invalid or corrupt image: %(path)s (%(e)s)", path=path, e=e))
 
     if page_size == "original":
         result = _merge_lossless(image_paths, output_path)
@@ -87,7 +88,7 @@ def _merge_lossless(image_paths: list, output_path: str) -> ServiceResult[None]:
             with open(output_path, "wb") as f:
                 f.write(img2pdf.convert(rgb_paths))
         except Exception as e:
-            return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, f"Image to PDF conversion failed: {e}")
+            return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, _l("Image to PDF conversion failed: %(e)s", e=e))
         finally:
             for p in rgb_paths:
                 if p not in image_paths:
@@ -97,7 +98,7 @@ def _merge_lossless(image_paths: list, output_path: str) -> ServiceResult[None]:
                         pass
         return ServiceResult.ok(None)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, f"Image to PDF conversion failed: {e}")
+        return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, _l("Image to PDF conversion failed: %(e)s", e=e))
 
 
 def _merge_with_page_size(
@@ -147,4 +148,4 @@ def _merge_with_page_size(
         c.save()
         return ServiceResult.ok(None)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, f"Failed to create PDF: {e}")
+        return ServiceResult.fail(ErrorCode.CONVERSION_FAILED, _l("Failed to create PDF: %(e)s", e=e))

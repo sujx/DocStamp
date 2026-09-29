@@ -8,6 +8,7 @@ import uuid
 
 from werkzeug.utils import secure_filename
 
+from flask_babel import lazy_gettext as _l
 from utils.file_security import validate_file_security
 
 
@@ -29,16 +30,16 @@ def validate_filename(raw_name: str, allowed_exts: set) -> str:
                     or has a disallowed extension.
     """
     if not raw_name:
-        raise ValueError("No filename provided")
+        raise ValueError(_l("No filename provided"))
     for char in FORBIDDEN_PATH_CHARS:
         if char in raw_name:
-            raise ValueError("Invalid characters in filename")
+            raise ValueError(_l("Invalid characters in filename"))
     ext = raw_name.rsplit(".", 1)[-1].lower() if "." in raw_name else ""
     if ext not in allowed_exts:
-        raise ValueError(f"File extension .{ext} is not allowed")
+        raise ValueError(_l("File extension .%(ext)s is not allowed", ext=ext))
     filename = secure_filename(raw_name)
     if not filename:
-        raise ValueError("Invalid filename after sanitization")
+        raise ValueError(_l("Invalid filename after sanitization"))
     if not filename.lower().endswith(f".{ext}"):
         filename = f"{filename}.{ext}"
     return filename

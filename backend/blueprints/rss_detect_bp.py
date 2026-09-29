@@ -1,6 +1,8 @@
 """RSS feed detection blueprint."""
 
 from flask import Blueprint, g, jsonify, request
+from flask_babel import gettext as _
+from flask_babel import gettext as _
 
 from utils.rate_limit import rate_limit
 from services.rss_detector import detect_feeds
@@ -16,7 +18,7 @@ def rss_detect():
     url = (data.get("url") or "").strip()
 
     if not url:
-        return jsonify({"code": 400, "msg": "URL is required", "requestId": getattr(g, "request_id", "-")}), 400
+        return jsonify({"code": 400, "msg": _("URL is required"), "requestId": getattr(g, "request_id", "-")}), 400
 
     result = detect_feeds(url)
     if not result.success:

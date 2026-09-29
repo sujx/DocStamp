@@ -7,6 +7,7 @@ from reportlab.lib.colors import HexColor
 from reportlab.pdfgen import canvas
 
 from errors import ErrorCode, ServiceResult
+from flask_babel import lazy_gettext as _l
 
 
 def add_page_numbers(filepath: str, output_path: str, params: dict) -> ServiceResult[dict]:
@@ -32,17 +33,17 @@ def add_page_numbers(filepath: str, output_path: str, params: dict) -> ServiceRe
     """
     mode = params.get("mode", "page_number")
     if mode not in ("page_number", "header", "footer"):
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Mode must be 'page_number', 'header', or 'footer'")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("Mode must be 'page_number', 'header', or 'footer'"))
 
     text_template = params.get("text", "{n}" if mode == "page_number" else "")
     if not text_template:
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, "Text template is required")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("Text template is required"))
 
     position = params.get("position", "bottom-center")
     valid_positions = {"top-left", "top-center", "top-right",
                        "bottom-left", "bottom-center", "bottom-right"}
     if position not in valid_positions:
-        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, f"Invalid position: {position}")
+        return ServiceResult.fail(ErrorCode.VALIDATION_ERROR, _l("Invalid position: %(position)s", position=position))
 
     font_size = int(params.get("font_size", 10))
     start_number = int(params.get("start_number", 1))
@@ -57,11 +58,11 @@ def add_page_numbers(filepath: str, output_path: str, params: dict) -> ServiceRe
     try:
         reader = PdfReader(filepath)
     except Exception as e:
-        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, f"Failed to read PDF: {e}")
+        return ServiceResult.fail(ErrorCode.PDF_READ_ERROR, _l("Failed to read PDF: %(e)s", e=e))
 
     total = len(reader.pages)
     if total == 0:
-        return ServiceResult.fail(ErrorCode.PDF_EMPTY, "PDF has no pages")
+        return ServiceResult.fail(ErrorCode.PDF_EMPTY, _l("PDF has no pages"))
 
     writer = PdfWriter()
 

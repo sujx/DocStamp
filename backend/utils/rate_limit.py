@@ -17,6 +17,7 @@ Usage:
 from functools import wraps
 
 from flask import jsonify, g, request
+from flask_babel import gettext
 
 from cache import cache
 
@@ -45,7 +46,7 @@ def rate_limit(max_requests: int, window_seconds: int = 60):
                     jsonify(
                         {
                             "code": 429,
-                            "msg": "Too many requests. Please try again later.",
+                            "msg": gettext("Too many requests. Please try again later."),
                             "requestId": getattr(g, "request_id", "-"),
                         }
                     ),
