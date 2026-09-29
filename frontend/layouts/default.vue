@@ -18,6 +18,8 @@
       </main>
       <AppFooter />
     </div>
+
+    <UNotifications />
   </div>
 </template>
 
