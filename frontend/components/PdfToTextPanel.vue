@@ -1,6 +1,6 @@
 <template>
   <div class="card bg-surface border-default">
-    <FileUploader :accept="'.pdf'" :max-size="100" :label="$t('pdfToText.uploadLabel')" @file-selected="onFileSelected" />
+    <FileUploader :accept="'.pdf'" :max-size="100" :label="$t('pdfToText.uploadLabel')" @file-selected="onFileSelected" @file-rejected="onFileRejected" />
     <UFormGroup v-if="file" :label="$t('pdfToText.pages')" class="mt-4">
       <UInput v-model="pagesInput" :placeholder="$t('pdfToText.pagesHint')" size="sm" />
     </UFormGroup>
@@ -31,6 +31,7 @@ const { downloadBlob } = useDownload();
 const file = ref<File | null>(null); const pagesInput = ref(""); const extracting = ref(false);
 const result = ref<{ text: string; total_pages: number; extracted_pages: number } | null>(null);
 function onFileSelected(f: File) { file.value = f; result.value = null; }
+function onFileRejected(p: { name: string; size: number; maxSizeMb: number }) { toast.add({ title: t("common.fileTooLarge", p), color: "warning" }); }
 async function extract() {
   if (!file.value) return; extracting.value = true;
   try {

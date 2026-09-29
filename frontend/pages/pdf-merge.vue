@@ -6,9 +6,9 @@
       <FileUploader
         :accept="'.pdf'"
         :max-size="100"
-        :multiple="true"
         :label="$t('pdfMerge.uploadLabel')"
-        @files-selected="onFilesSelected"
+        @file-selected="onFileSelected"
+        @file-rejected="onFileRejected"
       />
 
       <div v-if="files.length > 0" class="mt-4">
@@ -72,12 +72,17 @@ import axios from "axios";
 const { t } = useI18n();
 const { showError } = useApiError();
 const { downloadBlob } = useDownload();
+const toast = useToast();
 
 const files = ref<File[]>([]);
 const merging = ref(false);
 
-function onFilesSelected(newFiles: File[]) {
-  files.value = [...files.value, ...newFiles];
+function onFileSelected(f: File) {
+  files.value = [...files.value, f];
+}
+
+function onFileRejected(p: { name: string; size: number; maxSizeMb: number }) {
+  toast.add({ title: t("common.fileTooLarge", p), color: "warning" });
 }
 
 function moveUp(i: number) {

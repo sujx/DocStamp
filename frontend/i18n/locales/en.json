@@ -47,6 +47,7 @@
     "currentTime": "Current time",
     "langZh": "Switch to Chinese",
     "langEn": "Switch to English",
+    "fileTooLarge": "“{name}” exceeds the {maxSizeMb} MB limit",
     "pageError": "Page component failed. Please refresh."
   },
   "properties": {

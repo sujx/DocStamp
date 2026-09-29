@@ -46,16 +46,19 @@
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from "vue";
+
 const props = defineProps({
   icon: { type: String, default: "i-heroicons-arrow-up-tray" },
   hint: { type: String, default: "" },
   accept: { type: String, default: "" },
+  /** 上限，单位 MB（与后端 file_security.MAX_FILE_SIZE 同口径）；0 = 不限制 */
   maxSize: { type: Number, default: 0 },
 });
 
 const emit = defineEmits<{
   "file-selected": [file: File];
-  "file-rejected": [reason: string];
+  "file-rejected": [payload: { name: string; size: number; maxSizeMb: number }];
   reset: [];
 }>();
 
@@ -95,8 +98,8 @@ function onDrop(evt: DragEvent) {
 }
 
 function setFile(f: File) {
-  if (props.maxSize > 0 && f.size > props.maxSize) {
-    emit("file-rejected", `File exceeds ${formatSize(props.maxSize)} limit`);
+  if (props.maxSize > 0 && f.size > props.maxSize * 1048576) {
+    emit("file-rejected", { name: f.name, size: f.size, maxSizeMb: props.maxSize });
     return;
   }
   file.value = f;

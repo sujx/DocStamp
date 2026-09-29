@@ -47,6 +47,7 @@
     "currentTime": "当前时间",
     "langZh": "切换到中文",
     "langEn": "切换到英文",
+    "fileTooLarge": "「{name}」超过 {maxSizeMb} MB 上限",
     "pageError": "页面组件出错，请刷新重试"
   },
   "properties": {

@@ -1,6 +1,6 @@
 <template>
   <div class="card bg-surface border-default">
-    <FileUploader :accept="'.pdf'" :max-size="100" :label="$t('common.upload')" @file-selected="onFileSelected" />
+    <FileUploader :accept="'.pdf'" :max-size="100" :label="$t('common.upload')" @file-selected="onFileSelected" @file-rejected="onFileRejected" />
     <UFormGroup v-if="file" :label="$t('pdfCompress.quality')" class="mt-4">
       <div class="flex gap-3">
         <label v-for="q in qualities" :key="q.key" class="flex items-center gap-1.5 cursor-pointer text-sm text-primary">
@@ -28,10 +28,12 @@ import axios from "axios";
 const { t } = useI18n();
 const { showError } = useApiError();
 const { downloadBlob } = useDownload();
+const toast = useToast();
 const file = ref<File | null>(null); const quality = ref("medium"); const compressing = ref(false);
 const stats = ref<{ original_size: number; compressed_size: number; ratio: number } | null>(null);
 const qualities = computed(() => [{ key: "low", label: t("pdfCompress.low") }, { key: "medium", label: t("pdfCompress.medium") }, { key: "high", label: t("pdfCompress.high") }]);
 function onFileSelected(f: File) { file.value = f; stats.value = null; }
+function onFileRejected(p: { name: string; size: number; maxSizeMb: number }) { toast.add({ title: t("common.fileTooLarge", p), color: "warning" }); }
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`; if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;

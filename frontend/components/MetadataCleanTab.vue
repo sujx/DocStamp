@@ -5,6 +5,7 @@
       :max-size="100"
       :label="$t('common.upload')"
       @file-selected="onFileSelected"
+      @file-rejected="onFileRejected"
     />
 
     <div class="mt-6 flex gap-3">
@@ -26,6 +27,7 @@ import axios from "axios";
 const { t } = useI18n();
 const { showError } = useApiError();
 const { downloadBlob } = useDownload();
+const toast = useToast();
 
 const file = ref<File | null>(null);
 const cleaning = ref(false);
@@ -34,6 +36,10 @@ const result = ref<{ fields_cleaned: number } | null>(null);
 function onFileSelected(f: File) {
   file.value = f;
   result.value = null;
+}
+
+function onFileRejected(p: { name: string; size: number; maxSizeMb: number }) {
+  toast.add({ title: t("common.fileTooLarge", p), color: "warning" });
 }
 
 async function clean() {
