@@ -81,11 +81,11 @@ docStamp/
 
 ## 开发环境
 
-代码在 **Windows 侧编辑**（`D:\Workdir\DocStamp`，`core.autocrlf=true` 工作树是 CRLF），在 **WSL（AlmaLinux-10）** 里构建与测试（仓库位于 `/root/Project/DocStamp`）。两边靠 `sync-from-windows.sh` 打通：它按 `git ls-files` 把指定 pathspec 下**被跟踪的源文件**覆盖到 WSL clone，并逐文件转 LF（直接 `cp` 会把 CRLF 带进去，git 会显示整文件重写）、把 mode 归一到 644（`/mnt/d` 报 0777，否则整个工作树在 git 眼里都是 mode change）。**只同步跟踪文件是硬约束**：`backend/tasks.db*`、`backend/output/` 这类 gitignored 运行时状态在 Windows 侧是旧快照，早前按目录 `cp -r` 时就把 WSL 的统计库覆盖成 9-28 的副本（靠未 checkpoint 的 WAL 才找回），所以未跟踪文件一律不过去：
+代码在 **Windows 侧编辑**（`D:\Workdir\DocStamp`，`core.autocrlf=true` 工作树是 CRLF），在 **WSL（AlmaLinux-10）** 里构建与测试（仓库位于 `/root/Project/DocStamp`）。两边靠 `sync-from-windows.sh` 打通：它默认覆盖**全仓库被跟踪的文件**（`git ls-files -s`，可传 pathspec 缩小范围），逐文件转 LF（直接 `cp` 会把 CRLF 带进去，git 会显示整文件重写），并按 index 记录的 mode 落权限（`/mnt/d` 一律报 0777；凭猜测 `chmod` 要么把 644 的文件抬成 mode change，要么把 `manage.sh` 这类 755 的压回去，两种都会让 clone 常年显脏）。**只同步跟踪文件是硬约束**：`backend/tasks.db*`、`backend/output/` 这类 gitignored 运行时状态在 Windows 侧是旧快照，早前按目录 `cp -r` 时就把 WSL 的统计库覆盖成 9-28 的副本（靠未 checkpoint 的 WAL 才找回），所以未跟踪文件一律不过去：
 
 ```bash
-bash sync-from-windows.sh                # 默认 backend + frontend 的 i18n/components/pages/layouts
-bash sync-from-windows.sh frontend       # 也可只传某个 pathspec
+bash /root/sync-from-windows.sh              # 默认同步全仓库跟踪文件（含仓库根的 AGENTS.md / Dockerfile 等）
+bash /root/sync-from-windows.sh frontend     # 只传某个 pathspec 时缩小范围
 ```
 
 后端依赖装在 `backend/.venv`，`manage.sh` 调裸 `python3`，**每个新会话必须先激活 venv**：
