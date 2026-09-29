@@ -81,10 +81,11 @@ docStamp/
 
 ## 开发环境
 
-代码在 **Windows 侧编辑**（`D:\Workdir\DocStamp`，`core.autocrlf=true` 工作树是 CRLF），在 **WSL（AlmaLinux-10）** 里构建与测试（仓库位于 `/root/Project/DocStamp`）。两边靠 `sync-from-windows.sh` 打通：它把指定目录从 `/mnt/d/...` 覆盖到 WSL clone 并统一转成 LF（直接 `cp` 会把 CRLF 带进去，git 会显示整文件重写）：
+代码在 **Windows 侧编辑**（`D:\Workdir\DocStamp`，`core.autocrlf=true` 工作树是 CRLF），在 **WSL（AlmaLinux-10）** 里构建与测试（仓库位于 `/root/Project/DocStamp`）。两边靠 `sync-from-windows.sh` 打通：它按 `git ls-files` 把指定 pathspec 下**被跟踪的源文件**覆盖到 WSL clone，并逐文件转 LF（直接 `cp` 会把 CRLF 带进去，git 会显示整文件重写）、把 mode 归一到 644（`/mnt/d` 报 0777，否则整个工作树在 git 眼里都是 mode change）。**只同步跟踪文件是硬约束**：`backend/tasks.db*`、`backend/output/` 这类 gitignored 运行时状态在 Windows 侧是旧快照，早前按目录 `cp -r` 时就把 WSL 的统计库覆盖成 9-28 的副本（靠未 checkpoint 的 WAL 才找回），所以未跟踪文件一律不过去：
 
 ```bash
-bash /root/sync-from-windows.sh backend        # 也可传 frontend/i18n 等；默认 backend + 相关前端目录
+bash sync-from-windows.sh                # 默认 backend + frontend 的 i18n/components/pages/layouts
+bash sync-from-windows.sh frontend       # 也可只传某个 pathspec
 ```
 
 后端依赖装在 `backend/.venv`，`manage.sh` 调裸 `python3`，**每个新会话必须先激活 venv**：
@@ -282,6 +283,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 ### 测试与数据
 
 - **`backend/tasks.db.bak-20260923`（含 `-shm` / `-wal`）留在磁盘** —— 索引修复前的安全网，已确认 `integrity_check` ok，可择日删除。
+- **Windows 侧 `backend/tasks.db` 是 2026-09-28 的死快照** —— 统计数据以 WSL clone 那份为准（生产在服务器卷里，另有副本）。2026-09-30 因 `sync-from-windows.sh` 按目录 `cp -r` 把它覆盖进 WSL，主库瞬间退回 9-28；WAL 未 checkpoint 才把 9-29 的行找回来（已手动 `wal_checkpoint(TRUNCATE)` 合并，`operation_logs` 2919 行、`integrity_check` ok）。修复前的主库副本另存在 `/tmp/nodelete-tasksdb-Sep28snapshot.db`（WSL 重启即消失）。同步脚本已改为只按 `git ls-files` 拷贝，未跟踪运行时状态不再跨界。
 - **`backend/tests/__pycache__/` 残留 5 个已删模块的 `.pyc`**（`company_lookup` / `task_tracking` / `video_converter` / `watermark` / `worker`）—— 纯本机杂物，`.dockerignore` 已挡住不进镜像，可直接删该目录。
 
 ### 其他
@@ -289,6 +291,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 | 事项 | 为何未做 |
 |------|----------|
 | Gitee 上的旧仓库未删除 | 已弃用 Gitee，GitHub（public）为唯一远端；要清理需自行去 Gitee 删 |
+| `backend/.nuxt/` 31 个构建产物自 `07c348e`（first commit）就被跟踪 | `.gitignore` 第 35 行有 `.nuxt/`，但取消跟踪要 `git rm -r --cached`，属改仓库内容，未经确认不动。现状后果：WSL 里跑过 dev 构建后这些文件被重新生成，clone 的 `git status` 常年脏（489 KB 死产物）；`.dockerignore` 第 28 行已挡住，镜像不受影响 |
 | `edffc8c` 的 commit message 含已吊销的 DeepSeek key | 无可达 blob（不在任何文件内容里），已披露，**刻意不改写历史** |
 | `docs/` 被整目录 gitignore，但 `docs/vibecoding-blog.md` 已跟踪 | 新加到 `docs/` 的文件不会进仓库（`docs/plans/` 即未跟踪）。有意为之可忽略，否则需调 `.gitignore` 或用 `git add -f` |
 
