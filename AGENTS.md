@@ -264,8 +264,6 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 
 ### 测试与数据
 
-- **测试会往真实 `backend/tasks.db` 写流水** —— `backend/tests/conftest.py` 的 `app` fixture 只覆盖 `UPLOAD_FOLDER`、**不覆盖 `TASK_DB_PATH`**，而 `create_app()` 会 `init_db()` 打开真实库；早年隔离 DB 的 fixture 已随异步链路拆除，现在没有任何用例隔离它。证据：2026-09-23 当天 522 行 `operation_logs` 的 `ip_address` 全部是 `127.0.0.1`，即本机 pytest / dev 产生。修法：`app` fixture 把 `TASK_DB_PATH` 指向 `tmp_path`。
-  **⚠ 不要去删那些已写入的测试行**：上次 `tasks.db` 索引损坏（幽灵索引条目、`count(*)` 多报 12 行）正是历史删行造成的，删行会重演。
 - **`backend/tasks.db.bak-20260923`（含 `-shm` / `-wal`）留在磁盘** —— 索引修复前的安全网，已确认 `integrity_check` ok，可择日删除。
 - **`backend/tests/__pycache__/` 残留 5 个已删模块的 `.pyc`**（`company_lookup` / `task_tracking` / `video_converter` / `watermark` / `worker`）—— 纯本机杂物，`.dockerignore` 已挡住不进镜像，可直接删该目录。
 

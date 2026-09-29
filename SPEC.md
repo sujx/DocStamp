@@ -421,6 +421,11 @@ API 容器健康检查 `curl /api/v1/health`。容器以非 root 用户 `docstam
 
 ## 十一、版本历史
 
+### v3.9.2 (2026-09)
+
+- **测试库隔离**：`backend/tests/conftest.py` 在模块级、`create_app()` 之前把 `Config.TASK_DB_PATH` 改道到一次性临时库（打类属性一次即覆盖 `app.config` 拷贝与 `services/stats.py` 的 `OperationLog` 单例两条读取路径；会话级共享一个临时库，保持既有用例间语义）。此前每次全量 pytest 都往真实的 `backend/tasks.db`（生产用量统计唯一副本）追加 `operation_logs` 行；已写入的历史测试行按约定不删（删行会重演索引损坏）。AGENTS.md「测试与数据」首条挂账连背景一并勾掉。**无运行时改动**——本版本镜像内容与 v3.9.1 相同，发版仅为维持「镜像 ↔ 提交」一一对应
+- **验证**：pytest 193 passed（与 v3.9.1 基线持平）；跑前跑后真实 `tasks.db` `operation_logs` 行数 2777 → 2777，零写入
+
 ### v3.9.1 (2026-09)
 
 - **entrypoint 可写性守卫补强**：守卫原先只测「卷目录里能否新建文件」，测不出「目录可写但已存在的 `error.log` / `access.log` 属 root」的形态——2026-09-25 生产切换新镜像后正是踩中它：卷是老镜像以 root 运行时期创建的，目录属主无恙，旧日志文件仍是 root:root/644，gunicorn 启动前检查打不开 `errorlog` 即退出，`restart: unless-stopped` 循环重启，反代 502。现对三个挂载卷各补一条 `find -maxdepth 1 -type f ! -writable` 检查，失败时列出具体文件并打印同一份保留数据的 chown 指引（消息主体提为 `chown_hint` 复用）

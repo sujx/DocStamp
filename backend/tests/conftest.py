@@ -1,7 +1,9 @@
 """Shared fixtures for docStamp backend tests."""
 
+import atexit
 import io
 import os
+import shutil
 import sys
 import tempfile
 
@@ -11,6 +13,17 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from app import create_app
+from config import Config
+
+# Redirect the task DB to a throwaway file BEFORE any app is created:
+# create_app() copies Config into app.config at construction, and
+# services/stats.py caches an OperationLog singleton on first use —
+# patching the class attribute once here covers every reader for the
+# whole session. Without it, each run appends rows to the real
+# backend/tasks.db, the only copy of production usage stats.
+_TEST_DB_DIR = tempfile.mkdtemp(prefix="docstamp_test_db_")
+Config.TASK_DB_PATH = os.path.join(_TEST_DB_DIR, "tasks.db")
+atexit.register(shutil.rmtree, _TEST_DB_DIR, ignore_errors=True)
 
 
 @pytest.fixture
