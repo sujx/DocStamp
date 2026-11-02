@@ -10,9 +10,9 @@
 
 ---
 
-## 二、功能模块（13 个）
+## 二、功能模块（14 个）
 
-功能模块 = 12 项工具 + 使用统计，共 13 个；首页仪表盘是导航页不计入，下表按路由列出全部 14 个页面。
+功能模块 = 13 项工具 + 使用统计，共 14 个；首页仪表盘是导航页不计入，下表按路由列出全部 15 个页面。
 
 **侧栏导航**：
 
@@ -30,6 +30,7 @@ PDF 编辑          → /pdf-editor
 PDF 合并          → /pdf-merge
 PDF 脱敏          → /pdf-redact
 WebP 转 JPEG      → /webp-to-jpeg
+密码生成          → /password-gen
 使用统计          → /status
 ```
 
@@ -48,7 +49,8 @@ WebP 转 JPEG      → /webp-to-jpeg
 | 11 | PDF 合并 | `/pdf-merge` | 多 PDF 合并，拖拽排序 |
 | 12 | PDF 脱敏 | `/pdf-redact` | 框选/关键词标记敏感区，生成带马赛克的新 PDF |
 | 13 | WebP 转 JPEG | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
-| 14 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
+| 14 | 密码生成 | `/password-gen` | 随机密码 + 可复现密码（纯前端，零数据留存） |
+| 15 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
 
 ---
 
@@ -449,6 +451,13 @@ API 容器健康检查 `curl /api/v1/health`。容器以非 root 用户 `docstam
 ---
 
 ## 十一、版本历史
+
+### v3.10.0 (2026-11)
+
+- **新增「密码生成」工具**：纯前端实现，包含两个平行模块——随机密码（`crypto.getRandomValues` + 拒绝采样消除模偏差）和可复现密码（`crypto.subtle.digest('SHA-256', ...)` + 计数器模式扩展 + 确定性 Fisher-Yates 洗牌）。支持密码长度 8-128、四类字符可选、排除易混淆字符、批量生成（随机模式最多 20 条）、熵值实时显示。所有计算在浏览器本地完成，零数据留存、零网络传输
+- **前端新增文件**：`composables/usePasswordGen.ts`（核心算法）、`components/PasswordGenPanel.vue`（双卡并列 UI）、`pages/password-gen.vue`（路由页面）
+- **配置与 i18n**：`tools.config.ts` 新增 `password-gen` 条目（order: 8）；`zh-CN.json` / `en.json` 同步新增 `tabs.passwordGen` + `passwordGen.*` 命名空间；`dashboard.heroSubtitle` 13 → 14 项功能
+- **其他同步**：`stats_bp.py` sitemap 补 `/password-gen`；`layouts/default.vue` meta description 13 → 14；`AGENTS.md` / `README.md` / `SPEC.md` 模块计数 13 → 14
 
 ### v3.9.3 (2026-09)
 

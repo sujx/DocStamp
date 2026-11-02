@@ -17,11 +17,12 @@
     "status": "使用统计",
     "rssDetect": "RSS 探测",
     "webpToJpeg": "WebP 转 JPEG",
-    "pdfRedact": "PDF 脱敏"
+    "pdfRedact": "PDF 脱敏",
+    "passwordGen": "密码生成"
   },
   "dashboard": {
     "heroTitle": "文档处理，化繁为简",
-    "heroSubtitle": "13 项功能，覆盖格式转换、PDF 编辑、文档规范化等场景"
+    "heroSubtitle": "14 项功能，覆盖格式转换、PDF 编辑、文档规范化等场景"
   },
   "status": {
     "title": "使用统计",
@@ -318,5 +319,53 @@
     "download": "下载脱敏 PDF",
     "cleaned": "临时文件已清理。",
     "newFile": "处理另一个文件"
+  },
+  "passwordGen": {
+    "title": "密码生成",
+    "description": "生成高强度随机密码或可复现密码，所有计算在浏览器本地完成",
+    "random": {
+      "title": "随机密码",
+      "desc": "每次生成不同的随机密码",
+      "length": "密码长度",
+      "charTypes": "字符类型",
+      "charTypesHint": "至少选择一类",
+      "uppercase": "大写 A-Z",
+      "lowercase": "小写 a-z",
+      "digits": "数字 0-9",
+      "symbols": "符号 !{'@'}#$",
+      "excludeAmbiguous": "排除易混淆字符 i l 1 I O 0",
+      "count": "生成数量",
+      "generate": "生成密码",
+      "clear": "清空",
+      "result": "生成结果",
+      "empty": "点击「生成密码」开始"
+    },
+    "deterministic": {
+      "title": "可复现密码",
+      "desc": "通过固定词语生成可复现的密码。相同的输入永远生成相同的密码。",
+      "name": "变量名称",
+      "namePlaceholder": "如：haidian",
+      "salt": "盐值",
+      "saltPlaceholder": "如：beijing",
+      "toggleVisibility": "显示/隐藏盐值",
+      "length": "密码长度",
+      "charTypes": "字符类型",
+      "charTypesHint": "至少选择一类",
+      "uppercase": "大写 A-Z",
+      "lowercase": "小写 a-z",
+      "digits": "数字 0-9",
+      "symbols": "符号 !{'@'}#$",
+      "excludeAmbiguous": "排除易混淆字符 i l 1 I O 0",
+      "generate": "生成可复现密码",
+      "clear": "清空",
+      "result": "生成结果",
+      "empty": "输入变量名和盐值后点击「生成可复现密码」"
+    },
+    "common": {
+      "copy": "复制",
+      "copied": "已复制",
+      "errorNoClass": "请至少选择一种字符类型",
+      "errorNoInput": "请填写变量名称和盐值"
+    }
   }
 }

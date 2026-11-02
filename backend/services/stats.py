@@ -26,6 +26,7 @@ MODULE_NAMES = {
     "format-docx": "格式规范",
     "webp-to-jpeg": "WebP 转 JPEG",
     "pdf-redact": "PDF 脱敏",
+    "password-gen": "密码生成",
     "pageview": "页面浏览",
 }
 

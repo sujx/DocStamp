@@ -17,11 +17,12 @@
     "status": "Usage Stats",
     "rssDetect": "RSS Detector",
     "webpToJpeg": "WebP to JPEG",
-    "pdfRedact": "PDF Redaction"
+    "pdfRedact": "PDF Redaction",
+    "passwordGen": "Password Generator"
   },
   "dashboard": {
     "heroTitle": "Document Processing, Simplified",
-    "heroSubtitle": "13 features for format conversion, PDF editing, document standardization and more"
+    "heroSubtitle": "14 features for format conversion, PDF editing, document standardization and more"
   },
   "status": {
     "title": "Usage Statistics",
@@ -318,5 +319,53 @@
     "download": "Download redacted PDF",
     "cleaned": "Temporary files have been cleaned up.",
     "newFile": "Process another file"
+  },
+  "passwordGen": {
+    "title": "Password Generator",
+    "description": "Generate high-strength random passwords or reproducible passwords — all computation runs locally in your browser",
+    "random": {
+      "title": "Random Password",
+      "desc": "Generate a different random password each time",
+      "length": "Password Length",
+      "charTypes": "Character Types",
+      "charTypesHint": "Select at least one",
+      "uppercase": "Uppercase A-Z",
+      "lowercase": "Lowercase a-z",
+      "digits": "Digits 0-9",
+      "symbols": "Symbols !{'@'}#$",
+      "excludeAmbiguous": "Exclude ambiguous characters i l 1 I O 0",
+      "count": "Quantity",
+      "generate": "Generate Password",
+      "clear": "Clear",
+      "result": "Result",
+      "empty": "Click \"Generate Password\" to start"
+    },
+    "deterministic": {
+      "title": "Reproducible Password",
+      "desc": "Generate a reproducible password from fixed phrases. The same inputs always produce the same password.",
+      "name": "Variable Name",
+      "namePlaceholder": "e.g. haidian",
+      "salt": "Salt",
+      "saltPlaceholder": "e.g. beijing",
+      "toggleVisibility": "Show/hide salt",
+      "length": "Password Length",
+      "charTypes": "Character Types",
+      "charTypesHint": "Select at least one",
+      "uppercase": "Uppercase A-Z",
+      "lowercase": "Lowercase a-z",
+      "digits": "Digits 0-9",
+      "symbols": "Symbols !{'@'}#$",
+      "excludeAmbiguous": "Exclude ambiguous characters i l 1 I O 0",
+      "generate": "Generate Reproducible Password",
+      "clear": "Clear",
+      "result": "Result",
+      "empty": "Enter a variable name and salt, then click \"Generate Reproducible Password\""
+    },
+    "common": {
+      "copy": "Copy",
+      "copied": "Copied",
+      "errorNoClass": "Please select at least one character type",
+      "errorNoInput": "Please fill in the variable name and salt"
+    }
   }
 }
