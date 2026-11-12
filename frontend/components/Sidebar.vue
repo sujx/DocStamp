@@ -112,7 +112,6 @@ const navItems = computed(() =>
 );
 
 function isActive(href: string): boolean {
-  if (href === "/") return route.path === "/";
   return route.path.startsWith(href);
 }
 </script>

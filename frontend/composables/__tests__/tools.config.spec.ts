@@ -27,4 +27,11 @@ describe("tools.config", () => {
     const keys = SIDEBAR_ITEMS.map((item) => item.key);
     expect(keys.filter((key) => PDF_KEYS.includes(key))).toEqual(PDF_KEYS);
   });
+
+  it("没有任何导航条目占用站点根路径（/ 属于宣传页）", () => {
+    for (const item of TOOLS) {
+      expect(item.to, `${item.key} 不应指向 / —— / 是宣传页`).not.toBe("/");
+    }
+    expect(TOOLS.find((t) => t.key === "dashboard")!.to).toBe("/tools");
+  });
 });

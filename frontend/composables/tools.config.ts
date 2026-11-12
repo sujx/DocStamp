@@ -9,7 +9,7 @@ export interface ToolDef {
 
 export const TOOLS: ToolDef[] = [
   // ── 顶层 ──
-  { key: "dashboard", to: "/", icon: "i-heroicons-home", label: "tabs.dashboard", order: 1 },
+  { key: "dashboard", to: "/tools", icon: "i-heroicons-home", label: "tabs.dashboard", order: 1 },
   { key: "md2docx", to: "/md-to-docx", icon: "i-heroicons-arrow-down-tray", label: "tabs.md2docx", desc: "md2docx.description", order: 2 },
   { key: "format-docx", to: "/format-docx", icon: "i-heroicons-document-check", label: "tabs.formatDocx", desc: "format.description", order: 4 },
   { key: "rss-detect", to: "/rss-detect", icon: "i-heroicons-signal", label: "tabs.rssDetect", desc: "rssDetect.description", order: 7 },
