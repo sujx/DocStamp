@@ -126,7 +126,7 @@
     font-family: ui-monospace, "SFMono-Regular", Menlo, "Noto Sans Mono CJK SC", monospace;
     font-size: 12px;
     letter-spacing: 0.18em;
-    color: var(--color-text-tertiary);
+    color: var(--color-text-secondary);
   }
 
   .letterhead .lh-title {
