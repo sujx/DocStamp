@@ -365,5 +365,26 @@
       "errorNoClass": "Please select at least one character type",
       "errorNoInput": "Please fill in the variable name and salt"
     }
+  },
+  "landing": {
+    "hero": { "title": "Document & Official Writing Toolbox" },
+    "nav": {
+      "ariaLabel": "Landing navigation",
+      "tools": "Tools",
+      "promise": "Privacy",
+      "resources": "Resources",
+      "cta": "Open the tools"
+    },
+    "footer": {
+      "toolsTitle": "Tools",
+      "resourcesTitle": "Resources",
+      "allTools": "All tools",
+      "stats": "Usage stats",
+      "standard": "GB/T 9704-2012 (original PDF)",
+      "tagline": "One-stop document toolbox. No account, no install, no ads.",
+      "copyright": "© 2025-2026 鹊随金印 · doc.sujx.net",
+      "icp": "",
+      "contact": "sujx{'@'}live.cn"
+    }
   }
 }

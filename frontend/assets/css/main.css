@@ -94,6 +94,27 @@
     color: #ffffff;
     transform: scale(1.05);
   }
+
+  /* 印章「印」——侧栏 .seal-icon 的圆形变体，用于顶栏与页脚 */
+  .seal-dot {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-seal-red);
+    color: var(--color-seal-red);
+    font-family: "STKaiti", "KaiTi", "楷体", serif;
+    font-size: 13px;
+    line-height: 1;
+    transform: rotate(-8deg);
+  }
+
+  /* 衬线族：只给主标题、眉标、印章用，正文仍走 body 的 sans */
+  .font-official {
+    font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", SimSun, Georgia, serif;
+  }
 }
 
 /* ── Page transitions ── */

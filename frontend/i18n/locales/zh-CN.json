@@ -365,5 +365,26 @@
       "errorNoClass": "请至少选择一种字符类型",
       "errorNoInput": "请填写变量名称和盐值"
     }
+  },
+  "landing": {
+    "hero": { "title": "公文与文档处理" },
+    "nav": {
+      "ariaLabel": "宣传页导航",
+      "tools": "工具",
+      "promise": "隐私承诺",
+      "resources": "资源",
+      "cta": "立即使用"
+    },
+    "footer": {
+      "toolsTitle": "工具",
+      "resourcesTitle": "资源",
+      "allTools": "全部工具",
+      "stats": "使用情况",
+      "standard": "GB/T 9704-2012 标准原文",
+      "tagline": "一站式公文与文档在线处理。无账号、无安装、无广告。",
+      "copyright": "© 2025-2026 鹊随金印 · doc.sujx.net",
+      "icp": "",
+      "contact": "sujx{'@'}live.cn"
+    }
   }
 }

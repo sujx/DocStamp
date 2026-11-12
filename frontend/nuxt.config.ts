@@ -58,8 +58,8 @@ export default defineNuxtConfig({
     strategy: "no_prefix",
     defaultLocale: "zh-CN",
     locales: [
-      { code: "zh-CN", name: "中文", file: "zh-CN.json" },
-      { code: "en", name: "English", file: "en.json" },
+      { code: "zh-CN", name: "中文", file: "zh-CN.json", language: "zh-CN" },
+      { code: "en", name: "English", file: "en.json", language: "en" },
     ],
     lazy: false,
     bundle: { optimizeTranslationDirective: false },
