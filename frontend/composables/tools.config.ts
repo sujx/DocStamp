@@ -36,3 +36,6 @@ export const TOOLS: ToolDef[] = [
 
 // Sidebar 读这里；order 是展示顺序的唯一来源
 export const SIDEBAR_ITEMS: ToolDef[] = [...TOOLS].sort((a, b) => a.order - b.order)
+
+// 宣传页页脚精选的五件工具，数组顺序即展示顺序
+export const FOOTER_TOOL_KEYS = ["md2docx", "pdf-redact", "format-docx", "pdf-merge", "pdf-tools"];

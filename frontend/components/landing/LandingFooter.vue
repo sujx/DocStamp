@@ -16,7 +16,7 @@
             v-for="tool in toolLinks"
             :key="tool.to"
             :to="tool.to"
-            class="mb-2 block text-[13px] text-tertiary no-underline transition-colors duration-150 hover:text-brand-600"
+            class="flex min-h-[44px] items-center text-[13px] text-tertiary no-underline transition-colors duration-150 hover:text-brand-600"
           >{{ tool.label }}</NuxtLink>
         </div>
 
@@ -25,38 +25,36 @@
           <a
             href="/GBT9704-2012.pdf"
             target="_blank"
-            class="mb-2 block text-[13px] text-tertiary no-underline transition-colors duration-150 hover:text-brand-600"
+            rel="noopener"
+            class="flex min-h-[44px] items-center text-[13px] text-tertiary no-underline transition-colors duration-150 hover:text-brand-600"
           >{{ $t("landing.footer.standard") }}</a>
-          <NuxtLink to="/tools" class="mb-2 block text-[13px] text-tertiary no-underline transition-colors duration-150 hover:text-brand-600">{{ $t("landing.footer.allTools") }}</NuxtLink>
-          <NuxtLink to="/status" class="mb-2 block text-[13px] text-tertiary no-underline transition-colors duration-150 hover:text-brand-600">{{ $t("landing.footer.stats") }}</NuxtLink>
+          <NuxtLink to="/tools" class="flex min-h-[44px] items-center text-[13px] text-tertiary no-underline transition-colors duration-150 hover:text-brand-600">{{ $t("landing.footer.allTools") }}</NuxtLink>
+          <NuxtLink to="/status" class="flex min-h-[44px] items-center text-[13px] text-tertiary no-underline transition-colors duration-150 hover:text-brand-600">{{ $t("landing.footer.stats") }}</NuxtLink>
         </div>
       </div>
     </div>
 
-    <div class="border-t border-subtle px-4 py-4 text-center text-[12px] text-tertiary sm:px-6">
+    <div class="border-t border-subtle px-4 py-2 text-center text-[12px] text-tertiary sm:px-6">
       {{ $t("landing.footer.copyright") }}
       <template v-if="icp"> · {{ icp }}</template>
       ·
       <a
         :href="`mailto:${contact}`"
-        class="text-tertiary no-underline transition-colors duration-150 hover:text-brand-600"
+        class="inline-flex min-h-[44px] items-center text-tertiary no-underline transition-colors duration-150 hover:text-brand-600"
       >{{ contact }}</a>
     </div>
   </footer>
 </template>
 
 <script setup lang="ts">
-import { TOOLS } from "~/composables/tools.config";
+import { TOOLS, FOOTER_TOOL_KEYS, type ToolDef } from "~/composables/tools.config";
 
 const { t } = useI18n();
 
-const FOOTER_KEYS = ["md2docx", "pdf-redact", "format-docx", "pdf-merge", "pdf-tools"];
-
 const toolLinks = computed(() =>
-  FOOTER_KEYS.map((key) => {
-    const tool = TOOLS.find((x) => x.key === key)!;
-    return { to: tool.to, label: t(tool.label) };
-  }),
+  FOOTER_TOOL_KEYS.map((key) => TOOLS.find((x) => x.key === key))
+    .filter((tool): tool is ToolDef => Boolean(tool))
+    .map((tool) => ({ to: tool.to, label: t(tool.label) })),
 );
 
 const icp = computed(() => t("landing.footer.icp"));

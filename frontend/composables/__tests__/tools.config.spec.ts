@@ -5,7 +5,7 @@
  * 工具列表。这层契约在这里钉住，避免分组概念被无意间重新引入。
  */
 import { describe, it, expect } from "vitest";
-import { TOOLS, SIDEBAR_ITEMS } from "../tools.config";
+import { TOOLS, SIDEBAR_ITEMS, FOOTER_TOOL_KEYS } from "../tools.config";
 
 const PDF_KEYS = ["file-assembly", "print-split", "pdf-editor", "pdf-tools", "pdf-merge", "pdf-redact"];
 
@@ -33,5 +33,11 @@ describe("tools.config", () => {
       expect(item.to, `${item.key} 不应指向 / —— / 是宣传页`).not.toBe("/");
     }
     expect(TOOLS.find((t) => t.key === "dashboard")!.to).toBe("/tools");
+  });
+
+  it("页脚精选的五件工具都能在 TOOLS 里找到", () => {
+    for (const key of FOOTER_TOOL_KEYS) {
+      expect(TOOLS.some((t) => t.key === key), `页脚键 ${key} 不在 TOOLS 里`).toBe(true);
+    }
   });
 });
