@@ -387,6 +387,24 @@
       "flagSignature": "Flagship",
       "flagTextDeleted": "Text deleted"
     },
+    "promise": {
+      "kicker": "PRIVACY",
+      "title": "Deleted after processing — exceptions listed below",
+      "sub": "Every line below is checkable in our source — we only claim what is true today.",
+      "item1Title": "Gone when the response ends",
+      "item1Body": "Except for the three two-step tools listed below, every upload endpoint deletes both the upload and the result in the same response. Nothing is archived or indexed.",
+      "item2Title": "Uncollected files last at most 7 days",
+      "item2Body": "A daily sweeper clears intermediate artifacts older than 7 days, for every user alike.",
+      "item3Title": "No file names or contents in the usage ledger",
+      "item3Body": "It holds the module name, size, duration, outcome and a request id — enough to count which tool ran, not enough to reconstruct a single file.",
+      "notesTitle": "Exceptions, stated plainly",
+      "note1Title": "Exception: three two-step tools",
+      "note1Body": "MD to DOCX, Format DOCX and Print Split all run as generate-then-download, so the result sits in a temporary directory until you take it, and is cleared after at most 7 days.",
+      "note2Title": "We do log IP and browser",
+      "note2Body": "Those two columns are the only basis for unique-visitor counts. The IP comes from the X-Forwarded-For proxy header (or the direct connection address when there is no proxy), and the user agent is truncated to 200 characters.",
+      "note3Title": "Operational logs may carry file paths",
+      "note3Body": "When a deletion fails or an exception is thrown, the operational log records the temporary file path and a stack trace; the path may contain the name you uploaded with. Those logs are kept for 30 days. The usage ledger holds none of this."
+    },
     "nav": {
       "ariaLabel": "Landing navigation",
       "tools": "Tools",
