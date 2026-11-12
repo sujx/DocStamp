@@ -61,6 +61,7 @@ const PROMISE_NOTE_KEYS = [
   ["landing.promise.note1Title", "landing.promise.note1Body"],
   ["landing.promise.note2Title", "landing.promise.note2Body"],
   ["landing.promise.note3Title", "landing.promise.note3Body"],
+  ["landing.promise.note4Title", "landing.promise.note4Body"],
 ] as const;
 
 const promiseItems = computed(() =>

@@ -21,7 +21,7 @@
 
         <div class="mt-9 border-t border-brand-800 pt-6">
           <h3 class="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-brand-300">{{ notesTitle }}</h3>
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div v-for="note in notes" :key="note.title">
               <b class="mb-1 block text-[13px] text-white">{{ note.title }}</b>
               <span class="text-[12px] leading-relaxed text-brand-200">{{ note.body }}</span>
