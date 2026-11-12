@@ -75,6 +75,7 @@ export default defineNuxtConfig({
   nitro: {
     prerender: {
       crawlLinks: true,
+      routes: ["/sitemap.xml"],
       concurrency: 1,         // Serial prerender — prevents OOM on 2GB machines
       failOnError: false,     // Skip pages that fail, don't abort the build
     },
