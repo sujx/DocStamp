@@ -415,6 +415,11 @@
       "toolsDesc": "十四件工具一览，点开即用。",
       "statsDesc": "各模块调用量与独立访客，本站自己也在被统计。"
     },
+    "meta": {
+      "title": "公文与文档在线工具箱",
+      "description": "鹊随金印：Markdown 一键生成 GB/T 9704 公文，PDF 打码脱敏，Word 格式规范，PDF 合并压缩。多数工具处理完即删，例外在首页列明；统计库不含文件名，免注册。",
+      "keywords": "公文格式,GB/T 9704,Markdown转公文,PDF脱敏,PDF打码,PDF合并,PDF压缩,Word格式规范,文档工具箱"
+    },
     "nav": {
       "ariaLabel": "宣传页导航",
       "tools": "工具",

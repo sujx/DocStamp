@@ -66,6 +66,23 @@ definePageMeta({ layout: "landing" });
 
 const { t } = useI18n();
 
+useHead({
+  title: computed(() => t("landing.meta.title")),
+  meta: [
+    { name: "description", content: computed(() => t("landing.meta.description")) },
+    { name: "keywords", content: computed(() => t("landing.meta.keywords")) },
+    { property: "og:title", content: computed(() => t("landing.meta.title")) },
+    { property: "og:description", content: computed(() => t("landing.meta.description")) },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: "https://doc.sujx.net/" },
+    { property: "og:image", content: "https://doc.sujx.net/og.png" },
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: computed(() => t("landing.meta.title")) },
+    { name: "twitter:description", content: computed(() => t("landing.meta.description")) },
+    { name: "twitter:image", content: "https://doc.sujx.net/og.png" },
+  ],
+});
+
 const groups = computed(() =>
   LANDING_GROUPS.map((group) => ({
     label: t(group.labelKey),
