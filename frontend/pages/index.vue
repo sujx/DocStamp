@@ -19,6 +19,39 @@
       :notes-title="$t('landing.promise.notesTitle')"
       :notes="promiseNotes"
     />
+    <section id="resources" class="scroll-mt-20 py-14">
+      <div class="mx-auto max-w-5xl px-4 sm:px-6">
+        <div class="text-brand-600">
+          <SectionKicker :text="$t('landing.resource.kicker')" />
+        </div>
+        <h2 class="font-official mb-2 mt-2 text-[30px] font-extrabold tracking-wide text-primary">
+          {{ $t("landing.resource.title") }}
+        </h2>
+        <p class="mb-9 max-w-xl text-secondary">{{ $t("landing.resource.note") }}</p>
+
+        <div class="stagger-children grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <a
+            href="/GBT9704-2012.pdf"
+            target="_blank"
+            rel="noopener"
+            class="card card-interactive block no-underline"
+          >
+            <h3 class="mb-1.5 text-[15px] font-semibold text-primary">{{ $t("landing.footer.standard") }}</h3>
+            <p class="text-[13px] leading-relaxed text-secondary">{{ $t("landing.resource.standardDesc") }}</p>
+          </a>
+
+          <NuxtLink to="/tools" class="card card-interactive block no-underline">
+            <h3 class="mb-1.5 text-[15px] font-semibold text-primary">{{ $t("landing.footer.allTools") }}</h3>
+            <p class="text-[13px] leading-relaxed text-secondary">{{ $t("landing.resource.toolsDesc") }}</p>
+          </NuxtLink>
+
+          <NuxtLink to="/status" class="card card-interactive block no-underline">
+            <h3 class="mb-1.5 text-[15px] font-semibold text-primary">{{ $t("landing.footer.stats") }}</h3>
+            <p class="text-[13px] leading-relaxed text-secondary">{{ $t("landing.resource.statsDesc") }}</p>
+          </NuxtLink>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -26,6 +59,7 @@
 import LetterheadHero from "~/components/landing/LetterheadHero.vue";
 import ToolShowcase from "~/components/landing/ToolShowcase.vue";
 import PromiseBand from "~/components/landing/PromiseBand.vue";
+import SectionKicker from "~/components/landing/SectionKicker.vue";
 import { TOOLS, LANDING_GROUPS, LANDING_FLAGS, type ToolDef } from "~/composables/tools.config";
 
 definePageMeta({ layout: "landing" });

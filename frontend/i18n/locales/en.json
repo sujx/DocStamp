@@ -407,6 +407,14 @@
       "note4Title": "Operational logs may carry file paths",
       "note4Body": "When a deletion fails or an exception is thrown, the operational log records the temporary file path and a stack trace; the path may contain the name you uploaded with. Those logs are kept for 30 days. The usage ledger holds none of this."
     },
+    "resource": {
+      "kicker": "RESOURCES",
+      "title": "Know the standard, then use the tool",
+      "note": "Three references already on this site. No sign-up.",
+      "standardDesc": "The GB/T 9704 text itself — font sizes, line spacing, dates.",
+      "toolsDesc": "All fourteen tools in one grid.",
+      "statsDesc": "Module calls and unique visitors — this site counts itself too."
+    },
     "nav": {
       "ariaLabel": "Landing navigation",
       "tools": "Tools",
