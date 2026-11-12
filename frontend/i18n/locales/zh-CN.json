@@ -375,6 +375,18 @@
       "primary": "打开全部工具",
       "secondary": "PDF 脱敏打码"
     },
+    "tools": {
+      "kicker": "TOOLS / 工具",
+      "title": "十四件顺手的小工具",
+      "note": "每一项都只做一件事。点开即用，没有登录墙。",
+      "groupOfficial": "公文规范",
+      "groupPdf": "PDF",
+      "groupOffice": "Office 与元数据",
+      "groupImage": "图片",
+      "groupOther": "其他",
+      "flagSignature": "招牌",
+      "flagTextDeleted": "真删文字"
+    },
     "nav": {
       "ariaLabel": "宣传页导航",
       "tools": "工具",

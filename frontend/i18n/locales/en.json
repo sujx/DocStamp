@@ -375,6 +375,18 @@
       "primary": "Open all tools",
       "secondary": "PDF redaction"
     },
+    "tools": {
+      "kicker": "TOOLS",
+      "title": "Fourteen small tools, one job each",
+      "note": "Click and use it — no login wall, no setup.",
+      "groupOfficial": "Official format",
+      "groupPdf": "PDF",
+      "groupOffice": "Office & metadata",
+      "groupImage": "Images",
+      "groupOther": "More",
+      "flagSignature": "Flagship",
+      "flagTextDeleted": "Text deleted"
+    },
     "nav": {
       "ariaLabel": "Landing navigation",
       "tools": "Tools",

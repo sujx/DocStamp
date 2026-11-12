@@ -39,3 +39,18 @@ export const SIDEBAR_ITEMS: ToolDef[] = [...TOOLS].sort((a, b) => a.order - b.or
 
 // 宣传页页脚精选的五件工具，数组顺序即展示顺序
 export const FOOTER_TOOL_KEYS = ["md2docx", "pdf-redact", "format-docx", "pdf-merge", "pdf-tools"];
+
+/** 宣传页五段分组。键必须与 TOOLS 一一对应（除 dashboard），由契约测试钉住。 */
+export const LANDING_GROUPS: { labelKey: string; keys: string[] }[] = [
+  { labelKey: "landing.tools.groupOfficial", keys: ["md2docx", "format-docx"] },
+  { labelKey: "landing.tools.groupPdf", keys: ["file-assembly", "print-split", "pdf-editor", "pdf-tools", "pdf-merge", "pdf-redact"] },
+  { labelKey: "landing.tools.groupOffice", keys: ["properties", "excel-merge"] },
+  { labelKey: "landing.tools.groupImage", keys: ["webp-to-jpeg"] },
+  { labelKey: "landing.tools.groupOther", keys: ["rss-detect", "password-gen", "status"] },
+];
+
+/** 卡片徽章。键名与文案都必须是今天能为真的说法（见 Task 5 Step 3 的 R32）。 */
+export const LANDING_FLAGS: Record<string, string> = {
+  md2docx: "landing.tools.flagSignature",
+  "pdf-redact": "landing.tools.flagTextDeleted",
+};
