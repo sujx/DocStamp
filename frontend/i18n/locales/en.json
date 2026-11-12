@@ -367,7 +367,14 @@
     }
   },
   "landing": {
-    "hero": { "title": "Document & Official Writing Toolbox" },
+    "hero": {
+      "no": "鹊随金印 · Document Toolbox · Free to use",
+      "title": "Document & Official Writing Toolbox",
+      "sub": "Markdown to GB/T 9704 · PDF redaction · format cleanup · no account, no install",
+      "lede": "For anyone who has lost an afternoon to formatting: turn Markdown into a GB/T 9704-compliant document, and mask phone numbers and ID numbers in a PDF — the text layer underneath is deleted, not merely covered. No install, no account, use it and go.",
+      "primary": "Open all tools",
+      "secondary": "PDF redaction"
+    },
     "nav": {
       "ariaLabel": "Landing navigation",
       "tools": "Tools",

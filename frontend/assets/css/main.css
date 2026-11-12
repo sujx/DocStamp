@@ -115,6 +115,60 @@
   .font-official {
     font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", SimSun, Georgia, serif;
   }
+
+  /* ── 红头版式：宣传页 hero 专属（移植自 prototype/proto.css，色值改走 token） ── */
+  .letterhead {
+    padding: 4.5rem 0 0.5rem;
+    text-align: center;
+  }
+
+  .letterhead .lh-no {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, "Noto Sans Mono CJK SC", monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--color-text-tertiary);
+  }
+
+  .letterhead .lh-title {
+    margin: 0.875rem 0 0.375rem;
+    font-size: clamp(2.375rem, 6vw, 3.75rem);
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    color: var(--color-seal-red);
+  }
+
+  .letterhead .lh-sub {
+    margin-bottom: 1.625rem;
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+  }
+
+  .letterhead .lh-rule {
+    position: relative;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-seal-red);
+  }
+
+  .letterhead .lh-rule::before {
+    content: "★";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0 0.875rem;
+    background: var(--color-page);
+    color: var(--color-seal-red);
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .letterhead .hero-lede {
+    max-width: 640px;
+    margin: 1.875rem auto 0;
+    font-size: 1.0625rem;
+    color: var(--color-text-secondary);
+  }
 }
 
 /* ── Page transitions ── */
