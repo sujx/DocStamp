@@ -417,7 +417,7 @@
     },
     "meta": {
       "title": "Online toolbox for official documents",
-      "description": "DocStamp: Markdown to GB/T 9704, PDF redaction, Word cleanup, PDF merge and compress. Most tools delete results right away — every exception is listed on the home page. Free, no sign-up.",
+      "description": "DocStamp: Markdown to GB/T 9704, PDF redaction, Word formatting, PDF merge and compress. Most tools delete results right away — every exception is listed on the home page. Free, no sign-up.",
       "keywords": "GB/T 9704,official document format,markdown to official document,PDF redaction,PDF mosaic,PDF merge,PDF compress,Word format cleanup"
     },
     "nav": {
