@@ -7,10 +7,11 @@ import { describe, it, expect } from "vitest";
 import { TOOLS } from "../../../composables/tools.config";
 import { buildSitemapUrls, renderSitemapXml, SITE_ORIGIN } from "../../utils/sitemap";
 
-const PATHS = ["/", "/tools", ...TOOLS.filter((t) => t.key !== "dashboard").map((t) => t.to)];
+const DASHBOARD = TOOLS.find((t) => t.key === "dashboard")!.to;
+const PATHS = ["/", DASHBOARD, ...TOOLS.filter((t) => t.key !== "dashboard").map((t) => t.to)];
 
 describe("sitemap urls", () => {
-  it("等于 / + /tools + 全部非 dashboard 工具路由", () => {
+  it("等于 / + 仪表盘路由 + 全部非 dashboard 工具路由", () => {
     const relative = buildSitemapUrls(TOOLS, "https://s.test").map((u) => u.replace("https://s.test", ""));
     expect(relative).toEqual(PATHS);
   });
@@ -19,7 +20,7 @@ describe("sitemap urls", () => {
     expect(PATHS).toHaveLength(16);
     expect(new Set(PATHS).size).toBe(16);
     expect(PATHS).toContain("/pdf-redact");
-    expect(PATHS.filter((p) => p === "/tools")).toHaveLength(1);
+    expect(PATHS.filter((p) => p === DASHBOARD)).toHaveLength(1);
   });
 
   it("默认用站点正式域名，且不出现双斜杠", () => {
@@ -47,5 +48,12 @@ describe("sitemap xml", () => {
     expect(xml).toContain("<loc>https://doc.sujx.net/</loc>");
     expect(xml).toContain("<lastmod>2026-11-12</lastmod>");
     expect(xml.trimEnd().endsWith("</urlset>")).toBe(true);
+  });
+
+  it("对 loc 里的 XML 特殊字符转义", () => {
+    const xml = renderSitemapXml(["https://example.com/?a=1&b=2"], "2026-11-12");
+    expect(xml).toContain("&amp;");
+    expect(xml).not.toMatch(/<loc>[^<]*&(?!amp;|lt;|gt;|quot;|apos;)[^<]*<\/loc>/);
+    expect(xml).not.toContain('<loc>https://example.com/?a=1&b=2</loc>');
   });
 });

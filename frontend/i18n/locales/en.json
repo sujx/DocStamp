@@ -22,7 +22,9 @@
   },
   "dashboard": {
     "heroTitle": "Document Processing, Simplified",
-    "heroSubtitle": "14 features for format conversion, PDF editing, document standardization and more"
+    "heroSubtitle": "14 features for format conversion, PDF editing, document standardization and more",
+    "metaTitle": "Tool dashboard",
+    "metaDescription": "The in-app home for all 14 document tools."
   },
   "status": {
     "title": "Usage Statistics",
@@ -399,7 +401,7 @@
       "item3Body": "It holds the module name, duration, outcome and a request id — enough to count which tool ran, not enough to reconstruct a single file.",
       "notesTitle": "Exceptions, stated plainly",
       "note1Title": "Exception: three two-step tools",
-      "note1Body": "MD to DOCX, Format DOCX and Print Split all run as generate-then-download, so both your upload and the result stay in a server temporary directory until you take them, and are cleared after at most 7 days.",
+      "note1Body": "MD to DOCX, Format DOCX and Print Split all run as generate-then-download, so both your upload and the result stay in a server temporary directory and are swept after at most 7 days; downloading does not delete them.",
       "note2Title": "Exception: PDF Redaction and PDF Editor",
       "note2Body": "A redaction upload stays on the server while you mark it up: it is deleted when you download, and the page tries to notify the server when you leave. An abandoned session is only reclaimed the next time someone opens that tool, by an expiry sweep. Page images rendered when you open a file in PDF Editor stay in the temporary directory for at most 7 days; the upload itself is deleted immediately.",
       "note3Title": "We do log IP and browser",

@@ -34,6 +34,11 @@ import { TOOLS } from "~/composables/tools.config";
 
 const { t } = useI18n();
 
+useHead({
+  title: computed(() => t("dashboard.metaTitle")),
+  meta: [{ name: "description", content: computed(() => t("dashboard.metaDescription")) }],
+});
+
 const CONVERT_KEYS = ["md2docx", "format-docx"];
 const PDF_KEYS = ["file-assembly", "print-split", "pdf-editor", "pdf-tools", "pdf-merge", "pdf-redact"];
 const OFFICE_KEYS = ["properties", "excel-merge"];
