@@ -27,7 +27,7 @@
             :class="{ active: randomClasses[type.key] }"
           >
             <UCheckbox v-model="randomClasses[type.key]" />
-            <span class="text-sm">{{ $t(`passwordGen.random.${type.key}`) }}</span>
+            <span class="text-sm">{{ $t(type.randomLabel) }}</span>
           </label>
         </div>
       </UFormGroup>
@@ -131,7 +131,7 @@
             :class="{ active: detClasses[type.key] }"
           >
             <UCheckbox v-model="detClasses[type.key]" />
-            <span class="text-sm">{{ $t(`passwordGen.deterministic.${type.key}`) }}</span>
+            <span class="text-sm">{{ $t(type.detLabel) }}</span>
           </label>
         </div>
       </UFormGroup>
@@ -225,10 +225,10 @@ const saltVisible = ref(false);
 
 // Character type definitions
 const charTypes = [
-  { key: 'uppercase' },
-  { key: 'lowercase' },
-  { key: 'digits' },
-  { key: 'symbols' }
+  { key: 'uppercase', randomLabel: 'passwordGen.random.uppercase', detLabel: 'passwordGen.deterministic.uppercase' },
+  { key: 'lowercase', randomLabel: 'passwordGen.random.lowercase', detLabel: 'passwordGen.deterministic.lowercase' },
+  { key: 'digits', randomLabel: 'passwordGen.random.digits', detLabel: 'passwordGen.deterministic.digits' },
+  { key: 'symbols', randomLabel: 'passwordGen.random.symbols', detLabel: 'passwordGen.deterministic.symbols' }
 ];
 
 // Generate random passwords

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#EEF0F4"/>
+  <rect x="0" y="0" width="1200" height="630" fill="url(#paper)"/>
+  <defs>
+    <pattern id="paper" width="1" height="32" patternUnits="userSpaceOnUse">
+      <rect width="1" height="1" fill="rgba(31,42,68,0.02)"/>
+    </pattern>
+  </defs>
+
+  <circle cx="120" cy="110" r="30" fill="none" stroke="#C0392B" stroke-width="4"/>
+  <text x="120" y="120" font-size="26" fill="#C0392B" text-anchor="middle"
+        font-family="STKaiti, KaiTi, serif">印</text>
+
+  <text x="170" y="120" font-size="30" fill="#1F2A44" font-weight="700"
+        font-family="'Noto Serif CJK SC', serif">鹊随金印</text>
+
+  <text x="120" y="270" font-size="76" fill="#C0392B" font-weight="900" letter-spacing="6"
+        font-family="'Noto Serif CJK SC', serif">公文与文档处理</text>
+
+  <rect x="120" y="300" width="960" height="5" rx="3" fill="#C0392B"/>
+  <text x="600" y="308" font-size="26" fill="#C0392B" text-anchor="middle">★</text>
+
+  <text x="120" y="390" font-size="30" fill="#56627A"
+        font-family="'Noto Sans CJK SC', sans-serif">Markdown 一键出 GB/T 9704 公文</text>
+  <text x="120" y="443" font-size="30" fill="#56627A"
+        font-family="'Noto Sans CJK SC', sans-serif">PDF 敏感信息真删文字层再加马赛克</text>
+  <text x="120" y="496" font-size="30" fill="#56627A"
+        font-family="'Noto Sans CJK SC', sans-serif">多数工具处理完即删 · 统计库不记文件名</text>
+
+  <text x="120" y="566" font-size="26" fill="#6E7A93" letter-spacing="2"
+        font-family="'Noto Sans CJK SC', sans-serif">doc.sujx.net · 免注册 · 免费使用</text>
+</svg>

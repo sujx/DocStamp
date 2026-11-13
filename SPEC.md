@@ -12,12 +12,12 @@
 
 ## 二、功能模块（14 个）
 
-功能模块 = 13 项工具 + 使用统计，共 14 个；首页仪表盘是导航页不计入，下表按路由列出全部 15 个页面。
+功能模块 = 13 项工具 + 使用统计，共 14 个；仪表盘是导航页不计入，下表按路由列出应用内全部 15 个页面（对外宣传页 `/` 也不计入，v3.12.0 起它是站点首页，见「十一、宣传页首页」）。
 
 **侧栏导航**：
 
 ```
-首页              → /
+工具（仪表盘）     → /tools
 MD 转公文          → /md-to-docx
 格式规范          → /format-docx
 RSS 探测          → /rss-detect      (Feed 发现)
@@ -36,7 +36,7 @@ WebP 转 JPEG      → /webp-to-jpeg
 
 | # | 模块 | 路由 | 说明 |
 |---|------|------|------|
-| 1 | 仪表盘 | `/` | 工具卡片网格（3 列） |
+| 1 | 仪表盘 | `/tools` | 工具卡片网格（3 列）；v3.12.0 起从 `/` 搬到 `/tools` |
 | 2 | MD 转公文 | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX |
 | 3 | 属性修改 | `/properties` | 元数据修改 + 元数据清理（双 Tab） |
 | 4 | Excel 合并 | `/excel-merge` | .xlsx/.csv 结构相同合并 |
@@ -450,7 +450,105 @@ API 容器健康检查 `curl /api/v1/health`。容器以非 root 用户 `docstam
 
 ---
 
-## 十一、版本历史
+## 十一、宣传页首页
+
+v3.12.0 起对外首页从仪表盘换成宣传页。设计蓝本见 `docs/superpowers/specs/2026-11-12-landing-homepage-design.md`（`docs/` 被 `.gitignore` 排除，不入库）；本章记的是落地后的契约，与代码事实冲突时以代码为准。
+
+### 路由表
+
+| 路由 | 壳 | 页面文件 | 说明 |
+|------|----|----------|------|
+| `/` | `layouts/landing.vue` | `pages/index.vue` | 对外宣传页：sticky 顶导 + 红头 hero + 14 件工具（五段分组）+ 隐私承诺 + 资源区 + 页脚，无侧栏 |
+| `/tools` | `layouts/default.vue` | `pages/tools.vue` | 应用内仪表盘：13 张工具卡（`/status` 不在卡片网格里），有侧栏。原 `/` 的仪表盘 `git mv` 于此，内容一行未改 |
+| 14 个工具路由 | `layouts/default.vue` | `pages/*.vue` | 完全不变，旧书签全部有效 |
+
+14 个工具路由：`/md-to-docx`、`/format-docx`、`/rss-detect`、`/properties`、`/excel-merge`、`/file-assembly`、`/print-split`、`/pdf-editor`、`/pdf-tools`、`/pdf-merge`、`/pdf-redact`、`/webp-to-jpeg`、`/password-gen`、`/status`。
+
+- **`/` 不得再被任何 `TOOLS` 条目占用**（顶栏品牌链接 `to="/"` 是唯一例外）：`composables/tools.config.ts` 的 `dashboard` 条目是 `to: "/tools"`，`composables/__tests__/tools.config.spec.ts` 断言「没有任何条目 `to === "/"`」——这是本批唯一不可逆的约定，必须有测试钉住。
+- `components/PageHeader.vue` 的 `backTo` 默认值 `"/"` → `"/tools"`（全站 14 个工具页「返回」的唯一来源，无页面覆写）；`components/Sidebar.vue` 删掉已不可达的 `if (href === "/")` 特判。
+- 宣传页这批未改后端：`backend/app.py` 的 SPA fallback 按 `<route>/index.html` 命中，`/tools` 与 14 个既有工具路由走同一条码路，故 `X-API-Version` 仍是 3.11.0。
+
+### 双壳约定
+
+| 壳 | 用在哪 | 结构 | 必挂 |
+|----|--------|------|------|
+| `layouts/landing.vue` | 只有 `/` | 跳转链接 → sticky `<LandingNav>` → `<main id="main-content">` → `<LandingFooter>` | `<UNotifications />`；`titleTemplate` 为 `"%s - 鹊随金印"`；`htmlAttrs` 走 `useLocaleHead()`；`LanguageSwitcher` 在 `<LandingNav>` 顶栏 |
+| `layouts/default.vue` | `/tools`、14 个工具页（含 `/status`） | 侧边导航壳 | `<UNotifications />`；`LanguageSwitcher` 在侧栏 |
+
+- 页面侧用 `definePageMeta({ layout: "landing" })`（项目第一处 `definePageMeta`）；`/tools` 走隐式的 default。
+- **新 layout 必须同时挂 `<UNotifications />` 与 `LanguageSwitcher`**：`useToast()` 只往 `useState("notifications")` 里塞数据，Nuxt UI v2 没有自动注入（v3.9.3 已因缺容器让全站 toast 静默过一轮）；语言切换在本项目没有全局入口，各自壳里那份切换器就是该壳唯一的语言入口，缺了等于这个壳锁死中文。
+- 两壳的 `htmlAttrs.lang` 都由 `useLocaleHead()` 提供，不再硬编码 `zh-CN`。
+
+### 隐私承诺的真相表（文案的硬约束）
+
+三条承诺 + 四条如实披露逐条对应代码，措辞必须能被逐条验证。改文案前先核对本表。
+
+| 宣传页要说 | 代码事实 | 证据 |
+|---|---|---|
+| **一步完成的，响应结束即删**：一步完成的工具，上传件与产物在同一次响应里删掉，不归档、不建索引 | 机制有两种：`send_file` + `@after_this_request` + `cleanup_files`（excel_merge / img2pdf / metadata_clean / page_decorate / pdf2img / pdf_compress / pdf_editor 的 delete·insert·reorder / pdf_merge / webp_to_jpeg / properties 批处理 / pdf_redact 的 download），以及 `finally: cleanup_files(filepath)`（`pdf_to_text` 产物是内联 JSON 文本不落盘、`properties/info`）。批处理与 pdf2img 还在钩子里逐个删文件 + `os.rmdir` 删目录，无内容残留。`rss_detect` / `stats` 不收上传件，不在范围内。**不写硬计数**（新增接口就 rot），例外见下面七行 | `blueprints/img2pdf_bp.py:59-63`、`blueprints/pdf_to_text_bp.py:54`、`blueprints/properties_bp.py:37,134-146`、`blueprints/pdf2img_bp.py:49-57`、`blueprints/pdf_editor_bp.py:49-51` |
+| **例外①：三件两段式工具**：MD转公文、格式规范、打印分组都是「生成 → 下载」两步，**上传件与产物都**留在服务器临时目录，最长 7 天后由每日清扫清除；取走时不会删除 | 三个成功出口都只返回 id，成功路径完全没有 cleanup（原件也留着，对格式规范/打印分组来说原件才是敏感文档）；共用下载出口取走时也不删 | `backend/blueprints/convert.py:141-147`（MD转公文）、`convert.py:182-188`（格式规范）、`print_split_bp.py:41,48-56` + `:66-78`（打印分组 create/download）、`download.py:75` |
+| **例外②：PDF 脱敏的会话目录**：上传件在标记期间一直留在服务器，下载即删、离开页面时前端尽力通知；没人取走的会话要等下一次有人打开这个工具才由过期清扫回收 | `/open` 写盘后返回 JSON，`delete_session` 只在错误分支；真正删除在 `/download` 的 after_this_request 或 `/close`。`cleanup_expired` **全仓库唯一调用点**是下一次 `/open`，TTL 3600 秒但惰性触发。**且 7 天清扫扫不到它**：清扫只按顶层条目 mtime 判龄，`redact-sessions` 父目录 mtime 随每次建/删会话刷新，7 天内有人用过就整棵树跳过 → 对脱敏**既不能写「同响应删」也不能写「最长 7 天」，更不能写「一小时自毁」** | `backend/blueprints/pdf_redact_bp.py:55-94`（`:67` cleanup_expired、`:79,90,93` 仅错误分支删）、`:227-231`、`:255`；`backend/utils/redact_session.py:20,24,58,66,105`；`backend/utils/file_cleanup.py:73-84` |
+| **例外③：PDF 编辑的页面图片**：打开文件时渲染的页面 PNG 留在临时目录，最长 7 天后清除；上传件本身当即删除 | `/info` 建 `thumbs_<hex8>/` 用 pdftoppm 渲染最多 50 张 PNG，返回 JSON，`finally` 只删上传件；全仓库没有任何代码删 `thumbs_*`（只有创建点与清扫器 docstring 提到它） | `backend/blueprints/pdf_editor_bp.py:86-87,92-107,120,125-126`；`backend/utils/file_cleanup.py:50` |
+| **没人取走的，最长留 7 天**（脱敏会话目录是例外，见上）：临时目录由守护线程每日扫描，超过 7 天的条目清除，不区分用户 | `CLEANUP_INTERVAL_SECONDS = 24h`、`CLEANUP_MAX_AGE_DAYS = 7`，每小时检查一次是否到期；gunicorn master 起唯一守护线程，`.stats` / `.gitkeep` 永不老化；无按用户区分逻辑 | `backend/utils/file_cleanup.py:19-21,73-90,137-152`、`backend/gunicorn.conf.py:30-45` |
+| **统计库里没有文件名，也没有内容**：只记模块名、耗时、成功与否和一个请求 ID | 表无文件名字段，`resource_id` 存的是路由路径（变长路由带的是 uuid / hex token，不是原名）。**`file_size` 列存在但从来没人写，恒为 0** → 文案不许出现「体积」 | `backend/models.py:52-65,135`、`backend/app.py:111-125`、`backend/blueprints/stats_bp.py:37-48` |
+| **但统计库含 IP 与浏览器标识**：这是「独立访客」统计的唯一依据，照实写 | `ip_address` 取 `X-Forwarded-For` 最左，回落 `X-Real-IP` / `remote_addr`；`user_agent` 截断 200 字符 | `backend/app.py:118-122` |
+| **运维日志可能带上文件路径**：删除失败或抛异常时会记临时文件路径与堆栈，保留 30 天 | 落盘名是 `uuid_<secure_filename(原名)>`，清理失败告警把全路径写进日志；异常走 `logger.exception` + JSON 的 `stack` 字段；按日轮转留 30 份 | `backend/utils/file_cleanup.py:88`、`backend/utils/base/file_helpers.py:62-63`、`backend/error_handler.py:94`、`backend/json_logging.py:21,47-48` |
+
+例外总数是**五处**，不是三件：为用户文件建任务/产物子目录的 `os.makedirs` 只有 5 处（`pdf_editor_bp.py:87`、`print_split_bp.py:41`、`properties_bp.py:113`、`services/pdf_to_images.py:53`、`redact_session.py:58`；另有两处是启动期建 `LOG_DIR`（`json_logging.py:76`）与 `UPLOAD_FOLDER`（`app.py:71`），不涉及单次请求的用户文件），其中 properties 批处理与 pdf2img 都在钩子里删净，剩下的按工具归成上面三行披露。
+
+**禁止出现在文案里的说法**（今天不成立）：「物理磁盘零写入 / tmpfs」「容器重启即灭」
+（`output_data` 是具名卷，跨容器重建存活，`docker-compose.yml:26`）、「一小时自毁」
+（1 小时 TTL 只适用于 PDF 脱敏会话，且靠下一次访问惰性触发，`backend/utils/redact_session.py:24`）、「不记录文件名」
+（上传落盘名是 `uuid_<安全化原名>`，原名在文件消失前一直留在磁盘，`backend/utils/base/file_helpers.py:62-63`）。
+
+### sitemap 与 og
+
+- **sitemap 的 URL 来自 `TOOLS`，不是 `pages/`**：`server/routes/sitemap.xml.ts` 调 `server/utils/sitemap.ts` 的 `buildSitemapUrls(TOOLS)` + `renderSitemapXml(urls, lastmod)`，恰好 16 条（`/`、`/tools` + 14 条非 dashboard 条目，含 `/status`），`lastmod` 取构建日，`SITE_ORIGIN` 写死 `https://doc.sujx.net`（SSG 产物没有请求头可依）。`pages/` 里有 4 个零入链孤儿路由（`metadata-clean` / `page-decorate` / `pdf-compress` / `pdf-to-text`），`crawlLinks` 不会生成它们，写进 sitemap 就是宣告 4 条死链。必须同时在 `nuxt.config.ts` 的 `nitro.prerender.routes` 登记 `/sitemap.xml`——只写 handler 不加这一行，`robots.txt` 仍指向 404。
+- **og**：`public/og.svg` 是入库源文件（红头版式：印章 + 主标题 + 三条卖点），`public/og.png`（1200×630）是 chromium headless 的产物——只留 PNG 的话，下次改文案没人知道图是怎么来的。`pages/index.vue` 的 `useHead` 挂 `og:image` / `og:description` / `twitter:card=summary_large_image`，绝对地址写死 `https://doc.sujx.net/og.png`；不用 `logo.svg` 充当（微信/微博基本不渲染 SVG 分享图）。
+- **备案号走 i18n 键 `landing.footer.icp`，空即不渲染**：`LandingFooter.vue` 是 `v-if="icp"`。不做假号，也不走 `runtimeConfig`——SSG 产物在构建期就把值烘进 HTML，compose 的 `${VAR}` 注入对它无效；真实号到位后改一次文案、随正常发版重新构建镜像。
+- 容器内必须齐的四件产物：`.output/public/index.html`（宣传页，含 hero 文案与 14 张卡的服务端 HTML）、`tools/index.html`（搬家后的仪表盘）、`sitemap.xml`、`og.png`。
+
+### 验收记录（v3.12.0）
+
+容器构建产物四件齐验 + 浏览器 10 项清单实测，**10/10 PASS**（1280×900，DPR 1；截图留在本机 `/tmp/task11-shots/`，不入库）：
+
+| # | 清单项 | 实测 |
+|---|--------|------|
+| 1 | `/` 无侧栏、五区块 + 页脚齐全、无死链 | `aside` 0 个、`.sidebar-panel` 为 null；hero（h1「公文与文档处理」）、`#tools`（5 个分组标题 + 14 张卡）、`#promise`（3 条承诺 + 4 条披露）、`#resources`（3 张卡）、`<footer>` 全在；`a[href="#"]` = 0；`[Vue warn]` = 0 |
+| 2 | 顶栏切 en 整页换文、切回 zh 正常 | `documentElement.lang` 走 zh-CN → en → zh-CN，`localStorage` / cookie `docstamp_lang` 同步；title、顶栏、hero、工具区、承诺区、资源区、页脚全部换文。切回中文那一帧是 `06-home-zh-back-1280.png`（`03-…` 是首次中文帧，不是切回帧） |
+| 3 | toast 容器真的挂载 | 宣传页自身没有 toast 来源，改在 `/password-gen` 走真实 UI 触发：点击前 `body > div[role="region"]` = 0（空断言，证明不是常驻节点），点击后 = 1、文本「请填写变量名称和盐值」；`layouts/landing.vue` 与 `layouts/default.vue` 挂的是同一个 `<UNotifications />` |
+| 4 | 三个锚点不被 sticky 顶栏遮挡 | 顶栏高 57px，`scroll-margin-top` 计算值 80px（`scroll-mt-20`）；`#tools` / `#promise` / `#resources` 点击后标题完整可见（标题 top 163 / 204 / 164，均 > 57） |
+| 5 | `/tools` 渲染仪表盘、侧栏首项「工具」高亮 | h1「文档处理，化繁为简」，13 张卡，侧栏 15 项；侧栏默认 72px 折叠（`useSidebar` 的既有设计），展开到 256px 后首项文本「工具」、`href=/tools`、`aria-current="page"`、`nav-item--active` |
+| 6 | 工具页「返回」落 `/tools` | `/md-to-docx` 的返回链 `href=/tools`，点击后 `pathname === '/tools'`、h1 为仪表盘标题（SPA 内跳，非整页刷新） |
+| 7 | 旧深链直访正常 | `/pdf-redact`、`/password-gen`、`/status` 均渲染真实内容，无 404、无重定向回 `/` |
+| 8 | `prefers-reduced-motion: reduce` 下无位移 | hero `.letterhead` 与卡片 `.stagger-children > *` 的 `animation-duration` 由 0.4s / 0.35s 降到 `1e-05s`，700ms 内位置采样静止（`main.css` 的全局规则覆盖；动画只复用 `animate-fade-up` / `stagger-children`，不新增 keyframes） |
+| 9 | 触摸目标 ≥ 44px | 顶栏 `a` / `button` 与 hero 两个 CTA 的可见项最小 **44px**，`under44` 为空；量到 0 的只有 `.lang-switcher.collapsed` 里的隐藏分支——那是 `md` 以下的紧凑分支，`display:none` 使 `getBoundingClientRect()` 恒为 0，属有意隐藏而非欠账 |
+| 10 | `/sitemap.xml` 与 `/og.png` 可直取 | sitemap：200、`application/xml; charset=utf-8`、`<url>` **16** 条、`lastmod` 为构建日；og：200、`image/png` 65060 B、`naturalWidth/Height` = 1200×630 |
+
+非本批缺陷（已核实、不进验收门槛）：`/status` 在 :3000 dev（不是 `manage.sh` 的 :8080）下被 CORS 挡住，属 dev-origin 偏差；工具页 `<title>` 为空、`PageHeader` 返回链接仅 44×16 是既存问题；`[Vue warn]` 在工具页来自 `color="neutral"`，见 `AGENTS.md` 待办。
+
+---
+
+## 十二、版本历史
+
+### v3.12.0 (2026-11)
+
+- **宣传页成为首页，仪表盘搬到 `/tools`**：`pages/index.vue` 换成对外宣传页（顶导 + 红头 hero + 14 件工具五段分组 + 隐私承诺 + 资源区 + 页脚），原仪表盘 `git mv` 成 `pages/tools.vue`、内容一行未改；新增 `layouts/landing.vue`（sticky 顶栏 + `main#main-content` + `<UNotifications />`）、`components/landing/{LandingNav,LetterheadHero,ToolShowcase,PromiseBand,LandingFooter,SectionKicker}.vue` 与 `server/routes/sitemap.xml.ts` + `server/utils/sitemap.ts`。`tools.config` 的 `dashboard` 条目与 `PageHeader` 的 `backTo` 默认值改 `/tools`，`Sidebar` 删掉已不可达的 `/` 特判；`tools.config.spec.ts` 新增「无条目 `to === "/"`」断言
+- **隐私承诺按代码真相写，四条如实披露（例外共五处，归成三行）**：三条承诺 + 四条披露逐条对应后端实现（真相表见「十一、宣传页首页」）。据此收窄两处并补一行证据：item1 的「一步完成」点名三件两段式例外（MD转公文 / 格式规范 / 打印分组，`convert.py:141-147,182-188` + `print_split_bp.py:48-56,66-78`），item3 从「日志里没有文件名」收窄成「统计库里没有文件名，也没有内容」并新增「运维日志可能带上文件路径」（`file_cleanup.py:88`、`json_logging.py:21,47-48`）。同时去掉「体积」——`operation_logs.file_size` 恒为 0。今天不成立的四条（磁盘零写入 / 容器重启即灭 / 一小时自毁 / 不记录文件名）明确禁止出现在文案里，做不到的工程项全部登记进 `AGENTS.md` 待办
+- **`sitemap.xml` 兑现 `robots.txt` 的承诺**：从 `TOOLS` 单一数据源生成 16 条 URL（`/`、`/tools` + 14 个工具页，含 `/status`），`lastmod` 取构建日，并在 `nitro.prerender.routes` 登记——此前 `robots.txt` 一直宣告一个 404。URL 不取自 `pages/`：那 4 个零入链孤儿路由不会被预渲染，写进去就是 4 条死链
+- **og:image 与宣传页独立 TDK**：`public/og.svg` 手写 1200×630 红头版式、chromium headless 产出 `public/og.png`；`pages/index.vue` 的 `useHead` 覆写 title / description / keywords 并挂 `og:*` 与 `twitter:card`。同时修正 `layouts/default.vue` 里仍向 14 个工具页输出的「视频转换」「文档转MD」过期 meta（这两项功能已不存在）
+- **`X-API-Version` 保持 3.11.0**：宣传页各提交均未触及 `backend/`（版本号 3.9.3 → 3.11.0 的 bump 属独立的 v3.11.0 提交），14 个工具路由与 SPA fallback 均未动
+- **验证**：后端 `uv run pytest tests/ -q` **200 passed**；前端 `npx vitest run` **9 files / 78 passed**；容器内四件产物齐全（`index.html`、`tools/index.html`、`sitemap.xml`、`og.png`）；浏览器 10 项清单全过，记录见「十一、宣传页首页 · 验收记录」
+
+### v3.11.0 (2026-11)
+
+- **后端运行时 Python 3.12 → 3.13，依赖管理 Poetry → uv**：`backend/pyproject.toml` 由 Poetry 方言（`[tool.poetry.dependencies]` + `[tool.poetry.group.dev.dependencies]` + `poetry-core` build-backend）改写为 PEP 621 `[project]` + PEP 735 `[dependency-groups]`，`requires-python` `^3.12` → `>=3.13`，`package-mode = false` → `[tool.uv] package = false`。删 `backend/poetry.toml`（它的 `virtualenvs.in-project` 由 uv 默认在项目根建 `.venv` 取代），新增 `backend/.python-version`（3.13）与**入库**的 `backend/uv.lock`（65 个包，lock revision 5）；`.gitignore` 的 `poetry.lock` 段替换为「uv.lock 为什么要跟踪」的说明。解析结果：flask 3.1.3 / pydantic 2.14.3 / pillow 11.3.0（原 `^10`）/ pymupdf 1.28.2 / cryptography 48.0.1
+- **Dockerfile 里的手抄 pip 清单删除**：Stage 2 原本 `pip install --break-system-packages flask flask-cors …` 写两遍（带 `||` 回退），与 `pyproject.toml` 是两份独立声明且已经漂移（清单里没有 weasyprint）。现改三阶段：Stage 1 前端不动；Stage 2 `python:3.13-slim-bookworm` 内 `pip install uv==0.13.7` 后 `uv sync --frozen --no-dev`，只 `COPY` `pyproject.toml` + `uv.lock`，依赖层从此不随代码改动重装；Stage 3 同基础镜像，`COPY --from=backend-deps /opt/docstamp/.venv` 成品 venv 并前置到 `PATH`，`gunicorn --version` 保留作冒烟。两个 Stage 的镜像必须逐字一致——venv 里的 `bin/python` 是指向 `/usr/local/bin/python3.13` 的软链。babel `locale-data` 剪枝与 `__pycache__`/`.pyc` 清理的目标路径随之从系统 `site-packages` 挪到 venv（实测 1084 个文件 / 32 MB → 138 个 / 1.3 MB，只留 `en*`/`zh*`）。`uv` 只在 Stage 2 出现、不进最终镜像；系统 `pip` 的包体照旧删掉，`/usr/local/bin/pip` 那层壳仍在、调用即 Traceback——与迁移前的镜像行为一致
+- **`.dockerignore` 的 venv 规则改成 `**/.venv/`**：dockerignore 锚定构建上下文根，与 gitignore「不含斜杠即匹配任意深度」的语义相反，原来的裸 `.venv/` 挡不住 `backend/.venv`——真挡不住就是几百 MB 的上下文，且随后的 `COPY backend/ ./backend/` 会把宿主机那份 venv 盖进镜像里 uv 刚解析好的成品上
+- **`manage.sh` 走 uv**：`python3 app.py` → `uv run python app.py`、`python3 -m pytest` → `uv run pytest`，新增 `_require_uv`（只挂在跑本机后端的入口，`docker-up` 不需要）。AGENTS.md 里「每个新会话必须先 `source backend/.venv/bin/activate`」的仪式作废，`uv run` 自己按锁文件对齐环境
+- **依赖增删**：`weasyprint` 从声明中删除——全仓库无一处 `import weasyprint`，旧 pip 清单里也没有它（DOCX→PDF 走 pandoc），只有 README 的依赖表还挂着；`Pillow` `^10` → `>=11,<12`，代码未用到 11 移除的 `ANTIALIAS` 一类旧常量
+- **`X-API-Version` 3.9.3 → 3.11.0**：v3.10.0 发版时漏 bump，本批跟上，恢复「打一次 curl 即可确认线上镜像」
+- **验证**：`uv lock --check` 与 `uv sync` 全绿；`uv run pytest tests/ -v` **200 passed**（含在有 `/etc/mime.types` 的 Debian 上通过的 `test_download_reports_binary_mimetype`；AGENTS.md 的「AlmaLinux 必失败」仍成立）；`./manage.sh backend` 起得来、`stop` 停得掉（uv 转发 SIGTERM 有效），curl 直接看到 `X-API-Version: 3.11.0`；`docker build` 全量通过并实跑容器（Debian 本机，基础镜像走 daemon 里已配的 registry mirror）——容器内 `python -V` = 3.13.18、`command -v gunicorn` = `/opt/docstamp/.venv/bin/gunicorn`、`command -v uv` 为空、`/api/v1/health` 200、`/` 返回 239 KB SPA、`/api/v1/stats/modules` 出 JSON、4 个 worker 正常写 `access.log`/`app.log`/`error.log`，且 `backend/.venv` 未泄漏进镜像；`uv run mypy --strict` 报 319 errors / 43 files 属**存量**——仓库没有安装 `pre-commit` 钩子，strict 从未真正成为门槛，报错集中在 118 条 `no-untyped-def` 与 63 条 `type-arg`，本批未改任何 `.py` 业务逻辑，故不构成本批回归
 
 ### v3.10.0 (2026-11)
 

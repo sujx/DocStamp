@@ -94,6 +94,81 @@
     color: #ffffff;
     transform: scale(1.05);
   }
+
+  /* 印章「印」——侧栏 .seal-icon 的圆形变体，用于顶栏与页脚 */
+  .seal-dot {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-seal-red);
+    color: var(--color-seal-red);
+    font-family: "STKaiti", "KaiTi", "楷体", serif;
+    font-size: 13px;
+    line-height: 1;
+    transform: rotate(-8deg);
+  }
+
+  /* 衬线族：只给主标题、眉标、印章用，正文仍走 body 的 sans */
+  .font-official {
+    font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", SimSun, Georgia, serif;
+  }
+
+  /* ── 红头版式：宣传页 hero 专属（移植自 prototype/proto.css，色值改走 token） ── */
+  .letterhead {
+    padding: 4.5rem 0 0.5rem;
+    text-align: center;
+  }
+
+  .letterhead .lh-no {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, "Noto Sans Mono CJK SC", monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--color-text-secondary);
+  }
+
+  .letterhead .lh-title {
+    margin: 0.875rem 0 0.375rem;
+    font-size: clamp(2.375rem, 6vw, 3.75rem);
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    color: var(--color-seal-red);
+  }
+
+  .letterhead .lh-sub {
+    margin-bottom: 1.625rem;
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+  }
+
+  .letterhead .lh-rule {
+    position: relative;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-seal-red);
+  }
+
+  .letterhead .lh-rule::before {
+    content: "★";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0 0.875rem;
+    background: var(--color-page);
+    color: var(--color-seal-red);
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .letterhead .hero-lede {
+    max-width: 640px;
+    margin: 1.875rem auto 0;
+    font-size: 1.0625rem;
+    color: var(--color-text-secondary);
+  }
 }
 
 /* ── Page transitions ── */

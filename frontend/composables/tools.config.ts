@@ -9,7 +9,7 @@ export interface ToolDef {
 
 export const TOOLS: ToolDef[] = [
   // ── 顶层 ──
-  { key: "dashboard", to: "/", icon: "i-heroicons-home", label: "tabs.dashboard", order: 1 },
+  { key: "dashboard", to: "/tools", icon: "i-heroicons-home", label: "tabs.dashboard", order: 1 },
   { key: "md2docx", to: "/md-to-docx", icon: "i-heroicons-arrow-down-tray", label: "tabs.md2docx", desc: "md2docx.description", order: 2 },
   { key: "format-docx", to: "/format-docx", icon: "i-heroicons-document-check", label: "tabs.formatDocx", desc: "format.description", order: 4 },
   { key: "rss-detect", to: "/rss-detect", icon: "i-heroicons-signal", label: "tabs.rssDetect", desc: "rssDetect.description", order: 7 },
@@ -36,3 +36,21 @@ export const TOOLS: ToolDef[] = [
 
 // Sidebar 读这里；order 是展示顺序的唯一来源
 export const SIDEBAR_ITEMS: ToolDef[] = [...TOOLS].sort((a, b) => a.order - b.order)
+
+// 宣传页页脚精选的五件工具，数组顺序即展示顺序
+export const FOOTER_TOOL_KEYS = ["md2docx", "pdf-redact", "format-docx", "pdf-merge", "pdf-tools"];
+
+/** 宣传页五段分组。键必须与 TOOLS 一一对应（除 dashboard），由契约测试钉住。 */
+export const LANDING_GROUPS: { labelKey: string; keys: string[] }[] = [
+  { labelKey: "landing.tools.groupOfficial", keys: ["md2docx", "format-docx"] },
+  { labelKey: "landing.tools.groupPdf", keys: ["file-assembly", "print-split", "pdf-editor", "pdf-tools", "pdf-merge", "pdf-redact"] },
+  { labelKey: "landing.tools.groupOffice", keys: ["properties", "excel-merge"] },
+  { labelKey: "landing.tools.groupImage", keys: ["webp-to-jpeg"] },
+  { labelKey: "landing.tools.groupOther", keys: ["rss-detect", "password-gen", "status"] },
+];
+
+/** 卡片徽章。键名与文案都必须是今天能为真的说法（见 Task 5 Step 3 的 R32）。 */
+export const LANDING_FLAGS: Record<string, string> = {
+  md2docx: "landing.tools.flagSignature",
+  "pdf-redact": "landing.tools.flagTextDeleted",
+};

@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "dashboard": "首页",
+    "dashboard": "工具",
     "properties": "属性修改",
     "fileAssembly": "文件组装",
     "printSplit": "打印分组",
@@ -22,7 +22,9 @@
   },
   "dashboard": {
     "heroTitle": "文档处理，化繁为简",
-    "heroSubtitle": "14 项功能，覆盖格式转换、PDF 编辑、文档规范化等场景"
+    "heroSubtitle": "14 项功能，覆盖格式转换、PDF 编辑、文档规范化等场景",
+    "metaTitle": "工具仪表盘",
+    "metaDescription": "14 项文档工具的应用内首页。"
   },
   "status": {
     "title": "使用统计",
@@ -274,6 +276,7 @@
   "pdfRedact": {
     "title": "PDF 脱敏",
     "description": "上传 PDF，框选或按关键词标记敏感内容，生成带马赛克的新 PDF（原文件不改动）",
+    "guideLink": "阅读教程：PDF 涂黑 ≠ 打码",
     "hint": "仅支持 .pdf，单文件最大 100 MB；加密 PDF 请先解密",
     "tooLarge": "文件超过 100 MB 上限",
     "uploading": "上传中",
@@ -328,7 +331,6 @@
       "desc": "每次生成不同的随机密码",
       "length": "密码长度",
       "charTypes": "字符类型",
-      "charTypesHint": "至少选择一类",
       "uppercase": "大写 A-Z",
       "lowercase": "小写 a-z",
       "digits": "数字 0-9",
@@ -350,7 +352,6 @@
       "toggleVisibility": "显示/隐藏盐值",
       "length": "密码长度",
       "charTypes": "字符类型",
-      "charTypesHint": "至少选择一类",
       "uppercase": "大写 A-Z",
       "lowercase": "小写 a-z",
       "digits": "数字 0-9",
@@ -366,6 +367,98 @@
       "copied": "已复制",
       "errorNoClass": "请至少选择一种字符类型",
       "errorNoInput": "请填写变量名称和盐值"
+    }
+  },
+  "landing": {
+    "hero": {
+      "no": "鹊随金印 · 文档工具箱 · 免费使用",
+      "title": "公文与文档处理",
+      "sub": "Markdown 转公文 · PDF 脱敏打码 · 格式规范化 · 免注册免安装",
+      "lede": "写给被格式折磨的文字工作者：把 Markdown 敲成标准 GB/T 9704 公文，给 PDF 里的手机号、身份证号打上马赛克，并删掉马赛克底下的文字层——不用装软件，不用注册，随用随走。",
+      "primary": "打开全部工具",
+      "secondary": "PDF 脱敏打码"
+    },
+    "tools": {
+      "kicker": "TOOLS / 工具",
+      "title": "十四件顺手的小工具",
+      "note": "每一项都只做一件事。点开即用，没有登录墙。",
+      "groupOfficial": "公文规范",
+      "groupPdf": "PDF",
+      "groupOffice": "Office 与元数据",
+      "groupImage": "图片",
+      "groupOther": "其他",
+      "flagSignature": "招牌",
+      "flagTextDeleted": "真删文字"
+    },
+    "promise": {
+      "kicker": "PRIVACY / 承诺",
+      "title": "处理完就删，例外写在下面",
+      "sub": "下面每一句都能在仓库里逐条验证——我们只写今天做得到的事。",
+      "item1Title": "一步完成的，响应结束即删",
+      "item1Body": "上传件与产物在同一次响应里删掉，不归档、不建索引。需要分几步走的工具是例外，下面逐条写明。",
+      "item2Title": "没人取走的，最长留 7 天",
+      "item2Body": "临时目录由守护线程每日扫描，超过 7 天的条目清除，不区分用户。PDF 脱敏的会话目录是例外，见下。",
+      "item3Title": "统计库里没有文件名，也没有内容",
+      "item3Body": "只记模块名、耗时、成功与否和一个请求 ID——够算清哪件工具被用了几次，不够还原任何一份文件。",
+      "notesTitle": "例外与如实披露",
+      "note1Title": "例外：三件两段式工具",
+      "note1Body": "MD转公文、格式规范、打印分组都是「生成 → 下载」两步，你的上传件与产物都留在服务器临时目录，最长 7 天后由每日扫描清除；下载时不会删除它们。",
+      "note2Title": "例外：PDF 脱敏与 PDF 编辑",
+      "note2Body": "脱敏的上传件在你标记期间一直留在服务器：下载即删，离开页面时前端会尽力通知服务器删除；没人取走的会话，要等下一次有人打开这个工具才由过期清扫回收。PDF 编辑打开文件时渲染的页面图片留在临时目录，最长 7 天后清除，上传件本身当即删除。",
+      "note3Title": "我们确实记录 IP 与浏览器标识",
+      "note3Body": "这是「独立访客」统计的唯一依据；IP 取自代理头 X-Forwarded-For（无代理时用直连地址），浏览器标识截断到 200 字符。",
+      "note4Title": "运维日志可能带上文件路径",
+      "note4Body": "删除失败或抛异常时，运维日志会记下临时文件路径与堆栈，路径里可能带着你上传时的文件名；这类日志保留 30 天。统计库不含这些。"
+    },
+    "resource": {
+      "kicker": "RESOURCES / 资源",
+      "title": "先懂标准，再用工具",
+      "note": "站内已有的四份参照，不用注册。",
+      "standardDesc": "国标原文，字号、行距、成文日期对着查。",
+      "toolsDesc": "十四件工具一览，点开即用。",
+      "statsDesc": "各模块调用量与独立访客，本站自己也在被统计。",
+      "guideTitle": "PDF 脱敏教程",
+      "guideDesc": "黑框为什么不算脱敏，扫描件又差在哪。"
+    },
+    "meta": {
+      "title": "公文与文档在线工具箱",
+      "description": "鹊随金印：Markdown 一键生成 GB/T 9704 公文，PDF 打码脱敏，Word 格式规范，PDF 合并压缩。多数工具处理完即删，例外在首页列明；统计库不含文件名，免注册。",
+      "keywords": "公文格式,GB/T 9704,Markdown转公文,PDF脱敏,PDF打码,PDF合并,PDF压缩,Word格式规范,文档工具箱"
+    },
+    "nav": {
+      "ariaLabel": "宣传页导航",
+      "tools": "工具",
+      "promise": "隐私承诺",
+      "resources": "资源",
+      "cta": "立即使用"
+    },
+    "footer": {
+      "toolsTitle": "工具",
+      "resourcesTitle": "资源",
+      "allTools": "全部工具",
+      "stats": "使用情况",
+      "guide": "使用教程",
+      "standard": "GB/T 9704-2012 标准原文",
+      "tagline": "一站式公文与文档在线处理。无账号、无安装、无广告。",
+      "copyright": "© 2025-2026 鹊随金印 · doc.sujx.net",
+      "icp": "",
+      "contact": "sujx{'@'}live.cn"
+    }
+  },
+  "guide": {
+    "pdfRedact": {
+      "kicker": "GUIDE · 脱敏",
+      "title": "PDF 涂黑 ≠ 打码",
+      "metaTitle": "PDF 涂黑 ≠ 打码：为什么黑框不是脱敏",
+      "metaDescription": "黑框遮不住 PDF 里的文字。本文讲清文字层与图片层的区别、真脱敏的两步做法，以及本工具对扫描件的已知局限。",
+      "metaKeywords": "PDF脱敏,PDF打码,黑框脱敏,文字层,马赛克,敏感信息",
+      "published": "2026-11-13",
+      "reading": "阅读约 5 分钟",
+      "toolLabel": "对应工具：",
+      "localeNotice": "",
+      "ctaTitle": "想直接试一次？",
+      "ctaBody": "拖入 PDF，关键词定位或手动框选，删文字层 + 马赛克遮盖，最后逐框复检。",
+      "ctaButton": "去脱敏 →"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "dashboard": "Home",
+    "dashboard": "Tools",
     "properties": "Properties",
     "fileAssembly": "File Assembly",
     "printSplit": "Print Split",
@@ -22,7 +22,9 @@
   },
   "dashboard": {
     "heroTitle": "Document Processing, Simplified",
-    "heroSubtitle": "14 features for format conversion, PDF editing, document standardization and more"
+    "heroSubtitle": "14 features for format conversion, PDF editing, document standardization and more",
+    "metaTitle": "Tool dashboard",
+    "metaDescription": "The in-app home for all 14 document tools."
   },
   "status": {
     "title": "Usage Statistics",
@@ -274,6 +276,7 @@
   "pdfRedact": {
     "title": "PDF Redaction",
     "description": "Upload a PDF, mark sensitive areas with boxes or keyword search, and download a mosaic-redacted copy. The original is never modified.",
+    "guideLink": "Read the guide: black boxes are not redaction",
     "hint": ".pdf only, up to 100 MB per file. Decrypt password-protected PDFs first.",
     "tooLarge": "File exceeds the 100 MB limit",
     "uploading": "Uploading",
@@ -328,7 +331,6 @@
       "desc": "Generate a different random password each time",
       "length": "Password Length",
       "charTypes": "Character Types",
-      "charTypesHint": "Select at least one",
       "uppercase": "Uppercase A-Z",
       "lowercase": "Lowercase a-z",
       "digits": "Digits 0-9",
@@ -350,7 +352,6 @@
       "toggleVisibility": "Show/hide salt",
       "length": "Password Length",
       "charTypes": "Character Types",
-      "charTypesHint": "Select at least one",
       "uppercase": "Uppercase A-Z",
       "lowercase": "Lowercase a-z",
       "digits": "Digits 0-9",
@@ -366,6 +367,98 @@
       "copied": "Copied",
       "errorNoClass": "Please select at least one character type",
       "errorNoInput": "Please fill in the variable name and salt"
+    }
+  },
+  "landing": {
+    "hero": {
+      "no": "鹊随金印 · Document Toolbox · Free to use",
+      "title": "Document & Official Writing Toolbox",
+      "sub": "Markdown to GB/T 9704 · PDF redaction · format cleanup · no account, no install",
+      "lede": "For anyone who has lost an afternoon to formatting: turn Markdown into a GB/T 9704-compliant document, and mask phone numbers and ID numbers in a PDF — the text layer underneath is deleted, not merely covered. No install, no account, use it and go.",
+      "primary": "Open all tools",
+      "secondary": "PDF redaction"
+    },
+    "tools": {
+      "kicker": "TOOLS",
+      "title": "Fourteen small tools, one job each",
+      "note": "Click and use it — no login wall, no setup.",
+      "groupOfficial": "Official format",
+      "groupPdf": "PDF",
+      "groupOffice": "Office & metadata",
+      "groupImage": "Images",
+      "groupOther": "More",
+      "flagSignature": "Flagship",
+      "flagTextDeleted": "Text deleted"
+    },
+    "promise": {
+      "kicker": "PRIVACY",
+      "title": "Deleted after processing — exceptions listed below",
+      "sub": "Every line below is checkable in our source — we only claim what is true today.",
+      "item1Title": "Single-step tools: gone when the response ends",
+      "item1Body": "The upload and the result are deleted in the same response. Nothing is archived or indexed. Tools that take several steps are the exception — each is listed below.",
+      "item2Title": "Uncollected files last at most 7 days",
+      "item2Body": "A daily sweeper clears entries in the temporary directory older than 7 days, for every user alike. Redaction session directories are the exception — see below.",
+      "item3Title": "No file names or contents in the usage ledger",
+      "item3Body": "It holds the module name, duration, outcome and a request id — enough to count which tool ran, not enough to reconstruct a single file.",
+      "notesTitle": "Exceptions, stated plainly",
+      "note1Title": "Exception: three two-step tools",
+      "note1Body": "MD to DOCX, Format DOCX and Print Split all run as generate-then-download, so both your upload and the result stay in a server temporary directory and are swept after at most 7 days; downloading does not delete them.",
+      "note2Title": "Exception: PDF Redaction and PDF Editor",
+      "note2Body": "A redaction upload stays on the server while you mark it up: it is deleted when you download, and the page tries to notify the server when you leave. An abandoned session is only reclaimed the next time someone opens that tool, by an expiry sweep. Page images rendered when you open a file in PDF Editor stay in the temporary directory for at most 7 days; the upload itself is deleted immediately.",
+      "note3Title": "We do log IP and browser",
+      "note3Body": "Those two columns are the only basis for unique-visitor counts. The IP comes from the X-Forwarded-For proxy header (or the direct connection address when there is no proxy), and the user agent is truncated to 200 characters.",
+      "note4Title": "Operational logs may carry file paths",
+      "note4Body": "When a deletion fails or an exception is thrown, the operational log records the temporary file path and a stack trace; the path may contain the name you uploaded with. Those logs are kept for 30 days. The usage ledger holds none of this."
+    },
+    "resource": {
+      "kicker": "RESOURCES",
+      "title": "Know the standard, then use the tool",
+      "note": "Four references on this site. No sign-up.",
+      "standardDesc": "The GB/T 9704 text itself — font sizes, line spacing, dates.",
+      "toolsDesc": "All fourteen tools in one grid.",
+      "statsDesc": "Module calls and unique visitors — this site counts itself too.",
+      "guideTitle": "PDF redaction guide",
+      "guideDesc": "Why a black box fails, and where scanned PDFs fall short."
+    },
+    "meta": {
+      "title": "Online toolbox for official documents",
+      "description": "DocStamp: Markdown to GB/T 9704, PDF redaction, Word formatting, PDF merge and compress. Most tools delete results right away — every exception is listed on the home page. Free, no sign-up.",
+      "keywords": "GB/T 9704,official document format,markdown to official document,PDF redaction,PDF mosaic,PDF merge,PDF compress,Word format cleanup"
+    },
+    "nav": {
+      "ariaLabel": "Landing navigation",
+      "tools": "Tools",
+      "promise": "Privacy",
+      "resources": "Resources",
+      "cta": "Open the tools"
+    },
+    "footer": {
+      "toolsTitle": "Tools",
+      "resourcesTitle": "Resources",
+      "allTools": "All tools",
+      "stats": "Usage stats",
+      "guide": "Guide",
+      "standard": "GB/T 9704-2012 (original PDF)",
+      "tagline": "One-stop document toolbox. No account, no install, no ads.",
+      "copyright": "© 2025-2026 鹊随金印 · doc.sujx.net",
+      "icp": "",
+      "contact": "sujx{'@'}live.cn"
+    }
+  },
+  "guide": {
+    "pdfRedact": {
+      "kicker": "GUIDE · Redaction",
+      "title": "PDF black boxes are not redaction",
+      "metaTitle": "Black boxes are not redaction: how PDF redaction really works",
+      "metaDescription": "A black box does not hide the text layer. What real redaction does, and the known limits of this tool on scanned PDFs.",
+      "metaKeywords": "PDF redaction, black box, text layer, mosaic, sensitive data",
+      "published": "2026-11-13",
+      "reading": "About 5 min read",
+      "toolLabel": "Tool:",
+      "localeNotice": "This guide is currently available in Chinese only.",
+      "ctaTitle": "Want to try it?",
+      "ctaBody": "Upload a PDF, locate with keywords or draw boxes, then delete the text layer and cover it with mosaic — every box is re-checked.",
+      "ctaButton": "Open redaction tool →"
     }
   }
 }

@@ -45,6 +45,6 @@ const errorMessage = computed(() => {
 });
 
 function handleError() {
-  clearError({ redirect: "/" });
+  clearError({ redirect: "/tools" });
 }
 </script>

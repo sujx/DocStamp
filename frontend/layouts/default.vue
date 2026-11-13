@@ -43,16 +43,18 @@ watch(() => route.fullPath, (path) => {
   trackPageView(path);
 }, { immediate: true });
 
+const localeHead = useLocaleHead({ seo: false, dir: false });
+
 useHead({
   titleTemplate: "%s - 鹊随金印",
   meta: [
-    { name: "description", content: "鹊随金印 — 一站式文档处理工具箱。MD转公文、文档转MD、PDF编辑、视频转换、Excel合并等14项功能，即开即用。" },
+    { name: "description", content: "鹊随金印 — 一站式文档处理工具箱。Markdown 转 GB/T 9704 公文、PDF 脱敏打码、Word 格式规范、PDF 合并压缩页码、Excel 合并、属性清理，即开即用。" },
     { name: "theme-color", content: "#3B63D8" },
-    { name: "keywords", content: "文档处理,PDF转换,MD转DOCX,视频转换,Excel合并,GB/T 9704" },
+    { name: "keywords", content: "文档处理,公文格式,GB/T 9704,Markdown转公文,PDF脱敏,PDF合并,PDF压缩,Word格式规范,Excel合并" },
     { property: "og:title", content: "鹊随金印 - 文档处理工具箱" },
     { property: "og:description", content: "一站式文档处理，14项功能，即开即用" },
     { property: "og:type", content: "website" },
   ],
-  htmlAttrs: { lang: "zh-CN" },
+  htmlAttrs: computed(() => localeHead.value?.htmlAttrs ?? {}),
 });
 </script>

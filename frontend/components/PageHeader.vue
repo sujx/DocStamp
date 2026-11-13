@@ -18,6 +18,6 @@ withDefaults(defineProps<{
   title?: string
   description?: string
 }>(), {
-  backTo: "/",
+  backTo: "/tools",
 });
 </script>

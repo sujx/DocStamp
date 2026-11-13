@@ -19,13 +19,33 @@ ARG NODE_HEAP=2048
 ENV NODE_OPTIONS="--max-old-space-size=${NODE_HEAP}"
 
 # BUST_FRONTEND: pass --build-arg BUST_FRONTEND=$(date +%s) to force
-# npm run build to re-execute while keeping npm ci + apt + pip cached.
+# npm run build to re-execute while keeping npm ci + apt + uv cached.
 # Must be referenced in the RUN command itself, not just declared as ARG.
 ARG BUST_FRONTEND
 RUN BUST_FRONTEND=${BUST_FRONTEND} npm run build
 
-# ── Stage 2: Python 3.12 runtime ────────────────────────────────────
-FROM python:3.12-slim-bookworm
+# ── Stage 2: Resolve Python dependencies with uv ─────────────────────
+# Own stage so uv and its cache never reach the runtime image — Stage 3 copies
+# the finished venv out. MUST use the same base as Stage 3: the venv's
+# interpreter is a symlink to /usr/local/bin/python3.13.
+FROM python:3.13-slim-bookworm AS backend-deps
+
+# Both indexes point at the Aliyun mirror the old pip install used; this box
+# and the ECS host sit behind the CN network where pypi.org crawls.
+# uv itself is pinned because backend/uv.lock is written at lock revision 5.
+ENV PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/ \
+    UV_DEFAULT_INDEX=https://mirrors.aliyun.com/pypi/simple/ \
+    UV_NO_CACHE=1
+RUN pip install --no-cache-dir --break-system-packages uv==0.13.7
+
+WORKDIR /opt/docstamp
+# Lock and manifest only: this layer re-runs when dependencies change, not on
+# every code edit. `package = false` means uv never needs the source tree.
+COPY backend/pyproject.toml backend/uv.lock ./
+RUN uv sync --frozen --no-dev
+
+# ── Stage 3: Python 3.13 runtime ─────────────────────────────────────
+FROM python:3.13-slim-bookworm
 
 # Alibaba Cloud Debian mirror
 RUN sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list.d/debian.sources \
@@ -43,27 +63,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
-# Install Python dependencies (Alibaba mirror, fallback to PyPI)
-COPY backend/pyproject.toml ./
-RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ \
-    && pip install --break-system-packages --no-cache-dir --root-user-action=ignore \
-        flask flask-cors flask-babel flask-caching \
-        python-docx openpyxl python-pptx \
-        markdown bleach img2pdf pypdf Pillow reportlab \
-        gunicorn pydantic cryptography pdfminer.six requests python-dotenv \
-        PyMuPDF \
-    || pip install --break-system-packages --no-cache-dir --root-user-action=ignore \
-        flask flask-cors flask-babel flask-caching \
-        python-docx openpyxl python-pptx \
-        markdown bleach img2pdf pypdf Pillow reportlab \
-        gunicorn pydantic cryptography pdfminer.six requests python-dotenv \
-        PyMuPDF \
-    && gunicorn --version \
-    && rm -rf /usr/local/lib/python3.12/site-packages/pip \
-    && rm -rf /usr/local/lib/python3.12/site-packages/setuptools \
-    && find /usr/local/lib/python3.12 -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null; true \
-    && find /usr/local/lib/python3.12 -type f -name "*.pyc" -delete 2>/dev/null; true \
-    && find /usr/local/lib/python3.12/site-packages/babel/locale-data -type f \
+# Runtime dependencies come from the uv-resolved venv, so there is no install
+# list here to drift out of sync with backend/pyproject.toml any more.
+# `gunicorn --version` also proves the venv is on PATH before anything else.
+COPY --from=backend-deps /opt/docstamp/.venv /opt/docstamp/.venv
+ENV PATH="/opt/docstamp/.venv/bin:${PATH}"
+RUN gunicorn --version \
+    && rm -rf /usr/local/lib/python3.13/site-packages/pip \
+    && rm -rf /usr/local/lib/python3.13/site-packages/setuptools \
+    && find /usr/local/lib/python3.13 /opt/docstamp/.venv -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null; true \
+    && find /usr/local/lib/python3.13 /opt/docstamp/.venv -type f -name "*.pyc" -delete 2>/dev/null; true \
+    && find /opt/docstamp/.venv/lib/python3.13/site-packages/babel/locale-data -type f \
         ! -name "en*" ! -name "zh*" -delete 2>/dev/null; true
 
 # Copy backend code

@@ -38,8 +38,8 @@ docs/
 # Nuxt 4 migration leftovers (srcDir default changed to app/)
 app/
 
-# Poetry
-poetry.lock
+# uv — `uv.lock` is tracked on purpose: `uv sync --frozen` in the Dockerfile
+# resolves from it, so the image and every dev box install the same versions.
 
 # Docker
 # .dockerignore is tracked on purpose: without it the build context includes
