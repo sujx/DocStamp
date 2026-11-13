@@ -14,6 +14,8 @@
 | UI 库 | Nuxt UI v2 | ^2.21 |
 | CSS | Tailwind CSS v3 | tailwind.config.ts |
 | i18n | @nuxtjs/i18n v9 | zh-CN / en |
+| 后端运行时 | Python | 3.13 |
+| 后端依赖管理 | uv (`pyproject.toml` + `uv.lock`) | lock revision 5 |
 | 后端框架 | Flask | ^3.1 |
 | 参数校验 | Pydantic v2 | ^2.13 |
 | 异步任务 | 无独立 worker；每日临时文件清理由 gunicorn `on_starting` 启动的守护线程负责 | backend/utils/file_cleanup.py |
@@ -37,6 +39,8 @@ docStamp/
 │   ├── fill_zh_po.py         # 中文消息表 → translations/zh_Hans_CN/…/messages.po
 │   ├── translations/           # messages.pot + zh_Hans_CN/LC_MESSAGES/messages.{po,mo}
 │   ├── gunicorn.conf.py        # 生产: bind 0.0.0.0:5000, workers=2, on_starting 启动每日清理
+│   ├── pyproject.toml          # 后端依赖唯一声明处 (uv, requires-python >=3.13)
+│   ├── uv.lock                 # 锁文件，与 pyproject.toml 一起提交；镜像构建按它 --frozen 安装
 │   ├── blueprints/             # HTTP 路由层 (每功能一个文件)
 │   ├── services/               # 业务逻辑层 (纯函数，零 Flask 依赖，返回 ServiceResult[T])
 │   └── utils/                  # 通用工具 (file_security / file_cleanup / rate_limit / retry / crypto)
@@ -89,11 +93,15 @@ bash /root/sync-from-windows.sh              # 默认同步全仓库跟踪文件
 bash /root/sync-from-windows.sh frontend     # 只传某个 pathspec 时缩小范围
 ```
 
-后端依赖装在 `backend/.venv`，`manage.sh` 调裸 `python3`，**每个新会话必须先激活 venv**：
+后端依赖由 **uv** 管理：`backend/pyproject.toml` 是唯一声明处，`backend/uv.lock` 锁死版本，环境建在 `backend/.venv`。入口一律走 `uv run`（`manage.sh` 已改），**「每个新会话先激活 venv」这一步已经作废**——`uv run` 会按锁文件自动对齐环境：
 
 ```bash
-source backend/.venv/bin/activate   # 不加这一步 ./manage.sh start 会报 ModuleNotFoundError: flask
+cd backend && uv sync                 # 首次 clone 或改依赖后；默认就装 dev 组
+uv run pytest tests/ -v               # 等价于 ../manage.sh test
+uv run mypy --strict <文件或包>       # 别用 /usr/bin/mypy：它走系统解释器的 site-packages，看不见 .venv
 ```
+
+加依赖用 `uv add <pkg>` / `uv add --dev <pkg>`，`pyproject.toml` 和 `uv.lock` 一起提交。镜像构建走 `uv sync --frozen --no-dev`，dev 组不进镜像。国内网络下 `pypi.org` 只有几百 kB/s，需要镜像时临时加 `UV_DEFAULT_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple`——只在环境变量里换，写进 `pyproject.toml` 会把 `uv.lock` 的 registry 全部改写到国内源。
 
 **WSL 已知环境差异**：AlmaLinux 无 `/etc/mime.types`，`mimetypes.guess_type("x.docx")` 返回 `None`，故 `tests/test_routes_critical.py::test_download_reports_binary_mimetype` 在 WSL 必失败（生产 Debian 镜像有该表，非代码缺陷）；其余 199 条用例为准。
 
@@ -241,6 +249,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 - `.env` 不进镜像，通过 compose `${VAR}` 注入
 - HEALTHCHECK 在 compose 中定义（打 `/api/v1/health`）
 - npm ci 需要 lockfile 同步
+- Python 依赖在 Stage 2 由 `uv sync --frozen --no-dev` 按 `backend/uv.lock` 解析，Stage 3 只拷成品 venv（两个 Stage 的 `python:3.13-slim-bookworm` 必须同版本，venv 里的解释器是软链）。`Dockerfile` 里不再有 pip 包清单，加依赖只改 `pyproject.toml` + `uv.lock`；`.dockerignore` 的 venv 规则是 `**/.venv/`——dockerignore 锚定构建上下文根，裸写 `.venv/` 挡不住 `backend/.venv`
 
 ## 统计持久化
 
@@ -254,7 +263,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 
 | 事项 | 为何未做 |
 |------|----------|
-| 服务器切到单容器新镜像 | 已定「服务器上先不动，后期更新 docker 镜像来解决」。本机镜像已验收（健康检查 200、SPA 217KB、`X-API-Version: 3.7`、pandoc 2.17.1.1 / pdftoppm 22.12.0、`.cleanup-stamp` 与 tasks.db(WAL) 正常落盘），但生产切换未经实证 |
+| 服务器切到单容器新镜像 | 已定「服务器上先不动，后期更新 docker 镜像来解决」。本机镜像已验收（健康检查 200、SPA 217KB、`X-API-Version: 3.7`、pandoc 2.17.1.1 / pdftoppm 22.12.0、`.cleanup-stamp` 与 tasks.db(WAL) 正常落盘），但生产切换未经实证。v3.11.0（Python 3.13 + uv）本机重跑过同一串：health 200 + `X-API-Version: 3.11.0`、SPA 239KB、`gunicorn` 从 `/opt/docstamp/.venv/bin` 解析、镜像内无 `uv`、4 worker 日志正常落盘；同样只是本机证据，生产切换仍未实证 |
 | 服务器运维 `.env` 删掉 AI / DeepSeek 残留行 | 仓库与开发机均无 `.env`（gitignored）；compose 已不再注入该变量，这行现在是惰性的，但 key 已吊销 |
 | `Dockerfile` 的 `CMD` 补 `--workers` | compose 传了 `--workers 2`，裸 `docker run` 会落到 `gunicorn.conf.py` 的 `min(8, cpu*2+1)`（2 核 = 5 个 worker）。生产走 compose 故被兜住 |
 | 删掉 `backend/gunicorn.conf.py` 的 `pidfile` | `"/var/run/docstamp.pid"` 恒被 `Dockerfile` 与 compose 的 `--pid /tmp/gunicorn.pid` 覆盖，且 `docstamp` 用户对 `/var/run` 无写权，属死配置 |
@@ -264,7 +273,8 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 
 | 事项 | 为何未做 |
 |------|----------|
-| 开发模式没有清理线程 | 每日清理只挂在 gunicorn `on_starting`，`python app.py` 不起它，dev 机器只能 `./manage.sh clean-output` 手动清 |
+| 开发模式没有清理线程 | 每日清理只挂在 gunicorn `on_starting`，`uv run python app.py` 不起它，dev 机器只能 `./manage.sh clean-output` 手动清 |
+| 后端 `mypy --strict` 不是门槛 | v3.11.0 迁 uv 时实测：`uv run mypy --ignore-missing-imports --strict --explicit-package-bases $(git ls-files '*.py')` 报 **319 errors / 43 files**，全是存量（118 条 `no-untyped-def` + 63 条 `type-arg` + 55 条 `arg-type`）。`pyproject.toml` 写着 `strict = true`、`backend/.pre-commit-config.yaml` 也挂了 mypy，但 `.git/hooks/pre-commit` 不存在，所以这道门槛从未跑过。要修属一整批，不在依赖迁移里顺带动 |
 
 ### 前端组件
 

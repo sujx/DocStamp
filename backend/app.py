@@ -88,7 +88,7 @@ def create_app() -> Flask:
 
     @app.after_request
     def _set_version_header(response):
-        response.headers["X-API-Version"] = "3.9.3"
+        response.headers["X-API-Version"] = "3.11.0"
         return response
 
     @app.after_request

@@ -4,11 +4,15 @@
 # into every image built here — and those images get pushed to ACR.
 
 # ── VCS & tooling ────────────────────────────────────────────────────
+# Patterns here are anchored to the context root, unlike .gitignore — a bare
+# ".venv/" would miss backend/.venv, which uv creates. Copying that host
+# environment in would ship a 300 MB context and let COPY overwrite the
+# image's own `uv sync --frozen` result.
 .git
 .gitignore
 .gitattributes
-.venv/
-venv/
+**/.venv/
+**/venv/
 
 # ── Frontend deps & build output (rebuilt inside the image) ──────────
 frontend/node_modules/

@@ -452,6 +452,16 @@ API 容器健康检查 `curl /api/v1/health`。容器以非 root 用户 `docstam
 
 ## 十一、版本历史
 
+### v3.11.0 (2026-11)
+
+- **后端运行时 Python 3.12 → 3.13，依赖管理 Poetry → uv**：`backend/pyproject.toml` 由 Poetry 方言（`[tool.poetry.dependencies]` + `[tool.poetry.group.dev.dependencies]` + `poetry-core` build-backend）改写为 PEP 621 `[project]` + PEP 735 `[dependency-groups]`，`requires-python` `^3.12` → `>=3.13`，`package-mode = false` → `[tool.uv] package = false`。删 `backend/poetry.toml`（它的 `virtualenvs.in-project` 由 uv 默认在项目根建 `.venv` 取代），新增 `backend/.python-version`（3.13）与**入库**的 `backend/uv.lock`（65 个包，lock revision 5）；`.gitignore` 的 `poetry.lock` 段替换为「uv.lock 为什么要跟踪」的说明。解析结果：flask 3.1.3 / pydantic 2.14.3 / pillow 11.3.0（原 `^10`）/ pymupdf 1.28.2 / cryptography 48.0.1
+- **Dockerfile 里的手抄 pip 清单删除**：Stage 2 原本 `pip install --break-system-packages flask flask-cors …` 写两遍（带 `||` 回退），与 `pyproject.toml` 是两份独立声明且已经漂移（清单里没有 weasyprint）。现改三阶段：Stage 1 前端不动；Stage 2 `python:3.13-slim-bookworm` 内 `pip install uv==0.13.7` 后 `uv sync --frozen --no-dev`，只 `COPY` `pyproject.toml` + `uv.lock`，依赖层从此不随代码改动重装；Stage 3 同基础镜像，`COPY --from=backend-deps /opt/docstamp/.venv` 成品 venv 并前置到 `PATH`，`gunicorn --version` 保留作冒烟。两个 Stage 的镜像必须逐字一致——venv 里的 `bin/python` 是指向 `/usr/local/bin/python3.13` 的软链。babel `locale-data` 剪枝与 `__pycache__`/`.pyc` 清理的目标路径随之从系统 `site-packages` 挪到 venv（实测 1084 个文件 / 32 MB → 138 个 / 1.3 MB，只留 `en*`/`zh*`）。`uv` 只在 Stage 2 出现、不进最终镜像；系统 `pip` 的包体照旧删掉，`/usr/local/bin/pip` 那层壳仍在、调用即 Traceback——与迁移前的镜像行为一致
+- **`.dockerignore` 的 venv 规则改成 `**/.venv/`**：dockerignore 锚定构建上下文根，与 gitignore「不含斜杠即匹配任意深度」的语义相反，原来的裸 `.venv/` 挡不住 `backend/.venv`——真挡不住就是几百 MB 的上下文，且随后的 `COPY backend/ ./backend/` 会把宿主机那份 venv 盖进镜像里 uv 刚解析好的成品上
+- **`manage.sh` 走 uv**：`python3 app.py` → `uv run python app.py`、`python3 -m pytest` → `uv run pytest`，新增 `_require_uv`（只挂在跑本机后端的入口，`docker-up` 不需要）。AGENTS.md 里「每个新会话必须先 `source backend/.venv/bin/activate`」的仪式作废，`uv run` 自己按锁文件对齐环境
+- **依赖增删**：`weasyprint` 从声明中删除——全仓库无一处 `import weasyprint`，旧 pip 清单里也没有它（DOCX→PDF 走 pandoc），只有 README 的依赖表还挂着；`Pillow` `^10` → `>=11,<12`，代码未用到 11 移除的 `ANTIALIAS` 一类旧常量
+- **`X-API-Version` 3.9.3 → 3.11.0**：v3.10.0 发版时漏 bump，本批跟上，恢复「打一次 curl 即可确认线上镜像」
+- **验证**：`uv lock --check` 与 `uv sync` 全绿；`uv run pytest tests/ -v` **200 passed**（含在有 `/etc/mime.types` 的 Debian 上通过的 `test_download_reports_binary_mimetype`；AGENTS.md 的「AlmaLinux 必失败」仍成立）；`./manage.sh backend` 起得来、`stop` 停得掉（uv 转发 SIGTERM 有效），curl 直接看到 `X-API-Version: 3.11.0`；`docker build` 全量通过并实跑容器（Debian 本机，基础镜像走 daemon 里已配的 registry mirror）——容器内 `python -V` = 3.13.18、`command -v gunicorn` = `/opt/docstamp/.venv/bin/gunicorn`、`command -v uv` 为空、`/api/v1/health` 200、`/` 返回 239 KB SPA、`/api/v1/stats/modules` 出 JSON、4 个 worker 正常写 `access.log`/`app.log`/`error.log`，且 `backend/.venv` 未泄漏进镜像；`uv run mypy --strict` 报 319 errors / 43 files 属**存量**——仓库没有安装 `pre-commit` 钩子，strict 从未真正成为门槛，报错集中在 118 条 `no-untyped-def` 与 63 条 `type-arg`，本批未改任何 `.py` 业务逻辑，故不构成本批回归
+
 ### v3.10.0 (2026-11)
 
 - **新增「密码生成」工具**：纯前端实现，包含两个平行模块——随机密码（`crypto.getRandomValues` + 拒绝采样消除模偏差）和可复现密码（`crypto.subtle.digest('SHA-256', ...)` + 计数器模式扩展 + 确定性 Fisher-Yates 洗牌）。支持密码长度 8-128、四类字符可选、排除易混淆字符、批量生成（随机模式最多 20 条）、熵值实时显示。所有计算在浏览器本地完成，零数据留存、零网络传输

@@ -29,8 +29,8 @@
 
 | 层 | 技术 |
 |------|------|
-| **后端框架** | Python 3.12 + Flask 3 + Pydantic v2 |
-| **后端依赖** | Flask-CORS / Flask-Babel / Flask-Caching / python-docx / openpyxl / python-pptx / img2pdf / pypdf / Pillow / reportlab / WeasyPrint / markdown / bleach / pdfminer.six / PyMuPDF / requests / python-dotenv / cryptography |
+| **后端框架** | Python 3.13 + Flask 3 + Pydantic v2 |
+| **后端依赖** | Flask-CORS / Flask-Babel / Flask-Caching / python-docx / openpyxl / python-pptx / img2pdf / pypdf / Pillow / reportlab / markdown / bleach / pdfminer.six / PyMuPDF / requests / python-dotenv / cryptography（uv 管理，`backend/uv.lock` 锁定） |
 | **文档工具链** | pandoc / poppler-utils（容器内已安装） |
 | **前端框架** | Nuxt 3.15.4 (SPA) + Nuxt UI v2 + Tailwind CSS v3 |
 | **国际化** | @nuxtjs/i18n v9（zh-CN / en） |
@@ -41,11 +41,8 @@
 ### 本地开发
 
 ```bash
-# 安装后端依赖（或用 poetry install）
-cd backend && pip3 install --break-system-packages flask flask-cors flask-babel \
-    flask-caching python-docx openpyxl python-pptx img2pdf pypdf Pillow reportlab \
-    gunicorn pydantic cryptography weasyprint markdown bleach pdfminer.six \
-    PyMuPDF requests python-dotenv
+# 安装后端依赖：uv 按 backend/uv.lock 建好 backend/.venv（含 dev 组），无需手工激活
+cd backend && uv sync
 
 # 安装前端依赖
 cd ../frontend && npm install
@@ -106,7 +103,7 @@ docStamp/
 │   ├── pages/                  # 17 个路由页面
 │   └── i18n/locales/           # zh-CN / en
 ├── docker-compose.yml          # 单容器编排（api）
-├── Dockerfile                  # 多阶段构建（node:22-alpine + python:3.12-slim）
+├── Dockerfile                  # 多阶段构建（node:22-alpine + uv 解析依赖 + python:3.13-slim 运行）
 ├── docker-entrypoint.sh        # Docker 入口（运行时目录 + volume 权限）
 ├── manage.sh                   # 开发/部署管理脚本
 ├── SPEC.md                     # 详细设计规范

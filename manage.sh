@@ -14,6 +14,9 @@
 #   ./manage.sh docker-up   启动 Docker 部署（单容器）
 #   ./manage.sh docker-down 停止 Docker 部署
 #   ./manage.sh clean-output 清理 output 目录
+#
+# 后端依赖由 uv 管理（backend/pyproject.toml + backend/uv.lock），
+# 所有 Python 入口都走 `uv run`，不需要先激活 backend/.venv。
 # ───────────────────────────────────────────────────────────────────
 
 set -euo pipefail
@@ -38,6 +41,14 @@ log_warn()  { echo -e "${YELLOW}[docStamp]${NC} $*"; }
 log_error() { echo -e "${RED}[docStamp]${NC} $*"; }
 
 _mkdir_pid() { mkdir -p "$PID_DIR"; }
+
+# Docker 路径不需要 uv（镜像里自带环境），所以只在跑本机后端的入口检查。
+_require_uv() {
+    if ! command -v uv >/dev/null 2>&1; then
+        log_error "未找到 uv，后端环境无法运行。安装：https://docs.astral.sh/uv/getting-started/installation/"
+        exit 1
+    fi
+}
 
 _is_running() {
     local pid_file="$1"
@@ -88,6 +99,7 @@ _force_stop_port() {
 }
 
 _start_backend() {
+    _require_uv
     if [[ -f "$BACKEND_PID" ]]; then
         local old_pid
         old_pid=$(cat "$BACKEND_PID" 2>/dev/null || true)
@@ -102,7 +114,7 @@ _start_backend() {
     _force_stop_port "$BACKEND_PORT"
     log_info "启动后端 (Flask, 端口 $BACKEND_PORT)..."
     cd "$BACKEND_DIR"
-    python3 app.py > "$PID_DIR/backend.log" 2>&1 &
+    uv run python app.py > "$PID_DIR/backend.log" 2>&1 &
 
     local pid=$!
     echo "$pid" > "$BACKEND_PID"
@@ -221,15 +233,17 @@ case "${1:-}" in
         log_info "Docker 部署已停止"
         ;;
     test)
+        _require_uv
         log_info "运行后端测试..."
         cd "$BACKEND_DIR"
-        python3 -m pytest tests/ -v
+        uv run pytest tests/ -v
         cd "$PROJECT_DIR"
         ;;
     test-cov)
+        _require_uv
         log_info "运行后端测试（含覆盖率）..."
         cd "$BACKEND_DIR"
-        python3 -m pytest tests/ --cov=./ --cov-report=term
+        uv run pytest tests/ --cov=./ --cov-report=term
         cd "$PROJECT_DIR"
         ;;
     clean-output)
