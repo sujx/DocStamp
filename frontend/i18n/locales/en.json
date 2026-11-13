@@ -276,6 +276,7 @@
   "pdfRedact": {
     "title": "PDF Redaction",
     "description": "Upload a PDF, mark sensitive areas with boxes or keyword search, and download a mosaic-redacted copy. The original is never modified.",
+    "guideLink": "Read the guide: black boxes are not redaction",
     "hint": ".pdf only, up to 100 MB per file. Decrypt password-protected PDFs first.",
     "tooLarge": "File exceeds the 100 MB limit",
     "uploading": "Uploading",
@@ -412,10 +413,12 @@
     "resource": {
       "kicker": "RESOURCES",
       "title": "Know the standard, then use the tool",
-      "note": "Three references already on this site. No sign-up.",
+      "note": "Four references on this site. No sign-up.",
       "standardDesc": "The GB/T 9704 text itself — font sizes, line spacing, dates.",
       "toolsDesc": "All fourteen tools in one grid.",
-      "statsDesc": "Module calls and unique visitors — this site counts itself too."
+      "statsDesc": "Module calls and unique visitors — this site counts itself too.",
+      "guideTitle": "PDF redaction guide",
+      "guideDesc": "Why a black box fails, and where scanned PDFs fall short."
     },
     "meta": {
       "title": "Online toolbox for official documents",
@@ -434,11 +437,28 @@
       "resourcesTitle": "Resources",
       "allTools": "All tools",
       "stats": "Usage stats",
+      "guide": "Guide",
       "standard": "GB/T 9704-2012 (original PDF)",
       "tagline": "One-stop document toolbox. No account, no install, no ads.",
       "copyright": "© 2025-2026 鹊随金印 · doc.sujx.net",
       "icp": "",
       "contact": "sujx{'@'}live.cn"
+    }
+  },
+  "guide": {
+    "pdfRedact": {
+      "kicker": "GUIDE · Redaction",
+      "title": "PDF black boxes are not redaction",
+      "metaTitle": "Black boxes are not redaction: how PDF redaction really works",
+      "metaDescription": "A black box does not hide the text layer. What real redaction does, and the known limits of this tool on scanned PDFs.",
+      "metaKeywords": "PDF redaction, black box, text layer, mosaic, sensitive data",
+      "published": "2026-11-13",
+      "reading": "About 5 min read",
+      "toolLabel": "Tool:",
+      "localeNotice": "This guide is currently available in Chinese only.",
+      "ctaTitle": "Want to try it?",
+      "ctaBody": "Upload a PDF, locate with keywords or draw boxes, then delete the text layer and cover it with mosaic — every box is re-checked.",
+      "ctaButton": "Open redaction tool →"
     }
   }
 }

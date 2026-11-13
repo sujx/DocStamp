@@ -296,7 +296,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 | PDF 编辑的 `thumbs_*` 页面图片有人删 | `backend/blueprints/pdf_editor_bp.py:86-87,92-107` 渲染最多 50 张页面 PNG，`:125-126` 的 `finally` 只删上传件；全仓库无任何删除点，页面图片留到 7 天清扫。做到才能把它并进「响应结束即删」 |
 | `operation_logs.file_size` 接上真实体积或删列 | 列存在但无任何调用方传值（`backend/models.py:135` 默认 0，`app.py:111-125` 与 `blueprints/stats_bp.py:37-48` 都不传），每行恒为 0；承诺带 item3 的「体积」因此被去掉 |
 | 日志不再存 IP + UA（若决定匿名化） | `/status` 独立访客去重靠这两列（`backend/app.py:118-122`、`backend/models.py:52-65`），动了是功能减级 |
-| 教程页 `/guide/*` 与政策/条款页 | 本批范围外 |
+| 其余教程与政策/条款页 | 已落地一篇 `/guide/pdf-redact`（宣传页资源区、页脚、脱敏页、sitemap 均已接入）；其余教程及隐私政策/服务条款/更新日志仍无页面，原型里全是 `href="#"` 占位。每篇都要先把文案对代码核实，故不一次铺开 |
 | 删掉 4 个零入链的孤儿路由页 | `frontend/pages/{metadata-clean,page-decorate,pdf-compress,pdf-to-text}.vue`；删页面属改仓库内容，需单独确认 |
 | `manage.sh clean-output` 清不掉目录 | `manage.sh:251` 用 `rm -f` + glob：退出码 1、目录残留、跳过点文件。生产清理走 `backend/utils/file_cleanup.py` 是对的，只有 dev 手动清理受影响；建议改为调用 Python 清理入口 |
 | `LanguageSwitcher` 28px 触摸目标 | 共享组件 scoped CSS 写死 `height: 28px`，本批只在 `LandingNav` 用 `:deep()` 局部提到 44px；根治要改共享组件，影响侧栏，属独立一批 |

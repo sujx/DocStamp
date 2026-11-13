@@ -276,6 +276,7 @@
   "pdfRedact": {
     "title": "PDF 脱敏",
     "description": "上传 PDF，框选或按关键词标记敏感内容，生成带马赛克的新 PDF（原文件不改动）",
+    "guideLink": "阅读教程：PDF 涂黑 ≠ 打码",
     "hint": "仅支持 .pdf，单文件最大 100 MB；加密 PDF 请先解密",
     "tooLarge": "文件超过 100 MB 上限",
     "uploading": "上传中",
@@ -412,10 +413,12 @@
     "resource": {
       "kicker": "RESOURCES / 资源",
       "title": "先懂标准，再用工具",
-      "note": "站内已有的三份参照，不用注册。",
+      "note": "站内已有的四份参照，不用注册。",
       "standardDesc": "国标原文，字号、行距、成文日期对着查。",
       "toolsDesc": "十四件工具一览，点开即用。",
-      "statsDesc": "各模块调用量与独立访客，本站自己也在被统计。"
+      "statsDesc": "各模块调用量与独立访客，本站自己也在被统计。",
+      "guideTitle": "PDF 脱敏教程",
+      "guideDesc": "黑框为什么不算脱敏，扫描件又差在哪。"
     },
     "meta": {
       "title": "公文与文档在线工具箱",
@@ -434,11 +437,28 @@
       "resourcesTitle": "资源",
       "allTools": "全部工具",
       "stats": "使用情况",
+      "guide": "使用教程",
       "standard": "GB/T 9704-2012 标准原文",
       "tagline": "一站式公文与文档在线处理。无账号、无安装、无广告。",
       "copyright": "© 2025-2026 鹊随金印 · doc.sujx.net",
       "icp": "",
       "contact": "sujx{'@'}live.cn"
+    }
+  },
+  "guide": {
+    "pdfRedact": {
+      "kicker": "GUIDE · 脱敏",
+      "title": "PDF 涂黑 ≠ 打码",
+      "metaTitle": "PDF 涂黑 ≠ 打码：为什么黑框不是脱敏",
+      "metaDescription": "黑框遮不住 PDF 里的文字。本文讲清文字层与图片层的区别、真脱敏的两步做法，以及本工具对扫描件的已知局限。",
+      "metaKeywords": "PDF脱敏,PDF打码,黑框脱敏,文字层,马赛克,敏感信息",
+      "published": "2026-11-13",
+      "reading": "阅读约 5 分钟",
+      "toolLabel": "对应工具：",
+      "localeNotice": "",
+      "ctaTitle": "想直接试一次？",
+      "ctaBody": "拖入 PDF，关键词定位或手动框选，删文字层 + 马赛克遮盖，最后逐框复检。",
+      "ctaButton": "去脱敏 →"
     }
   }
 }

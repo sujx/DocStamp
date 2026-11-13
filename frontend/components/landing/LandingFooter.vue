@@ -30,6 +30,7 @@
           >{{ $t("landing.footer.standard") }}</a>
           <NuxtLink to="/tools" class="flex min-h-[44px] items-center text-[13px] text-tertiary no-underline transition-colors duration-150 hover:text-brand-600">{{ $t("landing.footer.allTools") }}</NuxtLink>
           <NuxtLink to="/status" class="flex min-h-[44px] items-center text-[13px] text-tertiary no-underline transition-colors duration-150 hover:text-brand-600">{{ $t("landing.footer.stats") }}</NuxtLink>
+          <NuxtLink to="/guide/pdf-redact" class="flex min-h-[44px] items-center text-[13px] text-tertiary no-underline transition-colors duration-150 hover:text-brand-600">{{ $t("landing.footer.guide") }}</NuxtLink>
         </div>
       </div>
     </div>

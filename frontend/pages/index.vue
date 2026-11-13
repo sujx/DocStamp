@@ -29,7 +29,7 @@
         </h2>
         <p class="mb-9 max-w-xl text-secondary">{{ $t("landing.resource.note") }}</p>
 
-        <div class="stagger-children grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="stagger-children grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <a
             href="/GBT9704-2012.pdf"
             target="_blank"
@@ -48,6 +48,11 @@
           <NuxtLink to="/status" class="card card-interactive block no-underline">
             <h3 class="mb-1.5 text-[15px] font-semibold text-primary">{{ $t("landing.footer.stats") }}</h3>
             <p class="text-[13px] leading-relaxed text-secondary">{{ $t("landing.resource.statsDesc") }}</p>
+          </NuxtLink>
+
+          <NuxtLink to="/guide/pdf-redact" class="card card-interactive block no-underline">
+            <h3 class="mb-1.5 text-[15px] font-semibold text-primary">{{ $t("landing.resource.guideTitle") }}</h3>
+            <p class="text-[13px] leading-relaxed text-secondary">{{ $t("landing.resource.guideDesc") }}</p>
           </NuxtLink>
         </div>
       </div>
