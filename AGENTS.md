@@ -50,8 +50,11 @@ docStamp/
 │   ├── assets/css/main.css     # CSS 变量 (SynTime Royal Blue token)
 │   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError / useSidebar / usePageView / usePdfRedactMarks
 │   ├── components/             # 业务组件 + ui/ 原子组件
-│   ├── layouts/default.vue     # 侧边导航壳
-│   ├── pages/                  # 路由页面
+│   ├── components/landing/     # 宣传页区块 (LandingNav / LetterheadHero / ToolShowcase / PromiseBand / LandingFooter / SectionKicker)
+│   ├── layouts/default.vue     # 侧边导航壳 (应用内: /tools + 14 个工具页)
+│   ├── layouts/landing.vue     # 宣传页壳: sticky 顶栏 + 页脚 + UNotifications, 无侧栏
+│   ├── pages/                  # 路由页面 (index.vue = 宣传页, tools.vue = 仪表盘)
+│   ├── server/routes/          # Nitro 端点: sitemap.xml.ts (URL 来自 TOOLS, 不用 pages/)
 │   └── i18n/locales/           # zh-CN / en
 ├── docs/
 │   └── vibecoding-blog.md      # 开发经验分享
@@ -64,11 +67,12 @@ docStamp/
 
 ## 功能模块
 
-功能模块 14 个（13 项工具 + 使用统计）；下表 15 行含首页仪表盘，仪表盘是导航页不计入。
+功能模块 14 个（13 项工具 + 使用统计）；下表 16 行含宣传页与仪表盘两个导航页，二者都不计入。
 
 | # | 模块 | 路由 | 说明 |
 |---|------|------|------|
-| 1 | 仪表盘 | `/` | 工具卡片网格 |
+| 1 | 宣传页 | `/` | 对外首页：红头 hero + 14 件工具 + 隐私承诺 + 资源区 |
+| 1b | 仪表盘 | `/tools` | 工具卡片网格（应用内首页，有侧栏） |
 | 2 | MD 转公文 | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX |
 | 3 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
 | 4 | RSS 探测 | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅 |
@@ -162,8 +166,9 @@ def my_service(path: str) -> ServiceResult[dict]:
 - 禁止 `transition: all`，用具体属性列表
 - 表单校验：Vuelidate (`useValidation` composable)
 - API 错误提示：`useApiError().showError(e)` 弹 toast；需要内联展示时用 `useApiError().extractError(e)` 取消息（自动识别 JSON 与 Blob 两种错误体）；全局 401 由 `plugins/axios.client.ts` 拦截
-- Toast：`useToast().add({...})` 只往 `useState("notifications")` 里塞数据，**页面上必须有 `<UNotifications />` 容器才会渲染**——容器统一挂在 `layouts/default.vue`（全站页面都用 default layout），新增独立 layout 时要一起带上，否则该页所有 toast 静默失效（v2 无自动注入，实测删掉容器后 `toast.add` 调用成功但 DOM 零节点）
+- Toast：`useToast().add({...})` 只往 `useState("notifications")` 里塞数据，**页面上必须有 `<UNotifications />` 容器才会渲染**——容器挂在 `layouts/default.vue` 与 `layouts/landing.vue`，新增独立 layout 时要一起带上，否则该页所有 toast 静默失效（v2 无自动注入，实测删掉容器后 `toast.add` 调用成功但 DOM 零节点）
 - 文件下载：统一走 `useDownload().downloadBlob(blob, filename, successMsg?)`（挂 `<a>` → click → 延迟 100ms 摘除并 revoke，禁止在组件里手写这段；不传成功文案则不弹 toast）
+- `/` 是宣传页（`layouts/landing.vue`，无侧栏），`/tools` 是仪表盘（`layouts/default.vue`，有侧栏）。任何 `TOOLS` 条目都不得把 `to` 指向 `/`（顶栏品牌链接 `to="/"` 是唯一例外），由 `composables/__tests__/tools.config.spec.ts` 钉住。新 layout 必须同时挂 `<UNotifications />` 与 `LanguageSwitcher`。
 
 ### 工具配置单一数据源
 
@@ -276,12 +281,37 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 | 开发模式没有清理线程 | 每日清理只挂在 gunicorn `on_starting`，`uv run python app.py` 不起它，dev 机器只能 `./manage.sh clean-output` 手动清 |
 | 后端 `mypy --strict` 不是门槛 | v3.11.0 迁 uv 时实测：`uv run mypy --ignore-missing-imports --strict --explicit-package-bases $(git ls-files '*.py')` 报 **319 errors / 43 files**，全是存量（118 条 `no-untyped-def` + 63 条 `type-arg` + 55 条 `arg-type`）。`pyproject.toml` 写着 `strict = true`、`backend/.pre-commit-config.yaml` 也挂了 mypy，但 `.git/hooks/pre-commit` 不存在，所以这道门槛从未跑过。要修属一整批，不在依赖迁移里顺带动 |
 
+### 宣传页 / 隐私文案
+
+宣传页上的每条隐私承诺都按代码真相写（真相表见 `SPEC.md`「十一、宣传页首页」）。下表是「文案今天为真、但要做到更强的说法还得改存储或日志」的工程项——做完一条，文案才能升一级。
+
+| 事项 | 为何未做 |
+|------|----------|
+| 产物目录改 tmpfs（或给 upload 挂 tmpfs） | `output_data` 是具名卷，落在物理盘（`docker-compose.yml:26`）；做不到就不能写「磁盘零写入」 |
+| 硬 TTL 一小时 + 真定时扫描 | 通用临时文件是每日扫描、7 天上限（`backend/utils/file_cleanup.py:19-21`）；1 小时 TTL 只覆盖脱敏会话且惰性触发（`backend/utils/redact_session.py:24`） |
+| 上传落盘不带原名 | 存盘名 `uuid_<安全化原名>`（`backend/utils/base/file_helpers.py:62-63`） |
+| 三件两段式工具也做到取走即删 | MD转公文 / 格式规范 / 打印分组都是「生成 → 下载」：`backend/blueprints/convert.py:141-147,182-188` 与 `print_split_bp.py:48-56,66-78` 成功后只回 id，`download.py:75` 无删除钩子 |
+| 运维日志不再带文件路径 | `backend/utils/file_cleanup.py:88` 清理失败时把临时文件全路径写进日志，`error_handler.py:94` + `json_logging.py:47-48` 还带堆栈，保留 30 天（`json_logging.py:21`）。做到才能把承诺带 item3 从「统计库里没有文件名」升回「日志里没有文件名」 |
+| 脱敏会话目录纳入真定时清扫 | `cleanup_expired` 全仓库唯一调用点是下一次 `/open`（`backend/blueprints/pdf_redact_bp.py:67`），惰性触发；且 7 天清扫只按顶层条目 mtime 判龄（`backend/utils/file_cleanup.py:73-84`），`redact-sessions` 父目录 mtime 每次建/删会话都刷新 → 7 天内有人用过就整棵树跳过，废弃会话可能长期留存。做到才能对脱敏写「最长留 N」 |
+| PDF 编辑的 `thumbs_*` 页面图片有人删 | `backend/blueprints/pdf_editor_bp.py:86-87,92-107` 渲染最多 50 张页面 PNG，`:125-126` 的 `finally` 只删上传件；全仓库无任何删除点，页面图片留到 7 天清扫。做到才能把它并进「响应结束即删」 |
+| `operation_logs.file_size` 接上真实体积或删列 | 列存在但无任何调用方传值（`backend/models.py:135` 默认 0，`app.py:111-125` 与 `blueprints/stats_bp.py:37-48` 都不传），每行恒为 0；承诺带 item3 的「体积」因此被去掉 |
+| 日志不再存 IP + UA（若决定匿名化） | `/status` 独立访客去重靠这两列（`backend/app.py:118-122`、`backend/models.py:52-65`），动了是功能减级 |
+| 教程页 `/guide/*` 与政策/条款页 | 本批范围外 |
+| 删掉 4 个零入链的孤儿路由页 | `frontend/pages/{metadata-clean,page-decorate,pdf-compress,pdf-to-text}.vue`；删页面属改仓库内容，需单独确认 |
+| `manage.sh clean-output` 清不掉目录 | `manage.sh:251` 用 `rm -f` + glob：退出码 1、目录残留、跳过点文件。生产清理走 `backend/utils/file_cleanup.py` 是对的，只有 dev 手动清理受影响；建议改为调用 Python 清理入口 |
+| `LanguageSwitcher` 28px 触摸目标 | 共享组件 scoped CSS 写死 `height: 28px`，本批只在 `LandingNav` 用 `:deep()` 局部提到 44px；根治要改共享组件，影响侧栏，属独立一批 |
+
 ### 前端组件
 
 | 事项 | 为何未做 |
 |------|----------|
 | 全站 `color="neutral"` 无效 + `neutral-*` 类名惰性 | Nuxt UI v2 的灰阶值拼法是 `gray`（`neutral` 是 v3 拼法），故 `color="neutral"` 触发 `[Vue warn] Invalid prop`，组件退回默认灰阶；又因 `neutral` 是 Tailwind 内置色而未被 `safelistColors` 收录，`text-neutral-500` 一类 `neutral-*` 类名不在产物 CSS 里（实测该元素 `color` 为空、随父级）。存量问题、非本批引入，属独立一批 |
 | Toast 的 `color: "warning"/"success"/"error"` 全部无效（20 处） | `UNotification` 的 `color` 校验是 `["gray", ...appConfig.ui.colors]`，本项目 `appConfig.ui.colors` 只有 Tailwind 色板名 + `brand`/`primary`，**没有** `warning`/`success`/`error` 这类语义名；实测控制台 `[Vue warn]: Invalid prop ... at <Notification>`，且渲染出的进度条类名 `bg-warning-500` 在产物 CSS 里不存在（`bg-warning-500` 计算样式 = `rgba(0,0,0,0)`），只有白卡生效。以前 toast 根本不挂载（缺 `<UNotifications />`），所以这条一直没人看见；v3.9.3 挂上容器后暴露。修法属一批：语义色要么进 `tailwind.config.ts` 色板 + `safelistColors`，要么 20 处改成 `amber`/`green`/`red` |
+| primary solid 按钮白字对比度 3.82:1，不过 AA | Nuxt UI v2 的 default solid 是 `text-white bg-{color}-500`（`node_modules/@nuxt/ui/dist/runtime/ui.config/elements/button.js:56,76-77`），本项目 `app.config.ts` 把 `ui.primary = "brand"`，故全站约 45 个 primary 按钮都是白字 on `#4C7DF0`。修法二选一：solid 变体改 `bg-brand-600`（5.3:1）或整体调 primary 色阶；只改宣传页两个 CTA 会与站内不一致，属设计 token 批次 |
+| 14 个工具页 `<title>` 仍是空 `%s`（`- 鹊随金印`） | 本批只修 `/` 与新建的 `/tools`；统一补需给 `ToolDef` 加 `titleKey` 并接 `useHead`，属 14 页批量 TDK 批次 |
+| 宣传页工具组标签 `text-tertiary` 12px 对比度 ≈3.77:1，低于 AA | 与 R30 同属设计 token 批次；可改 `text-secondary` 或调深三级文本色 |
+| `SITE_ORIGIN` 与 `pages/index.vue` 的 og 绝对地址是两处字面量 | 改需 runtimeConfig 或构建期常量；今天域名无分歧，暂不动 |
+| sitemap 16 条 URL 共用同一个 UTC `lastmod` | 静态页每日都自称更新，属低信号；逐页 mtime 需构建期 plumbing |
 
 ### PDF 脱敏模块
 
@@ -290,6 +320,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 | 会话目录在 Windows 上删不掉 | 下载后的清理靠 POSIX unlink「删已打开的文件」语义；Windows 上 `send_file` 仍持有句柄，`shutil.rmtree(ignore_errors=True)` 静默失败，会话要等 1 小时 TTL 才消失。生产是 Linux 容器，故不改；「下载即删」只在容器里被实证 |
 | `/apply` 不限制单次 marks 数量 | `rate_limit` 限的是请求数（20/分钟），不限一次提交多少框；每个框都要渲染一张 200 DPI 位图，理论上可被单请求拖垮。关键词侧已有 `MAX_MATCHES=500` 挡住批量场景，内网 12 人规模下按「先证明再修」留着 |
 | 本机 `nuxt generate` 预渲染必失败 | Windows + Node 24 下 `@nuxt/icon` 生成的 `createRequire(globalThis._importMeta_.url)` 收到 `file:///_entry.js`，Node 拒收空 host 的 file URL 并抛错，`.output/public` 空产出。已用 HEAD 版 `nuxt.config.ts` 复现，且失败点在「Initializing prerenderer」——模块加载期，早于任何页面预渲染，与本模块改动无关；推测是本机 Node 由 24.18 升到 24.19 后收紧校验（v3.8 那批 `nuxt generate` 还是通的）。真实构建路径是 `Dockerfile` stage 1 的 node:22-alpine，镜像已验证，故不动 |
+| 马赛克对图片只是视觉覆盖，原图仍可提取 | `backend/services/pdf_redact.py:349-358` 用 `apply_redactions(images=PDF_REDACT_IMAGE_NONE)` 保留整页图片、再 `insert_image(overlay=True)` 把像素化位图盖上去；`_leftovers`（`:390-408`）只复检文字层。`SPEC.md:582`（v3.9 条目）已记实现机制，但用户可见的局限没进待办。不改后端行为，属文案/产品决策 |
 
 ### 测试与数据
 
