@@ -466,7 +466,7 @@ v3.12.0 起对外首页从仪表盘换成宣传页。设计蓝本见 `docs/super
 
 - **`/` 不得再被任何 `TOOLS` 条目占用**（顶栏品牌链接 `to="/"` 是唯一例外）：`composables/tools.config.ts` 的 `dashboard` 条目是 `to: "/tools"`，`composables/__tests__/tools.config.spec.ts` 断言「没有任何条目 `to === "/"`」——这是本批唯一不可逆的约定，必须有测试钉住。
 - `components/PageHeader.vue` 的 `backTo` 默认值 `"/"` → `"/tools"`（全站 14 个工具页「返回」的唯一来源，无页面覆写）；`components/Sidebar.vue` 删掉已不可达的 `if (href === "/")` 特判。
-- 后端零改动：`backend/app.py` 的 SPA fallback 按 `<route>/index.html` 命中，`/tools` 与 14 个既有工具路由走同一条码路，故 `X-API-Version` 仍是 3.11.0。
+- 宣传页这批未改后端：`backend/app.py` 的 SPA fallback 按 `<route>/index.html` 命中，`/tools` 与 14 个既有工具路由走同一条码路，故 `X-API-Version` 仍是 3.11.0。
 
 ### 双壳约定
 
@@ -537,7 +537,7 @@ v3.12.0 起对外首页从仪表盘换成宣传页。设计蓝本见 `docs/super
 - **隐私承诺按代码真相写，四条如实披露（例外共五处，归成三行）**：三条承诺 + 四条披露逐条对应后端实现（真相表见「十一、宣传页首页」）。据此收窄两处并补一行证据：item1 的「一步完成」点名三件两段式例外（MD转公文 / 格式规范 / 打印分组，`convert.py:141-147,182-188` + `print_split_bp.py:48-56,66-78`），item3 从「日志里没有文件名」收窄成「统计库里没有文件名，也没有内容」并新增「运维日志可能带上文件路径」（`file_cleanup.py:88`、`json_logging.py:21,47-48`）。同时去掉「体积」——`operation_logs.file_size` 恒为 0。今天不成立的四条（磁盘零写入 / 容器重启即灭 / 一小时自毁 / 不记录文件名）明确禁止出现在文案里，做不到的工程项全部登记进 `AGENTS.md` 待办
 - **`sitemap.xml` 兑现 `robots.txt` 的承诺**：从 `TOOLS` 单一数据源生成 16 条 URL（`/`、`/tools` + 14 个工具页，含 `/status`），`lastmod` 取构建日，并在 `nitro.prerender.routes` 登记——此前 `robots.txt` 一直宣告一个 404。URL 不取自 `pages/`：那 4 个零入链孤儿路由不会被预渲染，写进去就是 4 条死链
 - **og:image 与宣传页独立 TDK**：`public/og.svg` 手写 1200×630 红头版式、chromium headless 产出 `public/og.png`；`pages/index.vue` 的 `useHead` 覆写 title / description / keywords 并挂 `og:*` 与 `twitter:card`。同时修正 `layouts/default.vue` 里仍向 14 个工具页输出的「视频转换」「文档转MD」过期 meta（这两项功能已不存在）
-- **`X-API-Version` 保持 3.11.0**：后端零改动（`git diff --stat master HEAD -- backend/` 为空），14 个工具路由与 SPA fallback 均未动
+- **`X-API-Version` 保持 3.11.0**：宣传页各提交均未触及 `backend/`（版本号 3.9.3 → 3.11.0 的 bump 属独立的 v3.11.0 提交），14 个工具路由与 SPA fallback 均未动
 - **验证**：后端 `uv run pytest tests/ -q` **200 passed**；前端 `npx vitest run` **9 files / 78 passed**；容器内四件产物齐全（`index.html`、`tools/index.html`、`sitemap.xml`、`og.png`）；浏览器 10 项清单全过，记录见「十一、宣传页首页 · 验收记录」
 
 ### v3.11.0 (2026-11)
