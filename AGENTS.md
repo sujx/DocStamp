@@ -339,7 +339,6 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 | 事项 | 为何未做 |
 |------|----------|
 | Gitee 上的旧仓库未删除 | 已弃用 Gitee，GitHub（public）为唯一远端；要清理需自行去 Gitee 删 |
-| `backend/.nuxt/` 31 个构建产物自 `07c348e`（first commit）就被跟踪 | `.gitignore` 第 35 行有 `.nuxt/`，但取消跟踪要 `git rm -r --cached`，属改仓库内容，未经确认不动。现状后果：WSL 里跑过 dev 构建后这些文件被重新生成，clone 的 `git status` 常年脏（489 KB 死产物）；`.dockerignore` 第 28 行已挡住，镜像不受影响 |
 | `edffc8c` 的 commit message 含已吊销的 DeepSeek key | 无可达 blob（不在任何文件内容里），已披露，**刻意不改写历史** |
 | `docs/` 被整目录 gitignore，但 `docs/vibecoding-blog.md` 已跟踪 | 新加到 `docs/` 的文件不会进仓库（`docs/plans/` 即未跟踪）。有意为之可忽略，否则需调 `.gitignore` 或用 `git add -f` |
 
