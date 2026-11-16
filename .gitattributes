@@ -1,3 +1,22 @@
+# Store LF in every text blob, and check out LF. Without this rule a CRLF
+# worktree (Windows editors, or a copy that skipped dos2unix) reads as a real
+# modification: git had no eol policy for most paths, so 111 files sat dirty in
+# `git status` with zero content change.
+* text=auto eol=lf
+
+# Never let text=auto guess for binary payloads — a wrong guess strips bytes.
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.mo binary
+
 # Shell scripts must be checked out with LF even when core.autocrlf=true.
 # A CRLF shebang becomes "#!/bin/bash\r", which Docker's COPY bakes into the
 # image verbatim — the Linux kernel then fails with "no such file or directory"

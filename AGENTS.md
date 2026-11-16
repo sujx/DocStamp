@@ -93,7 +93,7 @@ docStamp/
 
 ## 开发环境
 
-代码在 **Windows 侧编辑**（`D:\Workdir\DocStamp`，`core.autocrlf=true` 工作树是 CRLF），在 **WSL（AlmaLinux-10）** 里构建与测试（仓库位于 `/root/Project/DocStamp`）。两边靠 `sync-from-windows.sh` 打通：它默认覆盖**全仓库被跟踪的文件**（`git ls-files -s`，可传 pathspec 缩小范围），逐文件转 LF（直接 `cp` 会把 CRLF 带进去，git 会显示整文件重写），并按 index 记录的 mode 落权限（`/mnt/d` 一律报 0777；凭猜测 `chmod` 要么把 644 的文件抬成 mode change，要么把 `manage.sh` 这类 755 的压回去，两种都会让 clone 常年显脏）。**只同步跟踪文件是硬约束**：`backend/tasks.db*`、`backend/output/` 这类 gitignored 运行时状态在 Windows 侧是旧快照，早前按目录 `cp -r` 时就把 WSL 的统计库覆盖成 9-28 的副本（靠未 checkpoint 的 WAL 才找回），所以未跟踪文件一律不过去：
+代码在 **Windows 侧编辑**（`D:\Workdir\DocStamp`，`core.autocrlf=true` 工作树是 CRLF），在 **WSL（AlmaLinux-10）** 里构建与测试（仓库位于 `/root/Project/DocStamp`）。两边靠 `sync-from-windows.sh` 打通：它默认覆盖**全仓库被跟踪的文件**（`git ls-files -s`，可传 pathspec 缩小范围），逐文件转 LF（`.gitattributes` 已把仓库与检出都钉成 LF，磁盘上留 CRLF 与约定不一致），并按 index 记录的 mode 落权限（`/mnt/d` 一律报 0777；凭猜测 `chmod` 要么把 644 的文件抬成 mode change，要么把 `manage.sh` 这类 755 的压回去，两种都会让 clone 常年显脏）。**只同步跟踪文件是硬约束**：`backend/tasks.db*`、`backend/output/` 这类 gitignored 运行时状态在 Windows 侧是旧快照，早前按目录 `cp -r` 时就把 WSL 的统计库覆盖成 9-28 的副本（靠未 checkpoint 的 WAL 才找回），所以未跟踪文件一律不过去：
 
 ```bash
 bash /root/sync-from-windows.sh              # 默认同步全仓库跟踪文件（含仓库根的 AGENTS.md / Dockerfile 等）
@@ -277,7 +277,6 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 | 服务器运维 `.env` 删掉 AI / DeepSeek 残留行 | 仓库与开发机均无 `.env`（gitignored）；compose 已不再注入该变量，这行现在是惰性的，但 key 已吊销 |
 | `Dockerfile` 的 `CMD` 补 `--workers` | compose 传了 `--workers 2`，裸 `docker run` 会落到 `gunicorn.conf.py` 的 `min(8, cpu*2+1)`（2 核 = 5 个 worker）。生产走 compose 故被兜住 |
 | 删掉 `backend/gunicorn.conf.py` 的 `pidfile` | `"/var/run/docstamp.pid"` 恒被 `Dockerfile` 与 compose 的 `--pid /tmp/gunicorn.pid` 覆盖，且 `docstamp` 用户对 `/var/run` 无写权，属死配置 |
-| `.dockerignore` / `.gitattributes` 钉 `eol=lf` | 现状只让 `git add` 警告「下次 touch 转 CRLF」；实测无碍（Go 行扫描剥 `\r`，git 属性解析也容忍 `\r`），故按「先证明再修」留着。v3.9.3 起 `backend/translations/*.po`/`.pot` 也进了仓库，每次 Windows 检出都是 CRLF，构建在 WSL clone（LF）里跑故未受影响 |
 
 ### 整站级
 
