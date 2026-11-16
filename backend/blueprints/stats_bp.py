@@ -1,28 +1,10 @@
-"""Stats dashboard routes: /api/stats/overview, /api/v1/track, sitemap."""
+"""Stats dashboard routes: /api/stats/overview, /api/v1/track."""
 
-from flask import Blueprint, Response, g, jsonify, request
+from flask import Blueprint, g, jsonify, request
 
 from services import stats as stats_service
 
 stats_bp = Blueprint("stats", __name__)
-
-
-@stats_bp.route("/sitemap.xml")
-def sitemap():
-    pages = [
-        "",
-        "/md-to-docx", "/format-docx",
-        "/properties", "/excel-merge",
-        "/file-assembly", "/print-split", "/pdf-editor",
-        "/pdf-tools", "/pdf-merge", "/webp-to-jpeg", "/pdf-redact", "/password-gen", "/status",
-    ]
-    base = request.host_url.rstrip("/")
-    items = "\n".join(
-        f"  <url><loc>{base}{p}</loc><changefreq>monthly</changefreq><priority>{'1.0' if p == '' else '0.8'}</priority></url>"
-        for p in pages
-    )
-    xml = f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{items}\n</urlset>'
-    return Response(xml, mimetype="application/xml")
 
 
 @stats_bp.route("/api/v1/track", methods=["POST"])

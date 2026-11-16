@@ -456,8 +456,3 @@ class TestWiring:
         from services.stats import MODULE_NAMES
 
         assert "pdf-redact" in MODULE_NAMES
-
-    def test_page_is_in_the_sitemap(self, client):
-        resp = client.get("/sitemap.xml")
-
-        assert "/pdf-redact" in resp.get_data(as_text=True)
