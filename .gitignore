@@ -66,3 +66,5 @@ htmlcov/
 
 # Tool output
 .qoder-credits/
+# Qoder IDE regenerates .qoder/repowiki/ knowledge caches beside the sources.
+.qoder/
