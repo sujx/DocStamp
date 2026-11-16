@@ -27,6 +27,7 @@ MODULE_NAMES = {
     "webp-to-jpeg": "WebP 转 JPEG",
     "pdf-redact": "PDF 脱敏",
     "password-gen": "密码生成",
+    "meeting-minutes": "会议纪要整理",
     "pageview": "页面浏览",
 }
 

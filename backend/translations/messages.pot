@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: docStamp VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-29 16:46+0800\n"
+"POT-Creation-Date: 2026-11-16 17:21+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,20 +17,42 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: error_handler.py:79
+#: error_handler.py:83
 msgid "Resource not found"
 msgstr ""
 
-#: error_handler.py:83
+#: error_handler.py:87
 msgid "Method not allowed"
 msgstr ""
 
-#: error_handler.py:87
+#: error_handler.py:91
 msgid "Request entity too large"
 msgstr ""
 
-#: error_handler.py:93
+#: error_handler.py:97
 msgid "系统异常"
+msgstr ""
+
+#: schemas.py:57
+msgid "Meeting name is required"
+msgstr ""
+
+#: schemas.py:59
+#, python-format
+msgid "Meeting name is too long (max %(limit)s characters)"
+msgstr ""
+
+#: schemas.py:69
+msgid "Print date must be written as YYYY-MM-DD"
+msgstr ""
+
+#: schemas.py:79
+msgid "At least one body paragraph is required"
+msgstr ""
+
+#: schemas.py:81
+#, python-format
+msgid "Too many people in a roster (max %(limit)s)"
 msgstr ""
 
 #: blueprints/convert.py:110
@@ -284,6 +306,11 @@ msgstr ""
 #: services/print_split.py:33
 #, python-format
 msgid "Failed to read PDF: %(e)s"
+msgstr ""
+
+#: services/minutes_docx.py:383
+#, python-format
+msgid "%(label)s list entry %(index)s has a unit but no name"
 msgstr ""
 
 #: services/page_decorator.py:36

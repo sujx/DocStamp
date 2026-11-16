@@ -19,13 +19,14 @@
     "webpToJpeg": "WebP to JPEG",
     "pdfRedact": "PDF Redaction",
     "passwordGen": "Password Generator",
-    "interestCalc": "Loan Calculator"
+    "interestCalc": "Loan Calculator",
+    "meetingMinutes": "Meeting Minutes"
   },
   "dashboard": {
     "heroTitle": "Document Processing, Simplified",
-    "heroSubtitle": "15 features for format conversion, PDF editing, document standardization, loan math and more",
+    "heroSubtitle": "16 features for format conversion, PDF editing, document standardization, loan math and more",
     "metaTitle": "Tool dashboard",
-    "metaDescription": "The in-app home for all 15 tools."
+    "metaDescription": "The in-app home for all 16 tools."
   },
   "status": {
     "title": "Usage Statistics",
@@ -381,7 +382,7 @@
     },
     "tools": {
       "kicker": "TOOLS",
-      "title": "Fifteen small tools, one job each",
+      "title": "Sixteen small tools, one job each",
       "note": "Click and use it — no login wall, no setup.",
       "groupOfficial": "Official format",
       "groupPdf": "PDF",
@@ -416,7 +417,7 @@
       "title": "Know the standard, then use the tool",
       "note": "Four references on this site. No sign-up.",
       "standardDesc": "The GB/T 9704 text itself — font sizes, line spacing, dates.",
-      "toolsDesc": "All fifteen tools in one grid.",
+      "toolsDesc": "All sixteen tools in one grid.",
       "statsDesc": "Module calls and unique visitors — this site counts itself too.",
       "guideTitle": "PDF redaction guide",
       "guideDesc": "Why a black box fails, and where scanned PDFs fall short."
@@ -548,5 +549,37 @@
       "upfrontFee": "The upfront fee cannot be negative and must be smaller than the principal, otherwise nothing is left to disburse.",
       "feeRate": "The per-period fee rate must be between 0 and 5%."
     }
+  },
+  "meetingMinutes": {
+    "title": "Meeting Minutes",
+    "description": "Enter the meeting name and the body, and get a DOCX laid out per GB/T 9704-2012 clause 10.3 (minutes format): red small-brand-song title block, red header rule, size-3 Fangsong body on fixed 29pt lines",
+    "metaTitle": "Meeting Minutes",
+    "metaDescription": "Generate meeting-minutes DOCX files per the GB/T 9704-2012 minutes format: flag, header rule, body typeface and line spacing all follow the standard.",
+    "meetName": "Meeting name",
+    "meetNameHint": "The word 纪要 (minutes) is appended automatically to form the flag — don't type it yourself.",
+    "meetNamePlaceholder": "e.g. Information Technology Center weekly meeting",
+    "body": "Body",
+    "bodyHint": "One line per natural paragraph; blank lines are merged, and a leading ordinal picks the level font.",
+    "bodyPlaceholder": "The meeting agreed on three items of work.",
+    "attachments": "Attachments",
+    "attachmentsHint": "One attachment per line; trailing punctuation is dropped and several entries are numbered.",
+    "attachmentsPlaceholder": "Statistics table",
+    "attendees": "Present",
+    "leave": "On leave",
+    "witness": "Attending",
+    "rosterHint": "One person per line: organisation, a space, then the name; leave a block empty to omit it.",
+    "rosterPlaceholder": "Information Technology Center Zhang San",
+    "colophon": {
+      "cc": "Copied to",
+      "ccHint": "One organisation per line; they are joined with 、 and the last one gets a full stop. Leave it empty to drop the block.",
+      "ccPlaceholder": "e.g. General Affairs Office",
+      "printOrg": "Printing organ",
+      "printOrgPlaceholder": "e.g. Information Technology Center General Affairs Office",
+      "printDate": "Print date",
+      "hint": "The date keeps full Arabic numerals with no padded month or day (7.3.5.4); the printing organ sits one character in from the left and the date one character in from the right (7.4.3)."
+    },
+    "generate": "Generate minutes DOCX",
+    "levels": "Ordinals (7.3.3): 一、→ size-3 Heiti; （一）→ size-3 Kaiti; 1. / （1）→ size-3 Fangsong. Each paragraph indents two characters and wraps flush left.",
+    "note": "The meeting name and body are sent to the server for typesetting; the generated file is deleted from the server as soon as the response ends — nothing is retained."
   }
 }

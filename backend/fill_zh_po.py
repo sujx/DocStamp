@@ -121,13 +121,19 @@ TRANSLATIONS = {
     "No filename provided": "未提供文件名",
     "Invalid characters in filename": "文件名包含非法字符",
     "Invalid filename after sanitization": "文件名清洗后无效",
+    "Meeting name is required": "会议名称不能为空",
+    "At least one body paragraph is required": "正文至少需要一段非空白内容",
+    "Meeting name is too long (max %(limit)s characters)": "会议名称过长（最多 %(limit)s 字）",
+    "Too many people in a roster (max %(limit)s)": "名单人数过多（每类最多 %(limit)s 人）",
+    "%(label)s list entry %(index)s has a unit but no name": "%(label)s名单第 %(index)s 人只填了单位，姓名没填",
+    "Print date must be written as YYYY-MM-DD": "印发日期要写成 YYYY-MM-DD（如 2026-01-05）",
 }
 
 
 def main() -> None:
     backend = Path(__file__).resolve().parents[0]
     pot_path = backend / "translations" / "messages.pot"
-    po_path = backend / "translations" / "zh_CN" / "LC_MESSAGES" / "messages.po"
+    po_path = backend / "translations" / "zh_Hans_CN" / "LC_MESSAGES" / "messages.po"
     po_path.parent.mkdir(parents=True, exist_ok=True)
 
     cat = read_po(pot_path.open("rb"))

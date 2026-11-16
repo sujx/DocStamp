@@ -1,28 +1,29 @@
 # 鹊随金印 (docStamp) — 文档处理工具箱
 
-一站式文档处理 Web 应用：14 项文档工具 + 1 个使用统计页，中英双语，即开即用，无需注册。
+一站式文档处理 Web 应用：15 项文档工具 + 1 个使用统计页，中英双语，即开即用，无需注册。
 
 ## 功能
 
-首页是宣传页（`/`，无侧栏），仪表盘（工具首页）搬到 `/tools`；其下 15 个工具页面按下表顺序排列（与侧边导航一致）：
+首页是宣传页（`/`，无侧栏），仪表盘（工具首页）搬到 `/tools`；其下 16 个工具页面按下表顺序排列（与侧边导航一致）：
 
 | # | 功能 | 路由 | 说明 |
 |---|------|------|------|
 | 1 | **MD 转公文** | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX |
 | 2 | **格式规范** | `/format-docx` | DOCX 按 GB/T 9704-2012 格式化 |
-| 3 | **RSS 探测** | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
-| 4 | **密码生成** | `/password-gen` | 随机密码 + 可复现密码（纯前端，零数据留存） |
-| 5 | **利息计算** | `/interest-calc` | 房贷/消费贷/信用贷：四种还款方式 + 费用折进真实年化（纯前端，零数据留存） |
-| 6 | **属性修改** | `/properties` | 元数据修改 + 清理（双 Tab） |
-| 7 | **Excel 合并** | `/excel-merge` | 合并 .xlsx/.csv（同结构） |
-| 8 | **文件组装** | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
-| 9 | **打印分组** | `/print-split` | 按批次拆分 PDF |
-| 10 | **PDF 编辑** | `/pdf-editor` | 删除/插入/重排页面 |
-| 11 | **调整 PDF** | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚 |
-| 12 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
-| 13 | **PDF 脱敏** | `/pdf-redact` | 框选/关键词标记敏感区，生成带马赛克的新 PDF |
-| 14 | **WebP 转 JPEG** | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
-| 15 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
+| 3 | **会议纪要整理** | `/meeting-minutes` | 会议名称 + 正文 + 名单 → GB/T 9704-2012 10.3 纪要 DOCX |
+| 4 | **RSS 探测** | `/rss-detect` | 输入 URL，自动发现 RSS/Atom 订阅地址 |
+| 5 | **密码生成** | `/password-gen` | 随机密码 + 可复现密码（纯前端，零数据留存） |
+| 6 | **利息计算** | `/interest-calc` | 房贷/消费贷/信用贷：四种还款方式 + 费用折进真实年化（纯前端，零数据留存） |
+| 7 | **属性修改** | `/properties` | 元数据修改 + 清理（双 Tab） |
+| 8 | **Excel 合并** | `/excel-merge` | 合并 .xlsx/.csv（同结构） |
+| 9 | **文件组装** | `/file-assembly` | 图片合并 PDF + PDF 拆解为图片 |
+| 10 | **打印分组** | `/print-split` | 按批次拆分 PDF |
+| 11 | **PDF 编辑** | `/pdf-editor` | 删除/插入/重排页面 |
+| 12 | **调整 PDF** | `/pdf-tools` | PDF 转文本 + 压缩 + 页码页眉页脚 |
+| 13 | **PDF 合并** | `/pdf-merge` | 合并多个 PDF，拖拽排序 |
+| 14 | **PDF 脱敏** | `/pdf-redact` | 框选/关键词标记敏感区，生成带马赛克的新 PDF |
+| 15 | **WebP 转 JPEG** | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
+| 16 | **使用统计** | `/status` | 模块调用量 + 访客统计（ECharts） |
 
 另有 4 个面板子页（page-decorate / pdf-compress / pdf-to-text / metadata-clean）被对应工具页内嵌引用。
 

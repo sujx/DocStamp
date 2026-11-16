@@ -39,7 +39,7 @@ useHead({
   meta: [{ name: "description", content: computed(() => t("dashboard.metaDescription")) }],
 });
 
-const CONVERT_KEYS = ["md2docx", "format-docx"];
+const CONVERT_KEYS = ["md2docx", "format-docx", "meeting-minutes"];
 const PDF_KEYS = ["file-assembly", "print-split", "pdf-editor", "pdf-tools", "pdf-merge", "pdf-redact"];
 const OFFICE_KEYS = ["properties", "excel-merge"];
 

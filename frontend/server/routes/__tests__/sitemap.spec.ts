@@ -1,6 +1,6 @@
 /**
  * sitemap 的 URL 集必须与导航单一数据源一致：
- * 首页 + 仪表盘 + 15 个非 dashboard 条目 + 1 篇教程 = 18 条，顺序固定、无重复。
+ * 首页 + 仪表盘 + 16 个非 dashboard 条目 + 1 篇教程 = 19 条，顺序固定、无重复。
  * 不启服务器，只验纯函数。
  */
 import { describe, it, expect } from "vitest";
@@ -16,11 +16,12 @@ describe("sitemap urls", () => {
     expect(relative).toEqual(PATHS);
   });
 
-  it("恰好 18 条、顺序固定、无重复", () => {
-    expect(PATHS).toHaveLength(18);
-    expect(new Set(PATHS).size).toBe(18);
+  it("恰好 19 条、顺序固定、无重复", () => {
+    expect(PATHS).toHaveLength(19);
+    expect(new Set(PATHS).size).toBe(19);
     expect(PATHS).toContain("/pdf-redact");
     expect(PATHS).toContain("/interest-calc");
+    expect(PATHS).toContain("/meeting-minutes");
     expect(PATHS).toContain("/guide/pdf-redact");
     expect(PATHS.filter((p) => p === DASHBOARD)).toHaveLength(1);
   });

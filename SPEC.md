@@ -10,9 +10,9 @@
 
 ---
 
-## 二、功能模块（15 个）
+## 二、功能模块（16 个）
 
-功能模块 = 14 项工具 + 使用统计，共 15 个；仪表盘是导航页不计入，下表按路由列出应用内全部 16 个页面（对外宣传页 `/` 也不计入，v3.12.0 起它是站点首页，见「十一、宣传页首页」）。
+功能模块 = 15 项工具 + 使用统计，共 16 个；仪表盘是导航页不计入，下表按路由列出应用内全部 17 个页面（对外宣传页 `/` 也不计入，v3.12.0 起它是站点首页，见「十一、宣传页首页」）。
 
 **侧栏导航**（顺序即 `SIDEBAR_ITEMS` 渲染顺序，实测于 dev server）：
 
@@ -20,6 +20,7 @@
 工具（仪表盘）     → /tools
 MD 转公文          → /md-to-docx
 格式规范          → /format-docx
+会议纪要整理      → /meeting-minutes
 RSS 探测          → /rss-detect      (Feed 发现)
 密码生成          → /password-gen
 利息计算          → /interest-calc
@@ -52,7 +53,8 @@ WebP 转 JPEG      → /webp-to-jpeg
 | 13 | WebP 转 JPEG | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
 | 14 | 密码生成 | `/password-gen` | 随机密码 + 可复现密码（纯前端，零数据留存） |
 | 15 | 利息计算 | `/interest-calc` | 房贷/消费贷/信用贷：四种还款方式 + 费用折进真实年化（纯前端，零数据留存） |
-| 16 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
+| 16 | 会议纪要整理 | `/meeting-minutes` | 会议名称 + 正文 + 出席/请假/列席名单 → GB/T 9704-2012 10.3「纪要格式」DOCX（生成即取即删） |
+| 17 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
 
 ---
 
@@ -124,7 +126,7 @@ Nuxt UI v2（`UFormGroup`, `UButton`, `UInput`, `USelect`, `UTabs`, `UAlert`, `U
 
 ### 仪表盘
 
-顶部品牌 Hero（标题 + 一句话说明），下方单块 3 列工具卡片网格（14 张，按转换 → PDF → Office → 其他排序，带依次入场动画，不设分区标题）。每张卡片含图标徽章 + 标题 + 描述 + 悬停箭头指示。卡片使用 `.card.card-interactive` 全局样式，悬停时上浮 + 阴影加深 + 图标徽章反色。
+顶部品牌 Hero（标题 + 一句话说明），下方单块 3 列工具卡片网格（15 张，按转换 → PDF → Office → 其他排序，带依次入场动画，不设分区标题）。每张卡片含图标徽章 + 标题 + 描述 + 悬停箭头指示。卡片使用 `.card.card-interactive` 全局样式，悬停时上浮 + 阴影加深 + 图标徽章反色。
 
 ---
 
@@ -142,7 +144,7 @@ backend/
 ├── models.py               # OperationLog + BaseCRUD (原始 SQL)
 ├── cache.py                # Flask-Caching SimpleCache
 ├── gunicorn.conf.py        # 生产配置（on_starting 启动每日清理守护线程）
-├── blueprints/             # HTTP 路由层（每功能一个文件，共 15 个；实际路径均带 /api/v1 前缀）
+├── blueprints/             # HTTP 路由层（每功能一个文件，18 个：16 个功能 + download / stats；实际路径均带 /api/v1 前缀）
 │   ├── convert.py          # /api/convert, /api/preview, /api/stats (计数)
 │   ├── download.py         # /api/download, /api/health
 │   ├── stats_bp.py         # /api/stats/overview, /api/stats/seed
@@ -270,6 +272,7 @@ pybabel compile -D messages -d translations --statistics
 | `POST` | `/api/v1/pdf-redact/apply` | 执行脱敏，返回复检报告 |
 | `GET` | `/api/v1/pdf-redact/download/<sid>` | 下载脱敏 PDF（交付后清理会话） |
 | `POST` | `/api/v1/pdf-redact/close` | 主动释放会话 |
+| `POST` | `/api/v1/meeting-minutes` | 会议纪要 JSON → GB/T 9704-2012 10.3 纪要 DOCX（响应结束即删） |
 | `POST` | `/api/rss-detect` | RSS/Atom 订阅探测 |
 
 ---
@@ -466,14 +469,14 @@ v3.12.0 起对外首页从仪表盘换成宣传页。设计蓝本见 `docs/super
 
 | 路由 | 壳 | 页面文件 | 说明 |
 |------|----|----------|------|
-| `/` | `layouts/landing.vue` | `pages/index.vue` | 对外宣传页：sticky 顶导 + 红头 hero + 15 件工具（五段分组）+ 隐私承诺 + 资源区 + 页脚，无侧栏 |
-| `/tools` | `layouts/default.vue` | `pages/tools.vue` | 应用内仪表盘：14 张工具卡（`/status` 不在卡片网格里），有侧栏。原 `/` 的仪表盘 `git mv` 于此，内容一行未改 |
-| 15 个工具路由 | `layouts/default.vue` | `pages/*.vue` | 旧书签全部有效 |
+| `/` | `layouts/landing.vue` | `pages/index.vue` | 对外宣传页：sticky 顶导 + 红头 hero + 16 件工具（五段分组）+ 隐私承诺 + 资源区 + 页脚，无侧栏 |
+| `/tools` | `layouts/default.vue` | `pages/tools.vue` | 应用内仪表盘：15 张工具卡（`/status` 不在卡片网格里），有侧栏。原 `/` 的仪表盘 `git mv` 于此，内容一行未改 |
+| 16 个工具路由 | `layouts/default.vue` | `pages/*.vue` | 旧书签全部有效 |
 
-15 个工具路由：`/md-to-docx`、`/format-docx`、`/rss-detect`、`/properties`、`/excel-merge`、`/file-assembly`、`/print-split`、`/pdf-editor`、`/pdf-tools`、`/pdf-merge`、`/pdf-redact`、`/webp-to-jpeg`、`/password-gen`、`/interest-calc`、`/status`。
+16 个工具路由：`/md-to-docx`、`/format-docx`、`/meeting-minutes`、`/rss-detect`、`/properties`、`/excel-merge`、`/file-assembly`、`/print-split`、`/pdf-editor`、`/pdf-tools`、`/pdf-merge`、`/pdf-redact`、`/webp-to-jpeg`、`/password-gen`、`/interest-calc`、`/status`。
 
 - **`/` 不得再被任何 `TOOLS` 条目占用**（顶栏品牌链接 `to="/"` 是唯一例外）：`composables/tools.config.ts` 的 `dashboard` 条目是 `to: "/tools"`，`composables/__tests__/tools.config.spec.ts` 断言「没有任何条目 `to === "/"`」——这是本批唯一不可逆的约定，必须有测试钉住。
-- `components/PageHeader.vue` 的 `backTo` 默认值 `"/"` → `"/tools"`（全站 15 个工具页「返回」的唯一来源，无页面覆写）；`components/Sidebar.vue` 删掉已不可达的 `if (href === "/")` 特判。
+- `components/PageHeader.vue` 的 `backTo` 默认值 `"/"` → `"/tools"`（全站 16 个工具页「返回」的唯一来源，无页面覆写）；`components/Sidebar.vue` 删掉已不可达的 `if (href === "/")` 特判。
 - 宣传页这批未改后端：`backend/app.py` 的 SPA fallback 按 `<route>/index.html` 命中，`/tools` 与 14 个既有工具路由走同一条码路，故 `X-API-Version` 仍是 3.11.0。
 
 ### 双壳约定
@@ -481,7 +484,7 @@ v3.12.0 起对外首页从仪表盘换成宣传页。设计蓝本见 `docs/super
 | 壳 | 用在哪 | 结构 | 必挂 |
 |----|--------|------|------|
 | `layouts/landing.vue` | 只有 `/` | 跳转链接 → sticky `<LandingNav>` → `<main id="main-content">` → `<LandingFooter>` | `<UNotifications />`；`titleTemplate` 为 `"%s - 鹊随金印"`；`htmlAttrs` 走 `useLocaleHead()`；`LanguageSwitcher` 在 `<LandingNav>` 顶栏 |
-| `layouts/default.vue` | `/tools`、14 个工具页（含 `/status`） | 侧边导航壳 | `<UNotifications />`；`LanguageSwitcher` 在侧栏 |
+| `layouts/default.vue` | `/tools`、16 个工具页（含 `/status`） | 侧边导航壳 | `<UNotifications />`；`LanguageSwitcher` 在侧栏 |
 
 - 页面侧用 `definePageMeta({ layout: "landing" })`（项目第一处 `definePageMeta`）；`/tools` 走隐式的 default。
 - **新 layout 必须同时挂 `<UNotifications />` 与 `LanguageSwitcher`**：`useToast()` 只往 `useState("notifications")` 里塞数据，Nuxt UI v2 没有自动注入（v3.9.3 已因缺容器让全站 toast 静默过一轮）；语言切换在本项目没有全局入口，各自壳里那份切换器就是该壳唯一的语言入口，缺了等于这个壳锁死中文。
@@ -493,7 +496,7 @@ v3.12.0 起对外首页从仪表盘换成宣传页。设计蓝本见 `docs/super
 
 | 宣传页要说 | 代码事实 | 证据 |
 |---|---|---|
-| **一步完成的，响应结束即删**：一步完成的工具，上传件与产物在同一次响应里删掉，不归档、不建索引 | 机制有两种：`send_file` + `@after_this_request` + `cleanup_files`（excel_merge / img2pdf / metadata_clean / page_decorate / pdf2img / pdf_compress / pdf_editor 的 delete·insert·reorder / pdf_merge / webp_to_jpeg / properties 批处理 / pdf_redact 的 download），以及 `finally: cleanup_files(filepath)`（`pdf_to_text` 产物是内联 JSON 文本不落盘、`properties/info`）。批处理与 pdf2img 还在钩子里逐个删文件 + `os.rmdir` 删目录，无内容残留。`rss_detect` / `stats` 不收上传件，不在范围内。**不写硬计数**（新增接口就 rot），例外见下面七行 | `blueprints/img2pdf_bp.py:59-63`、`blueprints/pdf_to_text_bp.py:54`、`blueprints/properties_bp.py:37,134-146`、`blueprints/pdf2img_bp.py:49-57`、`blueprints/pdf_editor_bp.py:49-51` |
+| **一步完成的，响应结束即删**：一步完成的工具，上传件与产物在同一次响应里删掉，不归档、不建索引 | 机制有两种：`send_file` + `@after_this_request` + `cleanup_files`（excel_merge / img2pdf / metadata_clean / page_decorate / pdf2img / pdf_compress / pdf_editor 的 delete·insert·reorder / pdf_merge / webp_to_jpeg / properties 批处理 / pdf_redact 的 download / meeting_minutes），以及 `finally: cleanup_files(filepath)`（`pdf_to_text` 产物是内联 JSON 文本不落盘、`properties/info`）。批处理与 pdf2img 还在钩子里逐个删文件 + `os.rmdir` 删目录，无内容残留。`rss_detect` / `stats` 不收上传件，不在范围内。**不写硬计数**（新增接口就 rot），例外见下面七行 | `blueprints/img2pdf_bp.py:59-63`、`blueprints/pdf_to_text_bp.py:54`、`blueprints/properties_bp.py:37,134-146`、`blueprints/pdf2img_bp.py:49-57`、`blueprints/pdf_editor_bp.py:49-51` |
 | **例外①：三件两段式工具**：MD转公文、格式规范、打印分组都是「生成 → 下载」两步，**上传件与产物都**留在服务器临时目录，最长 7 天后由每日清扫清除；取走时不会删除 | 三个成功出口都只返回 id，成功路径完全没有 cleanup（原件也留着，对格式规范/打印分组来说原件才是敏感文档）；共用下载出口取走时也不删 | `backend/blueprints/convert.py:141-147`（MD转公文）、`convert.py:182-188`（格式规范）、`print_split_bp.py:41,48-56` + `:66-78`（打印分组 create/download）、`download.py:75` |
 | **例外②：PDF 脱敏的会话目录**：上传件在标记期间一直留在服务器，下载即删、离开页面时前端尽力通知；没人取走的会话要等下一次有人打开这个工具才由过期清扫回收 | `/open` 写盘后返回 JSON，`delete_session` 只在错误分支；真正删除在 `/download` 的 after_this_request 或 `/close`。`cleanup_expired` **全仓库唯一调用点**是下一次 `/open`，TTL 3600 秒但惰性触发。**且 7 天清扫扫不到它**：清扫只按顶层条目 mtime 判龄，`redact-sessions` 父目录 mtime 随每次建/删会话刷新，7 天内有人用过就整棵树跳过 → 对脱敏**既不能写「同响应删」也不能写「最长 7 天」，更不能写「一小时自毁」** | `backend/blueprints/pdf_redact_bp.py:55-94`（`:67` cleanup_expired、`:79,90,93` 仅错误分支删）、`:227-231`、`:255`；`backend/utils/redact_session.py:20,24,58,66,105`；`backend/utils/file_cleanup.py:73-84` |
 | **例外③：PDF 编辑的页面图片**：打开文件时渲染的页面 PNG 留在临时目录，最长 7 天后清除；上传件本身当即删除 | `/info` 建 `thumbs_<hex8>/` 用 pdftoppm 渲染最多 50 张 PNG，返回 JSON，`finally` 只删上传件；全仓库没有任何代码删 `thumbs_*`（只有创建点与清扫器 docstring 提到它） | `backend/blueprints/pdf_editor_bp.py:86-87,92-107,120,125-126`；`backend/utils/file_cleanup.py:50` |
@@ -538,6 +541,19 @@ v3.12.0 起对外首页从仪表盘换成宣传页。设计蓝本见 `docs/super
 ---
 
 ## 十二、版本历史
+
+### v3.14.0 (2026-11)
+
+- **新增第 16 个模块「会议纪要整理」`/meeting-minutes`**：会议名称 + 正文（textarea 每行一个自然段，不做文本解析）+ 出席/请假/列席名单 + 附件 + 版记（抄送机关 / 印发机关 / 印发日期）→ 一份严格按 **GB/T 9704—2012 第 10.3 条「纪要格式」**排出的 DOCX。与单位现行样例冲突处一律以国标为准（差异清单与确认口径见设计蓝本 `docs/superpowers/specs/2026-11-16-meeting-minutes-design.md`，垂直切片工单 001–009 在 `docs/superpowers/tickets/`，`docs/` 不入库）
+- **后端**：`services/minutes_docx.py`（零 Flask 依赖，`build_minutes(data, out_path) -> ServiceResult[None]`）+ `blueprints/meeting_minutes_bp.py`（`POST /api/v1/meeting-minutes`，`@validate_request(body=MeetingMinutesSchema)` + `@rate_limit(5 次 / 60 秒)` + `send_file` + `@after_this_request` 里 `cleanup_files`）+ `schemas.py` 的 `MeetingMinutesSchema` / `MinutesPersonSchema`；`app.py` 注册蓝图；`services/stats.py` 的 `MODULE_NAMES` 增 `"meeting-minutes": "会议纪要整理"`（不加则 `aggregate_by_module` 会把该模块的审计行静默丢弃，`/status` 上永远看不见）。**即取即删**形态，不进「三件两段式例外」
+- **不复用 `services/formatter.py`**：它是「已有文档 → 重排版式」的后处理器，且 `_set_run_font` 会主动删掉 `w:color`（`formatter.py:69`），红色纪要标志与红色版头线会被抹黑。版式常量按蓝本 §5 在本模块内逐条落值：A4 + 37/35/28/26 mm 页边距（→ 版心 156×225）、正文 3 号仿宋 + 固定 29 磅行距 + `firstLineChars=200`（左空二字、回行顶格，禁用 `left` 以免回行跟着缩进）、层次序号 一、→黑体 /（一）→楷体 / 1.（1）→仿宋、名单与附件用 `leftChars + hangingChars` 做「回行与冒号后首字对齐」、版记三条线 `sz` 序列 8/6/8 且与版心等宽、印发行靠段内左右两个制表位而非空格或右对齐、成文日期按 7.3.5.4 去月日前导零
+- **页码（7.5）**：打开 `w:evenAndOddHeaders`（`doc.settings.odd_and_even_pages_header_footer`），奇数页脚右对齐 + `w:rightChars="100"`、偶数页脚左对齐 + `w:leftChars="100"`，内容是「— `PAGE` 域 —」三段 run（4 号半角 Times New Roman + 宋体）。域 run 只写 `w:fldChar begin@w:dirty="true"` + `w:instrText " PAGE "` + `w:fldChar end`，**不缓存结果**——于是产物 XML 里没有任何字面量页码，Word 打开即重算。国标「不给空白页编页码」的前提（不插分页符、不分节）由 `test_nothing_forces_a_blank_page` 钉住
+- **校验与错误消息 i18n**：`MEET_NAME_MAX_CHARS=50` / `ROSTER_MAX_COUNT=100` 落在模块级常量（写进模型体会被 pydantic 以 `A non-annotated attribute was detected` 拒收），新增 6 个 msgid（会议名称空 / 过长、正文全空、名单超限、只填单位没填姓名、日期格式），一律 `lazy_gettext as _l` + `%(...)s` 命名插值，上限数字不进词条 key。`error_handler.py` 的 422 分支改为剥掉 pydantic 给自定义 validator 冠上的 `"Value error, "` 前缀——剩下的是源头已翻译好的 msgid。`fill_zh_po.py` 原本往 `translations/zh_CN/` 写（正是 AGENTS.md 警告的静默失配目录名），已改成在用的 `zh_Hans_CN`
+- **两条已知偏差（不静默）**：① 页码一字线上缘实测距版心下边缘 **6.48mm** 而非 7mm——Word 的 `w:pgMar/@w:footer` 量的是页脚**底边**到页面底边，故取 `35 − 7 − 半个 4 号字高 = 25.53mm`，LibreOffice 300dpi 量像素得 6.48mm，残余来自本机缺 宋体 / 仿宋_GB2312 被替换成 Noto Sans CJK SC 的行盒差异，**须在 Word / WPS 里复验**；② 7.4.1 的「版记末条分隔线与最后一面版心下边缘重合」不成立——版记按文档流排在主体末尾，要钉到末页底端得用 `w:framePr` 定位，Word 与 LibreOffice 环绕行为不一致且读 XML 断言不了，见工单 005
+- **顺带发现的存量缺陷**：`services/formatter.py:230-246` 用 `section.different_odd_and_even_pages` 开奇偶页脚，**python-docx 没有这个属性**（真名是 `doc.settings.odd_and_even_pages_header_footer`）——「格式规范」模块的奇偶页码从来没生效过。本模块不复用它，缺陷单独记账
+- **前端与宣传页**：`tools.config.ts` 注册 `order: 5`（紧跟格式规范），落进宣传页 `groupOfficial`；两个 locale 各增 23 键（`tabs.meetingMinutes` + `meetingMinutes.*`）；`MeetingMinutesPanel.vue` 把 422/400 内联渲染成 `role="alert"` 一行（`useApiError().extractError`），只有网络/5xx 才弹 toast；宣传页件数文案「十五件」→「十六件」（`tools.config.spec.ts` 新增「标题里的件数就是网格里的卡片数」断言，第 17 个工具进来时它会先红）；`sitemap.spec.ts` 的 URL 数随 `TOOLS` 到 19 条
+- **验证**：后端 `uv run pytest tests/ -q` **252 passed**（`test_meeting_minutes.py` 54 条，逐条对应国标条款号写 docstring，断言打在 OOXML 属性上而非渲染图）；前端 `npx vitest run` **14 files / 133 passed**；`uv run mypy --strict schemas.py` 干净；dev 浏览器实测中文面板两条 422 内联文案与零 toast；产物另经 `libreoffice --headless --convert-to pdf` + `pdftotext -bbox` + `pdftoppm -r 300` 量像素复核页序、行距与页码落位
+- **文档**：`AGENTS.md`（模块计数 16、功能表加第 16 行、`layouts/default.vue` 注释 16 个工具页、宣传页行「16 件工具」、两段式待办补记「纪要已用即取即删形态」）、`SPEC.md`（二章模块表 + 侧栏顺序、五章端点全集、八章 blueprint 计数、十一章路由表与双壳计数）、`README.md`（工具表新增一行并按侧栏顺序重排 3–16）
 
 ### v3.13.0 (2026-11)
 

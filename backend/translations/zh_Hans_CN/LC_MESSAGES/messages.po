@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: docStamp VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-29 16:46+0800\n"
+"POT-Creation-Date: 2026-11-16 17:21+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
@@ -18,21 +18,43 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: error_handler.py:79
+#: error_handler.py:83
 msgid "Resource not found"
 msgstr "资源不存在"
 
-#: error_handler.py:83
+#: error_handler.py:87
 msgid "Method not allowed"
 msgstr "请求方法不允许"
 
-#: error_handler.py:87
+#: error_handler.py:91
 msgid "Request entity too large"
 msgstr "请求体过大"
 
-#: error_handler.py:93
+#: error_handler.py:97
 msgid "系统异常"
 msgstr "系统异常"
+
+#: schemas.py:57
+msgid "Meeting name is required"
+msgstr "会议名称不能为空"
+
+#: schemas.py:59
+#, python-format
+msgid "Meeting name is too long (max %(limit)s characters)"
+msgstr "会议名称过长（最多 %(limit)s 字）"
+
+#: schemas.py:69
+msgid "Print date must be written as YYYY-MM-DD"
+msgstr "印发日期要写成 YYYY-MM-DD（如 2026-01-05）"
+
+#: schemas.py:79
+msgid "At least one body paragraph is required"
+msgstr "正文至少需要一段非空白内容"
+
+#: schemas.py:81
+#, python-format
+msgid "Too many people in a roster (max %(limit)s)"
+msgstr "名单人数过多（每类最多 %(limit)s 人）"
 
 #: blueprints/convert.py:110
 msgid "File too large"
@@ -286,6 +308,11 @@ msgstr "输入文件不存在"
 #, python-format
 msgid "Failed to read PDF: %(e)s"
 msgstr "读取 PDF 失败：%(e)s"
+
+#: services/minutes_docx.py:383
+#, python-format
+msgid "%(label)s list entry %(index)s has a unit but no name"
+msgstr "%(label)s名单第 %(index)s 人只填了单位，姓名没填"
 
 #: services/page_decorator.py:36
 msgid "Mode must be 'page_number', 'header', or 'footer'"

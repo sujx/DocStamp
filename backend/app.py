@@ -61,6 +61,8 @@ def create_app() -> Flask:
             "http://localhost:8080,http://127.0.0.1:8080",
         ).split(","),
         max_age=3600,
+        # 下载名以服务端为准，但跨域时浏览器默认不把 Content-Disposition 暴露给 JS。
+        expose_headers=["Content-Disposition"],
     )
 
     # Infrastructure
@@ -160,12 +162,14 @@ def create_app() -> Flask:
     from blueprints.page_decorate_bp import page_decorate_bp
     from blueprints.stats_bp import stats_bp
     from blueprints.rss_detect_bp import rss_detect_bp
+    from blueprints.meeting_minutes_bp import meeting_minutes_bp
 
     app.register_blueprint(pdf_compress_bp)
     app.register_blueprint(metadata_clean_bp)
     app.register_blueprint(page_decorate_bp)
     app.register_blueprint(stats_bp)
     app.register_blueprint(rss_detect_bp)
+    app.register_blueprint(meeting_minutes_bp)
 
     # SPA fallback — serve frontend static files (Nuxt generate output)
     static_dir = app.config["STATIC_FOLDER"]

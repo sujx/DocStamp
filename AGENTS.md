@@ -52,7 +52,7 @@ docStamp/
 │   ├── utils/                  # 纯计算引擎 (interest.ts：零 Vue / 零 Nuxt 依赖，可直接被 vitest 跑)
 │   ├── components/             # 业务组件 + ui/ 原子组件
 │   ├── components/landing/     # 宣传页区块 (LandingNav / LetterheadHero / ToolShowcase / PromiseBand / LandingFooter / SectionKicker)
-│   ├── layouts/default.vue     # 侧边导航壳 (应用内: /tools + 15 个工具页)
+│   ├── layouts/default.vue     # 侧边导航壳 (应用内: /tools + 16 个工具页)
 │   ├── layouts/landing.vue     # 宣传页壳: sticky 顶栏 + 页脚 + UNotifications, 无侧栏
 │   ├── pages/                  # 路由页面 (index.vue = 宣传页, tools.vue = 仪表盘)
 │   ├── server/routes/          # Nitro 端点: sitemap.xml.ts (URL 来自 TOOLS, 不用 pages/)
@@ -68,11 +68,11 @@ docStamp/
 
 ## 功能模块
 
-功能模块 15 个（14 项工具 + 使用统计）；下表 17 行含宣传页与仪表盘两个导航页，二者都不计入。
+功能模块 16 个（15 项工具 + 使用统计）；下表 18 行含宣传页与仪表盘两个导航页，二者都不计入。
 
 | # | 模块 | 路由 | 说明 |
 |---|------|------|------|
-| 1 | 宣传页 | `/` | 对外首页：红头 hero + 15 件工具 + 隐私承诺 + 资源区 |
+| 1 | 宣传页 | `/` | 对外首页：红头 hero + 16 件工具 + 隐私承诺 + 资源区 |
 | 1b | 仪表盘 | `/tools` | 工具卡片网格（应用内首页，有侧栏） |
 | 2 | MD 转公文 | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX |
 | 3 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
@@ -88,7 +88,8 @@ docStamp/
 | 13 | WebP 转 JPEG | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
 | 14 | 密码生成 | `/password-gen` | 随机密码 + 可复现密码（纯前端，零数据留存） |
 | 15 | 利息计算 | `/interest-calc` | 房贷/消费贷/信用贷：四种还款方式 + 费用折进真实年化（纯前端，零数据留存） |
-| 16 | 使用统计 | `/status` | 模块调用量 + 访客统计 (ECharts) |
+| 16 | 会议纪要整理 | `/meeting-minutes` | 会议名称 + 正文 + 出席/请假/列席名单 → GB/T 9704-2012 10.3 纪要 DOCX |
+| 17 | 使用统计 | `/status` | 模块调用量 + 访客统计 (ECharts) |
 
 ## 开发环境
 
@@ -295,7 +296,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 | 产物目录改 tmpfs（或给 upload 挂 tmpfs） | `output_data` 是具名卷，落在物理盘（`docker-compose.yml:26`）；做不到就不能写「磁盘零写入」 |
 | 硬 TTL 一小时 + 真定时扫描 | 通用临时文件是每日扫描、7 天上限（`backend/utils/file_cleanup.py:19-21`）；1 小时 TTL 只覆盖脱敏会话且惰性触发（`backend/utils/redact_session.py:24`） |
 | 上传落盘不带原名 | 存盘名 `uuid_<安全化原名>`（`backend/utils/base/file_helpers.py:62-63`） |
-| 三件两段式工具也做到取走即删 | MD转公文 / 格式规范 / 打印分组都是「生成 → 下载」：`backend/blueprints/convert.py:141-147,182-188` 与 `print_split_bp.py:48-56,66-78` 成功后只回 id，`download.py:75` 无删除钩子 |
+| 三件两段式工具也做到取走即删 | MD转公文 / 格式规范 / 打印分组都是「生成 → 下载」：`backend/blueprints/convert.py:141-147,182-188` 与 `print_split_bp.py:48-56,66-78` 成功后只回 id，`download.py:75` 无删除钩子。会议纪要整理已用即取即删形态（`blueprints/meeting_minutes_bp.py` 的 `send_file` + `@after_this_request cleanup_files`，`tests/test_meeting_minutes.py::test_artifact_is_gone_once_the_response_is_back` 钉住），所以这三件仍是全部例外 |
 | 运维日志不再带文件路径 | `backend/utils/file_cleanup.py:88` 清理失败时把临时文件全路径写进日志，`error_handler.py:94` + `json_logging.py:47-48` 还带堆栈，保留 30 天（`json_logging.py:21`）。做到才能把承诺带 item3 从「统计库里没有文件名」升回「日志里没有文件名」 |
 | 脱敏会话目录纳入真定时清扫 | `cleanup_expired` 全仓库唯一调用点是下一次 `/open`（`backend/blueprints/pdf_redact_bp.py:67`），惰性触发；且 7 天清扫只按顶层条目 mtime 判龄（`backend/utils/file_cleanup.py:73-84`），`redact-sessions` 父目录 mtime 每次建/删会话都刷新 → 7 天内有人用过就整棵树跳过，废弃会话可能长期留存。做到才能对脱敏写「最长留 N」 |
 | PDF 编辑的 `thumbs_*` 页面图片有人删 | `backend/blueprints/pdf_editor_bp.py:86-87,92-107` 渲染最多 50 张页面 PNG，`:125-126` 的 `finally` 只删上传件；全仓库无任何删除点，页面图片留到 7 天清扫。做到才能把它并进「响应结束即删」 |

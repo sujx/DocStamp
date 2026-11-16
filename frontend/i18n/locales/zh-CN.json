@@ -19,13 +19,14 @@
     "webpToJpeg": "WebP 转 JPEG",
     "pdfRedact": "PDF 脱敏",
     "passwordGen": "密码生成",
-    "interestCalc": "利息计算"
+    "interestCalc": "利息计算",
+    "meetingMinutes": "会议纪要整理"
   },
   "dashboard": {
     "heroTitle": "文档处理，化繁为简",
-    "heroSubtitle": "15 项功能，覆盖格式转换、PDF 编辑、文档规范化、财务计算等场景",
+    "heroSubtitle": "16 项功能，覆盖格式转换、PDF 编辑、文档规范化、财务计算等场景",
     "metaTitle": "工具仪表盘",
-    "metaDescription": "15 项工具的应用内首页。"
+    "metaDescription": "16 项工具的应用内首页。"
   },
   "status": {
     "title": "使用统计",
@@ -381,7 +382,7 @@
     },
     "tools": {
       "kicker": "TOOLS / 工具",
-      "title": "十五件顺手的小工具",
+      "title": "十六件顺手的小工具",
       "note": "每一项都只做一件事。点开即用，没有登录墙。",
       "groupOfficial": "公文规范",
       "groupPdf": "PDF",
@@ -416,7 +417,7 @@
       "title": "先懂标准，再用工具",
       "note": "站内已有的四份参照，不用注册。",
       "standardDesc": "国标原文，字号、行距、成文日期对着查。",
-      "toolsDesc": "十五件工具一览，点开即用。",
+      "toolsDesc": "十六件工具一览，点开即用。",
       "statsDesc": "各模块调用量与独立访客，本站自己也在被统计。",
       "guideTitle": "PDF 脱敏教程",
       "guideDesc": "黑框为什么不算脱敏，扫描件又差在哪。"
@@ -548,5 +549,37 @@
       "upfrontFee": "前置费用不能为负，且必须小于本金，否则到手金额不为正。",
       "feeRate": "每期费率要在 0 到 5% 之间。"
     }
+  },
+  "meetingMinutes": {
+    "title": "会议纪要整理",
+    "description": "填会议名称与正文，按 GB/T 9704—2012 第 10.3 条「纪要格式」生成可直接签发的纪要 DOCX：红色小标宋纪要标志、版头红色分隔线、3 号仿宋正文与 29 磅固定行距",
+    "metaTitle": "会议纪要整理",
+    "metaDescription": "按 GB/T 9704—2012 纪要格式生成会议纪要 DOCX：标志、版头分隔线、正文行距与缩进全部按国标排定。",
+    "meetName": "会议名称",
+    "meetNameHint": "末尾会自动接「纪要」二字组成标志，不必自己写。",
+    "meetNamePlaceholder": "如：信息技术中心例会",
+    "body": "正文",
+    "bodyHint": "每行一个自然段，空行会被合并；行首序号自动判层级并换字体。",
+    "bodyPlaceholder": "本次会议议定了三项工作。",
+    "attachments": "附件",
+    "attachmentsHint": "一行一个附件名；末尾标点会被去掉，多个自动编号。",
+    "attachmentsPlaceholder": "某某统计表",
+    "attendees": "出席",
+    "leave": "请假",
+    "witness": "列席",
+    "rosterHint": "一行一人：单位 + 空格 + 姓名；留空则该块不排。",
+    "rosterPlaceholder": "信息技术中心 张三",
+    "colophon": {
+      "cc": "抄送机关",
+      "ccHint": "一行一个机关，自动用顿号相连；最后一个后面加句号。留空则整块不排。",
+      "ccPlaceholder": "如：综合处",
+      "printOrg": "印发机关",
+      "printOrgPlaceholder": "如：信息技术中心综合处",
+      "printDate": "印发日期",
+      "hint": "日期用阿拉伯数字标全、月与日不补零（7.3.5.4）；印发机关左空一字、印发日期右空一字（7.4.3）。"
+    },
+    "generate": "生成纪要 DOCX",
+    "levels": "层次序号（7.3.3）：一、→ 黑体三号；（一）→ 楷体三号；1. /（1）→ 仿宋三号。每段首行缩进二字、回行顶格。",
+    "note": "会议名称与正文会发送到服务器排版；生成的文件在响应结束后立即从服务器删除，不做留存。"
   }
 }

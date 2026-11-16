@@ -12,6 +12,7 @@ export const TOOLS: ToolDef[] = [
   { key: "dashboard", to: "/tools", icon: "i-heroicons-home", label: "tabs.dashboard", order: 1 },
   { key: "md2docx", to: "/md-to-docx", icon: "i-heroicons-arrow-down-tray", label: "tabs.md2docx", desc: "md2docx.description", order: 2 },
   { key: "format-docx", to: "/format-docx", icon: "i-heroicons-document-check", label: "tabs.formatDocx", desc: "format.description", order: 4 },
+  { key: "meeting-minutes", to: "/meeting-minutes", icon: "i-heroicons-clipboard-document-list", label: "tabs.meetingMinutes", desc: "meetingMinutes.description", order: 5 },
   { key: "rss-detect", to: "/rss-detect", icon: "i-heroicons-signal", label: "tabs.rssDetect", desc: "rssDetect.description", order: 7 },
   { key: "password-gen", to: "/password-gen", icon: "i-heroicons-key", label: "tabs.passwordGen", desc: "passwordGen.description", order: 8 },
   { key: "interest-calc", to: "/interest-calc", icon: "i-heroicons-calculator", label: "tabs.interestCalc", desc: "interestCalc.description", order: 9 },
@@ -43,7 +44,7 @@ export const FOOTER_TOOL_KEYS = ["md2docx", "pdf-redact", "format-docx", "pdf-me
 
 /** 宣传页五段分组。键必须与 TOOLS 一一对应（除 dashboard），由契约测试钉住。 */
 export const LANDING_GROUPS: { labelKey: string; keys: string[] }[] = [
-  { labelKey: "landing.tools.groupOfficial", keys: ["md2docx", "format-docx"] },
+  { labelKey: "landing.tools.groupOfficial", keys: ["md2docx", "format-docx", "meeting-minutes"] },
   { labelKey: "landing.tools.groupPdf", keys: ["file-assembly", "print-split", "pdf-editor", "pdf-tools", "pdf-merge", "pdf-redact"] },
   { labelKey: "landing.tools.groupOffice", keys: ["properties", "excel-merge"] },
   { labelKey: "landing.tools.groupImage", keys: ["webp-to-jpeg"] },

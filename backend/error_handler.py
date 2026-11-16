@@ -59,10 +59,14 @@ def register_error_handlers(app: Flask) -> None:
 
     @app.errorhandler(ValidationError)
     def handle_pydantic_validation_error(e: ValidationError):
-        """Pydantic validation failure → 422."""
+        """Pydantic validation failure → 422.
+
+        自定义 validator 抛的 ValueError 会被 pydantic 冠上「Value error, 」前缀；
+        前缀一掉，剩下的就是 msgid 本身，翻译在源头（schemas.py 的 `_l`）已经做完。
+        """
         errors = e.errors()
         first_message = errors[0]["msg"] if errors else "Validation failed"
-        return _format_error(422, first_message, "ValidationError")
+        return _format_error(422, first_message.removeprefix("Value error, "), "ValidationError")
 
     @app.errorhandler(ServiceError)
     def handle_service_error(e: ServiceError):
