@@ -26,7 +26,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov"],
-      include: ["composables/**", "components/**"],
+      include: ["composables/**", "components/**", "utils/**"],
     },
   },
   resolve: {

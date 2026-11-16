@@ -18,13 +18,14 @@
     "rssDetect": "RSS Detector",
     "webpToJpeg": "WebP to JPEG",
     "pdfRedact": "PDF Redaction",
-    "passwordGen": "Password Generator"
+    "passwordGen": "Password Generator",
+    "interestCalc": "Loan Calculator"
   },
   "dashboard": {
     "heroTitle": "Document Processing, Simplified",
-    "heroSubtitle": "14 features for format conversion, PDF editing, document standardization and more",
+    "heroSubtitle": "15 features for format conversion, PDF editing, document standardization, loan math and more",
     "metaTitle": "Tool dashboard",
-    "metaDescription": "The in-app home for all 14 document tools."
+    "metaDescription": "The in-app home for all 15 tools."
   },
   "status": {
     "title": "Usage Statistics",
@@ -380,7 +381,7 @@
     },
     "tools": {
       "kicker": "TOOLS",
-      "title": "Fourteen small tools, one job each",
+      "title": "Fifteen small tools, one job each",
       "note": "Click and use it — no login wall, no setup.",
       "groupOfficial": "Official format",
       "groupPdf": "PDF",
@@ -415,7 +416,7 @@
       "title": "Know the standard, then use the tool",
       "note": "Four references on this site. No sign-up.",
       "standardDesc": "The GB/T 9704 text itself — font sizes, line spacing, dates.",
-      "toolsDesc": "All fourteen tools in one grid.",
+      "toolsDesc": "All fifteen tools in one grid.",
       "statsDesc": "Module calls and unique visitors — this site counts itself too.",
       "guideTitle": "PDF redaction guide",
       "guideDesc": "Why a black box fails, and where scanned PDFs fall short."
@@ -459,6 +460,93 @@
       "ctaTitle": "Want to try it?",
       "ctaBody": "Upload a PDF, locate with keywords or draw boxes, then delete the text layer and cover it with mosaic — every box is re-checked.",
       "ctaButton": "Open redaction tool →"
+    }
+  },
+  "interestCalc": {
+    "title": "Loan Calculator",
+    "description": "Amortization schedules for equal-payment, equal-principal, interest-first and bullet repayment, with management and service fees folded into the true annual rate — every number computed in your browser",
+    "metaTitle": "Loan Calculator",
+    "metaDescription": "Period-by-period repayment plans and full cost for four repayment methods, including the true annual rate (APR / EAR) after one-time and per-period fees.",
+    "privacy": "Principal, rate, term and fees are computed entirely in your browser and never sent to the server. This page reports only its visit path under the site-wide counter, which carries no amount.",
+    "form": {
+      "title": "Loan terms",
+      "principal": "Principal",
+      "yuan": "CNY",
+      "optional": "Leave blank if none",
+      "period": "Term",
+      "periodHint": "{n} periods in total, one per month",
+      "rate": "Interest rate",
+      "upfrontFee": "One-time upfront fee",
+      "upfrontFeeHint": "A service or management fee charged at signing, or withheld from the disbursement: it shrinks the cash you actually get, not the balance you repay",
+      "periodFeeRate": "Per-period fee rate",
+      "periodFeeRateHint": "Charged on the original principal and never declining with the balance — this is exactly how credit-card instalments and most consumer loans quote a monthly rate",
+      "method": "Repayment method",
+      "reset": "Restore defaults",
+      "fixErrors": "Fix the fields flagged in red on the left first."
+    },
+    "periodUnit": {
+      "year": "Years",
+      "month": "Months"
+    },
+    "rateUnit": {
+      "year": "Annual %",
+      "month": "Monthly %",
+      "day": "Daily (bps)"
+    },
+    "method": {
+      "annuity": "Equal payment",
+      "linear": "Equal principal",
+      "interestFirst": "Interest first",
+      "bullet": "Bullet repayment"
+    },
+    "result": {
+      "title": "True cost",
+      "subtitle": "The annual rate once fees and the timing of every cash flow are folded in",
+      "apr": "True annual rate (APR)",
+      "aprHint": "Period rate × 12 — the same basis a quoted rate uses. Compare it against the {nominal} on your offer",
+      "ear": "Effective annual rate (EAR)",
+      "earHint": "Compounded monthly across a full year",
+      "notApplicable": "The upfront fee already covers the whole principal, so the cash flows never change sign and there is no annual rate to solve for.",
+      "disbursed": "Cash in hand",
+      "perPeriod": "Per period (principal + interest)",
+      "totalOutflow": "Total paid",
+      "totalInterest": "Total interest",
+      "totalFee": "Total fees",
+      "totalCost": "Full cost",
+      "feeSplit": "{period} per period + {upfront} upfront",
+      "totalCostHint": "= interest + fees = total paid − principal"
+    },
+    "table": {
+      "title": "Repayment schedule",
+      "subtitle": "{n} periods in total",
+      "period": "#",
+      "opening": "Opening balance",
+      "principalPart": "Principal",
+      "interestPart": "Interest",
+      "feePart": "Fee",
+      "outflow": "Total",
+      "balance": "Closing balance",
+      "expand": "Show all {n} periods",
+      "collapse": "Collapse to the first 12"
+    },
+    "compare": {
+      "title": "Four methods side by side",
+      "subtitle": "Same money, same quote — only the timing of the cash flows differs",
+      "method": "Method",
+      "perPeriod": "Per period",
+      "totalInterest": "Interest",
+      "totalFee": "Fees",
+      "totalCost": "Full cost",
+      "apr": "True annual rate",
+      "current": "Selected",
+      "hint": "The three monthly-amortizing rows share one true annual rate by construction; they differ in total interest and in how much pressure the early years put on your cash flow. Bullet repayment looks the most expensive in interest, yet because the principal sits untouched for decades its true annual rate lands well below the quoted one."
+    },
+    "error": {
+      "principal": "Enter a principal between 0 and 1 billion.",
+      "periods": "The term must convert to between 1 and 600 monthly periods.",
+      "rate": "The rate cannot be negative, and the nominal annual rate must stay under 100% — check that you picked the right unit.",
+      "upfrontFee": "The upfront fee cannot be negative and must be smaller than the principal, otherwise nothing is left to disburse.",
+      "feeRate": "The per-period fee rate must be between 0 and 5%."
     }
   }
 }

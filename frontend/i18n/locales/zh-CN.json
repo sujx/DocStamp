@@ -18,13 +18,14 @@
     "rssDetect": "RSS 探测",
     "webpToJpeg": "WebP 转 JPEG",
     "pdfRedact": "PDF 脱敏",
-    "passwordGen": "密码生成"
+    "passwordGen": "密码生成",
+    "interestCalc": "利息计算"
   },
   "dashboard": {
     "heroTitle": "文档处理，化繁为简",
-    "heroSubtitle": "14 项功能，覆盖格式转换、PDF 编辑、文档规范化等场景",
+    "heroSubtitle": "15 项功能，覆盖格式转换、PDF 编辑、文档规范化、财务计算等场景",
     "metaTitle": "工具仪表盘",
-    "metaDescription": "14 项文档工具的应用内首页。"
+    "metaDescription": "15 项工具的应用内首页。"
   },
   "status": {
     "title": "使用统计",
@@ -380,7 +381,7 @@
     },
     "tools": {
       "kicker": "TOOLS / 工具",
-      "title": "十四件顺手的小工具",
+      "title": "十五件顺手的小工具",
       "note": "每一项都只做一件事。点开即用，没有登录墙。",
       "groupOfficial": "公文规范",
       "groupPdf": "PDF",
@@ -415,7 +416,7 @@
       "title": "先懂标准，再用工具",
       "note": "站内已有的四份参照，不用注册。",
       "standardDesc": "国标原文，字号、行距、成文日期对着查。",
-      "toolsDesc": "十四件工具一览，点开即用。",
+      "toolsDesc": "十五件工具一览，点开即用。",
       "statsDesc": "各模块调用量与独立访客，本站自己也在被统计。",
       "guideTitle": "PDF 脱敏教程",
       "guideDesc": "黑框为什么不算脱敏，扫描件又差在哪。"
@@ -459,6 +460,93 @@
       "ctaTitle": "想直接试一次？",
       "ctaBody": "拖入 PDF，关键词定位或手动框选，删文字层 + 马赛克遮盖，最后逐框复检。",
       "ctaButton": "去脱敏 →"
+    }
+  },
+  "interestCalc": {
+    "title": "利息计算",
+    "description": "房贷、消费贷、信用贷的等额本息 / 等额本金 / 先息后本 / 到期一次还本付息还款计划，并把管理费与服务费折进真实年化利率，所有数字在浏览器本地算完",
+    "metaTitle": "利息计算",
+    "metaDescription": "四种还款方式的逐期还款计划与全成本，含一次性前置费用与每期费率折算出的真实年利率（APR / EAR）。",
+    "privacy": "本金、利率、期限与费用全部在浏览器内计算，不会发送到服务器。本页只按全站规则上报一次访问路径，其中不含任何金额信息。",
+    "form": {
+      "title": "贷款条件",
+      "principal": "贷款本金",
+      "yuan": "元",
+      "optional": "没有可留空",
+      "period": "贷款期限",
+      "periodHint": "共 {n} 期，一期按月",
+      "rate": "利率",
+      "upfrontFee": "一次性前置费用",
+      "upfrontFeeHint": "服务费 / 管理费在签约放款时收走或直接从本金里扣掉：只减少到手现金，不减少还款基数",
+      "periodFeeRate": "每期费率",
+      "periodFeeRateHint": "按名义本金固定收取、不随余额递减——信用卡分期和多数消费贷的「月费率」就是这个口径",
+      "method": "还款方式",
+      "reset": "恢复默认",
+      "fixErrors": "请先修正左侧输入项标红的提示。"
+    },
+    "periodUnit": {
+      "year": "年",
+      "month": "月"
+    },
+    "rateUnit": {
+      "year": "年利率 %",
+      "month": "月利率 %",
+      "day": "日息（万分之）"
+    },
+    "method": {
+      "annuity": "等额本息",
+      "linear": "等额本金",
+      "interestFirst": "先息后本",
+      "bullet": "到期一次还本付息"
+    },
+    "result": {
+      "title": "真实成本",
+      "subtitle": "把费用与现金流时间一起折进去之后的年利率",
+      "apr": "真实年利率（APR）",
+      "aprHint": "期利率 × 12，与贷款报价同口径——报价上写的 {nominal} 能不能对上，就看这个数",
+      "ear": "有效年利率（EAR）",
+      "earHint": "按月复利滚一整年",
+      "notApplicable": "前置费用已经覆盖了全部本金，现金流方向没有反转，算不出真实年利率。",
+      "disbursed": "到手金额",
+      "perPeriod": "每期还款（本息）",
+      "totalOutflow": "实付总额",
+      "totalInterest": "利息合计",
+      "totalFee": "费用合计",
+      "totalCost": "全成本",
+      "feeSplit": "每期 {period} + 前置 {upfront}",
+      "totalCostHint": "= 利息合计 + 费用合计 = 实付总额 − 本金"
+    },
+    "table": {
+      "title": "还款计划表",
+      "subtitle": "共 {n} 期",
+      "period": "期",
+      "opening": "期初余额",
+      "principalPart": "本期还本",
+      "interestPart": "本期利息",
+      "feePart": "本期费用",
+      "outflow": "本期合计",
+      "balance": "期末余额",
+      "expand": "展开全部 {n} 期",
+      "collapse": "收起，只看前 12 期"
+    },
+    "compare": {
+      "title": "四种还款方式并排",
+      "subtitle": "同一笔钱、同一个报价，只差现金流的时间",
+      "method": "还款方式",
+      "perPeriod": "每期（本息）",
+      "totalInterest": "利息合计",
+      "totalFee": "费用合计",
+      "totalCost": "全成本",
+      "apr": "真实年利率",
+      "current": "当前",
+      "hint": "等额本息、等额本金、先息后本三行的真实年利率本就相同，差异全在利息总额和前期现金流压力上。到期一次还本付息看着利息最多，其实因为本金几十年不动，真实年利率明显低于报价。"
+    },
+    "error": {
+      "principal": "本金要填 0 到 10 亿之间的数字。",
+      "periods": "期限换算成月数后要在 1 到 600 期之间。",
+      "rate": "利率不能为负，且换算后的名义年化不能超过 100%——请确认单位选对了。",
+      "upfrontFee": "前置费用不能为负，且必须小于本金，否则到手金额不为正。",
+      "feeRate": "每期费率要在 0 到 5% 之间。"
     }
   }
 }

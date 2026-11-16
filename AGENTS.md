@@ -48,10 +48,11 @@ docStamp/
 │   ├── nuxt.config.ts          # SSG + i18n + Nuxt UI v2
 │   ├── tailwind.config.ts      # Tailwind v3 品牌色阶
 │   ├── assets/css/main.css     # CSS 变量 (SynTime Royal Blue token)
-│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError / useSidebar / usePageView / usePdfRedactMarks
+│   ├── composables/            # tools.config / useValidation / useApi / useDownload / useApiError / useSidebar / usePageView / usePdfRedactMarks / useInterestCalc
+│   ├── utils/                  # 纯计算引擎 (interest.ts：零 Vue / 零 Nuxt 依赖，可直接被 vitest 跑)
 │   ├── components/             # 业务组件 + ui/ 原子组件
 │   ├── components/landing/     # 宣传页区块 (LandingNav / LetterheadHero / ToolShowcase / PromiseBand / LandingFooter / SectionKicker)
-│   ├── layouts/default.vue     # 侧边导航壳 (应用内: /tools + 14 个工具页)
+│   ├── layouts/default.vue     # 侧边导航壳 (应用内: /tools + 15 个工具页)
 │   ├── layouts/landing.vue     # 宣传页壳: sticky 顶栏 + 页脚 + UNotifications, 无侧栏
 │   ├── pages/                  # 路由页面 (index.vue = 宣传页, tools.vue = 仪表盘)
 │   ├── server/routes/          # Nitro 端点: sitemap.xml.ts (URL 来自 TOOLS, 不用 pages/)
@@ -67,11 +68,11 @@ docStamp/
 
 ## 功能模块
 
-功能模块 14 个（13 项工具 + 使用统计）；下表 16 行含宣传页与仪表盘两个导航页，二者都不计入。
+功能模块 15 个（14 项工具 + 使用统计）；下表 17 行含宣传页与仪表盘两个导航页，二者都不计入。
 
 | # | 模块 | 路由 | 说明 |
 |---|------|------|------|
-| 1 | 宣传页 | `/` | 对外首页：红头 hero + 14 件工具 + 隐私承诺 + 资源区 |
+| 1 | 宣传页 | `/` | 对外首页：红头 hero + 15 件工具 + 隐私承诺 + 资源区 |
 | 1b | 仪表盘 | `/tools` | 工具卡片网格（应用内首页，有侧栏） |
 | 2 | MD 转公文 | `/md-to-docx` | Markdown → GB/T 9704-2012 DOCX |
 | 3 | 格式规范 | `/format-docx` | GB/T 9704-2012 格式化 |
@@ -86,7 +87,8 @@ docStamp/
 | 12 | PDF 脱敏 | `/pdf-redact` | 框选/关键词标记敏感区，生成带马赛克的新 PDF |
 | 13 | WebP 转 JPEG | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
 | 14 | 密码生成 | `/password-gen` | 随机密码 + 可复现密码（纯前端，零数据留存） |
-| 15 | 使用统计 | `/status` | 模块调用量 + 访客统计 (ECharts) |
+| 15 | 利息计算 | `/interest-calc` | 房贷/消费贷/信用贷：四种还款方式 + 费用折进真实年化（纯前端，零数据留存） |
+| 16 | 使用统计 | `/status` | 模块调用量 + 访客统计 (ECharts) |
 
 ## 开发环境
 
@@ -164,7 +166,9 @@ def my_service(path: str) -> ServiceResult[dict]:
 - 所有 UI 文本用 `$t()`，禁止硬编码
 - 颜色通过 CSS 变量或 Tailwind token，禁止 inline hex
 - 禁止 `transition: all`，用具体属性列表
-- 表单校验：Vuelidate (`useValidation` composable)
+- 表单校验：`useValidation.ts` 是 Vuelidate 包装，但**当前无任何页面调用它**（只有它自己的 spec）；纯前端计算页用 composable 里的纯函数校验（如 `useInterestCalc.validateForm` 返回「字段 → 文案键」，UI 只负责把键交给 `$t`）
+- `UInput type="number"` 的 `v-model` 交回来的是 **number，删空时是 null**，不是字符串：接它的一律按 `string | number | null` 处理。同理，`USelect` 的 `v-model` 挂在原生 `input` 事件上（不是 `change`）
+- Nuxt UI v2 的 `:ui` 覆盖要按 schema 的形状给值：`input.trailing` 是 `{ padding: {...} }` **对象**，给它一个字符串会让 `ui.value.trailing.padding[size]` 变成 `undefined['sm']` 直接抛错（实测整棵组件子树被 Vue 卸载，页面只剩「页面组件出错，请刷新重试」）
 - API 错误提示：`useApiError().showError(e)` 弹 toast；需要内联展示时用 `useApiError().extractError(e)` 取消息（自动识别 JSON 与 Blob 两种错误体）；全局 401 由 `plugins/axios.client.ts` 拦截
 - Toast：`useToast().add({...})` 只往 `useState("notifications")` 里塞数据，**页面上必须有 `<UNotifications />` 容器才会渲染**——容器挂在 `layouts/default.vue` 与 `layouts/landing.vue`，新增独立 layout 时要一起带上，否则该页所有 toast 静默失效（v2 无自动注入，实测删掉容器后 `toast.add` 调用成功但 DOM 零节点）
 - 文件下载：统一走 `useDownload().downloadBlob(blob, filename, successMsg?)`（挂 `<a>` → click → 延迟 100ms 摘除并 revoke，禁止在组件里手写这段；不传成功文案则不弹 toast）
@@ -280,6 +284,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 |------|----------|
 | 开发模式没有清理线程 | 每日清理只挂在 gunicorn `on_starting`，`uv run python app.py` 不起它，dev 机器只能 `./manage.sh clean-output` 手动清 |
 | 后端 `mypy --strict` 不是门槛 | v3.11.0 迁 uv 时实测：`uv run mypy --ignore-missing-imports --strict --explicit-package-bases $(git ls-files '*.py')` 报 **319 errors / 43 files**，全是存量（118 条 `no-untyped-def` + 63 条 `type-arg` + 55 条 `arg-type`）。`pyproject.toml` 写着 `strict = true`、`backend/.pre-commit-config.yaml` 也挂了 mypy，但 `.git/hooks/pre-commit` 不存在，所以这道门槛从未跑过。要修属一整批，不在依赖迁移里顺带动 |
+| 深色模式下设计 token 不跟随 | 实测：浏览器 `prefers-color-scheme: dark` 时 Nuxt UI 的 colorMode（默认 `system`）给 `<html>` 挂 `dark`，Nuxt UI 组件转成 `bg-gray-900`，而 `assets/css/main.css` 的 `--color-*` 只有一套浅色值，于是自研样式（`var(--color-muted)` 底 + `var(--color-text-secondary)` 字）落在深色卡上——`/password-gen` 与 `/interest-calc` 的卡片标题都近乎不可读。全站一致地坏，非某页缺陷；根治要么给 token 补 `dark:` 一套，要么把 colorMode 钉成 light。属设计 token 批次 |
 
 ### 宣传页 / 隐私文案
 
@@ -294,7 +299,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 | 运维日志不再带文件路径 | `backend/utils/file_cleanup.py:88` 清理失败时把临时文件全路径写进日志，`error_handler.py:94` + `json_logging.py:47-48` 还带堆栈，保留 30 天（`json_logging.py:21`）。做到才能把承诺带 item3 从「统计库里没有文件名」升回「日志里没有文件名」 |
 | 脱敏会话目录纳入真定时清扫 | `cleanup_expired` 全仓库唯一调用点是下一次 `/open`（`backend/blueprints/pdf_redact_bp.py:67`），惰性触发；且 7 天清扫只按顶层条目 mtime 判龄（`backend/utils/file_cleanup.py:73-84`），`redact-sessions` 父目录 mtime 每次建/删会话都刷新 → 7 天内有人用过就整棵树跳过，废弃会话可能长期留存。做到才能对脱敏写「最长留 N」 |
 | PDF 编辑的 `thumbs_*` 页面图片有人删 | `backend/blueprints/pdf_editor_bp.py:86-87,92-107` 渲染最多 50 张页面 PNG，`:125-126` 的 `finally` 只删上传件；全仓库无任何删除点，页面图片留到 7 天清扫。做到才能把它并进「响应结束即删」 |
-| `operation_logs.file_size` 接上真实体积或删列 | 列存在但无任何调用方传值（`backend/models.py:135` 默认 0，`app.py:111-125` 与 `blueprints/stats_bp.py:37-48` 都不传），每行恒为 0；承诺带 item3 的「体积」因此被去掉 |
+| `operation_logs.file_size` 接上真实体积或删列 | 列存在但无任何调用方传值（`backend/models.py:135` 默认 0，`app.py:111-125` 与 `blueprints/stats_bp.py:19-30` 都不传），每行恒为 0；承诺带 item3 的「体积」因此被去掉 |
 | 日志不再存 IP + UA（若决定匿名化） | `/status` 独立访客去重靠这两列（`backend/app.py:118-122`、`backend/models.py:52-65`），动了是功能减级 |
 | 其余教程与政策/条款页 | 已落地一篇 `/guide/pdf-redact`（宣传页资源区、页脚、脱敏页、sitemap 均已接入）；其余教程及隐私政策/服务条款/更新日志仍无页面，原型里全是 `href="#"` 占位。每篇都要先把文案对代码核实，故不一次铺开 |
 | 删掉 4 个零入链的孤儿路由页 | `frontend/pages/{metadata-clean,page-decorate,pdf-compress,pdf-to-text}.vue`；删页面属改仓库内容，需单独确认 |
@@ -311,7 +316,7 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 | 14 个工具页 `<title>` 仍是空 `%s`（`- 鹊随金印`） | 本批只修 `/` 与新建的 `/tools`；统一补需给 `ToolDef` 加 `titleKey` 并接 `useHead`，属 14 页批量 TDK 批次 |
 | 宣传页工具组标签 `text-tertiary` 12px 对比度 ≈3.77:1，低于 AA | 与 R30 同属设计 token 批次；可改 `text-secondary` 或调深三级文本色 |
 | `SITE_ORIGIN` 与 `pages/index.vue` 的 og 绝对地址是两处字面量 | 改需 runtimeConfig 或构建期常量；今天域名无分歧，暂不动 |
-| sitemap 16 条 URL 共用同一个 UTC `lastmod` | 静态页每日都自称更新，属低信号；逐页 mtime 需构建期 plumbing |
+| sitemap 全部 URL 共用同一个 UTC `lastmod` | 静态页每日都自称更新，属低信号；逐页 mtime 需构建期 plumbing |
 
 ### PDF 脱敏模块
 

@@ -14,6 +14,7 @@ export const TOOLS: ToolDef[] = [
   { key: "format-docx", to: "/format-docx", icon: "i-heroicons-document-check", label: "tabs.formatDocx", desc: "format.description", order: 4 },
   { key: "rss-detect", to: "/rss-detect", icon: "i-heroicons-signal", label: "tabs.rssDetect", desc: "rssDetect.description", order: 7 },
   { key: "password-gen", to: "/password-gen", icon: "i-heroicons-key", label: "tabs.passwordGen", desc: "passwordGen.description", order: 8 },
+  { key: "interest-calc", to: "/interest-calc", icon: "i-heroicons-calculator", label: "tabs.interestCalc", desc: "interestCalc.description", order: 9 },
 
   // ── Office 工具（展开到顶层）──
   { key: "properties", to: "/properties", icon: "i-heroicons-document-text", label: "tabs.properties", desc: "properties.description", order: 10 },
@@ -46,7 +47,7 @@ export const LANDING_GROUPS: { labelKey: string; keys: string[] }[] = [
   { labelKey: "landing.tools.groupPdf", keys: ["file-assembly", "print-split", "pdf-editor", "pdf-tools", "pdf-merge", "pdf-redact"] },
   { labelKey: "landing.tools.groupOffice", keys: ["properties", "excel-merge"] },
   { labelKey: "landing.tools.groupImage", keys: ["webp-to-jpeg"] },
-  { labelKey: "landing.tools.groupOther", keys: ["rss-detect", "password-gen", "status"] },
+  { labelKey: "landing.tools.groupOther", keys: ["rss-detect", "password-gen", "interest-calc", "status"] },
 ];
 
 /** 卡片徽章。键名与文案都必须是今天能为真的说法（见 Task 5 Step 3 的 R32）。 */

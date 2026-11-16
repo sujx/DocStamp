@@ -10,17 +10,19 @@
 
 ---
 
-## 二、功能模块（14 个）
+## 二、功能模块（15 个）
 
-功能模块 = 13 项工具 + 使用统计，共 14 个；仪表盘是导航页不计入，下表按路由列出应用内全部 15 个页面（对外宣传页 `/` 也不计入，v3.12.0 起它是站点首页，见「十一、宣传页首页」）。
+功能模块 = 14 项工具 + 使用统计，共 15 个；仪表盘是导航页不计入，下表按路由列出应用内全部 16 个页面（对外宣传页 `/` 也不计入，v3.12.0 起它是站点首页，见「十一、宣传页首页」）。
 
-**侧栏导航**：
+**侧栏导航**（顺序即 `SIDEBAR_ITEMS` 渲染顺序，实测于 dev server）：
 
 ```
 工具（仪表盘）     → /tools
 MD 转公文          → /md-to-docx
 格式规范          → /format-docx
 RSS 探测          → /rss-detect      (Feed 发现)
+密码生成          → /password-gen
+利息计算          → /interest-calc
 属性修改          → /properties      (元数据 + 清理)
 Excel 合并        → /excel-merge
 文件组装          → /file-assembly
@@ -30,7 +32,6 @@ PDF 编辑          → /pdf-editor
 PDF 合并          → /pdf-merge
 PDF 脱敏          → /pdf-redact
 WebP 转 JPEG      → /webp-to-jpeg
-密码生成          → /password-gen
 使用统计          → /status
 ```
 
@@ -50,7 +51,8 @@ WebP 转 JPEG      → /webp-to-jpeg
 | 12 | PDF 脱敏 | `/pdf-redact` | 框选/关键词标记敏感区，生成带马赛克的新 PDF |
 | 13 | WebP 转 JPEG | `/webp-to-jpeg` | WebP → JPEG，透明填白底，动图取首帧 |
 | 14 | 密码生成 | `/password-gen` | 随机密码 + 可复现密码（纯前端，零数据留存） |
-| 15 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
+| 15 | 利息计算 | `/interest-calc` | 房贷/消费贷/信用贷：四种还款方式 + 费用折进真实年化（纯前端，零数据留存） |
+| 16 | 使用统计 | `/status` | 模块调用量 + 访客统计 + ECharts 可视化 |
 
 ---
 
@@ -122,7 +124,7 @@ Nuxt UI v2（`UFormGroup`, `UButton`, `UInput`, `USelect`, `UTabs`, `UAlert`, `U
 
 ### 仪表盘
 
-顶部品牌 Hero（标题 + 一句话说明），下方单块 3 列工具卡片网格（12 张，按转换 → PDF → Office → 其他排序，带依次入场动画，不设分区标题）。每张卡片含图标徽章 + 标题 + 描述 + 悬停箭头指示。卡片使用 `.card.card-interactive` 全局样式，悬停时上浮 + 阴影加深 + 图标徽章反色。
+顶部品牌 Hero（标题 + 一句话说明），下方单块 3 列工具卡片网格（14 张，按转换 → PDF → Office → 其他排序，带依次入场动画，不设分区标题）。每张卡片含图标徽章 + 标题 + 描述 + 悬停箭头指示。卡片使用 `.card.card-interactive` 全局样式，悬停时上浮 + 阴影加深 + 图标徽章反色。
 
 ---
 
@@ -324,6 +326,7 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 | `useApi` | 通用 API 封装：`{ data, loading, pagination, fetchList }` + `useCache` |
 | `useDownload` | Blob 下载封装（`downloadBlob`）：挂 `<a>` → click → 延迟 100ms 摘除并 revoke；`successMsg` 可选，不传则不弹 toast |
 | `useApiError` | API 错误统一处理：`showError(e)` 弹 toast、`extractError(e)` 取消息（兼容 JSON 与 Blob 错误体）。命名避开 Nuxt 内置 `useError` |
+| `useInterestCalc` | 利息计算的表单壳：`InterestForm` 字段态 + `toPeriods` / `toInterestInput` 折算 + `validateForm` 返回「字段 → i18n 键」（校验是纯函数，UI 只把键交给 `$t`）；计算全部委派给 `utils/interest.ts` |
 
 ### 原子组件 (`components/ui/`)
 
@@ -344,6 +347,8 @@ AES-256 Fernet（cryptography 库）。密钥通过环境变量 `DOCSTAMP_ENCRYP
 
 ### 关键架构决策
 
+- **纯前端计算工具的层次**：`/interest-calc` 把算式全部关在 `utils/interest.ts`（零 Vue / 零 Nuxt 依赖，进出都是普通对象，vitest 直接跑纯函数用例），`composables/useInterestCalc.ts` 只做「表单值 ⇄ 引擎输入」折算与校验并返回 i18n 键，组件不写算式。该模块的设计蓝本见 `docs/superpowers/specs/2026-11-13-interest-calculation-design.md`（`docs/` 被 `.gitignore` 排除，不入库）；口径与现金流骨架的完整推导在那里，下面两条是必须长期守住的结论。
+- **利息计算的口径**：费用分两套语义——一次性前置费用（砍头息：只减少到手现金，还款基数仍是名义本金）与每期费率（按名义本金固定收取，不随余额递减，即信用卡分期「月费率」口径）；真实利息用 IRR（对月度现金流做二分求期利率）折成 **APR = 期利率 × 12**（与贷款报价同口径）和 **EAR**（按月复利滚一年）两个数并列展示，只给一个数就会让 4.9% 的房贷读成 5.01%。四种还款方式共用同一条现金流骨架，故费用模型与还款方式正交，信用卡分期无需特例。
 - **Panel 去重**：`PdfToTextPanel` / `PdfCompressPanel` / `PageDecoratePanel` 是各自功能的唯一实现。独立页面（`pdf-to-text.vue` 等）和 Tab 页（`pdf-tools.vue`）共享同一 Panel 组件，消除逻辑重复。
 - **懒加载**：Panel 组件通过 `defineAsyncComponent(() => import(...))` 按需加载。
 - **已删除组件**：`AppHeader.vue`（未使用，功能由 Sidebar 覆盖）、`ButtonPrimary.vue`（由 Nuxt UI `<UButton>` 替代）、`ProgressBar.vue`（由 Nuxt UI `<UProgress>` 替代）。
@@ -438,6 +443,9 @@ API 容器健康检查 `curl /api/v1/health`。容器以非 root 用户 `docstam
 | `UFormField` 不存在 | Nuxt UI v4→v2 API 差异 | 全局替换为 `UFormGroup` |
 | i18n locale 404 | `@nuxtjs/i18n` v9 默认目录变更 | locale 文件统一放在 `i18n/locales/` |
 | Tailwind v4→v3 | `@import "tailwindcss"` 语法差异 | 改为 `@tailwind base/components/utilities` + `tailwind.config.ts` |
+| Nuxt UI v2 `UInput` + `#trailing` 整页 500 | 只要存在 `#trailing` 插槽，`Input.vue:227` 就会取 `ui.value.trailing.padding[size]`；用字符串覆写 `:ui.trailing` 会把它变成没有 `padding` 的形状 → `Cannot read properties of undefined (reading 'sm')`，SSR 直接 500 | 不要覆写 `:ui.trailing`，后缀文字放进插槽自己加类名（`components/InterestCalcPanel.vue`） |
+| `UInput type="number"` 首次键入即崩 | `Input.vue:178,183` 先 `looseToNumber(value)` 再 `emit("update:modelValue", ...)`，交回来的是 **number**，删空是 **null**；无条件 `.trim()` 抛 `TypeError`，渲染期异常会把整个组件分支卸载，页面只剩旧 DOM + 「页面组件出错，请刷新重试」 | 共享的取值函数按 `string \| number \| null` 收敛（`composables/useInterestCalc.ts` 的 `num`），字段类型声明成 `NumericField` |
+| 浏览器里给 `USelect` 派发 `change` 没反应 | `Select.vue:11,184` 把 `update:modelValue` 挂在原生 `input` 事件上，`change` 只 emit 组件自己的 `change` 事件，不改模型值 | 驱动 UI 或写测试时用 `input` 事件 |
 
 ### 部署
 
@@ -458,14 +466,14 @@ v3.12.0 起对外首页从仪表盘换成宣传页。设计蓝本见 `docs/super
 
 | 路由 | 壳 | 页面文件 | 说明 |
 |------|----|----------|------|
-| `/` | `layouts/landing.vue` | `pages/index.vue` | 对外宣传页：sticky 顶导 + 红头 hero + 14 件工具（五段分组）+ 隐私承诺 + 资源区 + 页脚，无侧栏 |
-| `/tools` | `layouts/default.vue` | `pages/tools.vue` | 应用内仪表盘：13 张工具卡（`/status` 不在卡片网格里），有侧栏。原 `/` 的仪表盘 `git mv` 于此，内容一行未改 |
-| 14 个工具路由 | `layouts/default.vue` | `pages/*.vue` | 完全不变，旧书签全部有效 |
+| `/` | `layouts/landing.vue` | `pages/index.vue` | 对外宣传页：sticky 顶导 + 红头 hero + 15 件工具（五段分组）+ 隐私承诺 + 资源区 + 页脚，无侧栏 |
+| `/tools` | `layouts/default.vue` | `pages/tools.vue` | 应用内仪表盘：14 张工具卡（`/status` 不在卡片网格里），有侧栏。原 `/` 的仪表盘 `git mv` 于此，内容一行未改 |
+| 15 个工具路由 | `layouts/default.vue` | `pages/*.vue` | 旧书签全部有效 |
 
-14 个工具路由：`/md-to-docx`、`/format-docx`、`/rss-detect`、`/properties`、`/excel-merge`、`/file-assembly`、`/print-split`、`/pdf-editor`、`/pdf-tools`、`/pdf-merge`、`/pdf-redact`、`/webp-to-jpeg`、`/password-gen`、`/status`。
+15 个工具路由：`/md-to-docx`、`/format-docx`、`/rss-detect`、`/properties`、`/excel-merge`、`/file-assembly`、`/print-split`、`/pdf-editor`、`/pdf-tools`、`/pdf-merge`、`/pdf-redact`、`/webp-to-jpeg`、`/password-gen`、`/interest-calc`、`/status`。
 
 - **`/` 不得再被任何 `TOOLS` 条目占用**（顶栏品牌链接 `to="/"` 是唯一例外）：`composables/tools.config.ts` 的 `dashboard` 条目是 `to: "/tools"`，`composables/__tests__/tools.config.spec.ts` 断言「没有任何条目 `to === "/"`」——这是本批唯一不可逆的约定，必须有测试钉住。
-- `components/PageHeader.vue` 的 `backTo` 默认值 `"/"` → `"/tools"`（全站 14 个工具页「返回」的唯一来源，无页面覆写）；`components/Sidebar.vue` 删掉已不可达的 `if (href === "/")` 特判。
+- `components/PageHeader.vue` 的 `backTo` 默认值 `"/"` → `"/tools"`（全站 15 个工具页「返回」的唯一来源，无页面覆写）；`components/Sidebar.vue` 删掉已不可达的 `if (href === "/")` 特判。
 - 宣传页这批未改后端：`backend/app.py` 的 SPA fallback 按 `<route>/index.html` 命中，`/tools` 与 14 个既有工具路由走同一条码路，故 `X-API-Version` 仍是 3.11.0。
 
 ### 双壳约定
@@ -490,7 +498,7 @@ v3.12.0 起对外首页从仪表盘换成宣传页。设计蓝本见 `docs/super
 | **例外②：PDF 脱敏的会话目录**：上传件在标记期间一直留在服务器，下载即删、离开页面时前端尽力通知；没人取走的会话要等下一次有人打开这个工具才由过期清扫回收 | `/open` 写盘后返回 JSON，`delete_session` 只在错误分支；真正删除在 `/download` 的 after_this_request 或 `/close`。`cleanup_expired` **全仓库唯一调用点**是下一次 `/open`，TTL 3600 秒但惰性触发。**且 7 天清扫扫不到它**：清扫只按顶层条目 mtime 判龄，`redact-sessions` 父目录 mtime 随每次建/删会话刷新，7 天内有人用过就整棵树跳过 → 对脱敏**既不能写「同响应删」也不能写「最长 7 天」，更不能写「一小时自毁」** | `backend/blueprints/pdf_redact_bp.py:55-94`（`:67` cleanup_expired、`:79,90,93` 仅错误分支删）、`:227-231`、`:255`；`backend/utils/redact_session.py:20,24,58,66,105`；`backend/utils/file_cleanup.py:73-84` |
 | **例外③：PDF 编辑的页面图片**：打开文件时渲染的页面 PNG 留在临时目录，最长 7 天后清除；上传件本身当即删除 | `/info` 建 `thumbs_<hex8>/` 用 pdftoppm 渲染最多 50 张 PNG，返回 JSON，`finally` 只删上传件；全仓库没有任何代码删 `thumbs_*`（只有创建点与清扫器 docstring 提到它） | `backend/blueprints/pdf_editor_bp.py:86-87,92-107,120,125-126`；`backend/utils/file_cleanup.py:50` |
 | **没人取走的，最长留 7 天**（脱敏会话目录是例外，见上）：临时目录由守护线程每日扫描，超过 7 天的条目清除，不区分用户 | `CLEANUP_INTERVAL_SECONDS = 24h`、`CLEANUP_MAX_AGE_DAYS = 7`，每小时检查一次是否到期；gunicorn master 起唯一守护线程，`.stats` / `.gitkeep` 永不老化；无按用户区分逻辑 | `backend/utils/file_cleanup.py:19-21,73-90,137-152`、`backend/gunicorn.conf.py:30-45` |
-| **统计库里没有文件名，也没有内容**：只记模块名、耗时、成功与否和一个请求 ID | 表无文件名字段，`resource_id` 存的是路由路径（变长路由带的是 uuid / hex token，不是原名）。**`file_size` 列存在但从来没人写，恒为 0** → 文案不许出现「体积」 | `backend/models.py:52-65,135`、`backend/app.py:111-125`、`backend/blueprints/stats_bp.py:37-48` |
+| **统计库里没有文件名，也没有内容**：只记模块名、耗时、成功与否和一个请求 ID | 表无文件名字段，`resource_id` 存的是路由路径（变长路由带的是 uuid / hex token，不是原名）。**`file_size` 列存在但从来没人写，恒为 0** → 文案不许出现「体积」 | `backend/models.py:52-65,135`、`backend/app.py:111-125`、`backend/blueprints/stats_bp.py:19-30` |
 | **但统计库含 IP 与浏览器标识**：这是「独立访客」统计的唯一依据，照实写 | `ip_address` 取 `X-Forwarded-For` 最左，回落 `X-Real-IP` / `remote_addr`；`user_agent` 截断 200 字符 | `backend/app.py:118-122` |
 | **运维日志可能带上文件路径**：删除失败或抛异常时会记临时文件路径与堆栈，保留 30 天 | 落盘名是 `uuid_<secure_filename(原名)>`，清理失败告警把全路径写进日志；异常走 `logger.exception` + JSON 的 `stack` 字段；按日轮转留 30 份 | `backend/utils/file_cleanup.py:88`、`backend/utils/base/file_helpers.py:62-63`、`backend/error_handler.py:94`、`backend/json_logging.py:21,47-48` |
 
@@ -503,10 +511,10 @@ v3.12.0 起对外首页从仪表盘换成宣传页。设计蓝本见 `docs/super
 
 ### sitemap 与 og
 
-- **sitemap 的 URL 来自 `TOOLS`，不是 `pages/`**：`server/routes/sitemap.xml.ts` 调 `server/utils/sitemap.ts` 的 `buildSitemapUrls(TOOLS)` + `renderSitemapXml(urls, lastmod)`，恰好 16 条（`/`、`/tools` + 14 条非 dashboard 条目，含 `/status`），`lastmod` 取构建日，`SITE_ORIGIN` 写死 `https://doc.sujx.net`（SSG 产物没有请求头可依）。`pages/` 里有 4 个零入链孤儿路由（`metadata-clean` / `page-decorate` / `pdf-compress` / `pdf-to-text`），`crawlLinks` 不会生成它们，写进 sitemap 就是宣告 4 条死链。必须同时在 `nuxt.config.ts` 的 `nitro.prerender.routes` 登记 `/sitemap.xml`——只写 handler 不加这一行，`robots.txt` 仍指向 404。
+- **sitemap 的 URL 来自 `TOOLS`（+ `GUIDE_PATHS`），不是 `pages/`**：`server/routes/sitemap.xml.ts` 调 `server/utils/sitemap.ts` 的 `buildSitemapUrls(TOOLS)` + `renderSitemapXml(urls, lastmod)`，恰好 18 条（`/`、`/tools` + 15 条非 dashboard 条目（含 `/status`）+ 1 条 `GUIDE_PATHS` 里的 `/guide/pdf-redact`），`lastmod` 取构建日，`SITE_ORIGIN` 写死 `https://doc.sujx.net`（SSG 产物没有请求头可依）。`pages/` 里有 4 个零入链孤儿路由（`metadata-clean` / `page-decorate` / `pdf-compress` / `pdf-to-text`），`crawlLinks` 不会生成它们，写进 sitemap 就是宣告 4 条死链。必须同时在 `nuxt.config.ts` 的 `nitro.prerender.routes` 登记 `/sitemap.xml`——只写 handler 不加这一行，`robots.txt` 仍指向 404。`Flask` 侧曾经硬编码过一份 `/sitemap.xml`（`stats_bp.py`），只列 13 条——缺 `/rss-detect`、`/tools` 与教程页，新增工具还得记得手改后端，已删除，Nitro 产物是唯一来源：`backend/config.py` 的 `STATIC_FOLDER` 指向 `frontend/.output/public`，`app.py` 的静态路由在 SPA fallback 之前按精确文件命中。
 - **og**：`public/og.svg` 是入库源文件（红头版式：印章 + 主标题 + 三条卖点），`public/og.png`（1200×630）是 chromium headless 的产物——只留 PNG 的话，下次改文案没人知道图是怎么来的。`pages/index.vue` 的 `useHead` 挂 `og:image` / `og:description` / `twitter:card=summary_large_image`，绝对地址写死 `https://doc.sujx.net/og.png`；不用 `logo.svg` 充当（微信/微博基本不渲染 SVG 分享图）。
 - **备案号走 i18n 键 `landing.footer.icp`，空即不渲染**：`LandingFooter.vue` 是 `v-if="icp"`。不做假号，也不走 `runtimeConfig`——SSG 产物在构建期就把值烘进 HTML，compose 的 `${VAR}` 注入对它无效；真实号到位后改一次文案、随正常发版重新构建镜像。
-- 容器内必须齐的四件产物：`.output/public/index.html`（宣传页，含 hero 文案与 14 张卡的服务端 HTML）、`tools/index.html`（搬家后的仪表盘）、`sitemap.xml`、`og.png`。
+- 容器内必须齐的四件产物：`.output/public/index.html`（宣传页，含 hero 文案与 15 张卡的服务端 HTML）、`tools/index.html`（搬家后的仪表盘）、`sitemap.xml`、`og.png`。
 
 ### 验收记录（v3.12.0）
 
@@ -530,6 +538,17 @@ v3.12.0 起对外首页从仪表盘换成宣传页。设计蓝本见 `docs/super
 ---
 
 ## 十二、版本历史
+
+### v3.13.0 (2026-11)
+
+- **新增第 15 个模块「利息计算」`/interest-calc`（纯前端，零数据留存）**：面向房贷 / 消费贷 / 信用贷，四种还款方式（等额本息、等额本金、先息后本、到期一次还本付息）× 两套费用语义（一次性前置费用、按名义本金计的每期费率）× 三种利率单位（年 / 月 / 日息万分之）。设计蓝本 `docs/superpowers/specs/2026-11-13-interest-calculation-design.md`（`docs/` 不入库），口径与踩坑见「八、前端架构 · 关键架构决策」与「十、开发经验 · 前端」
+- **层次**：`utils/interest.ts` 纯引擎（零 Vue / 零 Nuxt 依赖）+ `composables/useInterestCalc.ts` 薄壳（折算、`validateForm` 返回「字段 → 文案键」、多方案对比）+ 4 个展示组件（`InterestCalcPanel` / `InterestSummaryCards` / `InterestMethodCompare` / `InterestScheduleTable`）+ `pages/interest-calc.vue`。`tools.config.ts` 注册 `order: 9`，落进宣传页 `groupOther`；两个 locale 各增 69 键，四处计数 14 → 15
+- **真实年化口径**：四种方式共用一条现金流骨架（t=0 净流入 = 本金 − 前置费用；t=k 净流出 = 本息 + 费用），对月度现金流用**二分法**解 `NPV = 0` 的期利率（不用牛顿法：无需初值、利率为 0 或费率极端时不发散），再并列给出 **APR = 期利率 × 12**（与报价同口径）与 **EAR = (1+r)¹²−1**——只给一个数会让 4.9% 的房贷读成 5.01%；前置费用吃满本金时现金流方向不反转，返回 `null` 显示「—」而不是抛错。金额按分舍入 + 末期补差，保证 `Σ还本 = 名义本金`、末期余额恰为 0
+- **后端只删不改**：`stats_bp.py` 里硬编码的 `/sitemap.xml` 路由**删除**（只列 13 条，缺 `/rss-detect`、`/tools` 与教程页，且每加一个工具都要手改后端），Nitro 产物成为唯一来源；`test_pdf_redact_bp.py::test_page_is_in_the_sitemap` 随之删除（前端 `sitemap.spec.ts` 已覆盖并改断 18 条含 `/interest-calc`）。无新端点、接口契约未变，`X-API-Version` 仍是 3.11.0
+- **落地时修掉的三个缺陷**（均 dev 实测暴露，先定位根因再改，测试先红后绿）：① `UInput` + `#trailing` 插槽 + `:ui.trailing` 字符串覆写 → `Input.vue:227` 取 `padding[size]` 抛 `undefined['sm']`，整页 SSR 500；② `UInput type="number"` 交回 number（删空是 null），无条件 `.trim()` 抛错并把整棵组件子树卸载；③ 对比表一个 `money()` 同时接 `InterestResult` 与 number，三列全渲染成 `NaN`
+- **已知减级（刻意）**：不做 CSV 导出、不做提前还款 / 组合贷 / LPR 重定价；深色模式下本页卡片标题近乎不可读——已核实是全站 `--color-*` token 只有一套浅色值，`/password-gen` 同样坏，记进 `AGENTS.md` 整站级待办而非本批静默打补丁
+- **验证**：前端 `npx vitest run` **12 files / 124 passed**（本批新增 46 条：引擎 30 / composable 13 / 组件 3，锚点含「求得的期利率回代 NPV 归零」自证与信用卡分期手算独立校验）；后端 `uv run pytest tests/ -q` **199 passed**；dev server 浏览器实测四组数字与引擎一致——100 万 / 30 年 / 4.9% 等额本息 → APR 4.90%、EAR 5.01%、每期 5,307.27、总利息 910,615.12、360 行末期余额 0.00；加 1 万前置费 + 每期费率 0.05% → 到手 990,000、全成本 1,100,615.12、APR 5.80%；信用卡分期 12 万 / 24 期 / 月费率 0.6% → APR 13.27%、EAR 14.10%（报价名义只有 7.2%）；到期一次还本付息 12 万 / 30 年 / 4.9% → APR 3.02%
+- **文档**：`AGENTS.md`（模块计数 15、目录树补 `frontend/utils/`、三条 Nuxt UI v2 约束、Vuelidate 那条改成实情、深色模式待办）、`SPEC.md`（模块表与侧栏顺序按实测重写、仪表盘卡片数、composables 表、关键架构决策两条、开发经验三行、十一章现状计数与 sitemap 18 条、`stats_bp.py` 行号引用 `37-48` → `19-30`）、`README.md`（模块表新增利息计算并按侧栏真实顺序把密码生成上移）
 
 ### v3.12.0 (2026-11)
 
