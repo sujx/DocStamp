@@ -14,10 +14,6 @@ from flask import Blueprint, after_this_request, jsonify, request, send_file
 from flask_babel import gettext as _
 
 from config import Config
-from utils import redact_session
-from utils.base.file_helpers import safe_download_name, validate_filename
-from utils.file_security import validate_file_security
-from utils.rate_limit import rate_limit
 from services.pdf_redact import (
     DEFAULT_MOSAIC_BLOCK,
     MAX_PAGES,
@@ -25,6 +21,10 @@ from services.pdf_redact import (
     inspect_pdf,
     redact_pdf,
 )
+from utils import redact_session
+from utils.base.file_helpers import safe_download_name, validate_filename
+from utils.file_security import validate_file_security
+from utils.rate_limit import rate_limit
 
 pdf_redact_bp = Blueprint("pdf_redact", __name__)
 

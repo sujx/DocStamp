@@ -4,8 +4,8 @@ import io
 import os
 import zipfile
 
-from services.properties import batch_modify_properties, read_properties, modify_properties
 from errors import ServiceResult
+from services.properties import batch_modify_properties, modify_properties, read_properties
 
 CORE_XML = "docProps/core.xml"
 EMPTY_PROPS = {

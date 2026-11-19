@@ -1,9 +1,9 @@
 """PDF merge: combine multiple PDF files into a single PDF."""
 
+from flask_babel import lazy_gettext as _l
 from pypdf import PdfReader, PdfWriter
 
 from errors import ErrorCode, ServiceResult
-from flask_babel import lazy_gettext as _l
 
 
 def merge_pdfs(filepaths: list[str], output_path: str) -> ServiceResult[int]:

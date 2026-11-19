@@ -2,10 +2,10 @@
 
 import os
 
+from flask_babel import lazy_gettext as _l
 from pypdf import PdfReader, PdfWriter
 
 from errors import ErrorCode, ServiceResult
-from flask_babel import lazy_gettext as _l
 
 MAX_IMAGE_DIM = 1200
 

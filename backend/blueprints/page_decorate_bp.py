@@ -8,9 +8,9 @@ from flask import Blueprint, after_this_request, jsonify, request, send_file
 from flask_babel import gettext as _
 
 from config import Config
+from services.page_decorator import add_page_numbers
 from utils.base.file_helpers import cleanup_files, save_upload
 from utils.rate_limit import rate_limit
-from services.page_decorator import add_page_numbers
 
 page_decorate_bp = Blueprint("page_decorate", __name__)
 

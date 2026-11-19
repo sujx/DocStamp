@@ -14,8 +14,9 @@ import io
 import os
 import re
 
-from errors import ErrorCode, ServiceResult
 from flask_babel import lazy_gettext as _l
+
+from errors import ErrorCode, ServiceResult
 
 DEFAULT_MOSAIC_BLOCK = 8
 

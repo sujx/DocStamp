@@ -2,12 +2,11 @@
 
 import csv
 import os
-from typing import List
 
+from flask_babel import lazy_gettext as _l
 from openpyxl import Workbook, load_workbook
 
 from errors import ErrorCode, ServiceResult
-from flask_babel import lazy_gettext as _l
 
 
 def _is_csv(filepath: str) -> bool:
@@ -15,14 +14,14 @@ def _is_csv(filepath: str) -> bool:
     return os.path.splitext(filepath)[1].lower() == ".csv"
 
 
-def _get_headers(filepath: str) -> List[str]:
+def _get_headers(filepath: str) -> list[str]:
     """Extract column headers (first row values) from an Excel or CSV file."""
     if _is_csv(filepath):
         return _get_headers_csv(filepath)
     return _get_headers_xlsx(filepath)
 
 
-def _get_headers_xlsx(filepath: str) -> List[str]:
+def _get_headers_xlsx(filepath: str) -> list[str]:
     """Extract headers from an .xlsx file."""
     wb = load_workbook(filepath, read_only=True)
     try:
@@ -36,9 +35,9 @@ def _get_headers_xlsx(filepath: str) -> List[str]:
         wb.close()
 
 
-def _get_headers_csv(filepath: str) -> List[str]:
+def _get_headers_csv(filepath: str) -> list[str]:
     """Extract headers from a CSV file."""
-    with open(filepath, "r", encoding="utf-8-sig", newline="") as f:
+    with open(filepath, encoding="utf-8-sig", newline="") as f:
         reader = csv.reader(f)
         try:
             row = next(reader)
@@ -48,7 +47,7 @@ def _get_headers_csv(filepath: str) -> List[str]:
 
 
 def merge_excel_files(
-    filepaths: List[str],
+    filepaths: list[str],
     output_path: str,
 ) -> ServiceResult[dict]:
     """Merge multiple .xlsx/.csv files with the same structure into one .xlsx.
@@ -128,7 +127,7 @@ def _append_xlsx_rows(ws, filepath: str) -> int:
 
 def _append_csv_rows(ws, filepath: str) -> int:
     """Append data rows (skipping header) from a CSV file. Returns row count."""
-    with open(filepath, "r", encoding="utf-8-sig", newline="") as f:
+    with open(filepath, encoding="utf-8-sig", newline="") as f:
         reader = csv.reader(f)
         try:
             next(reader)  # skip header

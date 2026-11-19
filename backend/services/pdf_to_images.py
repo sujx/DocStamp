@@ -2,12 +2,11 @@
 
 import os
 import subprocess
-from typing import Optional
 
+from flask_babel import lazy_gettext as _l
 from pypdf import PdfReader
 
 from errors import ErrorCode, ServiceResult
-from flask_babel import lazy_gettext as _l
 
 MIN_DPI = 72
 MAX_DPI = 600
@@ -18,7 +17,7 @@ def pdf_to_images(
     output_dir: str,
     fmt: str = "png",
     dpi: int = 200,
-    pages: Optional[list[int]] = None,
+    pages: list[int] | None = None,
 ) -> ServiceResult[dict]:
     """Convert PDF pages to images.
 

@@ -7,9 +7,9 @@ from flask import Blueprint, after_this_request, jsonify, request, send_file
 from flask_babel import gettext as _
 
 from config import Config
+from services.properties import _resolve_time_props, batch_modify_properties, modify_properties, read_properties
 from utils.base.file_helpers import cleanup_files, save_upload
 from utils.rate_limit import rate_limit
-from services.properties import _resolve_time_props, batch_modify_properties, modify_properties, read_properties
 
 properties_bp = Blueprint("properties", __name__)
 
@@ -52,7 +52,7 @@ def properties_modify():
 
         props = {}
         for key in ("created", "modified", "creator", "last_modified_by", "unified_time"):
-            if key in request.form and request.form[key]:
+            if request.form.get(key):
                 props[key] = request.form[key]
         if not props:
             return jsonify({"error": _("No properties to modify")}), 400
@@ -103,7 +103,7 @@ def properties_batch_modify():
 
         props = {}
         for key in ("created", "modified", "creator", "last_modified_by", "unified_time"):
-            if key in request.form and request.form[key]:
+            if request.form.get(key):
                 props[key] = request.form[key]
         if not props:
             return jsonify({"error": _("No properties to modify")}), 400

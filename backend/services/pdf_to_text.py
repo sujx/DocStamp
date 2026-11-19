@@ -3,12 +3,12 @@
 Supports extracting text from PDF files with optional page range selection.
 """
 
+from flask_babel import lazy_gettext as _l
 from pdfminer.high_level import extract_text
 from pdfminer.layout import LAParams
 from pypdf import PdfReader
 
 from errors import ErrorCode, ServiceResult
-from flask_babel import lazy_gettext as _l
 
 
 def extract_pdf_text(filepath: str, page_numbers: list[int] | None = None) -> ServiceResult[str]:

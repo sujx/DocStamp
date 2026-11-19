@@ -2,12 +2,12 @@
 
 from io import BytesIO
 
+from flask_babel import lazy_gettext as _l
 from pypdf import PdfReader, PdfWriter
 from reportlab.lib.colors import HexColor
 from reportlab.pdfgen import canvas
 
 from errors import ErrorCode, ServiceResult
-from flask_babel import lazy_gettext as _l
 
 
 def add_page_numbers(filepath: str, output_path: str, params: dict) -> ServiceResult[dict]:

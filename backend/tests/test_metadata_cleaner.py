@@ -2,8 +2,8 @@
 
 import os
 
-from services.metadata_cleaner import clean_metadata
 from errors import ServiceResult
+from services.metadata_cleaner import clean_metadata
 
 
 class TestCleanMetadata:

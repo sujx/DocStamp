@@ -16,7 +16,7 @@ Usage:
 
 from functools import wraps
 
-from flask import jsonify, g, request
+from flask import g, jsonify, request
 from flask_babel import gettext
 
 from cache import cache

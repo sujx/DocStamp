@@ -11,9 +11,9 @@ from html.parser import HTMLParser
 from urllib.parse import urljoin, urlparse
 
 import requests
+from flask_babel import lazy_gettext as _l
 
 from errors import ErrorCode, ServiceResult
-from flask_babel import lazy_gettext as _l
 
 # ── Common paths to probe ────────────────────────────────────────────────
 COMMON_FEED_PATHS = [
@@ -121,7 +121,7 @@ def detect_feeds(url: str) -> ServiceResult[list[dict]]:
     # Layer 3: Site-specific rules
     try:
         rules_path = os.path.join(os.path.dirname(__file__), "..", "rss_rules.json")
-        with open(rules_path, "r") as f:
+        with open(rules_path) as f:
             rules = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         rules = {}
@@ -197,7 +197,7 @@ def _match_pattern(pattern: str, path: str) -> dict | None:
         return None
 
     params = {}
-    for pp, rp in zip(pattern_parts, path_parts):
+    for pp, rp in zip(pattern_parts, path_parts, strict=True):
         if pp.startswith(":"):
             params[pp[1:]] = rp
         elif pp.lower() != rp.lower():

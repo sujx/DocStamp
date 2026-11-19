@@ -34,6 +34,7 @@ from tests.helpers_docx import (
     tab_stops,
     text_of,
 )
+
 ENDPOINT = "/api/v1/meeting-minutes"
 MEET_NAME = "信息技术中心例会"
 FLAG = "信息技术中心例会纪要"

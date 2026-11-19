@@ -4,8 +4,8 @@ import os
 
 import pytest
 
-from services.pdf_compressor import MAX_IMAGE_DIM, compress_pdf
 from errors import ServiceResult
+from services.pdf_compressor import MAX_IMAGE_DIM, compress_pdf
 
 IMAGE_W, IMAGE_H = 2000, 1500
 

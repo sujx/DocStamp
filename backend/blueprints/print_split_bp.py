@@ -7,9 +7,9 @@ from flask import Blueprint, jsonify, request, send_file
 from flask_babel import gettext as _
 
 from config import Config
+from services.print_split import split_pdf
 from utils.base.file_helpers import cleanup_files, save_upload
 from utils.rate_limit import rate_limit
-from services.print_split import split_pdf
 
 print_split_bp = Blueprint("print_split", __name__)
 
@@ -27,7 +27,7 @@ def print_split_create():
         if not file.filename:
             return jsonify({"error": _("No file selected")}), 400
 
-        filename, filepath = save_upload(file, Config.PDF_EXTENSIONS, Config.UPLOAD_FOLDER)
+        _fn, filepath = save_upload(file, Config.PDF_EXTENSIONS, Config.UPLOAD_FOLDER)
         batch_size = int(request.form.get("batch_size", 60))
         interval_seconds = int(request.form.get("interval", 60))
 

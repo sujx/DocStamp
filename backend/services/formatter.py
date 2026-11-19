@@ -6,14 +6,14 @@ detection, and page numbers.
 """
 
 import re
+
 from docx import Document
-from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+from docx.shared import Cm, Pt
 
 from errors import ServiceResult
-
 
 # ── Font configuration ──────────────────────────────────────────────
 FONT_CONFIG = {

@@ -9,9 +9,9 @@ from flask_babel import gettext as _
 from werkzeug.utils import secure_filename
 
 from config import Config
+from services.pdf_editor import pdf_delete_pages, pdf_insert_pages, pdf_reorder_pages
 from utils.base.file_helpers import cleanup_files, save_upload
 from utils.rate_limit import rate_limit
-from services.pdf_editor import pdf_delete_pages, pdf_insert_pages, pdf_reorder_pages
 
 pdf_editor_bp = Blueprint("pdf_editor", __name__)
 
@@ -76,7 +76,7 @@ def pdf_editor_info():
         if not file.filename:
             return jsonify({"error": _("No file selected")}), 400
 
-        fn, filepath = save_upload(file, Config.PDF_EXTENSIONS, Config.UPLOAD_FOLDER)
+        _fn, filepath = save_upload(file, Config.PDF_EXTENSIONS, Config.UPLOAD_FOLDER)
 
         from pypdf import PdfReader
         reader = PdfReader(filepath)
@@ -95,7 +95,8 @@ def pdf_editor_info():
                 check=True, capture_output=True, timeout=30,
             )
         except (subprocess.CalledProcessError, FileNotFoundError):
-            from PIL import Image as PILImage, ImageDraw
+            from PIL import Image as PILImage
+            from PIL import ImageDraw
             for i in range(max_preview):
                 page = reader.pages[i]
                 w = max(int(float(page.mediabox.width) * 0.25), 80)

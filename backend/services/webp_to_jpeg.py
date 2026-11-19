@@ -6,8 +6,9 @@ layer is skipped for .webp uploads — Pillow's decoder is the only content gate
 
 import os
 
-from errors import ErrorCode, ServiceResult
 from flask_babel import lazy_gettext as _l
+
+from errors import ErrorCode, ServiceResult
 
 DEFAULT_QUALITY = 90
 

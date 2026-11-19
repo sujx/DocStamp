@@ -2,8 +2,9 @@
 
 import os
 
-from errors import ErrorCode, ServiceResult
 from flask_babel import lazy_gettext as _l
+
+from errors import ErrorCode, ServiceResult
 
 
 def clean_metadata(filepath: str, output_path: str) -> ServiceResult[dict]:
@@ -36,6 +37,7 @@ def clean_metadata(filepath: str, output_path: str) -> ServiceResult[dict]:
 def _clean_docx(filepath: str, output_path: str) -> ServiceResult[dict]:
     """Strip metadata from a DOCX file."""
     import shutil
+
     from docx import Document
 
     shutil.copy2(filepath, output_path)
@@ -58,6 +60,7 @@ def _clean_docx(filepath: str, output_path: str) -> ServiceResult[dict]:
 def _clean_xlsx(filepath: str, output_path: str) -> ServiceResult[dict]:
     """Strip metadata from an XLSX file."""
     import shutil
+
     from openpyxl import load_workbook
 
     shutil.copy2(filepath, output_path)
@@ -80,6 +83,7 @@ def _clean_xlsx(filepath: str, output_path: str) -> ServiceResult[dict]:
 def _clean_pptx(filepath: str, output_path: str) -> ServiceResult[dict]:
     """Strip metadata from a PPTX file."""
     import shutil
+
     from pptx import Presentation
 
     shutil.copy2(filepath, output_path)

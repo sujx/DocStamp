@@ -4,9 +4,9 @@ from flask import Blueprint, jsonify, request
 from flask_babel import gettext as _
 
 from config import Config
+from services.pdf_to_text import extract_pdf_text, get_pdf_page_count
 from utils.base.file_helpers import cleanup_files, save_upload
 from utils.rate_limit import rate_limit
-from services.pdf_to_text import extract_pdf_text, get_pdf_page_count
 
 pdf_to_text_bp = Blueprint("pdf_to_text", __name__)
 

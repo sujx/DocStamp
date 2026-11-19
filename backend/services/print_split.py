@@ -5,10 +5,10 @@ Splits a multi-page PDF into numbered batches for controlled printing.
 
 import os
 
+from flask_babel import lazy_gettext as _l
 from pypdf import PdfReader, PdfWriter
 
 from errors import ErrorCode, ServiceResult
-from flask_babel import lazy_gettext as _l
 
 
 def split_pdf(filepath: str, output_dir: str, batch_size: int) -> ServiceResult[list]:

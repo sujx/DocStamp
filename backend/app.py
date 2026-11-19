@@ -30,10 +30,10 @@ from flask_babel import Babel
 from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from config import Config
-from json_logging import setup_json_logging
-from error_handler import register_error_handlers
 from cache import init_cache
+from config import Config
+from error_handler import register_error_handlers
+from json_logging import setup_json_logging
 from models import OperationLog, init_db
 
 
@@ -133,16 +133,16 @@ def create_app() -> Flask:
     # Register blueprints — one per feature for clear module boundaries
     from blueprints.convert import convert_bp
     from blueprints.download import download_bp
-    from blueprints.properties_bp import properties_bp
+    from blueprints.excel_merge_bp import excel_merge_bp
     from blueprints.img2pdf_bp import img2pdf_bp
     from blueprints.pdf2img_bp import pdf2img_bp
-    from blueprints.print_split_bp import print_split_bp
     from blueprints.pdf_editor_bp import pdf_editor_bp
-    from blueprints.excel_merge_bp import excel_merge_bp
-    from blueprints.pdf_to_text_bp import pdf_to_text_bp
     from blueprints.pdf_merge_bp import pdf_merge_bp
-    from blueprints.webp_to_jpeg_bp import webp_to_jpeg_bp
     from blueprints.pdf_redact_bp import pdf_redact_bp
+    from blueprints.pdf_to_text_bp import pdf_to_text_bp
+    from blueprints.print_split_bp import print_split_bp
+    from blueprints.properties_bp import properties_bp
+    from blueprints.webp_to_jpeg_bp import webp_to_jpeg_bp
 
     app.register_blueprint(convert_bp)
     app.register_blueprint(download_bp)
@@ -157,12 +157,12 @@ def create_app() -> Flask:
     app.register_blueprint(webp_to_jpeg_bp)
     app.register_blueprint(pdf_redact_bp)
 
-    from blueprints.pdf_compress_bp import pdf_compress_bp
+    from blueprints.meeting_minutes_bp import meeting_minutes_bp
     from blueprints.metadata_clean_bp import metadata_clean_bp
     from blueprints.page_decorate_bp import page_decorate_bp
-    from blueprints.stats_bp import stats_bp
+    from blueprints.pdf_compress_bp import pdf_compress_bp
     from blueprints.rss_detect_bp import rss_detect_bp
-    from blueprints.meeting_minutes_bp import meeting_minutes_bp
+    from blueprints.stats_bp import stats_bp
 
     app.register_blueprint(pdf_compress_bp)
     app.register_blueprint(metadata_clean_bp)

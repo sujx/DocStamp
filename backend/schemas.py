@@ -14,7 +14,6 @@ from typing import Any, cast
 from flask_babel import lazy_gettext as _l
 from pydantic import BaseModel, ConfigDict, Field, ValidatorFunctionWrapHandler, field_validator, model_validator
 
-
 # ── Markdown ────────────────────────────────────────────────────────────
 
 class MdPreviewSchema(BaseModel):

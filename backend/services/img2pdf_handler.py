@@ -7,11 +7,10 @@ Uses img2pdf for lossless conversion.
 import os
 
 import img2pdf
+from flask_babel import lazy_gettext as _l
 from PIL import Image
 
 from errors import ErrorCode, ServiceResult
-from flask_babel import lazy_gettext as _l
-
 
 # Page size definitions in points (1 point = 1/72 inch)
 PAGE_SIZES = {

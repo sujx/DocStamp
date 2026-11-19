@@ -5,6 +5,7 @@ All environment-variable-driven settings have sensible defaults.
 """
 
 import os
+from typing import ClassVar
 
 
 class Config:
@@ -19,17 +20,17 @@ class Config:
     MAX_MD_SIZE = 16 * 1024 * 1024  # 16 MB
 
     # ── Allowed Extensions per Feature ──────────────────────────────
-    OFFICE_EXTENSIONS = {"docx", "xlsx", "pptx"}
-    IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "tiff", "tif"}
-    PDF_EXTENSIONS = {"pdf"}
-    EXCEL_EXTENSIONS = {"xlsx", "csv"}
-    MD_EXTENSIONS = {"md", "markdown", "txt"}
+    OFFICE_EXTENSIONS: ClassVar[set[str]] = {"docx", "xlsx", "pptx"}
+    IMAGE_EXTENSIONS: ClassVar[set[str]] = {"png", "jpg", "jpeg", "tiff", "tif"}
+    PDF_EXTENSIONS: ClassVar[set[str]] = {"pdf"}
+    EXCEL_EXTENSIONS: ClassVar[set[str]] = {"xlsx", "csv"}
+    MD_EXTENSIONS: ClassVar[set[str]] = {"md", "markdown", "txt"}
     # Files served back over /api/v1/download/<filename>: generated documents
     # from md-to-docx / format-docx land in the upload folder under these names.
-    DOWNLOAD_EXTENSIONS = {"docx", "md"}
+    DOWNLOAD_EXTENSIONS: ClassVar[set[str]] = {"docx", "md"}
 
     # ── Security ────────────────────────────────────────────────────
-    FORBIDDEN_PATH_CHARS = {"..", "/", "\\"}
+    FORBIDDEN_PATH_CHARS: ClassVar[set[str]] = {"..", "/", "\\"}
     SECRET_KEY = os.environ.get("DOCSTAMP_SECRET_KEY", "dev-secret-change-in-production")
 
     # ── Task DB ─────────────────────────────────────────────────────
@@ -56,5 +57,5 @@ class Config:
     LOG_DIR = os.environ.get("DOCSTAMP_LOG_DIR", "/var/log/docstamp")
 
     # ── i18n ────────────────────────────────────────────────────────
-    LANGUAGES = ["en", "zh_CN"]
+    LANGUAGES: ClassVar[list[str]] = ["en", "zh_CN"]
     BABEL_DEFAULT_LOCALE = "en"

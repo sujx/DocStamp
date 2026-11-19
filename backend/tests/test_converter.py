@@ -2,8 +2,8 @@
 
 import os
 
-from services.converter import md_to_docx
 from errors import ServiceResult
+from services.converter import md_to_docx
 
 
 class TestMdToDocx:

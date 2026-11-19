@@ -10,7 +10,6 @@ from flask_babel import lazy_gettext as _l
 
 from errors import ErrorCode, ServiceResult
 
-
 # Default timeout in seconds for subprocess calls
 SUBPROCESS_TIMEOUT = 120
 
@@ -63,19 +62,19 @@ def _run_subprocess(
                     "stderr": result.stderr.strip(),
                 }
             )
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as exc:
         raise ConversionError(
             _l("%(description)s timed out after %(timeout)ss")
             % {"description": description, "timeout": timeout}
-        )
-    except FileNotFoundError:
+        ) from exc
+    except FileNotFoundError as exc:
         raise ConversionError(
             _l(
                 "%(description)s failed: command '%(cmd)s' not found. "
                 "Please ensure it is installed."
             )
             % {"description": description, "cmd": cmd[0]}
-        )
+        ) from exc
 
 
 def md_to_docx(md_path: str, docx_path: str) -> ServiceResult[str]:
@@ -102,7 +101,7 @@ def md_to_docx(md_path: str, docx_path: str) -> ServiceResult[str]:
 def _extract_title(md_path: str) -> str:
     """Extract the first h1 heading from a markdown file as the document title."""
     try:
-        with open(md_path, "r", encoding="utf-8") as f:
+        with open(md_path, encoding="utf-8") as f:
             for line in f:
                 stripped = line.strip()
                 if stripped.startswith("# ") and not stripped.startswith("## "):

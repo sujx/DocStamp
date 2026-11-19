@@ -3,7 +3,7 @@
 import io
 from unittest.mock import patch
 
-from errors import ServiceResult, ErrorCode
+from errors import ErrorCode, ServiceResult
 
 
 class TestPdfMergeEndpoint:

@@ -2,8 +2,8 @@
 
 import os
 
-from services.pdf_merger import merge_pdfs
 from errors import ServiceResult
+from services.pdf_merger import merge_pdfs
 
 
 class TestMergePdfs:

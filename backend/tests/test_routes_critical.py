@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from errors import ServiceResult, ErrorCode
+from errors import ErrorCode, ServiceResult
 
 
 class TestHealthEndpoint:

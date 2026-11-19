@@ -17,8 +17,9 @@ import zipfile
 from datetime import datetime
 from xml.etree import ElementTree as ET
 
-from errors import ErrorCode, ServiceResult
 from flask_babel import lazy_gettext as _l
+
+from errors import ErrorCode, ServiceResult
 
 
 def read_properties(filepath: str) -> ServiceResult[dict]:

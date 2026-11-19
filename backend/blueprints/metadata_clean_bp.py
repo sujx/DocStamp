@@ -7,9 +7,9 @@ from flask import Blueprint, after_this_request, jsonify, request, send_file
 from flask_babel import gettext as _
 
 from config import Config
+from services.metadata_cleaner import clean_metadata
 from utils.base.file_helpers import cleanup_files, save_upload
 from utils.rate_limit import rate_limit
-from services.metadata_cleaner import clean_metadata
 
 METADATA_CLEAN_EXTENSIONS = {"docx", "xlsx", "pptx", "pdf"}
 

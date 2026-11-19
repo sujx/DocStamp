@@ -7,9 +7,9 @@ from flask import Blueprint, after_this_request, jsonify, request, send_file
 from flask_babel import gettext as _
 
 from config import Config
+from services.pdf_compressor import compress_pdf
 from utils.base.file_helpers import cleanup_files, save_upload
 from utils.rate_limit import rate_limit
-from services.pdf_compressor import compress_pdf
 
 pdf_compress_bp = Blueprint("pdf_compress", __name__)
 

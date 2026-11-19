@@ -10,7 +10,6 @@ import os
 
 from flask_babel import lazy_gettext as _l
 
-
 # ── Extension Whitelist ─────────────────────────────────────────────────
 
 ALLOWED_EXTENSIONS: dict[str, str] = {

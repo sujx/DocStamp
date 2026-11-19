@@ -11,14 +11,12 @@ All error responses follow the format:
 
 import functools
 import uuid
-from typing import Type
 
 from flask import Flask, g, jsonify, request
 from flask_babel import gettext as _
 from pydantic import BaseModel, ValidationError
 
 from errors import ErrorCode, ServiceError
-
 
 # ── requestId Injection ─────────────────────────────────────────────────
 
@@ -102,9 +100,9 @@ def register_error_handlers(app: Flask) -> None:
 # ── Request Validation Decorator ────────────────────────────────────────
 
 def validate_request(
-    body: Type[BaseModel] | None = None,
-    form: Type[BaseModel] | None = None,
-    query: Type[BaseModel] | None = None,
+    body: type[BaseModel] | None = None,
+    form: type[BaseModel] | None = None,
+    query: type[BaseModel] | None = None,
 ):
     """Decorator: validate Flask request data with Pydantic schemas.
 

@@ -7,9 +7,9 @@ from flask import Blueprint, after_this_request, jsonify, request, send_file
 from flask_babel import gettext as _
 
 from config import Config
+from services.webp_to_jpeg import webp_to_jpeg
 from utils.base.file_helpers import cleanup_files, safe_download_name, save_upload
 from utils.rate_limit import rate_limit
-from services.webp_to_jpeg import webp_to_jpeg
 
 webp_to_jpeg_bp = Blueprint("webp_to_jpeg", __name__)
 

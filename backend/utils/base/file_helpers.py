@@ -6,11 +6,10 @@ Mirrors the helpers originally inline in app.py for reuse across routes.
 import os
 import uuid
 
+from flask_babel import lazy_gettext as _l
 from werkzeug.utils import secure_filename
 
-from flask_babel import lazy_gettext as _l
 from utils.file_security import validate_file_security
-
 
 FORBIDDEN_PATH_CHARS = {"..", "/", "\\"}
 

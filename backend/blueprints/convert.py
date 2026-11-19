@@ -11,11 +11,10 @@ from flask_babel import gettext as _
 from config import Config
 from error_handler import validate_request
 from schemas import MdPreviewSchema
-from utils.base.file_helpers import cleanup_files, save_upload
-from utils.rate_limit import rate_limit
-
 from services.converter import ConversionError, md_to_docx
 from services.formatter import format_docx
+from utils.base.file_helpers import cleanup_files, save_upload
+from utils.rate_limit import rate_limit
 
 convert_bp = Blueprint("convert", __name__)
 
@@ -50,7 +49,7 @@ ALLOWED_ATTRS = {
 
 def _read_stats():
     try:
-        with open(STATS_FILE, "r") as f:
+        with open(STATS_FILE) as f:
             return json.load(f).get("total_conversions", 0)
     except (FileNotFoundError, json.JSONDecodeError):
         return 0
@@ -166,7 +165,7 @@ def format_docx_endpoint():
         if not file.filename:
             return jsonify({"error": _("No file selected")}), 400
 
-        filename, filepath = save_upload(file, {"docx"}, Config.UPLOAD_FOLDER)
+        _fn, filepath = save_upload(file, {"docx"}, Config.UPLOAD_FOLDER)
         download_id = f"{uuid.uuid4().hex}.docx"
         output_path = os.path.join(Config.UPLOAD_FOLDER, download_id)
 

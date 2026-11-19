@@ -6,11 +6,9 @@
 """
 
 import io
-from typing import Optional
 
 from docx import Document
 from docx.oxml.ns import qn
-
 
 # ── 打开与单位换算 ───────────────────────────────────────────────────
 
@@ -19,20 +17,20 @@ def open_docx(content: bytes) -> Document:
     return Document(io.BytesIO(content))
 
 
-def attr_of(element, name: str) -> Optional[str]:
+def attr_of(element, name: str) -> str | None:
     """读 qn(name) 属性；元素为 None 或属性缺失返回 None。"""
     if element is None:
         return None
     return element.get(qn(name))
 
 
-def mm(element, name: str) -> Optional[float]:
+def mm(element, name: str) -> float | None:
     """把元素上某属性的 twips 值折算成毫米。"""
     raw = attr_of(element, name)
     return None if raw is None else int(raw) * 25.4 / 1440
 
 
-def pt(element, name: str) -> Optional[float]:
+def pt(element, name: str) -> float | None:
     """把元素上某属性的 twips 值折算成磅。"""
     raw = attr_of(element, name)
     return None if raw is None else int(raw) / 20
@@ -61,7 +59,7 @@ def paragraph_containing(doc: Document, needle: str):
     raise AssertionError(f"产物里没有文本包含 {needle!r} 的段落")
 
 
-def p_pr(p) -> Optional[object]:
+def p_pr(p) -> object | None:
     """段落的 w:pPr。"""
     return p.find(qn("w:pPr"))
 
@@ -72,24 +70,24 @@ def p_child(p, path: str):
     return None if pr is None else pr.find(qn(path))
 
 
-def alignment(p) -> Optional[str]:
+def alignment(p) -> str | None:
     """w:jc/@w:val —— 'both' 即两端对齐，'center' 居中。"""
     return attr_of(p_child(p, "w:jc"), "w:val")
 
 
-def indent(p, name: str) -> Optional[int]:
+def indent(p, name: str) -> int | None:
     """w:ind 上的一个属性（如 'w:firstLineChars'），返回原值整数。"""
     raw = attr_of(p_child(p, "w:ind"), name)
     return None if raw is None else int(raw)
 
 
-def spacing(p, name: str) -> Optional[int]:
+def spacing(p, name: str) -> int | None:
     """w:spacing 上的一个属性（如 'w:line'、'w:before'），返回原值整数。"""
     raw = attr_of(p_child(p, "w:spacing"), name)
     return None if raw is None else int(raw)
 
 
-def border(p, edge: str, name: str) -> Optional[str]:
+def border(p, edge: str, name: str) -> str | None:
     """pPr/w:pBdr 下某条边（如 'w:bottom'）的属性值。"""
     pbdr = p_child(p, "w:pBdr")
     return None if pbdr is None else attr_of(pbdr.find(qn(edge)), name)
@@ -130,7 +128,7 @@ def forced_page_breaks(doc: Document) -> list:
     return breaks + [e for e in body.iter(qn("w:sectPr")) if e.getparent().tag == qn("w:pPr")]
 
 
-def field_instruction(p) -> Optional[str]:
+def field_instruction(p) -> str | None:
     """段落里 w:instrText 的文本（PAGE 域指令），没有则 None。"""
     for instr in p.iter(qn("w:instrText")):
         if instr.text and "PAGE" in instr.text:
@@ -174,22 +172,22 @@ def r_child(run, tag: str):
     return None if pr is None else pr.find(qn(tag))
 
 
-def east_asia_font(run) -> Optional[str]:
+def east_asia_font(run) -> str | None:
     """w:rFonts/@w:eastAsia —— 中文字体名。"""
     return attr_of(r_child(run, "w:rFonts"), "w:eastAsia")
 
 
-def ascii_font(run) -> Optional[str]:
+def ascii_font(run) -> str | None:
     """w:rFonts/@w:ascii —— 西文/数字字体名。"""
     return attr_of(r_child(run, "w:rFonts"), "w:ascii")
 
 
-def run_color(run) -> Optional[str]:
+def run_color(run) -> str | None:
     """w:color/@w:val —— 未显式设置返回 None（即随默认黑色）。"""
     return attr_of(r_child(run, "w:color"), "w:val")
 
 
-def run_size_pt(run) -> Optional[float]:
+def run_size_pt(run) -> float | None:
     """w:sz/@w:val 半磅 → 磅。"""
     raw = attr_of(r_child(run, "w:sz"), "w:val")
     return None if raw is None else int(raw) / 2

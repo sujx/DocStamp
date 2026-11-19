@@ -38,6 +38,7 @@ dev = [
     "flake8>=7.0,<8",
     "isort>=5.13,<6",
     "mypy>=1.8,<2",
+    "ruff>=0.17.5",
 ]
 
 [tool.uv]
@@ -53,6 +54,24 @@ line-length = 120
 [tool.isort]
 profile = "black"
 line_length = 120
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+# E/F replace flake8, I replaces isort; UP/C4/B/RUF are added on purpose.
+# BLE/S stay unselected: swallowing exceptions at the ServiceResult boundary is
+# the design (58 BLE001 + 9 S110 are deliberate, see AGENTS.md).
+# SIM stays off until its own pass (8 style-only rewrites).
+select = ["E4", "E7", "E9", "F", "I", "UP", "C4", "B", "RUF"]
+ignore = [
+    "RUF001",
+    "RUF002",
+    "RUF003",  # fullwidth punctuation is intentional in the Chinese copy
+    "E402",    # app.py/wsgi.py load .env before importing config, by design
+    "UP046",   # PEP 695 generics for ServiceResult[T] is a separate pass
+]
 
 [tool.mypy]
 ignore_missing_imports = true

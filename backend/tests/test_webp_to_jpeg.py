@@ -34,7 +34,7 @@ class TestWebpToJpegService:
         assert result.success, result.message
         with Image.open(out) as img:
             assert img.mode == "RGB"
-            r, g, b = img.getpixel((0, 0))
+            r, g, _b = img.getpixel((0, 0))
         # 50% blue over a white backfill — red and green must be lifted well
         # above the pure-blue source value of 0.
         assert r > 100 and g > 100

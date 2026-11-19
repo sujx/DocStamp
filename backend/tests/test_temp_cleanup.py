@@ -9,7 +9,7 @@ those two files.
 
 import os
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -168,26 +168,26 @@ class TestCleanupScheduling:
     cleanup when the stamp file says the last run is over 24h ago."""
 
     def test_due_when_never_run(self, tmp_path):
-        assert cleanup_due(tmp_path / "stamp", datetime.now(timezone.utc)) is True
+        assert cleanup_due(tmp_path / "stamp", datetime.now(UTC)) is True
 
     def test_not_due_when_just_run(self, tmp_path):
         stamp = tmp_path / "stamp"
-        run_cleanup(str(tmp_path), stamp, now=datetime.now(timezone.utc))
+        run_cleanup(str(tmp_path), stamp, now=datetime.now(UTC))
 
-        assert cleanup_due(stamp, datetime.now(timezone.utc)) is False
+        assert cleanup_due(stamp, datetime.now(UTC)) is False
 
     def test_due_when_last_run_over_a_day_ago(self, tmp_path):
         stamp = tmp_path / "stamp"
         run_cleanup(str(tmp_path), stamp,
-                    now=datetime.now(timezone.utc) - timedelta(hours=25))
+                    now=datetime.now(UTC) - timedelta(hours=25))
 
-        assert cleanup_due(stamp, datetime.now(timezone.utc)) is True
+        assert cleanup_due(stamp, datetime.now(UTC)) is True
 
     def test_due_when_stamp_is_corrupt(self, tmp_path):
         stamp = tmp_path / "stamp"
         stamp.write_text("garbage", encoding="utf-8")
 
-        assert cleanup_due(stamp, datetime.now(timezone.utc)) is True
+        assert cleanup_due(stamp, datetime.now(UTC)) is True
 
     def test_run_cleanup_deletes_aged_files_and_stamps(self, tmp_path, monkeypatch):
         calls = {}
@@ -200,7 +200,7 @@ class TestCleanupScheduling:
         monkeypatch.setattr(fc, "cleanup_temp_files", fake_cleanup)
 
         stamp = tmp_path / "stamp"
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         fc.run_cleanup(str(tmp_path), stamp, now=now)
 
