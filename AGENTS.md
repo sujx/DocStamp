@@ -106,6 +106,7 @@ bash /root/sync-from-windows.sh frontend     # 只传某个 pathspec 时缩小�
 cd backend && uv sync                 # 首次 clone 或改依赖后；默认就装 dev 组
 uv run pytest tests/ -v               # 等价于 ../manage.sh test
 uv run mypy --strict <文件或包>       # 别用 /usr/bin/mypy：它走系统解释器的 site-packages，看不见 .venv
+uv run ruff check .                   # lint 门禁：select 与豁免理由全在 backend/pyproject.toml 的 [tool.ruff]
 ```
 
 加依赖用 `uv add <pkg>` / `uv add --dev <pkg>`，`pyproject.toml` 和 `uv.lock` 一起提交。镜像构建走 `uv sync --frozen --no-dev`，dev 组不进镜像。国内网络下 `pypi.org` 只有几百 kB/s，需要镜像时临时加 `UV_DEFAULT_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple`——只在环境变量里换，写进 `pyproject.toml` 会把 `uv.lock` 的 registry 全部改写到国内源。
@@ -285,6 +286,15 @@ background: linear-gradient(168deg, #2A2166 0%, #23337A 30%, #1E4E7E 55%, #17646
 | 开发模式没有清理线程 | 每日清理只挂在 gunicorn `on_starting`，`uv run python app.py` 不起它，dev 机器只能 `./manage.sh clean-output` 手动清 |
 | 后端 `mypy --strict` 不是门槛 | v3.11.0 迁 uv 时实测：`uv run mypy --ignore-missing-imports --strict --explicit-package-bases $(git ls-files '*.py')` 报 **319 errors / 43 files**，全是存量（118 条 `no-untyped-def` + 63 条 `type-arg` + 55 条 `arg-type`）。`pyproject.toml` 写着 `strict = true`、`backend/.pre-commit-config.yaml` 也挂了 mypy，但 `.git/hooks/pre-commit` 不存在，所以这道门槛从未跑过。要修属一整批，不在依赖迁移里顺带动 |
 | 深色模式下设计 token 不跟随 | 实测：浏览器 `prefers-color-scheme: dark` 时 Nuxt UI 的 colorMode（默认 `system`）给 `<html>` 挂 `dark`，Nuxt UI 组件转成 `bg-gray-900`，而 `assets/css/main.css` 的 `--color-*` 只有一套浅色值，于是自研样式（`var(--color-muted)` 底 + `var(--color-text-secondary)` 字）落在深色卡上——`/password-gen` 与 `/interest-calc` 的卡片标题都近乎不可读。全站一致地坏，非某页缺陷；根治要么给 token 补 `dark:` 一套，要么把 colorMode 钉成 light。属设计 token 批次 |
+| `ruff format` 未执行，black/flake8/isort 仍在 dev 组 | lint 门禁已换成 `uv run ruff check .`（`backend/pyproject.toml` 的 `[tool.ruff]`：line-length 120、select `E4,E7,E9,F,I,UP,C4,B,RUF`，0 告警），但**格式化**是另一个量级：`ruff format --check` 实测 **51 文件待重排 / 29 已合格**，与 `uv run black --check` 结论一致（存量漂移，非本批引入）。整仓重排会淹掉同批的语义改动，故单独一批；那批做完再连同 `backend/.pre-commit-config.yaml`（仍列着 black/flake8/isort，且 `.git/hooks/pre-commit` 至今不存在）一起删掉这三个依赖 |
+| `[tool.ruff.lint]` 未启用 SIM | 实测 `--select SIM` 仅 8 条（6 条 `SIM105` try/except/pass → `contextlib.suppress`、2 条 `SIM108` 三元式），全被 ruff 标为 unsafe fix 且要动 5 个本批未碰的文件。已写明豁免的另有 `RUF001/2/3`（中文全角标点，实测 676 条误报）、`E402`（`app.py`/`wsgi.py` 先 load `.env` 再 import config）、`UP046`（`ServiceResult[T]` 转 PEP 695 语法单独一批）；`BLE/S` 两组干脆未 select，理由见上一条同文件注释 |
+
+### 使用统计
+
+| 事项 | 为何未做 |
+|------|----------|
+| `/status` 时间窗边界日整日丢失 | `backend/services/stats.py:92` 的 `since` 用 `datetime.isoformat()`（`2026-11-12T03:57:55.833556+00:00`），而 `operation_logs.created_at` 存的是列默认值 `datetime('now')` 的空格格式（`2026-11-12 03:57:21`）；`_by_module` / `_daily_counts` / `_count_distinct_ips` 全走字符串比较 `created_at >= ?`，同一天内 `' '`(0x20) < `'T'`(0x54) 直接判负。实测该边界日当天 4 行、命中 `>= since` **0 行**——趋势图最老那天恒为 0。修法是 `since` 同样 `strftime("%Y-%m-%d %H:%M:%S")`（种子侧已这么落，由 `backend/tests/test_stats_seed.py` 钉住），ruff 第一批只接通种子时间戳，不顺带改窗口口径 |
+| PDF 插入页的 `insert_pages` 不校验形状 | `backend/blueprints/pdf_editor_bp.py:171` 把 `json.loads(request.form.get("insert_pages", "null"))` 原样交给服务层，传 `insert_pages=5` 时 `backend/services/pdf_editor.py:98` 的 `for p in pages_to_insert` 抛 `TypeError`，经全局 handler 出 **500** 而非 400。本批只把标注对齐成 `list[int] | None`，入参校验属 `schemas.py` DTO 批次 |
 
 ### 宣传页 / 隐私文案
 
