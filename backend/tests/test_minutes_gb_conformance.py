@@ -9,9 +9,9 @@
 """
 
 import re
-import pytest
 from datetime import date
-from docx.oxml.ns import qn
+
+import pytest
 
 from services.minutes_docx import PAGE_DASH, build_minutes
 from tests.helpers_docx import (
@@ -30,9 +30,9 @@ from tests.helpers_docx import (
     page_setup,
     paragraph_containing,
     paragraphs,
-    runs,
     run_color,
     run_size_pt,
+    runs,
     setting_on,
     spacing,
     tab_stops,

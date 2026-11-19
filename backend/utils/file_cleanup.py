@@ -12,7 +12,7 @@ import os
 import shutil
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 logger = logging.getLogger(__name__)
 
@@ -111,10 +111,10 @@ def _write_stamp(stamp_path, when: datetime) -> None:
         logger.warning("could not write cleanup stamp %s: %s", stamp_path, e)
 
 
-def cleanup_due(stamp_path, now: datetime = None,
+def cleanup_due(stamp_path, now: datetime | None = None,
                 interval_seconds: int = CLEANUP_INTERVAL_SECONDS) -> bool:
     """True when the last cleanup is older than interval_seconds (or unknown)."""
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     try:
         with open(stamp_path, encoding="utf-8") as f:
             last = datetime.fromisoformat(f.read().strip())
@@ -123,8 +123,8 @@ def cleanup_due(stamp_path, now: datetime = None,
     return (now - last).total_seconds() >= interval_seconds
 
 
-def run_cleanup(upload_folder: str, stamp_path, now: datetime = None) -> None:
-    now = now or datetime.now(timezone.utc)
+def run_cleanup(upload_folder: str, stamp_path, now: datetime | None = None) -> None:
+    now = now or datetime.now(UTC)
     if not os.path.isdir(upload_folder):
         logger.warning("upload folder missing, skipping cleanup: %s", upload_folder)
         return

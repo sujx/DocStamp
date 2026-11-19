@@ -1,9 +1,9 @@
 """PDF page manipulation — delete, insert, reorder pages."""
 
+from flask_babel import lazy_gettext as _l
 from pypdf import PdfReader, PdfWriter
 
 from errors import ErrorCode, ServiceResult
-from flask_babel import lazy_gettext as _l
 
 
 def pdf_delete_pages(input_path: str, output_path: str, pages_to_delete: list) -> ServiceResult[dict]:
@@ -58,7 +58,7 @@ def pdf_insert_pages(
     insert_path: str,
     output_path: str,
     at_position: int,
-    pages_to_insert: list = None,
+    pages_to_insert: list[int] | None = None,
 ) -> ServiceResult[dict]:
     """Insert pages from another PDF into the source PDF.
 

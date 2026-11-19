@@ -1,6 +1,5 @@
 """Tests for the PDF redaction session store (utils/redact_session.py)."""
 
-import json
 import os
 import time
 
@@ -104,7 +103,8 @@ class TestCleanup:
     def test_ignores_other_entries_in_the_upload_folder(self, root):
         os.makedirs(os.path.join(root, "thumbs_abc"), exist_ok=True)
         stray = os.path.join(root, "loose.pdf")
-        open(stray, "wb").write(b"%PDF-1.4")
+        with open(stray, "wb") as f:
+            f.write(b"%PDF-1.4")
 
         removed = cleanup_expired(root)
 

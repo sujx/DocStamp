@@ -6,7 +6,7 @@ import os
 import pytest
 from PIL import Image, ImageChops, ImageFilter, ImageStat
 
-from errors import ErrorCode, ServiceResult
+from errors import ErrorCode
 from services.pdf_redact import (
     DEFAULT_MOSAIC_BLOCK,
     find_text_matches,
@@ -16,7 +16,6 @@ from services.pdf_redact import (
     redact_pdf,
     region_text,
 )
-
 
 # ── helpers ─────────────────────────────────────────────────────────────
 

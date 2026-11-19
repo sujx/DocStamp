@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[0]))
 
 from babel.messages.pofile import read_po, write_po
 
-TZ = {"Asia/Shanghai": "+0800"}  # noqa
+TZ = {"Asia/Shanghai": "+0800"}
 
 TRANSLATIONS = {
     "Resource not found": "资源不存在",

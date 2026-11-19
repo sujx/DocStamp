@@ -5,10 +5,10 @@ and test-data seeding for the stats dashboard.
 """
 
 import random
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-from config import Config
 from backend.models import OperationLog
+from config import Config
 
 MODULE_NAMES = {
     "convert": "MD 转公文",
@@ -72,7 +72,7 @@ def daily_trend(since: str, days: int) -> list[dict]:
     by_date = {r.get("date", ""): r.get("cnt", 0) for r in rows}
 
     result = []
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
     for i in range(days - 1, -1, -1):
         d = (today - timedelta(days=i)).isoformat()
         result.append({"date": d, "count": by_date.get(d, 0)})
@@ -89,7 +89,7 @@ def unique_visitors(since: str) -> int:
 
 def build_overview(days: int) -> dict:
     days = max(1, min(days, 365))
-    since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+    since = (datetime.now(UTC) - timedelta(days=days)).isoformat()
 
     by_module = aggregate_by_module(since)
     total = sum(m["count"] for m in by_module)
@@ -120,17 +120,19 @@ def seed_test_data() -> dict:
         "Mozilla/5.0 Edge/120.0",
     ]
     modules = list(MODULE_NAMES.keys())
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     seeded = 0
     for module in modules:
         records = random.randint(1, 10)
         for i in range(records):
+            # Same format as the column default datetime('now'): the dashboard
+            # filters created_at with a string comparison.
             ts = (now - timedelta(
                 days=random.randint(0, 14),
                 hours=random.randint(0, 23),
                 minutes=random.randint(0, 59),
-            )).isoformat()
+            )).strftime("%Y-%m-%d %H:%M:%S")
             op_log.log_operation(
                 session_id=f"seed-{module}-{i}",
                 operation_type=module,
@@ -140,6 +142,7 @@ def seed_test_data() -> dict:
                 user_agent=random.choice(test_agents),
                 status=random.choices(["success", "error"], weights=[0.9, 0.1])[0],
                 duration_ms=random.randint(50, 5000),
+                created_at=ts,
             )
             seeded += 1
 

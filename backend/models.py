@@ -135,8 +135,13 @@ class OperationLog(BaseCRUD):
         file_size: int = 0, ip_address: str = "",
         user_agent: str = "", status: str = "success",
         error_code: str = "", duration_ms: int = 0,
+        created_at: str | None = None,
     ) -> str:
-        """Record an operation in the audit log."""
+        """Record an operation in the audit log.
+
+        created_at is omitted from the INSERT when not given, so the column
+        default applies — passing NULL explicitly would store NULL.
+        """
         data = {
             "session_id": session_id,
             "operation_type": operation_type,
@@ -149,6 +154,8 @@ class OperationLog(BaseCRUD):
             "error_code": error_code,
             "duration_ms": duration_ms,
         }
+        if created_at is not None:
+            data["created_at"] = created_at
         return self.insert(data)
 
     # ── Aggregate queries for the status dashboard ─────────────────

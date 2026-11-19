@@ -2,10 +2,9 @@
 
 from flask import Blueprint, g, jsonify, request
 from flask_babel import gettext as _
-from flask_babel import gettext as _
 
-from utils.rate_limit import rate_limit
 from services.rss_detector import detect_feeds
+from utils.rate_limit import rate_limit
 
 rss_detect_bp = Blueprint("rss-detect", __name__)
 
