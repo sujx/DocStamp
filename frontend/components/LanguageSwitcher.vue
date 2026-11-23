@@ -34,7 +34,7 @@ function setLang(lang: string) {
 .lang-switcher {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   max-width: 100%;
   overflow: hidden;
 }
@@ -46,9 +46,9 @@ function setLang(lang: string) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: transparent;
   cursor: pointer;
   padding: 3px 6px;
@@ -57,7 +57,8 @@ function setLang(lang: string) {
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
-  transition: all 0.2s cubic-bezier(.16, 1, .3, 1);
+  color: var(--color-on-dark-muted);
+  transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out);
 }
 .lang-switcher.collapsed .lang-btn {
   width: 28px;
@@ -68,15 +69,17 @@ function setLang(lang: string) {
   padding: 0;
 }
 .lang-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--color-on-dark-raise);
+  color: var(--color-on-dark);
 }
 .lang-btn.active {
-  background: rgba(76, 125, 240, 0.22);
-  border-color: rgba(76, 125, 240, 0.40);
+  background: var(--color-on-dark-raise);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  color: var(--color-on-dark);
 }
 .flag {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 500;
   line-height: 1;
   flex-shrink: 0;
   width: 18px;
@@ -85,21 +88,13 @@ function setLang(lang: string) {
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #8FA0C8;
-  transition: all 0.2s cubic-bezier(.16, 1, .3, 1);
-}
-.lang-btn.active .flag {
-  background: #4C7DF0;
-  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
 }
 .label {
   font-size: 11px;
   line-height: 1;
   white-space: nowrap;
-  color: #8FA0C8;
-}
-.lang-btn.active .label {
-  color: #fff;
+  color: inherit;
 }
 </style>

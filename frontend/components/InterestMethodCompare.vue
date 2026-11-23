@@ -2,7 +2,7 @@
   <UCard v-if="comparisons.length">
     <template #header>
       <div>
-        <h2 class="text-lg font-semibold text-primary">{{ t("interestCalc.compare.title") }}</h2>
+        <h2 class="text-[15px] font-medium text-primary">{{ t("interestCalc.compare.title") }}</h2>
         <p class="text-sm text-secondary mt-1">{{ t("interestCalc.compare.subtitle") }}</p>
       </div>
     </template>
@@ -35,7 +35,7 @@
             <td class="py-2 pr-3 text-right text-primary">{{ amount(item.result.totalInterest) }}</td>
             <td class="py-2 pr-3 text-right text-primary">{{ amount(item.result.totalFee) }}</td>
             <td class="py-2 pr-3 text-right text-primary">{{ amount(item.result.totalCost) }}</td>
-            <td class="py-2 pr-3 text-right font-semibold text-brand-700">
+            <td class="py-2 pr-3 text-right font-medium tabular-nums text-brand-700">
               {{ formatPercent(item.result.aprPercent) }}
             </td>
           </tr>

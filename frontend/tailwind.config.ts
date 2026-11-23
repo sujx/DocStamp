@@ -27,6 +27,7 @@ export default <Config>{
         page: "#EEF0F4",
         surface: "#ffffff",
         muted: "#F4F6FA",
+        raised: "#ECEFF4",
         sidebar: "#23337A",
       },
       textColor: {
@@ -35,8 +36,9 @@ export default <Config>{
         tertiary: "#6E7A93",
       },
       borderColor: {
-        default: "#E3E8F0",
-        subtle: "#EEF0F4",
+        default: "rgba(31, 42, 68, 0.10)",
+        subtle: "rgba(31, 42, 68, 0.06)",
+        strong: "rgba(31, 42, 68, 0.18)",
       },
       borderRadius: {
         sm: "6px",
@@ -46,21 +48,20 @@ export default <Config>{
         full: "9999px",
       },
       boxShadow: {
-        xs: "0 1px 2px rgba(26, 43, 79, 0.04)",
-        card: "0 2px 6px rgba(26, 43, 79, 0.05), 0 1px 2px rgba(26, 43, 79, 0.04)",
-        elevated: "0 6px 14px -2px rgba(26, 43, 79, 0.07), 0 2px 6px -2px rgba(26, 43, 79, 0.04)",
-        sidebar: "0 12px 22px -4px rgba(26, 43, 79, 0.08), 0 6px 10px -4px rgba(26, 43, 79, 0.04)",
-        subtle: "0 1px 2px rgba(26, 43, 79, 0.04)",
+        xs: "0 1px 2px rgba(16, 24, 40, 0.05)",
+        card: "0 1px 2px rgba(16, 24, 40, 0.05)",
+        elevated: "0 8px 24px rgba(16, 24, 40, 0.06)",
+        sidebar: "0 8px 24px rgba(16, 24, 40, 0.08)",
+        subtle: "0 1px 2px rgba(16, 24, 40, 0.05)",
       },
       transitionDuration: {
-        DEFAULT: "200ms",
+        DEFAULT: "160ms",
       },
       transitionTimingFunction: {
-        DEFAULT: "cubic-bezier(.16, 1, .3, 1)",
-        spring: "cubic-bezier(.16, 1, .3, 1)",
+        DEFAULT: "cubic-bezier(0.22, 1, 0.36, 1)",
       },
       animation: {
-        "fade-up": "fade-up 0.4s cubic-bezier(.16, 1, .3, 1) both",
+        "fade-up": "fade-up 400ms cubic-bezier(0.22, 1, 0.36, 1) both",
       },
     },
   },

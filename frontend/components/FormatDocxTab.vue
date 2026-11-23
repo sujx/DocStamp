@@ -1,25 +1,27 @@
 <template>
   <div>
     <div
-      class="border-2 border-dashed rounded-lg p-12 text-center transition-colors duration-150 cursor-pointer"
-      :class="isDragover ? 'border-brand-700 bg-brand-soft' : 'border-default bg-surface'"
+      class="cursor-pointer rounded-xl border border-dashed p-8 text-center transition-colors"
+      :class="isDragover ? 'border-brand-600 bg-brand-soft' : 'border-default bg-surface hover:border-strong'"
       @dragover.prevent="isDragover = true"
       @dragleave.prevent="isDragover = false"
       @drop.prevent="onDrop"
     >
-      <UIcon name="i-heroicons-document-text" class="w-12 h-12 mx-auto mb-3 text-tertiary" />
-      <p class="text-base font-medium mb-1 text-primary">{{ $t("format.docxDragText") }}</p>
-      <p class="text-sm mb-4 text-secondary">{{ $t("format.docxFormats") }}</p>
+      <div class="icon-badge mx-auto mb-3">
+        <UIcon name="i-heroicons-document-text" class="size-[18px]" />
+      </div>
+      <p class="mb-1 text-[15px] font-medium text-primary">{{ $t("format.docxDragText") }}</p>
+      <p class="mb-4 text-[13px] text-secondary">{{ $t("format.docxFormats") }}</p>
       <label>
         <UButton color="primary" variant="soft" as="span">{{ $t("format.upload") }}</UButton>
         <input type="file" accept=".docx" class="hidden" @change="onFileSelect" />
       </label>
     </div>
 
-    <div v-if="selectedFile" class="p-4 mt-4 card bg-surface border-default">
-      <div class="flex items-center gap-3 mb-4">
-        <UIcon name="i-heroicons-document-text" class="w-5 h-5 shrink-0 text-brand-700" />
-        <span class="flex-1 text-sm font-medium truncate text-primary">{{ selectedFile.name }}</span>
+    <div v-if="selectedFile" class="card mt-4">
+      <div class="mb-4 flex items-center gap-3">
+        <UIcon name="i-heroicons-document-text" class="size-[18px] shrink-0 text-secondary" />
+        <span class="flex-1 truncate text-[13px] font-medium text-primary">{{ selectedFile.name }}</span>
         <UButton size="xs" variant="ghost" color="neutral" @click="selectedFile = null">{{ $t("common.reset") }}</UButton>
       </div>
       <UButton color="primary" :loading="isFormatting" block @click="formatFile">

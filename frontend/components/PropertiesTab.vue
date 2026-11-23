@@ -1,7 +1,7 @@
 <template>
   <div class="pt-3">
-    <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("properties.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty text-secondary" >{{ $t("properties.description") }}</p>
+    <h2 class="text-[28px] font-medium leading-tight text-balance text-primary">{{ $t("properties.title") }}</h2>
+    <p class="mb-6 mt-2 max-w-xl text-[15px] text-pretty leading-relaxed text-secondary">{{ $t("properties.description") }}</p>
 
     <!-- Mode toggle -->
     <div class="flex gap-4 mb-4">
@@ -19,7 +19,7 @@
     <div v-if="batchMode">
       <label class="block mb-4">
         <UButton color="primary" variant="soft" as="span">
-          <UIcon name="i-heroicons-document-plus" class="w-4 h-4 mr-1" />
+          <UIcon name="i-heroicons-document-plus" class="size-4 mr-1" />
           {{ $t("properties.selectFiles") }}
         </UButton>
         <input type="file" multiple accept=".docx,.xlsx,.pptx" class="hidden" @change="onBatchFiles" />

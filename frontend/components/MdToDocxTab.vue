@@ -4,27 +4,24 @@
     <div class="columns-wrapper">
       <!-- Left: Editor Panel -->
       <div class="column-panel">
-        <div
-          class="panel-card"
-          :style="{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-default)' }"
-        >
+        <div class="panel-card">
           <!-- Header -->
           <div class="panel-header">
             <span class="panel-title">
-              <UIcon name="i-heroicons-pencil-square" class="w-4 h-4" />
+              <UIcon name="i-heroicons-pencil-square" class="size-4" />
               {{ $t("md2docx.editor") }}
             </span>
             <div class="toolbar">
               <UButton size="xs" variant="outline" color="neutral" @click="upload">
-                <UIcon name="i-heroicons-folder-open" class="w-3.5 h-3.5 mr-1" />
+                <UIcon name="i-heroicons-folder-open" class="size-4 mr-1" />
                 {{ $t("md2docx.upload") }}
               </UButton>
               <UButton size="xs" variant="outline" color="neutral" @click="loadSample">
-                <UIcon name="i-heroicons-document-text" class="w-3.5 h-3.5 mr-1" />
+                <UIcon name="i-heroicons-document-text" class="size-4 mr-1" />
                 {{ $t("md2docx.sample") }}
               </UButton>
               <UButton size="xs" variant="outline" color="neutral" @click="clearAll">
-                <UIcon name="i-heroicons-trash" class="w-3.5 h-3.5 mr-1" />
+                <UIcon name="i-heroicons-trash" class="size-4 mr-1" />
                 {{ $t("md2docx.clear") }}
               </UButton>
             </div>
@@ -40,7 +37,7 @@
             @drop.prevent="onDrop"
           >
             <div v-if="dragOver" class="drop-overlay">
-              <UIcon name="i-heroicons-arrow-up-tray" class="w-10 h-10" />
+              <UIcon name="i-heroicons-arrow-up-tray" class="size-6" />
               <p>{{ $t("md2docx.dropHint") }}</p>
             </div>
             <textarea
@@ -58,17 +55,14 @@
 
       <!-- Right: Preview Panel -->
       <div class="column-panel">
-        <div
-          class="panel-card preview-panel"
-          :style="{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-default)' }"
-        >
+        <div class="panel-card preview-panel">
           <!-- Header -->
           <div class="panel-header">
             <span class="panel-title">
-              <UIcon name="i-heroicons-eye" class="w-4 h-4" />
+              <UIcon name="i-heroicons-eye" class="size-4" />
               {{ $t("md2docx.preview") }}
             </span>
-            <span class="panel-badge" v-if="previewHtml" style="background: var(--color-brand-soft); color: var(--color-brand-700);">
+            <span v-if="previewHtml" class="panel-badge">
               {{ $t("md2docx.live") }}
             </span>
           </div>
@@ -77,14 +71,14 @@
           <div class="preview-area">
             <!-- Loading -->
             <div v-if="previewLoading" class="preview-placeholder">
-              <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin" />
+              <UIcon name="i-heroicons-arrow-path" class="size-5 animate-spin" />
               <p>{{ $t("md2docx.previewLoading") }}</p>
             </div>
 
             <!-- Empty State -->
             <div v-else-if="!previewHtml" class="preview-placeholder">
               <div class="empty-icon-circle">
-                <UIcon name="i-heroicons-document-text" class="w-8 h-8" />
+                <UIcon name="i-heroicons-document-text" class="size-5" />
               </div>
               <p class="empty-title">{{ $t("md2docx.emptyTitle") }}</p>
               <span class="empty-hint">{{ $t("md2docx.emptyHint") }}</span>
@@ -106,7 +100,7 @@
           class="convert-btn"
           @click="convertPlain"
         >
-          <UIcon name="i-heroicons-document" class="w-5 h-5 mr-2" />
+          <UIcon name="i-heroicons-document" class="size-[18px] mr-2" />
           {{ convertingPlain ? $t("md2docx.converting") : $t("md2docx.convertPlain") }}
         </UButton>
         <UButton
@@ -115,18 +109,17 @@
           class="convert-btn"
           @click="convertOfficial"
         >
-          <UIcon name="i-heroicons-arrow-right-circle" class="w-5 h-5 mr-2" />
+          <UIcon name="i-heroicons-arrow-right-circle" class="size-[18px] mr-2" />
           {{ convertingOfficial ? $t("md2docx.converting") : $t("md2docx.convertOfficial") }}
         </UButton>
       </div>
       <p class="privacy-hint text-pretty">
-        <UIcon name="i-heroicons-shield-check" class="w-3.5 h-3.5 inline" />
+        <UIcon name="i-heroicons-shield-check" class="size-4 inline" />
         {{ $t("md2docx.privacy") }}
       </p>
       <a
         href="/GBT9704-2012.pdf" target="_blank"
-        class="text-xs underline underline-offset-2"
-        :style="{ color: 'var(--color-text-tertiary)' }"
+        class="text-xs text-tertiary underline underline-offset-2"
       >{{ $t("md2docx.gbtLink") }}</a>
     </div>
 
@@ -363,25 +356,26 @@ function convertOfficial() { doConvert("official"); }
 .panel-card {
   display: flex;
   flex-direction: column;
-  border: 1px solid;
-  border-radius: 10px;
-  overflow: hidden;
   width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
 }
 
 .panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--color-border-default);
-  background: #fafbfc;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-muted);
   flex-shrink: 0;
 }
 
 .panel-title {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-text-primary);
   display: flex;
   align-items: center;
@@ -389,10 +383,8 @@ function convertOfficial() { doConvert("official"); }
 }
 
 .panel-badge {
-  font-size: 11px;
-  padding: 3px 10px;
-  border-radius: 9999px;
-  font-weight: 600;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
 }
 
 .toolbar {
@@ -420,15 +412,15 @@ function convertOfficial() { doConvert("official"); }
   align-items: center;
   justify-content: center;
   background: var(--color-brand-soft);
-  border: 2px dashed var(--color-brand-700);
+  border: 1px dashed var(--color-brand-600);
   z-index: 10;
   color: var(--color-brand-700);
 }
 
 .drop-overlay p {
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .md-editor {
@@ -452,7 +444,7 @@ function convertOfficial() { doConvert("official"); }
 }
 
 .md-editor::placeholder {
-  color: #b8bcc2;
+  color: var(--color-text-tertiary);
   font-size: 13px;
 }
 
@@ -476,15 +468,14 @@ function convertOfficial() { doConvert("official"); }
 }
 
 .empty-icon-circle {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-muted);
-  border-radius: 50%;
-  margin-bottom: 4px;
-  color: var(--color-text-tertiary);
+  background: var(--color-raised);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-secondary);
 }
 
 .empty-title {
@@ -497,21 +488,18 @@ function convertOfficial() { doConvert("official"); }
 .empty-hint {
   font-size: 12px;
   margin-top: 4px;
-  opacity: 0.6;
+  color: var(--color-text-tertiary);
 }
 
 /* ── Document Paper ──────────────────────────────────────────── */
 .doc-paper {
-  background:
-    #fefefe;
   padding: 56px 48px;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 3px 8px rgba(0, 0, 0, 0.05);
+  background: var(--color-doc-paper);
+  box-shadow: var(--shadow-elevated);
   font-family: "仿宋_GB2312", "FangSong", "STFangsong", serif;
   font-size: 16px;
   line-height: 28.6pt;
-  color: #000;
+  color: var(--color-doc-ink);
   word-break: break-word;
   border-radius: 2px;
 }
@@ -579,12 +567,6 @@ function convertOfficial() { doConvert("official"); }
 
 .convert-btn {
   min-width: 160px;
-  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
-}
-
-.convert-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 138, 61, 0.25);
 }
 
 .privacy-hint {
@@ -605,7 +587,7 @@ function convertOfficial() { doConvert("official"); }
   align-items: center;
   justify-content: center;
   gap: 16px;
-  background: rgba(249, 247, 232, 0.94);
+  background: color-mix(in srgb, var(--color-page) 94%, transparent);
 }
 
 .spinner {
@@ -615,7 +597,7 @@ function convertOfficial() { doConvert("official"); }
 }
 
 .spinner .ring {
-  animation: dash 1.5s ease-in-out infinite;
+  animation: dash 1.5s var(--ease-out) infinite;
 }
 
 @keyframes spin {
@@ -630,7 +612,7 @@ function convertOfficial() { doConvert("official"); }
 
 .loading-text {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-text-primary);
 }
 
@@ -639,8 +621,8 @@ function convertOfficial() { doConvert("official"); }
   color: var(--color-text-secondary);
 }
 
-.overlay-fade-enter-active { transition: opacity 200ms ease-out; }
-.overlay-fade-leave-active { transition: opacity 150ms ease-out; }
+.overlay-fade-enter-active { transition: opacity 200ms var(--ease-out); }
+.overlay-fade-leave-active { transition: opacity 160ms var(--ease-out); }
 .overlay-fade-enter-from,
 .overlay-fade-leave-to { opacity: 0; }
 </style>

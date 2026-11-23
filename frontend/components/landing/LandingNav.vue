@@ -1,11 +1,11 @@
 <template>
-  <header class="sticky top-0 z-50 border-b border-default bg-surface/95 backdrop-blur">
+  <header class="sticky top-0 z-50 border-b border-default bg-surface">
     <div class="mx-auto flex h-14 max-w-5xl items-center gap-2 px-3 sm:gap-6 sm:px-6">
       <NuxtLink to="/" class="flex min-h-[44px] items-center gap-2.5 no-underline">
         <span class="seal-dot">印</span>
         <!-- 320px 下「印章 + 四字品牌 + 药丸 + CTA」横排放不下（实测英文 CTA 124px），
              品牌字会折成两行撑破顶栏；窄屏只留印章，文字 sr-only 保住可访问名。 -->
-        <span class="sr-only font-official text-lg font-bold text-primary sm:not-sr-only">鹊随金印</span>
+        <span class="sr-only text-[15px] font-medium text-primary sm:not-sr-only">鹊随金印</span>
       </NuxtLink>
 
       <nav class="ml-auto flex items-center gap-2 sm:gap-3 md:gap-5" :aria-label="$t('landing.nav.ariaLabel')">
@@ -13,20 +13,20 @@
           v-for="anchor in anchors"
           :key="anchor.href"
           :href="anchor.href"
-          class="hidden min-h-[44px] items-center text-sm text-secondary no-underline transition-colors duration-150 hover:text-brand-600 sm:inline-flex"
+          class="hidden min-h-[44px] items-center text-sm text-secondary no-underline transition-colors hover:text-brand-700 sm:inline-flex"
         >{{ anchor.label }}</a>
 
         <!-- 响应式 display 类必须挂在普通 div 上：LanguageSwitcher 根节点的
              scoped 规则 .lang-switcher[data-v] 是 (0,2,0)，会压过 .hidden /
              .md:hidden 的 (0,1,0)，直接写在组件上两份实例会同时可见。 -->
-        <div class="lang-pill rounded-lg bg-brand-900 px-1.5">
+        <div class="lang-pill rounded-md px-1.5">
           <div class="md:hidden"><LanguageSwitcher collapsed /></div>
           <div class="hidden md:block"><LanguageSwitcher /></div>
         </div>
 
         <NuxtLink
           to="/tools"
-          class="inline-flex min-h-[44px] items-center whitespace-nowrap rounded-lg bg-brand-500 px-3 text-sm font-semibold text-white no-underline transition-colors duration-200 hover:bg-brand-600 sm:px-4"
+          class="inline-flex min-h-[44px] items-center whitespace-nowrap rounded-md bg-brand-600 px-3 text-sm font-medium text-white no-underline transition-colors hover:bg-brand-700 sm:px-4"
         >{{ $t("landing.nav.cta") }}</NuxtLink>
       </nav>
     </div>
@@ -44,6 +44,11 @@ const anchors = computed(() => [
 </script>
 
 <style scoped>
+/* 语言切换器是为深色面板写的，这里给它同一块墨底，而不是品牌蓝色块 */
+.lang-pill {
+  background: var(--color-hero-field);
+}
+
 /* LanguageSwitcher 自带 28px 按钮（为深色侧栏设计）。共享组件不动，
    在这里提到 44px：选择器比子组件的 scoped 规则多一级，稳定胜出。 */
 .lang-pill :deep(.lang-switcher .lang-btn) {

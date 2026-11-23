@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+  <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
     <PageHeader :title="$t('interestCalc.title')" :description="$t('interestCalc.description')" />
     <InterestCalcPanel />
   </div>

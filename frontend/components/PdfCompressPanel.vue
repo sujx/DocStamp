@@ -10,7 +10,7 @@
     </UFormGroup>
     <div class="mt-6 flex gap-3">
       <UButton color="primary" :disabled="!file" :loading="compressing" @click="compress">
-        <UIcon name="i-heroicons-arrows-pointing-in" class="w-4 h-4 mr-1.5" /> {{ compressing ? $t("common.processing") : $t("pdfCompress.compress") }}
+        <UIcon name="i-heroicons-arrows-pointing-in" class="size-4 mr-1.5" /> {{ compressing ? $t("common.processing") : $t("pdfCompress.compress") }}
       </UButton>
     </div>
     <div v-if="stats" class="mt-6 p-4 rounded-lg border bg-brand-soft border-default">

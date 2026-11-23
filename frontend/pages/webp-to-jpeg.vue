@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+  <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
     <PageHeader :title="$t('webpToJpeg.title')" :description="$t('webpToJpeg.description')" />
 
     <div class="card bg-surface border-default">
@@ -13,7 +13,7 @@
 
       <div v-if="file" class="mt-6">
         <UButton color="primary" :loading="converting" @click="convert">
-          <UIcon name="i-heroicons-arrow-down-tray" class="w-4 h-4 mr-1.5" />
+          <UIcon name="i-heroicons-arrow-down-tray" class="size-4 mr-1.5" />
           {{ converting ? $t("common.processing") : $t("webpToJpeg.convert") }}
         </UButton>
       </div>

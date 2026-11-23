@@ -4,7 +4,7 @@
     <UCard>
       <template #header>
         <div>
-          <h2 class="text-lg font-semibold text-text-primary">{{ $t('passwordGen.random.title') }}</h2>
+          <h2 class="text-[15px] font-medium text-primary">{{ $t('passwordGen.random.title') }}</h2>
           <p class="text-sm text-text-secondary mt-1">{{ $t('passwordGen.random.desc') }}</p>
         </div>
       </template>
@@ -13,7 +13,7 @@
       <UFormGroup :label="$t('passwordGen.random.length')" class="mb-5">
         <div class="flex items-center gap-3">
           <URange v-model="randomLength" :min="8" :max="64" class="flex-1" />
-          <span class="min-w-[40px] text-center text-brand-700 font-semibold">{{ randomLength }}</span>
+          <span class="min-w-[40px] text-center font-medium tabular-nums text-brand-700">{{ randomLength }}</span>
         </div>
       </UFormGroup>
 
@@ -44,7 +44,7 @@
       <UFormGroup :label="$t('passwordGen.random.count')" class="mb-5">
         <div class="flex items-center gap-3">
           <URange v-model="randomCount" :min="1" :max="20" class="flex-1" />
-          <span class="min-w-[40px] text-center text-brand-700 font-semibold">{{ randomCount }}</span>
+          <span class="min-w-[40px] text-center font-medium tabular-nums text-brand-700">{{ randomCount }}</span>
         </div>
       </UFormGroup>
 
@@ -80,7 +80,7 @@
     <UCard>
       <template #header>
         <div>
-          <h2 class="text-lg font-semibold text-text-primary">{{ $t('passwordGen.deterministic.title') }}</h2>
+          <h2 class="text-[15px] font-medium text-primary">{{ $t('passwordGen.deterministic.title') }}</h2>
           <p class="text-sm text-text-secondary mt-1">{{ $t('passwordGen.deterministic.desc') }}</p>
         </div>
       </template>
@@ -101,13 +101,13 @@
           />
           <button
             type="button"
-            class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded hover:bg-muted transition-colors duration-150"
+            class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded hover:bg-muted transition-colors"
             :aria-label="$t('passwordGen.deterministic.toggleVisibility')"
             @click="saltVisible = !saltVisible"
           >
             <UIcon
               :name="saltVisible ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
-              class="w-5 h-5 text-text-tertiary"
+              class="size-[18px] text-text-tertiary"
             />
           </button>
         </div>
@@ -117,7 +117,7 @@
       <UFormGroup :label="$t('passwordGen.deterministic.length')" class="mb-5">
         <div class="flex items-center gap-3">
           <URange v-model="detLength" :min="8" :max="128" class="flex-1" />
-          <span class="min-w-[40px] text-center text-brand-700 font-semibold">{{ detLength }}</span>
+          <span class="min-w-[40px] text-center font-medium tabular-nums text-brand-700">{{ detLength }}</span>
         </div>
       </UFormGroup>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+  <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
     <PageHeader :title="$t('pdfMerge.title')" :description="$t('pdfMerge.description')" />
 
     <div class="card bg-surface border-default" >
@@ -20,33 +20,32 @@
         <div class="space-y-1.5">
           <div
             v-for="(f, i) in files" :key="f.name"
-            class="flex items-center gap-2 px-3 py-2 rounded-md text-sm border"
-            :style="{ backgroundColor: 'var(--color-muted)', borderColor: 'var(--color-border-subtle)', color: 'var(--color-text-primary)' }"
+            class="flex items-center gap-2 rounded-md border border-subtle bg-muted px-3 py-2 text-[13px] text-primary"
           >
-            <UIcon name="i-heroicons-bars-3" class="w-4 h-4 shrink-0 cursor-move text-tertiary"  />
+            <UIcon name="i-heroicons-bars-3" class="size-4 shrink-0 cursor-move text-tertiary"  />
             <span class="flex-1 truncate">{{ f.name }}</span>
             <button
               :disabled="i === 0"
-              class="p-1 rounded hover:bg-[var(--color-border-subtle)] disabled:opacity-30"
+              class="p-1 rounded hover:bg-raised disabled:opacity-30"
               :aria-label="$t('pdfMerge.moveUp')"
               @click="moveUp(i)"
             >
-              <UIcon name="i-heroicons-chevron-up" class="w-3.5 h-3.5" />
+              <UIcon name="i-heroicons-chevron-up" class="size-4" />
             </button>
             <button
               :disabled="i === files.length - 1"
-              class="p-1 rounded hover:bg-[var(--color-border-subtle)] disabled:opacity-30"
+              class="p-1 rounded hover:bg-raised disabled:opacity-30"
               :aria-label="$t('pdfMerge.moveDown')"
               @click="moveDown(i)"
             >
-              <UIcon name="i-heroicons-chevron-down" class="w-3.5 h-3.5" />
+              <UIcon name="i-heroicons-chevron-down" class="size-4" />
             </button>
             <button
-              class="p-1 rounded hover:bg-[var(--color-border-subtle)]"
+              class="p-1 rounded hover:bg-raised"
               :aria-label="$t('pdfMerge.removeFile')"
               @click="removeFile(i)"
             >
-              <UIcon name="i-heroicons-x-mark" class="w-3.5 h-3.5 text-tertiary"  />
+              <UIcon name="i-heroicons-x-mark" class="size-4 text-tertiary"  />
             </button>
           </div>
         </div>
@@ -57,7 +56,7 @@
             :disabled="files.length < 2" :loading="merging"
             @click="merge"
           >
-            <UIcon name="i-heroicons-arrows-right-left" class="w-4 h-4 mr-1.5" />
+            <UIcon name="i-heroicons-arrows-right-left" class="size-4 mr-1.5" />
             {{ merging ? $t("common.processing") : $t("pdfMerge.merge") }}
           </UButton>
         </div>

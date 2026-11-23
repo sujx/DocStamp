@@ -14,7 +14,7 @@
   <text x="170" y="120" font-size="30" fill="#1F2A44" font-weight="700"
         font-family="'Noto Serif CJK SC', serif">鹊随金印</text>
 
-  <text x="120" y="270" font-size="76" fill="#C0392B" font-weight="900" letter-spacing="6"
+  <text x="120" y="270" font-size="76" fill="#C0392B" font-weight="700" letter-spacing="2"
         font-family="'Noto Serif CJK SC', serif">公文与文档处理</text>
 
   <rect x="120" y="300" width="960" height="5" rx="3" fill="#C0392B"/>

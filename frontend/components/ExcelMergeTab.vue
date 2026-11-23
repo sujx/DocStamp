@@ -1,11 +1,11 @@
 <template>
   <div class="pt-3">
-    <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("excelMerge.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty text-secondary" >{{ $t("excelMerge.description") }}</p>
+    <h2 class="text-[28px] font-medium leading-tight text-balance text-primary">{{ $t("excelMerge.title") }}</h2>
+    <p class="mb-6 mt-2 max-w-xl text-[15px] text-pretty leading-relaxed text-secondary">{{ $t("excelMerge.description") }}</p>
 
     <label class="block mb-4">
       <UButton color="primary" variant="soft" as="span">
-        <UIcon name="i-heroicons-table-cells" class="w-4 h-4 mr-1" />
+        <UIcon name="i-heroicons-table-cells" class="size-4 mr-1" />
         {{ $t("excelMerge.selectFiles") }}
       </UButton>
       <input type="file" multiple accept=".xlsx,.csv" class="hidden" @change="onFilesSelected" />
@@ -13,14 +13,14 @@
 
     <div v-if="files.length" class="p-3 rounded-md mb-4 bg-surface border border-default">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-semibold text-secondary" >{{ $t("excelMerge.fileCount", { n: files.length }) }}</span>
+        <span class="text-[12px] font-medium text-secondary">{{ $t("excelMerge.fileCount", { n: files.length }) }}</span>
         <UButton size="xs" variant="ghost" color="neutral" @click="files=[]">{{ $t("common.reset") }}</UButton>
       </div>
       <div
         v-for="(f, idx) in files" :key="f.id"
         class="flex items-center gap-2 py-2 border-t border-subtle"
       >
-        <UIcon name="i-heroicons-table-cells" class="w-4 h-4 shrink-0 text-tertiary"  />
+        <UIcon name="i-heroicons-table-cells" class="size-4 shrink-0 text-tertiary"  />
         <span class="flex-1 text-sm truncate text-primary" >{{ f.name }}</span>
         <span v-if="f.rowCount !== null" class="text-xs shrink-0 text-tertiary" >{{ $t("excelMerge.rowsCount", { n: f.rowCount }) }}</span>
         <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-x-mark" :aria-label="$t('a11y.removeFile')" @click="files.splice(idx,1)" />

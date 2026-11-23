@@ -2,7 +2,7 @@
   <UCard>
     <template #header>
       <div>
-        <h2 class="text-lg font-semibold text-primary">{{ t("interestCalc.result.title") }}</h2>
+        <h2 class="text-[15px] font-medium text-primary">{{ t("interestCalc.result.title") }}</h2>
         <p class="text-sm text-secondary mt-1">{{ t("interestCalc.result.subtitle") }}</p>
       </div>
     </template>
@@ -18,7 +18,7 @@
       </div>
       <div class="text-right shrink-0">
         <p class="text-sm text-secondary">{{ t("interestCalc.result.ear") }}</p>
-        <p class="text-xl font-semibold text-primary">{{ formatPercent(result.earPercent) }}</p>
+        <p class="text-[28px] font-medium tabular-nums text-primary">{{ formatPercent(result.earPercent) }}</p>
         <p class="text-xs text-tertiary mt-1">{{ t("interestCalc.result.earHint") }}</p>
       </div>
     </div>
@@ -30,7 +30,7 @@
     <dl class="grid grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5 mt-6">
       <div v-for="tile in tiles" :key="tile.labelKey">
         <dt class="text-xs text-tertiary">{{ t(tile.labelKey) }}</dt>
-        <dd class="text-lg font-semibold text-primary tabular-nums mt-0.5">{{ tile.value }}</dd>
+        <dd class="mt-0.5 text-[20px] font-medium tabular-nums text-primary">{{ tile.value }}</dd>
         <dd v-if="tile.hint" class="text-xs text-tertiary mt-0.5">{{ tile.hint }}</dd>
       </div>
     </dl>
@@ -110,9 +110,9 @@ const tiles = computed(() => [
 }
 
 .rate-figure {
-  font-size: 34px;
+  font-size: 32px;
   line-height: 1.15;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-brand-700);
   font-variant-numeric: tabular-nums;
 }

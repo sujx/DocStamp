@@ -10,7 +10,7 @@
 
     <div class="mt-6 flex gap-3">
       <UButton color="primary" :disabled="!file" :loading="cleaning" @click="clean">
-        <UIcon name="i-heroicons-shield-exclamation" class="w-4 h-4 mr-1.5" />
+        <UIcon name="i-heroicons-shield-exclamation" class="size-4 mr-1.5" />
         {{ cleaning ? $t("common.processing") : $t("metadataClean.clean") }}
       </UButton>
     </div>

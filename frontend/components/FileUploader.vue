@@ -1,9 +1,9 @@
 <template>
   <div
-    class="border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer"
+    class="cursor-pointer rounded-xl border border-dashed p-6 text-center transition-colors"
     :class="isDragover
-      ? 'border-brand-600 bg-brand-soft/60 scale-[1.01]'
-      : 'border-default bg-surface hover:border-brand-300 hover:bg-muted/30'"
+      ? 'border-brand-600 bg-brand-soft'
+      : 'border-default bg-surface hover:border-strong hover:bg-muted'"
     @dragover.prevent="isDragover = true"
     @dragleave.prevent="isDragover = false"
     @drop.prevent="onDrop"
@@ -11,10 +11,10 @@
     <!-- Empty state -->
     <div v-if="!fileName" class="flex flex-col items-center gap-2">
       <div class="icon-badge mb-1">
-        <UIcon :name="icon" class="size-5" />
+        <UIcon :name="icon" class="size-[18px]" />
       </div>
-      <p class="text-sm text-secondary">{{ $t("common.uploadHint") }}</p>
-      <p v-if="hint" class="text-xs text-pretty text-tertiary">{{ hint }}</p>
+      <p class="text-[13px] text-secondary">{{ $t("common.uploadHint") }}</p>
+      <p v-if="hint" class="text-[12px] text-pretty text-tertiary">{{ hint }}</p>
       <label class="cursor-pointer">
         <UButton color="primary" variant="soft" as="span">
           {{ $t("common.upload") }}
@@ -31,12 +31,12 @@
 
     <!-- File selected -->
     <div v-else class="flex items-center gap-3 text-left">
-      <div class="icon-badge !size-10 shrink-0">
-        <UIcon :name="fileIcon" class="size-5" />
+      <div class="icon-badge shrink-0">
+        <UIcon :name="fileIcon" class="size-[18px]" />
       </div>
-      <div class="flex-1 min-w-0">
-        <span class="font-semibold text-sm block truncate text-primary">{{ fileName }}</span>
-        <span v-if="fileSize" class="text-xs text-pretty text-tertiary tabular-nums">{{ formatSize(fileSize) }}</span>
+      <div class="min-w-0 flex-1">
+        <span class="block truncate text-[13px] font-medium text-primary">{{ fileName }}</span>
+        <span v-if="fileSize" class="text-[12px] text-pretty tabular-nums text-tertiary">{{ formatSize(fileSize) }}</span>
       </div>
       <UButton size="xs" variant="ghost" color="neutral" @click="reset">
         {{ $t("common.reset") }}

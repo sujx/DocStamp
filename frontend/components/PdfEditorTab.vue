@@ -1,7 +1,7 @@
 <template>
   <div class="pt-3">
-    <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("pdfEditor.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty text-secondary" >{{ $t("pdfEditor.description") }}</p>
+    <h2 class="text-[28px] font-medium leading-tight text-balance text-primary">{{ $t("pdfEditor.title") }}</h2>
+    <p class="mb-6 mt-2 max-w-xl text-[15px] text-pretty leading-relaxed text-secondary">{{ $t("pdfEditor.description") }}</p>
 
     <!-- Mode selector -->
     <div class="flex gap-4 mb-4">
@@ -27,11 +27,11 @@
         <div class="grid gap-3" style="grid-template-columns: repeat(auto-fill,minmax(100px,1fr));">
           <div
             v-for="p in pageThumbs" :key="p.page_no"
-            class="rounded-md overflow-hidden border-2 cursor-pointer transition-colors duration-150"
-            :class="deleteSet.has(p.page_no) ? 'border-red-500' : 'border-neutral-200'"
+            class="rounded-md overflow-hidden border-2 cursor-pointer transition-colors"
+            :class="deleteSet.has(p.page_no) ? 'border-red-500' : 'border-default'"
             @click="toggleDeletePage(p.page_no)"
           >
-            <img :src="p.thumb" class="w-full object-contain h-[130px] bg-muted" @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
+            <img :src="p.thumb" class="w-full object-contain h-[132px] bg-muted" @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
             <div class="text-xs text-center py-1 bg-surface" >{{ $t("pdfEditor.page") }} {{ p.page_no }}</div>
           </div>
         </div>
@@ -70,13 +70,13 @@
         <div class="grid gap-3" style="grid-template-columns: repeat(auto-fill,minmax(100px,1fr));">
           <div
             v-for="(p, idx) in pageThumbs" :key="p.page_no"
-            class="rounded-md overflow-hidden border cursor-grab bg-white transition-[opacity,transform,border-color] duration-150"
+            class="rounded-md overflow-hidden border cursor-grab bg-surface transition-[opacity,transform,border-color]"
             :class="[{ 'opacity-50 scale-95': dragIdx === idx }, dragOverIdx === idx ? 'border-brand-700' : 'border-default']"
             draggable="true"
             @dragstart="onDragStart(idx)" @dragover.prevent="onDragOver(idx)"
             @drop="onDrop(idx)" @dragend="dragIdx=null"
           >
-            <img :src="p.thumb" class="w-full object-contain h-[130px] bg-muted" @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
+            <img :src="p.thumb" class="w-full object-contain h-[132px] bg-muted" @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
             <div class="flex items-center justify-between px-1 py-0.5 bg-surface" >
               <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-chevron-up" :disabled="idx===0" :aria-label="$t('a11y.moveUp')" @click="movePage(idx,-1)" />
               <span class="text-xs text-pretty text-tertiary" >{{ idx+1 }}</span>

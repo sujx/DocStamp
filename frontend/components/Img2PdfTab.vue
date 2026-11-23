@@ -1,11 +1,11 @@
 <template>
   <div class="pt-3">
-    <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("img2pdf.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty text-secondary" >{{ $t("img2pdf.description") }}</p>
+    <h2 class="text-[28px] font-medium leading-tight text-balance text-primary">{{ $t("img2pdf.title") }}</h2>
+    <p class="mb-6 mt-2 max-w-xl text-[15px] text-pretty leading-relaxed text-secondary">{{ $t("img2pdf.description") }}</p>
 
     <label class="block mb-4">
       <UButton color="primary" variant="soft" as="span">
-        <UIcon name="i-heroicons-photo" class="w-4 h-4 mr-1" />
+        <UIcon name="i-heroicons-photo" class="size-4 mr-1" />
         {{ $t("common.upload") }}
       </UButton>
       <input type="file" multiple accept=".png,.jpg,.jpeg,.tiff,.tif" class="hidden" @change="onFilesSelected" />
@@ -13,13 +13,13 @@
 
     <div v-if="images.length" class="mb-4">
       <p class="text-xs mb-3 text-tertiary" >
-        <UIcon name="i-heroicons-arrows-pointing-out" class="w-3.5 h-3.5 inline mr-1" />
+        <UIcon name="i-heroicons-arrows-pointing-out" class="size-4 mr-1 inline" />
         {{ $t("img2pdf.dragHint") }}
       </p>
       <div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(140px,1fr));">
         <div
           v-for="(img, idx) in images" :key="img.id"
-          class="relative rounded-md overflow-hidden border cursor-grab bg-white transition-transform duration-150"
+          class="relative rounded-md overflow-hidden border cursor-grab bg-surface transition-transform"
           :class="[{ 'opacity-50 scale-95': dragIdx === idx }, dragOverIdx === idx ? 'border-brand-700' : 'border-default']"
           draggable="true"
           @dragstart="onDragStart(idx)"

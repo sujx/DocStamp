@@ -4,7 +4,7 @@
       <!-- 输入 -->
       <UCard class="xl:col-span-1">
         <template #header>
-          <h2 class="text-lg font-semibold text-primary">{{ $t("interestCalc.form.title") }}</h2>
+          <h2 class="text-[15px] font-medium text-primary">{{ $t("interestCalc.form.title") }}</h2>
         </template>
 
         <UFormGroup class="mb-5" :label="$t('interestCalc.form.principal')" :error="fieldError('principal')">

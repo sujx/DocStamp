@@ -23,10 +23,10 @@
     "meetingMinutes": "会议纪要整理"
   },
   "dashboard": {
-    "heroTitle": "文档处理，化繁为简",
-    "heroSubtitle": "16 项功能，覆盖格式转换、PDF 编辑、文档规范化、财务计算等场景",
+    "heroTitle": "工具",
+    "heroSubtitle": "15 项工具，覆盖格式转换、PDF 编辑、文档规范化与财务计算",
     "metaTitle": "工具仪表盘",
-    "metaDescription": "16 项工具的应用内首页。"
+    "metaDescription": "15 项工具的应用内首页。"
   },
   "status": {
     "title": "使用统计",
@@ -36,6 +36,7 @@
     "byModule": "模块调用分布",
     "dailyTrend": "每日调用趋势",
     "modulePie": "模块占比",
+    "otherModules": "其余 {n} 项",
     "days": "最近 {n} 天",
     "noData": "暂无测试数据，点击下方按钮生成示例数据",
     "seedData": "生成测试数据"
@@ -54,6 +55,14 @@
     "langEn": "切换到英文",
     "fileTooLarge": "「{name}」超过 {maxSizeMb} MB 上限",
     "pageError": "页面组件出错，请刷新重试"
+  },
+  "error": {
+    "title": "页面出错了",
+    "notFound": "你访问的页面不存在，请检查链接是否正确。",
+    "forbidden": "你没有权限访问此页面。",
+    "server": "服务器暂时无法处理这个请求，请稍后再试。",
+    "unknown": "遇到了未知错误，请刷新页面重试。",
+    "backHome": "返回首页"
   },
   "properties": {
     "title": "Office 文档属性修改",
@@ -158,7 +167,7 @@
     "convertPlain": "普通转化",
     "convertOfficial": "公文转化",
     "converting": "正在转换...",
-    "success": "转换成功！公文文件已生成",
+    "success": "公文文件已生成",
     "emptyWarning": "请输入 Markdown 内容",
     "fileLoaded": "已加载文件: {name}",
     "fileReadError": "文件读取失败",
@@ -169,7 +178,7 @@
     "emptyHint": "右侧将实时显示公文预览效果",
     "privacy": "上传文件及转换结果将在您下载后立即删除",
     "convertingHint": "正在应用 GB/T 9704-2012 公文格式",
-    "gbtLink": "📄 GB/T 9704-2012 公文格式规范"
+    "gbtLink": "GB/T 9704-2012 公文格式规范"
   },
   "format": {
     "description": "将现有 DOCX 文件格式化为 GB/T 9704-2012 标准公文格式",
@@ -373,15 +382,25 @@
   },
   "landing": {
     "hero": {
-      "no": "鹊随金印 · 文档工具箱 · 免费使用",
+      "doc": {
+        "head": "鹊随金印文件",
+        "no": "鹊随金印〔2026〕12 号",
+        "title": "关于文档处理工具上线的通知",
+        "to": "各部门、各直属机构：",
+        "body1": "公文格式与文档处理工具已上线，支持 Markdown 转公文、PDF 脱敏与格式规范化，免注册、免安装。",
+        "body2": "请结合工作实际选用，使用中遇到的格式问题可随时反馈。",
+        "sign": "鹊随金印办公室",
+        "date": "2026 年 11 月 20 日"
+      },
       "title": "公文与文档处理",
       "sub": "Markdown 转公文 · PDF 脱敏打码 · 格式规范化 · 免注册免安装",
       "lede": "写给被格式折磨的文字工作者：把 Markdown 敲成标准 GB/T 9704 公文，给 PDF 里的手机号、身份证号打上马赛克，并删掉马赛克底下的文字层——不用装软件，不用注册，随用随走。",
       "primary": "打开全部工具",
-      "secondary": "PDF 脱敏打码"
+      "secondary": "PDF 脱敏打码",
+      "imgAlt": "深色桌面上的两张空白公文纸与一枚红色印章"
     },
     "tools": {
-      "kicker": "TOOLS / 工具",
+      "kicker": "工具",
       "title": "十六件顺手的小工具",
       "note": "每一项都只做一件事。点开即用，没有登录墙。",
       "groupOfficial": "公文规范",
@@ -389,11 +408,10 @@
       "groupOffice": "Office 与元数据",
       "groupImage": "图片",
       "groupOther": "其他",
-      "flagSignature": "招牌",
-      "flagTextDeleted": "真删文字"
+            "flagTextDeleted": "真删文字"
     },
     "promise": {
-      "kicker": "PRIVACY / 承诺",
+      "kicker": "隐私",
       "title": "处理完就删，例外写在下面",
       "sub": "下面每一句都能在仓库里逐条验证——我们只写今天做得到的事。",
       "item1Title": "一步完成的，响应结束即删",
@@ -413,7 +431,7 @@
       "note4Body": "删除失败或抛异常时，运维日志会记下临时文件路径与堆栈，路径里可能带着你上传时的文件名；这类日志保留 30 天。统计库不含这些。"
     },
     "resource": {
-      "kicker": "RESOURCES / 资源",
+      "kicker": "资源",
       "title": "先懂标准，再用工具",
       "note": "站内已有的四份参照，不用注册。",
       "standardDesc": "国标原文，字号、行距、成文日期对着查。",
@@ -449,7 +467,7 @@
   },
   "guide": {
     "pdfRedact": {
-      "kicker": "GUIDE · 脱敏",
+      "kicker": "脱敏指南",
       "title": "PDF 涂黑 ≠ 打码",
       "metaTitle": "PDF 涂黑 ≠ 打码：为什么黑框不是脱敏",
       "metaDescription": "黑框遮不住 PDF 里的文字。本文讲清文字层与图片层的区别、真脱敏的两步做法，以及本工具对扫描件的已知局限。",

@@ -23,25 +23,26 @@
     "meetingMinutes": "Meeting Minutes"
   },
   "dashboard": {
-    "heroTitle": "Document Processing, Simplified",
-    "heroSubtitle": "16 features for format conversion, PDF editing, document standardization, loan math and more",
+    "heroTitle": "Tools",
+    "heroSubtitle": "15 tools for format conversion, PDF editing, document standardization and loan math",
     "metaTitle": "Tool dashboard",
-    "metaDescription": "The in-app home for all 16 tools."
+    "metaDescription": "The in-app home for all 15 tools."
   },
   "status": {
-    "title": "Usage Statistics",
+    "title": "Usage statistics",
     "description": "Module call counts and website visitor analytics",
-    "totalCalls": "Total Calls",
-    "visitors": "Unique Visitors",
-    "byModule": "Calls by Module",
-    "dailyTrend": "Daily Trend",
-    "modulePie": "Module Share",
+    "totalCalls": "Total calls",
+    "visitors": "Unique visitors",
+    "byModule": "Calls by module",
+    "dailyTrend": "Daily trend",
+    "modulePie": "Module share",
+    "otherModules": "Other {n} modules",
     "days": "Last {n} days",
     "noData": "No data yet. Click below to generate sample data.",
-    "seedData": "Generate Sample Data"
+    "seedData": "Generate sample data"
   },
   "common": {
-    "upload": "Upload File",
+    "upload": "Upload file",
     "uploadHint": "Click or drag file here",
     "download": "Download",
     "processing": "Processing...",
@@ -54,6 +55,14 @@
     "langEn": "Switch to English",
     "fileTooLarge": "“{name}” exceeds the {maxSizeMb} MB limit",
     "pageError": "Page component failed. Please refresh."
+  },
+  "error": {
+    "title": "Something went wrong",
+    "notFound": "The page you asked for does not exist. Check the link.",
+    "forbidden": "You do not have access to this page.",
+    "server": "The server could not handle this request. Try again later.",
+    "unknown": "An unexpected error occurred. Reload the page to try again.",
+    "backHome": "Back to home"
   },
   "properties": {
     "title": "Office Document Properties",
@@ -158,7 +167,7 @@
     "convertPlain": "Plain Convert",
     "convertOfficial": "Official Convert",
     "converting": "Converting...",
-    "success": "Conversion successful! Document generated",
+    "success": "Document generated",
     "emptyWarning": "Please enter Markdown content",
     "fileLoaded": "File loaded: {name}",
     "fileReadError": "Failed to read file",
@@ -169,13 +178,13 @@
     "emptyHint": "Document preview will appear here in real-time",
     "privacy": "Uploaded files and conversion results are deleted immediately after download",
     "convertingHint": "Applying GB/T 9704-2012 document format",
-    "gbtLink": "📄 GB/T 9704-2012 Document Format Specification"
+    "gbtLink": "GB/T 9704-2012 Document Format Specification"
   },
   "format": {
     "description": "Reformat existing DOCX files to GB/T 9704-2012 official document standards",
     "docxDragText": "Drag DOCX file here, or",
     "docxFormats": "Upload a .docx file to apply GB/T 9704-2012 formatting",
-    "upload": "Upload File",
+    "upload": "Upload file",
     "formatting": "Formatting...",
     "downloadDocx": "Download Formatted Document"
   },
@@ -373,15 +382,25 @@
   },
   "landing": {
     "hero": {
-      "no": "鹊随金印 · Document Toolbox · Free to use",
-      "title": "Document & Official Writing Toolbox",
+      "doc": {
+        "head": "DocStamp Notice",
+        "no": "DocStamp 〔2026〕 No. 12",
+        "title": "Notice on the release of the document toolbox",
+        "to": "To every team:",
+        "body1": "The toolbox is live: Markdown to GB/T 9704, PDF redaction and format cleanup, with no account and no install.",
+        "body2": "Pick the tool you need and report any formatting problem you run into.",
+        "sign": "DocStamp Office",
+        "date": "20 Nov 2026"
+      },
+      "title": "Official documents, formatted",
       "sub": "Markdown to GB/T 9704 · PDF redaction · format cleanup · no account, no install",
       "lede": "For anyone who has lost an afternoon to formatting: turn Markdown into a GB/T 9704-compliant document, and mask phone numbers and ID numbers in a PDF — the text layer underneath is deleted, not merely covered. No install, no account, use it and go.",
       "primary": "Open all tools",
-      "secondary": "PDF redaction"
+      "secondary": "PDF redaction",
+      "imgAlt": "Two blank official documents and a red seal on a dark desk"
     },
     "tools": {
-      "kicker": "TOOLS",
+      "kicker": "Tools",
       "title": "Sixteen small tools, one job each",
       "note": "Click and use it — no login wall, no setup.",
       "groupOfficial": "Official format",
@@ -389,11 +408,10 @@
       "groupOffice": "Office & metadata",
       "groupImage": "Images",
       "groupOther": "More",
-      "flagSignature": "Flagship",
-      "flagTextDeleted": "Text deleted"
+            "flagTextDeleted": "Text deleted"
     },
     "promise": {
-      "kicker": "PRIVACY",
+      "kicker": "Privacy",
       "title": "Deleted after processing — exceptions listed below",
       "sub": "Every line below is checkable in our source — we only claim what is true today.",
       "item1Title": "Single-step tools: gone when the response ends",
@@ -413,7 +431,7 @@
       "note4Body": "When a deletion fails or an exception is thrown, the operational log records the temporary file path and a stack trace; the path may contain the name you uploaded with. Those logs are kept for 30 days. The usage ledger holds none of this."
     },
     "resource": {
-      "kicker": "RESOURCES",
+      "kicker": "Resources",
       "title": "Know the standard, then use the tool",
       "note": "Four references on this site. No sign-up.",
       "standardDesc": "The GB/T 9704 text itself — font sizes, line spacing, dates.",
@@ -449,7 +467,7 @@
   },
   "guide": {
     "pdfRedact": {
-      "kicker": "GUIDE · Redaction",
+      "kicker": "Redaction guide",
       "title": "PDF black boxes are not redaction",
       "metaTitle": "Black boxes are not redaction: how PDF redaction really works",
       "metaDescription": "A black box does not hide the text layer. What real redaction does, and the known limits of this tool on scanned PDFs.",

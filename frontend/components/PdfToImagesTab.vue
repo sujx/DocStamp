@@ -1,7 +1,7 @@
 <template>
   <div class="pt-3">
-    <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("pdf2img.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty text-secondary" >{{ $t("pdf2img.description") }}</p>
+    <h2 class="text-[28px] font-medium leading-tight text-balance text-primary">{{ $t("pdf2img.title") }}</h2>
+    <p class="mb-6 mt-2 max-w-xl text-[15px] text-pretty leading-relaxed text-secondary">{{ $t("pdf2img.description") }}</p>
 
     <FileUploader
       accept=".pdf"
@@ -12,7 +12,7 @@
 
     <div v-if="selectedFile" class="p-4 mt-4 rounded-lg bg-surface" >
       <div v-if="pageCount !== null" class="flex items-center gap-3 mb-4 p-3 rounded-md bg-muted" >
-        <UIcon name="i-heroicons-document" class="w-5 h-5 shrink-0 text-brand-700"  />
+        <UIcon name="i-heroicons-document" class="size-[18px] shrink-0 text-brand-700"  />
         <span class="text-sm font-medium text-primary" >
           {{ $t("pdf2img.totalPages", { n: pageCount }) }}
         </span>

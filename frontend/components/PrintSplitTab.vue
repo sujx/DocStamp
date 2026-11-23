@@ -1,7 +1,7 @@
 <template>
   <div class="pt-3">
-    <h2 class="text-2xl font-bold mb-1 text-balance">{{ $t("printSplit.title") }}</h2>
-    <p class="text-sm mb-5 text-pretty text-secondary" >{{ $t("printSplit.description") }}</p>
+    <h2 class="text-[28px] font-medium leading-tight text-balance text-primary">{{ $t("printSplit.title") }}</h2>
+    <p class="mb-6 mt-2 max-w-xl text-[15px] text-pretty leading-relaxed text-secondary">{{ $t("printSplit.description") }}</p>
 
     <FileUploader
       ref="uploader"
@@ -37,8 +37,8 @@
       <p class="text-sm mb-3 text-secondary" >
         {{ $t("printSplit.downloaded") }}: {{ downloaded }} / {{ task.batch_count }}
         <span v-if="!allDone && !isPaused" class="ml-2">({{ $t("printSplit.nextDownload") }}: {{ countdown }}s)</span>
-        <span v-else-if="isPaused" class="ml-2 font-medium" style="color: #f59e0b;">{{ $t("printSplit.paused") }}</span>
-        <span v-else class="ml-2 font-medium text-brand-700" ><UIcon name="i-heroicons-check-circle" class="w-4 h-4 inline" /> {{ $t("printSplit.allDone") }}</span>
+        <span v-else-if="isPaused" class="ml-2 font-medium text-secondary">{{ $t("printSplit.paused") }}</span>
+        <span v-else class="ml-2 font-medium text-brand-700" ><UIcon name="i-heroicons-check-circle" class="size-4 inline" /> {{ $t("printSplit.allDone") }}</span>
       </p>
       <div class="flex gap-2">
         <UButton v-if="!isPaused && !allDone" color="warning" size="sm" @click="pause">{{ $t("printSplit.pause") }}</UButton>

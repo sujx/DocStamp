@@ -1,16 +1,14 @@
 <template>
-  <section id="tools" class="scroll-mt-20 py-14">
+  <section id="tools" class="scroll-mt-20 py-20">
     <div class="mx-auto max-w-5xl px-4 sm:px-6">
-      <div class="text-brand-600">
-        <LandingSectionKicker :text="$t('landing.tools.kicker')" />
-      </div>
-      <h2 class="font-official mb-2 mt-2 text-[30px] font-extrabold tracking-wide text-primary">
+      <LandingSectionKicker :text="$t('landing.tools.kicker')" />
+      <h2 class="font-official mb-3 mt-3 text-[28px] font-medium leading-tight text-primary">
         {{ $t("landing.tools.title") }}
       </h2>
-      <p class="mb-9 max-w-xl text-secondary">{{ $t("landing.tools.note") }}</p>
+      <p class="mb-8 max-w-xl text-secondary">{{ $t("landing.tools.note") }}</p>
 
-      <div v-for="group in groups" :key="group.label" class="mb-9 last:mb-0">
-        <h3 class="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-tertiary">{{ group.label }}</h3>
+      <div v-for="group in groups" :key="group.label" class="mb-8 last:mb-0">
+        <h3 class="mb-2 text-[13px] text-secondary">{{ group.label }}</h3>
         <div class="stagger-children grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <ToolCard
             v-for="item in group.items"

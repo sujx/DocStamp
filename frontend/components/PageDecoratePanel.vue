@@ -20,7 +20,7 @@
     </template>
     <div class="mt-6 flex gap-3">
       <UButton color="primary" :disabled="!file || !textTemplate" :loading="decorating" @click="decorate">
-        <UIcon name="i-heroicons-document-check" class="w-4 h-4 mr-1.5" /> {{ decorating ? $t("common.processing") : $t("pageDecorate.decorate") }}
+        <UIcon name="i-heroicons-document-check" class="size-4 mr-1.5" /> {{ decorating ? $t("common.processing") : $t("pageDecorate.decorate") }}
       </UButton>
     </div>
   </div>

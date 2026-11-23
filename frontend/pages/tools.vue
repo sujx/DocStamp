@@ -1,18 +1,9 @@
 <template>
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-    <!-- Hero -->
-    <div class="relative overflow-hidden rounded-xl border border-brand-200/60 bg-gradient-to-br from-brand-50 via-white to-brand-50/30 shadow-sm mb-8 px-5 py-5 animate-fade-up">
-      <div class="relative z-10 flex items-start gap-4">
-        <div class="icon-badge shrink-0 !size-12">
-          <UIcon name="i-heroicons-sparkles" class="size-6" />
-        </div>
-        <div>
-          <h1 class="text-xl font-bold gradient-text mb-1">{{ t("dashboard.heroTitle") }}</h1>
-          <p class="text-sm text-secondary leading-relaxed">{{ t("dashboard.heroSubtitle") }}</p>
-        </div>
-      </div>
-      <div class="absolute -right-8 -top-8 size-32 rounded-full bg-brand-100/40 blur-2xl" />
-      <div class="absolute -right-4 -bottom-10 size-24 rounded-full bg-brand-200/20 blur-xl" />
+  <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
+    <!-- Page title -->
+    <div class="mb-8 animate-fade-up">
+      <h1 class="text-[28px] font-medium leading-tight text-primary">{{ t("dashboard.heroTitle") }}</h1>
+      <p class="mt-2 max-w-xl text-[15px] leading-relaxed text-secondary">{{ t("dashboard.heroSubtitle") }}</p>
     </div>
 
     <!-- Tool grid -->

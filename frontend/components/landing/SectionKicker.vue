@@ -1,5 +1,5 @@
 <template>
-  <p class="text-[13px] font-semibold uppercase tracking-[0.18em] text-inherit">{{ text }}</p>
+  <p class="kicker">{{ text }}</p>
 </template>
 
 <script setup lang="ts">

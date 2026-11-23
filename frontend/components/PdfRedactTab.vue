@@ -20,12 +20,12 @@
         v-for="n in pageCount"
         :key="n"
         type="button"
-        class="shrink-0 overflow-hidden rounded border-2 transition-colors duration-150"
+        class="shrink-0 overflow-hidden rounded border-2 transition-colors"
         :class="n === current ? 'border-brand-700' : 'border-default'"
         :aria-label="$t('pdfRedact.pageOf', { page: n, total: pageCount })"
         @click="current = n"
       >
-        <img :src="thumbUrl(n)" class="block h-20 w-auto bg-white" loading="lazy" alt="" />
+        <img :src="thumbUrl(n)" class="block h-20 w-auto bg-surface" loading="lazy" alt="" />
       </button>
     </aside>
 
@@ -124,20 +124,20 @@
   </div>
 
   <div v-if="report" class="card bg-surface border-default" :class="session ? 'mt-4' : ''">
-    <h2 class="text-base font-semibold text-primary">{{ $t("pdfRedact.reportTitle") }}</h2>
+    <h2 class="text-[15px] font-medium text-primary">{{ $t("pdfRedact.reportTitle") }}</h2>
 
     <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
       <div>
         <dt class="text-xs text-tertiary">{{ $t("pdfRedact.reportMarks") }}</dt>
-        <dd class="text-lg font-semibold tabular-nums text-primary">{{ report.total_marks }}</dd>
+        <dd class="text-[20px] font-medium tabular-nums text-primary">{{ report.total_marks }}</dd>
       </div>
       <div>
         <dt class="text-xs text-tertiary">{{ $t("pdfRedact.reportApplied") }}</dt>
-        <dd class="text-lg font-semibold tabular-nums text-primary">{{ report.applied }}</dd>
+        <dd class="text-[20px] font-medium tabular-nums text-primary">{{ report.applied }}</dd>
       </div>
       <div>
         <dt class="text-xs text-tertiary">{{ $t("pdfRedact.reportImageMarks") }}</dt>
-        <dd class="text-lg font-semibold tabular-nums text-primary">{{ report.image_marks }}</dd>
+        <dd class="text-[20px] font-medium tabular-nums text-primary">{{ report.image_marks }}</dd>
       </div>
     </dl>
 

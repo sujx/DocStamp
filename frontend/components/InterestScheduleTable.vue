@@ -2,7 +2,7 @@
   <UCard>
     <template #header>
       <div>
-        <h2 class="text-lg font-semibold text-primary">{{ t("interestCalc.table.title") }}</h2>
+        <h2 class="text-[15px] font-medium text-primary">{{ t("interestCalc.table.title") }}</h2>
         <p class="text-sm text-secondary mt-1">
           {{ t("interestCalc.table.subtitle", { n: rows.length }) }}
         </p>

@@ -75,7 +75,7 @@
       <p v-if="error" class="text-sm text-red-600" role="alert">{{ error }}</p>
 
       <UButton color="primary" size="lg" :loading="generating" :disabled="!canGenerate" @click="generate">
-        <UIcon name="i-heroicons-document-arrow-down" class="w-4 h-4 mr-1.5" />
+        <UIcon name="i-heroicons-document-arrow-down" class="size-4 mr-1.5" />
         {{ generating ? $t("common.processing") : $t("meetingMinutes.generate") }}
       </UButton>
 

@@ -11,7 +11,7 @@
         @keyup.enter="doDetect"
       />
       <UButton color="primary" size="lg" :loading="detecting" @click="doDetect">
-        <UIcon name="i-heroicons-magnifying-glass" class="w-4 h-4 mr-1.5" />
+        <UIcon name="i-heroicons-magnifying-glass" class="size-4 mr-1.5" />
         {{ detecting ? $t("rssDetect.detecting") : $t("rssDetect.detect") }}
       </UButton>
     </div>
@@ -36,19 +36,19 @@
       >
         <UIcon
           :name="feed.type === 'atom' ? 'i-heroicons-globe-alt' : 'i-heroicons-signal'"
-          class="w-5 h-5 text-brand-700 shrink-0"
+          class="size-[18px] text-brand-700 shrink-0"
         />
         <div class="flex-1 min-w-0">
           <p class="text-sm font-medium truncate text-primary">{{ feed.title || feed.url }}</p>
           <p class="text-xs text-tertiary truncate">{{ feed.url }}</p>
         </div>
-        <div class="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        <div class="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
           <UButton size="xs" variant="ghost" color="neutral" @click="copyUrl(feed.url)">
-            <UIcon name="i-heroicons-clipboard" class="w-3.5 h-3.5" />
+            <UIcon name="i-heroicons-clipboard" class="size-4" />
             {{ $t("rssDetect.copy") }}
           </UButton>
           <UButton size="xs" variant="ghost" color="neutral" @click="openUrl(feed.url)">
-            <UIcon name="i-heroicons-arrow-top-right-on-square" class="w-3.5 h-3.5" />
+            <UIcon name="i-heroicons-arrow-top-right-on-square" class="size-4" />
             {{ $t("rssDetect.open") }}
           </UButton>
         </div>

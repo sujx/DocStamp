@@ -51,8 +51,7 @@ export const LANDING_GROUPS: { labelKey: string; keys: string[] }[] = [
   { labelKey: "landing.tools.groupOther", keys: ["rss-detect", "password-gen", "interest-calc", "status"] },
 ];
 
-/** 卡片徽章。键名与文案都必须是今天能为真的说法（见 Task 5 Step 3 的 R32）。 */
+/** 卡片上的一句补充。键名与文案都必须是今天能为真的说法（见 Task 5 Step 3 的 R32）。 */
 export const LANDING_FLAGS: Record<string, string> = {
-  md2docx: "landing.tools.flagSignature",
   "pdf-redact": "landing.tools.flagTextDeleted",
 };

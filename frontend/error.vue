@@ -1,29 +1,29 @@
 <template>
-  <div class="min-h-dvh flex items-center justify-center bg-page px-4">
-    <div class="text-center space-y-6 max-w-sm animate-fade-up">
-      <div class="icon-badge !size-20 mx-auto">
+  <div class="flex min-h-dvh items-center justify-center bg-page px-4">
+    <div class="max-w-sm space-y-6 text-center animate-fade-up">
+      <div class="icon-badge mx-auto border border-default">
         <UIcon
           :name="error?.statusCode === 404 ? 'i-heroicons-question-mark-circle' : 'i-heroicons-exclamation-triangle'"
-          class="size-10"
+          class="size-[18px]"
         />
       </div>
       <div>
-        <div class="text-5xl font-bold gradient-text mb-2">
+        <p class="text-[44px] font-medium leading-none tabular-nums text-primary">
           {{ error?.statusCode || 500 }}
-        </div>
-        <h1 class="text-lg font-semibold text-primary">
-          {{ error?.statusMessage || "页面出错了" }}
+        </p>
+        <h1 class="mt-3 text-[17px] font-medium leading-snug text-primary">
+          {{ error?.statusMessage || $t("error.title") }}
         </h1>
       </div>
-      <p class="text-sm text-secondary leading-relaxed">
+      <p class="text-[13px] leading-relaxed text-secondary">
         {{ errorMessage }}
       </p>
       <button
-        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg gradient-brand text-white text-sm font-medium shadow-card hover:shadow-elevated transition-all duration-200 cursor-pointer"
+        class="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-md bg-brand-600 px-5 text-[13px] font-medium text-white transition-colors hover:bg-brand-700"
         @click="handleError"
       >
         <UIcon name="i-heroicons-home" class="size-4" />
-        返回首页
+        {{ $t("error.backHome") }}
       </button>
     </div>
   </div>
@@ -36,12 +36,14 @@ const props = defineProps<{
   error: NuxtError;
 }>();
 
+const { t } = useI18n();
+
 const errorMessage = computed(() => {
   const code = props.error?.statusCode;
-  if (code === 404) return "你访问的页面不存在，请检查链接是否正确。";
-  if (code === 403) return "你没有权限访问此页面。";
-  if (code && code >= 500) return "服务器开小差了，请稍后再试。";
-  return "遇到了未知错误，请刷新页面重试。";
+  if (code === 404) return t("error.notFound");
+  if (code === 403) return t("error.forbidden");
+  if (code && code >= 500) return t("error.server");
+  return t("error.unknown");
 });
 
 function handleError() {

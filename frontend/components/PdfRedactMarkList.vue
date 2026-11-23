@@ -43,7 +43,7 @@
 
     <div class="card bg-surface border-default">
       <div class="flex items-center justify-between gap-2">
-        <span class="text-sm font-semibold text-primary">
+        <span class="text-[13px] font-medium text-primary">
           {{ $t("pdfRedact.marksTitle") }} · {{ marks.length }}
         </span>
         <div class="flex gap-1">

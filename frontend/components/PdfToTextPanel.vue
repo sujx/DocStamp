@@ -6,14 +6,14 @@
     </UFormGroup>
     <div class="mt-6 flex gap-3">
       <UButton color="primary" :disabled="!file" :loading="extracting" @click="extract">
-        <UIcon name="i-heroicons-document-text" class="w-4 h-4 mr-1.5" />
+        <UIcon name="i-heroicons-document-text" class="size-4 mr-1.5" />
         {{ extracting ? $t("common.processing") : $t("pdfToText.extract") }}
       </UButton>
       <UButton v-if="result" variant="outline" color="neutral" @click="downloadText">
-        <UIcon name="i-heroicons-arrow-down-tray" class="w-4 h-4 mr-1.5" /> {{ $t("common.download") }}
+        <UIcon name="i-heroicons-arrow-down-tray" class="size-4 mr-1.5" /> {{ $t("common.download") }}
       </UButton>
       <UButton v-if="result" variant="ghost" color="neutral" @click="copyText">
-        <UIcon name="i-heroicons-clipboard" class="w-4 h-4 mr-1.5" /> {{ $t("pdfToText.copy") }}
+        <UIcon name="i-heroicons-clipboard" class="size-4 mr-1.5" /> {{ $t("pdfToText.copy") }}
       </UButton>
     </div>
     <div v-if="result" class="mt-6">
